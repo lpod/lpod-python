@@ -2,7 +2,6 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from itools
-from itools.pkg import get_version
+from itools.pkg import setup
 
-
-__version__ = get_version()
+setup()
