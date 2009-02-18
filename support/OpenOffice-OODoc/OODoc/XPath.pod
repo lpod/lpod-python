@@ -1,0 +1,2043 @@
+=head1	NAME
+
+OpenOffice::OODoc::XPath - Low-level navigation in the documents
+
+=head1	DESCRIPTION
+
+This module is a low-level class which uses OODoc::File (without
+inheriting anything from it) along with the classes defined in the
+XML::Twig module. It's a common basis for the other, more user-
+friendly, document-oriented modules. It uses XPath expressions in
+order to retrieve any document element (but it doesn't provide a
+full implementation of the XPath standard). In addition, while the
+most part of the provided methods are OpenDocument-aware, this module
+could be used against any other kind of XML documents, simply because
+it benefits from all the features of XML::Twig. Such a possibility
+may prove useful for applications that simultaneously process OpenDocument
+and non-OpenDocument XML files.
+
+The OpenOffice::OODoc::XPath class should not be explicitly used in the
+applications, because all its features are available in more user-friendly
+classes such as OODoc::Text, OODoc::Styles, OODoc::Image, OODoc::Document
+and OODoc::Meta. The present manual page is provided to describe the
+common methods and properties that are available with all these classes.
+
+This chapter can be skipped by programmers who are only interested
+in upper level methods provided by the OODoc::Text, ::Styles, ::Image and
+::Meta modules. Understanding these modules is easier and using them
+requires less Perl and XML expertise. However, calling OODoc::XPath methods
+remains a good rescue option as it allows all kinds of operations on all types
+of XML elements contained in any OpenDocument-compliant file.
+
+OODoc::XPath is the common foundation of OODoc::Meta, OODoc::Text,
+OODoc::Styles and OODoc::Image. It contains the lowest layer of
+navigation services for XML documents and handles the link with
+OODoc::File for file access. Its primary role is as an interface
+with the XML::Twig API.
+
+In the present manual chapter, you will see "elements" often mentioned.
+When it says that a module expects a parameter or returns an element
+(either singly or as a list), it is referring to an XML element.
+It is important to distinguish elements from their content
+(elements being simply references to XML data structures). To read
+or modify the content of an element such as its text or XML
+attributes, use the accessors also available within OODoc::XPath.
+
+In most cases where XPath methods require a reference to an element
+as an argument, there are two ways of proceeding:
+
+- reference the element directly (obtained previously)
+
+- or give an XPath expression and a position, being a string and an
+integer respectively; for example, the pair ('//office:body/text:p', 12)
+or ('//text:p', 12) represents the thirteenth occurrence of the 'text:p'
+element, i.e. the 13th paragraph (occurrences are numbered starting from 0).
+
+The second way requires the knowledge of an appropriate XPath
+expression (according the OpenDocument XML format specification).
+And a given XPath expression is not necessarily the same with an
+OpenDocument as in an OpenOffice.org document. So you should
+preferently use high level accessors (provided by derivative classes
+such as OODoc::Document) and avoid XPath hardcoding. However, you
+know you can at any time reach any element with XPath.
+
+Of course, you will never need to use XPath expressions in order to
+reach the most common text elements (such as paragraphs), because the
+OODoc::Text module provides more friendly accessors (for example, you
+will probably use the getParagraph() method and forget "//text:p").
+
+Some methods accept both forms which means that if the first
+parameter is recognised as an element reference, the position does
+not need to be given. Therefore the number of arguments for certain
+OODoc::XPath methods can vary.
+
+For those who really want to access all areas there are also
+OODoc::XPath methods which allow unrestricted access to every
+element or XML attribute via an access path in XPath syntax. If you
+are into this kind of thing, we recommend you obtain good syntax
+reference manuals for XPath and OpenDocument and a supply of
+aspirin.
+
+Methods which may return several lines of text (e.g. getTextList) do
+so either in the form of an unique character string containing "\n"
+separators or in table form.
+
+Unless otherwise stated, the word 'document' in this chapter only
+refers to XML documents contained within OODoc::XPath objects and
+not, say, OpenDocument files (as an end user would use).
+
+Amongst the different methods which return elements, attributes or
+text, some are called getXxx, others selectXxx or findXxx. Read
+methods whose names start with "get" generally refer to an
+unfiltered object or list, whereas others return an object or list
+filtered according to a parameter value. In this latter case the
+search parameter is treated as a standard expression and not an
+exact value. This means that if the search criteria is "xyz", all
+text containing "xyz" will be considered a match. To restrict the
+search to text exactly equal to "xyz", use "^xyz$" as the search
+criteria (following Perl regular expression syntax).
+
+Several methods allow you to place copies of or references to
+elements (from other documents or from other positions in the same
+document) in any position in the current document. This offers
+powerful manoeuvrability but only if these placements conform with
+the destination position's context.
+
+For example, you can easily copy a paragraph from one document
+to another but only if you knowingly modify the paragraph's style
+attribute if that style is not already defined in the destination
+document. You can also copy the style but only if you are sure that
+this style is not already defined by another unknown style in the
+destination document (and so on).
+
+For advanced users familiar with the XML::Twig API, it might be
+interesting to know that all the objects called "elements" in the
+following chapters are objects of the OpenOffice::OODoc::Element
+class, which is an XML::Twig::Elt derivative. So all methods associated
+with this class are directly applicable to these elements, on top of the
+functionality described in this manual. However, the knowledge of XML::Twig
+is not mandatory.
+
+Important note: The applications should not explicitly work with this
+class. We recommend using OODoc::Meta and OODoc::Document (which are both
+OODoc::XPath derivatives). These two objects provide highest-level methods
+which are neater and more productive. Explicit use of OODoc::XPath methods
+(which sometimes require large numbers of parameters) should only be
+considered as a last resort in unexpected circumstances for access to any
+element or XML attribute not handled by more friendly methods. However,
+the present manual chapter could prove helpful because all the common
+features of OODoc::Meta and OODoc::Document are described here.
+
+=head2	Methods
+
+=head3	Constructor : OpenOffice::OODoc::XPath->new(<parameters>);
+
+        Short Form: odfXPath(<parameters>)
+
+	Returns a new OpenDocument connector, i.e. an interface which
+	can be used for subsequent operations on a well-formed document.
+	
+	This constructor should not be called directly; it's implicitly
+	triggered each time a Meta or Document object is created. So the
+	following description apply to odfMeta() and odfDocument().
+
+	The document is loaded and parsed according to various options.
+	The most used option is 'file'; it simply allows the application
+	to process an OpenDocument file selected by its path/name in the
+	file system.
+	
+	Example:
+
+		my $doc = odfXPath
+				(
+				file	=> "myfile.ods",
+				part	=> "content"
+				);
+		# ... lot of processing ...
+		$doc->save;
+
+        Returns a new document connector. In the example above, the object
+	is loaded from a regular OpenDocument file, that is the most current
+	option, but there are other possibilities. It's possible to use
+	flat XML (available as a string in memory, or loaded from a file).
+	In addition, this constructor is able to create a new document
+	from scratch.
+
+        Parameters are named (hash key => value). The constructor must get
+        at least one parameter giving a means of obtaining the XML document
+        that it will represent. Several options are available; each one is
+	represented through the following examples:
+
+	    # option 1 (using an existing flat XML document)
+            my $doc = odfXPath(xml => $xml_string);
+
+	    # option 2 (using a previously created ODF file interface)
+	    my $oofile = odfContainer('source.odt');
+            my $doc = odfXPath(container => $oofile, part => 'meta');
+
+	    # option 3 (using a regular ODF file directly)
+            my $doc = odfXPath(file => 'source.odt', part => 'content');
+	
+	    # option 4 (multiple instances against a single file)
+	    my $content = odfXPath(file => 'source.odt', part => 'content');
+	    my $meta = odfXPath(file => $content, part => 'meta');
+	    my $styles = odfXPath(file => $content, part => 'styles');
+
+	Remember "odfXPath()" represents "OpenOffice::OODoc::XPath->new()" 
+	in the instructions above, and you can (and should) use this shortcut
+	provided that you have loaded the main OpenOffice::OODoc module, and
+	not only and explicitly the OpenOffice::OODoc::XPath module.
+
+        The first form uses an XML string directly (previously loaded or
+        created by the program). To be used for very specific applications
+	working with flat XML documents exports and not with standard
+	OOo/OpenDocument files.
+
+        The second method links OODoc::XPath to an existing OODoc::File
+        object (through the "container" option) and indicates which XML part it
+	is to extract (metadata, content, styles, etc). The OODoc::File is an
+	abstraction of an already open ODF container. It can be shared, i.e.
+	several OODoc::XPath objects can be instantiated with the same
+	OODoc::File object, and this possibility must be used when
+	several OODoc::XPath objects have to bring consistent changes in
+	a single file (see option 4 below). In order to create the
+	required OODoc::File object, simply use odfFile() with a filename
+	as argument (for advanced use, see OpenOffice::OODoc::File).
+
+	The third method is the easiest, because the user just provide
+	a filename and a member, and all the file interface is run silently
+	(i.e. an invisible OODoc::File object is automatically created and
+	used to get the content). It's probably the most used approach; its
+	recommended when the user doesn't need to get more than one member
+	in the same file.
+
+	The 'part' option is a selector that tells what component is needed
+	(content, styles, metadata, ...) knowing that an OODoc::XPath object
+	can handle only one component. Its default value is 'content'.
+
+	Note that the 'part' option replaces the deprecated 'member' option.
+	However, for compatibility reasons, 'member' is supported yet (if
+	both 'member' and 'part' are erroneously provided, 'member' prevails).
+	
+	If the application needs to process, say, the content and the styles
+	in the same session, it must create two, or more, OODoc::XPath objects
+	possibly associated with the same file interface. The appropriate way
+	is shown in our last example above. The first instance is associated
+	with a filename. Then the other instances are created with the first
+	one, provided as the value of the 'file' option instead of a filename.
+	The constructor tries to be user-friendly: if the 'file' value is
+	a character string, it's regarded as a filename, but if this value,
+	is an existing OpenOffice::OODoc::XPath object, the new object is
+	automatically connected to the same file interface as the other one.
+	The file interface is transparently provided by a common shared
+	OpenOffice::OODoc::File object (you can safely ignore the features
+	of this object, but a corresponding manual chapter is available for
+	more details).
+	
+	Be careful: creating more than one OpenOffice::OODoc::XPath objects
+	linked by their 'file' parameters to the same explicit filename (and
+	not linked with each other) produces useless extra I/O operations and
+	possible conflicts.
+ 
+	Caution: being associated with a common interface via OODoc::File,
+	none of these OODoc::XPath objects should be deleted before the final
+	save() call for this archive. So by calling a save, the File object
+	"calls up" all the XPath objects which were "connected" to it in order
+	to "ask" each of them for the changes which were made to the XML
+        (content, styles, meta, etc.). The results are unpredictable if any
+        of them is absent when called.
+
+	If the provided filename has a ".xml" or ".XML" suffix, or whatever
+	the name if the 'flat_xml' option is set to 1, the file is processed
+	as flat XML and not as a regular OOo file. No OODoc::File object is
+	created, and the result of a subsequent call of the save() method
+	produces a flat XML export (and not a regular OOo/OpenDocument file).
+
+        You can pass the optional parameter 'element' in any case where the
+        constructor is called without the 'xml' parameter. Bearing in mind
+        that an OODoc::XPath object will not necessarily handle an entire
+        XML document, this extra parameter indicates the name of the XML
+        element to be loaded and handled. If the 'element' parameter is not
+        given for an OpenDocument file, a default element will be chosen
+	according to the following table:
+
+            'meta'	=> 'office:document-meta'
+            'content'	=> 'office:document-content'
+            'styles'	=> 'office:document-styles'
+            'settings'	=> 'office:document-settings'
+	    'manifest'	=> 'manifest:manifest'
+
+        Conversely, the 'element' parameter becomes mandatory if the chosen
+        XML element is not listed above. Through OODoc::File, OODoc::XPath
+        can actually access archives which are not necessarily in
+        OpenDocument format and may be, for example, "databases" of
+        presentation and content templates.
+
+	If the application needs to create a new document, and not process
+	an existing one, an additional option must be passed:
+
+		create		=> "<class>"
+
+	where "class" must be one of the following list: "text",
+	"spreadsheet", "presentation" or "drawing", according to the needed
+	content class. And, for very special needs, the user can pass an
+	additional "template_path" to select an ad hoc directory of XML
+	templates instead of the default one. This user-provided directory
+	must have the same kind of structure and content as the "templates"
+	subdirectory of the OpenOffice::OODoc installation.
+
+	An additional 'opendocument' option can be provided and set to 'true'
+	or 'false'. If this option is 'false', the new document is created
+	according to the OpenOffice.org 1.0 format instead of the OASIS
+	OpenDocument format. The default format is OpenDocument. The
+	'opendocument' option works for new documents only and is ignored
+	unless the 'create' option. This module can create and process either
+	OpenOffice.org 1.0 documents or ODF documents but can't directly
+	convert a document from one format to the other one.
+
+	OODoc::XPath can process ODF documents provided through XML flat
+	files as well as in the compressed (zip) format. The given file is
+	automatically processed as flat XML if either it's name ends by ".xml"
+	or the 'flat_xml' option is set to '1'. When processing a flat XML
+	file, OODoc::XPath doesn't load the OODoc::File zip interface. So,
+	a subsequent call of the save() method can only export the document
+	as flat XML.
+
+	An optional 'readable_XML' can be passed. If this option is provided
+	and set to 'on' or 'true', the resulting XML will be smartly indented
+	(and, of course, more space-consuming). This feature is intended for
+	debugging purposes and should not be used in production.
+
+	The 'local_encoding' option can be set with the appropriate value
+	when a particular character set (and not the default one) must be
+	used for a document.
+	
+	A 'read_only' can be provided and set to 'true' in order to prevent
+	the current member from being written back to the physical ODF file
+	when the save() method is called.
+
+        Other optional parameters can also be passed to the constructor (see
+        Properties below).
+
+=head3	appendElement(path, position, name/xml, [options]);
+
+=head3	appendElement(element, name/xml, [options]);
+
+        Adds a new element or existing element to the list of child elements
+        of an existing parent element given first (by [path, position] or by
+        reference).
+
+        The argument after the position argument can be an XML element name.
+
+        Example:
+
+            $content->appendElement
+            	(
+            	'//office:body', 0, 'text:p',
+            	text => "New text"
+            	);
+
+        adds a paragraph containing the phrase "New text" to the end of the
+        document body. (Remember that in the case of an OpenDocument text
+	file (Writer), it would be better to use the appendParagraph method of
+	OpenOffice::OODoc::Text as this requires fewer parameters.
+
+        If the 'text' option is omitted, an empty element is created (in the
+        above example it would be an empty paragraph or line feed).
+
+        You can pass the 'attribute' or 'attributes' option which is a hash
+	whose keys are the XML attribute names and whose values are the XML
+        attribute values. Use of these options depends on the type of
+        document and the type of element and requires knowledge of
+        OpenDocument conventions.
+
+        Example:
+
+            $my_style	=
+            	{
+            	'style:name'	=> 'P1',
+            	'style:family	=> 'paragraph'
+            	};
+
+            $content->appendElement
+            	(
+            	'//office:automatic-styles', 0, 'style:style',
+            	attribute	=> $my_style
+            	);
+
+        creates a new paragraph style called 'P1' in the list of "automatic
+        styles" ("automatic styles" are styles which are not explicitly
+	indicated in the styles list as it appears to the end user).
+
+        This method lets you add any kind of element into a document, even
+        exotic ones. With the most common OpenDocument objects (e.g.
+        paragraphs), though, it is easier to use the specialist methods
+        contained in other modules.
+
+        The 'name' argument can be replaced by an existing element in the
+        same OODoc::XPath object or in another. In which case no element is
+        created but the existing element is simply referenced with a new
+        position even though it remains in its old position. Caution: any
+        modification of an element which is referenced several times in one
+        or more documents is made to all references. If you want to add a
+        similar but separate element, you must use replicateElement which
+        produces a new element from the content of an existing one.
+
+        The 'name' argument can also be replaced by an XML string. This
+        string must correspond to the correct XML description of a UTF-8
+        encoded OpenDocument element. For example, it could be a
+        string which had been previously exported using the exportXMLElement
+        method of OODoc::XPath, or extracted from an OpenDocument file by
+        some other application. If for any reason you absolutely have to
+	use a non-UTF8 XML string which contains 8-bit characters (accented
+	letters, etc.), you can always convert the string using the
+	encode_text method before passing it to appendElement. Of course,
+	the problem will not arise if you are absolutely sure that the string
+	only contains ASCII (7 bit) characters. XML syntax is checked, but it
+	is up to the user to verify that the element import conforms to
+	OpenDocument XML grammar.
+
+        The following piece of code produces the same result as the first
+        example:
+
+            $xml = '<text:p text:style-name="Standard">' .
+            	'New text' .
+            	'</text:p>';
+            $content->appendElement
+            	(
+            	'//office:body', 0, $xml
+            	);
+
+        Using this method, after one or more element creations by direct
+        importation of XML strings, it might be useful to call the
+        reorganize method (but not absolutely necessary).
+	
+=head3	appendLineBreak(element)
+
+	Appends a line break to a text element. This method allows the user
+	to create a single text element (ex: a paragraph) including one or
+	more breaks, instead of separate elements.
+	
+	The example below appends a new text in a new line to the end of
+	an existing paragraph:
+	
+	    my $p = $doc->getElement('//text:p', 5);
+	    $doc->appendLineBreak($p);
+	    $doc->extendText($p, 'A new line in the same paragraph');
+	    
+=head3	appendSpaces(element, length)
+
+	Appends a sequence of multiple spaces to a text element, knowing that
+	a string containing repeated spaces shouldn't be stored as is in a
+	document (see setText() and spaces() for details about repeated
+	spaces).
+	
+=head3	appendTabStop(element)
+
+	Appends a tab stop ("\t") to a text element.
+
+=head3	blankSpaces(length)
+
+	See spaces().
+
+=head3	cloneContent(oodoc_xpath_object)
+
+        Cancels the entire document contents of the current instance and
+        replaces it with a reference to the contents of another OODoc::XPath
+        object.
+
+        Example:
+
+            $doc1	= OpenOffice::OODoc::XPath->new
+            		(
+            		file	=> 'template.ods',
+            		member	=> 'styles'
+            		);
+            $doc2	= OpenOffice::OODoc::XPath->new
+            		(
+            		file	=> 'sheet.ods',
+            		member	=> 'styles'
+            		);
+            $doc2->cloneContent($doc1);
+            $doc2->save;
+
+        This sequence replaces the styles and page layout of 'sheet.ods'
+        with those of 'template.ods'.
+
+        The above example could easily have been written without even using
+        OODoc::XPath by acting directly on the files. For example, extract
+        the 'styles.xml' member from 'template.ods' and insert it into
+        'sheet.ods'. The use of OODoc::XPath and the cloneContent method
+        guarantees that the transferred content corresponds to an
+        OpenDocument document and allows reads/writes to it on the fly.
+
+        Caution: the "cloned" content is not physically copied. Calling this
+        method references one single physical content in two documents. Any
+        modifications made to the content of either of these two documents
+        applies equally to the other and vice-versa.
+
+=head3	contentClass([class name])
+
+	Accessor to get or set the class of the document content. If the
+	current member is a document content, returns its class according
+	to the OpenDocument terminology, i.e. one of the following values:
+	"text", "spreadsheet", "presentation", or "drawing".
+
+	Returns an empty string if the current member is not a document
+	content (if it's, for example, the "meta" or "styles" member).
+
+	This accessor is read-only.
+
+=head3	createSpaces(length)
+
+	See spaces().
+
+=head3	createElement(name, text)
+
+=head3	createElement(xml)
+
+        Creates a new element without attributes which is not inserted in a
+        document.
+
+        Example:
+
+            my $element =
+            	$doc->createElement
+            		('my_element', 'its content');
+
+        creates a new XML element without attributes and returns its
+        reference.
+
+        Instead of a name, the first argument can be the full XML
+        description of the element. Example:
+
+            my $element = $doc->createElement
+            		('<text:p>My text</text:p>');
+
+        This new element is temporary: it is not linked to any document. It
+        is destined to be used later by another method.
+
+        The name can contain a namespace prefix which would look like this:
+        'namespace:name'.
+
+        In its second form, a well-formed XML string can be supplied as a
+        single argument. The recognition criteria is the presence of the "<"
+        character at the beginning of the argument. See appendElement for
+        comments on the direct insertion of XML.
+
+        Explicit calls to createElement should be rare. This method is
+        normally called silently by higher-level methods which are capable
+        of creating an element, inserting it in a document's XML tree and
+        giving it attributes (see appendElement and insertElement).
+
+=head3	createFrame(name => frame_name [, options])
+
+	Creates an empty frame. A frame is an OpenDocument object which
+	controls a rectangular area where a visible content is displayed.
+	Possible contents for a frame are text boxes or images.
+	
+	This method works is not focused on a particular document class
+	(for example, it works on text documents as well as on presentations),
+	but the visible effects of some options are not always exactly the
+	same.
+	
+	Possible options are:
+	
+		'name'		=> unique name
+		
+	The 'name' is an identifier; if provided, it should be unique for
+	the document.
+		
+		'attachment'	=> existing container
+		
+	The value of this option, if provided, must be an existing element
+	which can contain a text box according to the OpenDocument rules.
+	Such an object may be, for example, a draw page if the current
+	document class is 'presentation' or 'drawing', or a paragraph if
+	this class is 'text'.
+	
+		'page'		=> page number or name
+		
+	The effects of the 'page' option depends on the content class of the
+	current document. If this option is used, it indicates that the frame
+	will be anchored to a page, and the given value is a page number.
+	It does not matter if, when createFrame() is called, this number is
+	beyond the end of the document or not. If the content class of the
+	document is "presentation" (Impress) or "drawing" (Draw), then the
+	page option must be either the visible name or the object reference
+	of an existing draw page. Caution: the 'page' option is ignored if
+	'attachment' is provided; in the other hand, either 'page' or
+	'attachment' nust be provided in order to really include the new frame
+	in the document.
+	
+		'position'	=> coordinates
+		
+	The coordinates are provided as a string. They go from left to right
+	and top to bottom. Coordinates should be given here in the form of a
+	string "x,y", and the default unit is centimeter. You can choose
+	any other OpenDocument-supported unit instead by attaching the
+	corresponding usual abbreviation, such as "12.5cm, 35mm" which is the
+	same as "125mm, 3.5cm" or "12.5,3.5", etc. The point ("pt") unit is
+	allowed as well. The default coordinates are "0, 0". By default,
+	the coordinates are relative to the anchor point. So, the coordinates
+	are directly page-related if a valid 'page' option is provided only,
+	but if the box is attached to, say, a paragraph, the origin of the
+	coordinates is the beginning of the paragraph. However, the real
+	interpretation of the coordinates depends on the style. With some
+	style definitions, the coordinates may just be ignored (ex: if the
+	style says "the frame is centered", OpenOffice.org will center the
+	frame whatever its stored coordinates). According to other possible
+	style definitions, the coordinates could be counted from the right
+	and/or from the bottom and not from the left/top.
+	
+		'size'		=> the size of the box
+
+	Provided using as a string using the same syntax and units as the
+	position, the 'size' option is strongly recommended knowing that a
+	sizeless frame couldn't be properly displayed. The width comes
+	first in the string. The height is sometimes ignored, according to
+	the style of the frame: by default, the display height of a text box
+	(which is a particular frame) is automatically adjusted to the
+	content.
+		
+		'style'		=> style name
+		
+	The 'style' option allows the application to set the frame style.
+	Caution, a text style can't be used as a frame style. A frame
+	style controls the box properties only (border, background, shadow,
+	and so on), and not the content properties. Reusing an existing frame
+	style through this option is generally a good idea.
+		
+=head3	currentContext([context])
+
+	Accessor allowing the application to change the context for some
+	search methods (including getElement()).
+	
+	The default context is the root of the document. By setting the
+	current context to a lower level object, the application can restrain
+	the search to the descendants of this object.
+	
+	In the example below, the getElement() method retrieves a paragraph
+	by order number in a previously selected section, and not in the whole
+	document.
+	
+		my $section = $doc->getElement("//text:section", $s_number);
+		$doc->currentContext($section);
+		my $paragraph = $doc->getElement("//text:p", $p_number);
+		
+	Without argument, simply returns the previous current context.
+	
+	See also resetCurrentContext().
+
+=head3	decode_text(utf8_string)
+
+        Caution: this method is a non-exported class method. It must be used
+        like this:
+
+            OpenOffice::OODoc::XPath::decode_text($utf8_string);
+
+        and not from an OODoc::XPath instance.
+
+        Decodes a UTF-8 string and returns an 8 bit character translation
+	of it out of the user's character set, as defined by the following
+	variable:
+
+            $OpenOffice::OODoc::XPath::LOCAL_CHARSET
+
+        for which the default value is 'iso-8859-1'. See the Perl/Encode
+	manual for the list of supported character sets.
+	
+	OpenDocument uses UTF-8 XML encoding.
+
+        Explicit calls to this method should be rare. It is used internally
+        by methods which return text extracted from document content (e.g.
+        getText).
+
+        Warning to contributors: any method which returns text extracted
+        from ODF documents is based on decode_text; so any modification or
+	improvement of the decoding logic should be made there.
+
+=head3	encode_text(editable_string)
+
+        Class method.
+
+        Encodes "local" character strings (for writing to ODF documents).
+
+        Example:
+
+            $string = OpenOffice::OODoc::encode_text($local_string);
+
+        The local character string is defined by the following global
+        variable:
+
+            $OpenOffice::OODoc::XPath::LOCAL_CHARSET
+
+        for which the default value is 'iso-8859-1'.
+
+        Explicit calls to this method should generally be avoided. It is
+        used internally by methods which insert text or attribute values
+        into documents (e.g. setText).
+
+=head3	dispose()
+
+	Deletes the calling document object. Recommended as soon as the
+	object is no longer needed by the application, and sometimes
+	mandatory to avoid memory leaks, especially in long-running processes.
+
+=head3	exportXMLBody()
+
+        Returns the XML string for use by another application representing
+        the body of a document, without UTF8 decoding.
+
+=head3	exportXMLContent()
+
+	See getXMLContent()
+
+=head3	exportXMLElement(path, position)
+
+=head3	exportXMLElement(element)
+
+        Returns the XML string which represents a particular document
+        element (style definition, paragraph, table cell, object, etc.) for
+        use by another application without UTF8 decoding.
+
+        This method is principally designed to allow remote exchanges of
+        elements between programs using any XML storage or transfer method.
+        It acts as "sender" whilst the "receiver" can use appendElement or
+        insertElement (for example) to insert any exported elements into a
+        document. Example:
+
+            # sender programme
+            # ...
+            open (EXPORT, "> transfer.xml");
+            print EXPORT $doc->exportXMLElement('//text:p', 15);
+            close EXPORT;
+
+            # receiver programme
+            # ...
+            open (IMPORT, "< transfer.xml");
+            $doc->appendElement('//office:body', 0, <IMPORT>);
+            close (IMPORT);
+
+        In this example, a paragraph is transferred but it could just as
+        easily be any content, presentation or metadata element.
+
+        Conversely, this method is not needed when transferring an element
+        from one document to another in the same program (or from one
+        document position to another). An element can be copied directly
+        from within the same program by reference or replication without
+        going via its XML (see appendElement(), insertElement() and
+        replicateElement()).
+
+=head3	extendText(path, position, text [, offset])
+
+=head3	extendText(element, text [, offset])
+
+	Appends the given text to the previous content of the given
+	element. If the optional 'offset' element is provided, the
+	new element is inserted at the given position.
+
+	Example:
+
+		$doc->setText($p, "Initial content");
+		$doc->extendText($p, " extended");
+	
+	Assuming $p is a regular text element (ex: a paragraph), its
+	content becomes "Initial content extended".
+	
+	If the second argument is an element itself, it's appended
+	as is to the first element. This feature can be used, for
+	example, in order to append sequences of repeated spaces:
+	
+		$doc->setText($p, "Begin");
+		$spaces = $doc->spaces(6);
+		$doc->extendText($p, $spaces);
+		$doc->extendText($p, "End");
+	
+	After the code sequence above, the $p element contains:
+	
+		"Begin      End"
+	
+	knowing that a single string containing repeated spaces could
+	not be properly processed by extendText(), even if the
+	'multiple_spaces' property is set (this property affects the
+	setText() method only).
+
+	(See also setText()).
+
+=head3	findElementList(element, filter [, replacement])
+
+	Returns all the children of the given element whose content matches
+        the given filter (regexp).
+
+        If the third argument ('replacement') is given, every string which
+        matches the filter in each child element will be replaced by this
+        'replacement' value. This 'replacement' argument can be a character
+        string or a function reference. (See replaceText() method below.)
+
+        Filtering and possible replacement only affects an element's content
+        and not its attributes.
+
+        This method is mostly for internal use. We recommend using other
+        methods for the selective extraction of elements.
+
+=head3	flatten(element)
+
+	Converts in place the content of the given element to a flat string,
+	removing any structure. Same as $element->flatten() (see flatten()
+	in the "Element methods" section below). If no element is provided,
+	"flattens" the current context element, which is, by default, the
+	root of the document (be careful !). 
+	
+=head3	getAttribute(path, position, name)
+
+=head3	getAttribute(element, name)
+
+        Returns the 'name' value of the chosen element (or undef if name is
+        not defined or if the element does not exist).
+
+        Example:
+
+            my $style	=
+             $doc->getAttribute('//text:p', 15, 'text:style-name');
+
+        returns the style for paragraph 15.
+
+=head3	getAttributes(path, position)
+
+=head3	getAttributes(element)
+
+        Returns a list of the element's attributes in the form of a hash
+        whose keys are the attributes' XML names.
+
+=head3	getBody()
+
+	Returns the root of the document body. The document body is the
+	main container of all the displayable content not including page
+	headers, page footers, and page backgrounds.
+
+=head3	getDescendants(tag [, context])
+
+	Returns the list of the descendants of the given context element
+	strictly matching the given tag. Example:
+	
+		my $section = $doc->getSection("SectionName");
+		my @paragraphs = $doc->getDescendants('text:p', $section);
+		
+	Here, @paragraphs is the list of all the paragraphs which are the
+	descendants (at every level) of a given section (the getSection()
+	method is described in the OpenOffice::OODoc::Text chapter).
+	
+	If the second argument is not provided, the current context of the
+	document is used (see currentContext()).
+	
+=head3	getElement(path [, position [, context]])
+
+	This method is provided in order to allow the user to retrieve any
+	element in any kind of XML document (ODF-compliant or not) using an
+	application-provided XPath expression. It should be used with elements
+	whose type is not explicitly supported by the more focused (and more
+	user-friendly) methods, described in other manual chapters (::Text,
+	::Styles, ::Meta, and ::Document).
+
+	It returns an element's reference from an XPath path and a position
+	(or undef if the given xpath does not indicate an existing element).
+	
+	The position argument is used to select a particular element, in the
+	order of the document, knowing that the given xpath expression could
+	select a set of elements. Without it, getElement() returns the first
+	element matching the given xpath.
+	
+	The XPath expression applies in the current context, and not always
+	in the whole document (see currentContext()). However, if the
+	reference of a previously selected element is provided as a third
+	argument, the given element is used as the context.
+
+        Position indicators start at 0 just like in Perl tables (and some
+	other programming languages).
+
+        Example:
+
+            my $p = $doc->getElement('//table:table', 0)
+
+        indicates an element containing the first table of a text document
+        or first sheet of a spreadsheet.
+
+        Positions can also be counted backwards from the end by giving
+        negative values, i.e. position -1 being the last element. Thus:
+
+            my $h = $doc->getElement('//text:h', -2);
+
+        indicates the second-last header of a text document.
+
+	Note: None of the two examples above should be used in a real
+	application, knowing that the ::Text module provides getTable() and
+	getHeading() that do the job without XPath coding.
+	
+        When successful, this method ensures that the returned object is
+        indeed an element and not another type of node (e.g. attribute,
+        text, comment, etc.). Such an object is never a printable text; it's
+	either a text container (whose content may be extracted using
+	getText() or getFlatText()) or a non-text element (such as a style,
+	a font declaration, a variable field, a document properties container,
+	etc).
+	
+=head3	getElementList(path)
+
+        Returns a list of all elements at a specified path.
+
+        Example:
+
+            my @ref_summary = $doc->getElementList('//text:h');
+
+        The above example returns a table containing all header elements of
+        a text document.
+
+        The path can of course be a more complex XPath expression
+        stipulating, for example, a selection of attribute values. In most
+        cases, you should avoid complicating things unnecessarily
+        (especially in Text, Image and Styles modules), as there are methods
+        for searching by element type, attribute and content which are much
+        easier to use and avoid the need to supply XPath expressions.
+
+        Note: the returned list contains elements in the sense of getElement
+        and not a list of element contents.
+
+=head3	getFlatText(path, position)
+
+=head3	getFlatText(element)
+
+	Like getText() below, but without rendering of possible tab stops,
+	line breaks, repeated spaces, or any other markup. The returned text
+	is just a decoded flat string.
+	
+=head3	getFrameElement(name/number)
+
+	Selects the frame identified by the given name, or by the given order
+	number in the document context.
+	
+=head3	getNodeByXPath(xpath_expression)
+
+=head3	getNodeByXPath(xpath_expression, context)
+
+=head3	getNodeByXPath(context, xpath_expression)
+
+        A low-level method which returns the node corresponding to the given
+        XPath expression, if it exists in the document. This method (which
+        gives unrestricted access to the entire content of a document) is
+        designed for use with the unexpected. You will obviously need to be
+        familiar with XPath syntax (not documented here) as well as
+        OpenDocument structure. See also selectNodesByXPath().
+
+=head3	getObjectCoordinates(object)
+
+	Returns the coordinates (X, Y) of the target object, if any. This
+	method makes sense with "positioned" objects, i.e. with frames and
+	frame-like objects (images, text boxes).
+	
+	In an array context, the coordinates are returned as two distinct
+	strings (horizontal, then vertical position). In a scalar context,
+	the values are returned in a single string, and separated by a comma.
+	
+	See createFrameElement() for details about the coordinates and size
+	units and notation.
+	
+=head3	getObjectDescription(object)
+
+	Returns the litteral description of a visible object. This method
+	makes sense for frames or frame-like objects (such as images or
+	text boxes).
+	
+=head3	getObjectSize(object)
+
+	Returns the size of the given object, if any. This method works with
+	frames and other frame-based objects, such as images and text boxes.
+	
+	In the returned data, the width comes first, followed by the height.
+	
+	The size is returned in the same way as the coordinates with
+	getObjectCoordinates().
+	
+=head3	getRoot()
+
+	Returns the absolute root element of the document. The root element
+	contains any other visible or non visible object, including the
+	document body (see getBody) and style definitions.
+	
+=head3	getText(path, position)
+
+=head3	getText(element)
+
+        Returns text in the local character set, possibly UTF-8 decoded,
+        contained in the element given as an argument (by path/position or
+        by reference). See also getFlatText().
+
+        Two equivalent examples:
+
+        # version 1
+
+        my $element	= $doc->getElement('//text:p', 4);
+
+        my $text	= $doc->getText($element);
+
+        # version 2
+
+        my $text	= $doc->getText('//text:p', 4);
+
+        Version 2 is better if the only aim is to get the text from
+        paragraph 4. Version 1 is better, however, if during the course of
+        the program you want to perform other operations on the same
+        paragraph. Giving an element's reference will mean avoiding element
+        handling methods having to recalculate a reference from the XPath
+        path.
+
+=head3	getTextList(path)
+
+        Returns text from all elements in the specified path.
+
+        Example:
+
+            my $summary = $doc->getTextList('//text:h');
+
+            my $report = $doc->getTextList('//text:span');
+
+        The $summary variable contains a concatenation of all headers.
+        $report contains all the words or character strings that "stand out"
+        which the user has designated by their context, e.g. words in
+        italics in a non-italic paragraph.
+
+        In a list context, the returned data is a table, each of whose
+        elements contains the text of an XML element. In a scalar context
+        (as in our two examples), the returned value is a unique piece of
+        editable text and each element's content is separated from that of
+        the following element by a line feed.
+
+=head3	getXMLContent([filehandle])
+
+        Without argument, returns a document's entire XML content.
+
+	Exports the entire XML content of the current member to a flat file,
+	if a file handle is provided.
+
+	Note: the exported data are UTF8-encoded.
+
+	Example:
+
+		open my $fh, ">:utf8", "myfile.xml";
+		$doc->getXMLContent($fh);
+		close $fh;
+	
+	Synonym: exportXMLContent()
+
+=head3	getXPathValue(xpath_expression)
+
+=head3	getXPathValue(context, xpath_expression)
+
+=head3	getXPathValue(xpath_expression, context)
+
+        A low-level method which allows direct access to the value
+        corresponding to the given XPath expression in a document. Character
+        decoding is handled in the same way as with getText.
+
+        Example:
+
+            $expression =	'//office:automatic-styles'	.
+            		'/style:style'			.
+            		'[@style:style-name="P1"]'	.
+            		'/@style:parent-style-name';
+
+            print $doc->getXPathValue($expression);
+
+        This sequence displays the name of the parent style of automatic
+        style "P1" (if it exists within the document). Remember that more
+        simple methods in Text and/or Styles modules would indeed produce
+        the same result.
+
+        The optional element reference "context" can be given as an argument
+        either in first or second place. In this case, the search is limited
+        to the section of the document tree below this given element. The
+        default search area is the entire document.
+
+        Just as with other methods which require XPath paths, this one is
+        primarily for internal use. It should not be used by the majority of
+        applications.
+
+=head3	insertElement(path, position, name/xml [, options])
+
+=head3	insertElement(element, name/xml [, options])
+
+        Inserts a new element before or after the element specified by
+        [path, position] or by reference.
+
+        If the "name" argument is a literal, a new element with the name
+        given is created and then inserted. If the same argument is a
+        reference to an existing element, this element is then simply
+        inserted at the position indicated. This method is useful either for
+        adding new elements or for copying elements from one document to
+        another or from one position to another within the same document.
+
+        The position option allows you to choose the insertion point of the
+	new element. Possible values are "before", "after" and "within" (the
+	default is "before").
+	
+	If "position" is set to "within", the new element is inserted within
+	the text of the target element, so an additional "offset" option (i.e.
+	a numeric position in the string) is required. Caution: this feature
+	is provided for a few special purposes only; inserting text elements
+	within text strings is not the same as inserting text strings within
+	text strings. 
+
+	Other options are:
+
+            text	=> "text of element"
+
+            attribute	=> $attributes
+
+        The "attribute" (or "attributes") option is itself a hash reference
+	containing one or more attributes in the form [name => value] as in
+	appendElement.
+
+        When successful, this method returns the inserted element's
+        reference (else undef).
+
+        Example:
+
+            my $attributes	=
+            	{
+            	'text:style-name'	=> 'Heading 2',
+            	'text:level'		=> '2'
+            	};
+            $doc->insertElement
+            	(
+            	'//text:p', 4, 'text:h',
+            	position	=> 'after',
+            	text		=> 'New section',
+            	attribute	=> $attributes
+            	);
+
+        This sequence (in a text document) inserts a level 2 header
+	'New section' immediately after paragraph 4.
+
+        The $name argument can be replaced by an existing element. In this
+        case a new reference to the existing element is inserted, without
+        creating a whole new element. In this way you can display an element
+        at several locations or in several documents which is held in memory
+        only once. See the appendElement section for the consequences of
+        having multiple references to the same physical element. Better to
+        use replicateElement to insert separate copies of an element.
+
+        In the same conditions as in appendElement, the 'name' argument can
+        be replaced by an XML string which describes the element.
+
+        Note: to add an element to the end of a document, it would obviously
+        be better to use appendElement.
+
+=head3	isOpenDocument()
+
+	Returns 1 (true) if the current document is an OASIS Open Document.
+	To be used every time the application  needs to know the format of
+	the document, knowing that some differences between the two formats
+	can't be completely hidden by the API.
+
+=head3	lineBreak
+
+	Returns a special line break element, available for insertion within
+	an existing text element (knowing that "\n" is not recognized as a
+	line break if stored "as is"). The returned element is free, so it
+	could/should be inserted later within a text element.
+
+=head3	makeXPath(expression)
+
+=head3	makeXPath(context, expression)
+
+        Low-level method allowing the creation or direct modification
+        without restriction (almost) of any document element. It allows
+        "query" expressions in a language similar to XPath. If the given
+        XPath expression crosses several levels of hierarchy, intermediate
+        nodes can be created or modified "on the fly" by creating the
+        necessary path which in turn creates the final node.
+
+        Example:
+
+            $doc->makeXPath
+             (
+             '//office:body/text:p[4 @text:style-name="Text body"]'
+             );
+
+        This "query" applies the "Text body" style to paragraph 4 in the
+        body of the document. (In reality you will probably never use it
+        because the setStyle method of the Text module would do the same
+        thing much more simply.)
+
+        If, as in the above example, a node is accompanied by a position
+        indicator, it cannot be created but must simply act as a mandatory
+        "passage". This method cannot therefore be used to create, for
+        example, an Nth paragraph if there is already an N-1.
+
+        The only restrictions apply to namespaces which are given as
+        prefixes to element and attribute names. They must be defined in the
+        document i.e. conform to OpenDocument specifications. For the rest,
+	this method allows the creation of almost anything anywhere within a
+	document. Its use is reserved for OpenDocument XML specialists.
+
+        In its second form, a context node can be given as the first
+        argument. If present, the path is sought (and if necessary created)
+        starting from its position. By default, the path begins from the
+        root.
+
+        The returned value is the final node's reference (found or created).
+
+        The full "query language" syntax used in this method is not
+        documented here. makeXPath is designed to act more as a base for
+        other OpenOffice::OODoc methods than to be used in applications.
+	
+=head3	moveElements(target_element, element_list)
+
+	Moves a list of existing elements to a new attachment.
+	
+	One more elements are cut from their previous place and appended
+	as children of the target element.
+	
+	This method can be used to move elements from one place to another
+	place in the same document, as well as from one document to another
+	one (caution, the elements are moved, not copied).
+
+=head3	odfLocaltime()
+
+	Class method.
+
+	Converts the numeric time given in argument to an OpenOffice-compliant
+	date (ISO-8601). The argument type is the same as for the standard
+	Perl localtime() function, i.e. a number of seconds since the "epoch".
+	It can be, for example, a value previously returned by a time() call.
+
+	Without argument, returns the current local time in ISO-8601 format.
+
+	The result of this function can be used as is in order to set the
+	value of an ODF-compliant date-time element or attribute.
+
+=head3	odfTimelocal()
+
+	Class method.
+
+	Translates an ODF-formatted date (ISO-8601) into a regular Perl
+	numeric time format, i.e. a number of seconds since the "epoch". So,
+	the returned value can be processed with any Perl date formatting or
+	calculation function.
+
+	Example:
+
+		my $date_created = odfTimelocal($meta->creation_date());
+		$lt = localtime($date_created);
+		$elapsed = time() - $date_created;
+		print "This document has been created $date_created\n";
+		print "$elapsed seconds ago";
+	
+	This sequence prints the creation date of a document in local time
+	string format, then prints the number of seconds between the creation
+	date and now. Note that the creation_date() method used here works
+	with the meta-data document part only (see OpenOffice::OODoc::Meta for
+	details about this method).
+
+	Note: This function requires the Time::Local Perl module.
+
+=head3	odfVersion([new_version])
+
+	See openDocumentVersion()
+
+=head3	ooLocaltime([$time_value])
+
+	Class method.
+
+	See odfLocaltime()
+
+=head3	ooTimelocal($oodate)
+
+	Class method.
+
+	See odfTimelocal()
+
+=head3	openDocumentVersion([new_version])
+
+	Returns the version of the Open Document Format (ODF) in use in the
+	current document. If an argument is provided, it's used to set a
+	new version identifier.
+
+	Beware, this method doesn't really check the conformance of the
+	document to any version of the ODF standard. It just retrieves the
+	value of the version number attribute as it has been set by the
+	application which created or modified the document.
+
+	If openDocumentVersion() is used to set a new version number
+	declaration, the given value is not checked. So, this value could
+	be the number of a real or future ODF version (1.0, 1.1, 1.2, etc),
+	as well as any other arbitrary value (ex: 99, -1, ...).
+
+=head3	raw_import(member, source)
+
+        Physically imports an external file into an OpenDocument archive
+        associated with an XPath object, if it exists i.e. if the object was
+        created using file or archive parameters. This method only transmits
+        the command to the OODoc::File's raw_import method. Caution: it must
+        not be used with an "active" element i.e. an XML member to which the
+        current XPath object or another XPath object is already associated.
+        Remember too that the import is not actually carried out by
+        OODoc::File until a save and the imported data is therefore not
+        immediately available.
+
+=head3	raw_export(member, target)
+
+        Physically exports a member from an OpenDocument archive associated
+	with an XPath object, if it exists i.e. if the object was created
+	using file or archive parameters. This method only transmits the
+	command to the OODoc::File's raw_import method.
+
+=head3	removeAttribute(path, position, attribute)
+
+=head3	removeAttribute(element, attribute)
+
+        Deletes the "attribute" attribute (if found) of the given element by
+        [path, position] or by reference and returns "true". Has no physical
+        effect and returns undef if the attribute has not been defined or if
+        the element does not exist.
+
+=head3	removeElement(path, position)
+
+=head3	removeElement(element)
+
+        Deletes the given element (if found) by [path, position] or by
+        reference and returns "true". Returns undef if the element does not
+        exist.
+
+=head3	replaceElement(path, position, replacement [, options])
+
+=head3	replaceElement(old_element, new_element [, options])
+
+        Deletes the given element by [path, position] or by reference and
+        inserts another element in its place, either from another location
+        in the same document or from another document.
+
+        A new element can be supplied under the same conditions as for
+        insertElement.
+
+        By default or by using the mode => 'copy' option, it is a copy of
+        the new element which is inserted. With the mode => 'reference'
+        option, it is only a reference which is inserted. See the section on
+        appendElement for comments on the subject of multiple references to
+        a single physical element.
+
+=head3	replaceText(path, position, filter, replacement)
+
+=head3	replaceText(element, filter, replacement)
+
+        Replaces all sub-strings which match "filter" with "replacement" in
+        the text of an element (and its descendants) indicated by
+	[path, position] or by reference and returns the modified text. The
+	"filter" string can be an "exact" literal or a regular expression.
+
+        Example:
+
+            $doc->replaceText($p, "C(LIENT|USTOMER)", $contact);
+
+        replaces each occurrence of "CLIENT" and "CUSTOMER" with the content
+        of the $contact variable in the paragraph $p of document $doc.
+
+        The "replacement" argument can be a function reference. In which
+        case, the function is called each time the string is matched, and
+        the value returned by the function is used as the replacement value.
+
+        	sub action	{
+        		my $arg = shift;
+        		my $text = shift;
+        		print "$arg : $text\n";
+        		return "OK";
+        		}
+		$doc->replaceText($p, $expression, \&action, "Found");
+
+        displays "Found: <text>" (where <text> is the text retrieved) each
+        time a string matches $expression and replaces this string with
+        "OK". If $expression contains an "exact" string (not a regexp), then
+	clearly the text displayed will always be the same string. However,
+	if it happens to be a regular expression, it is in effect the text
+        retrieved which will be displayed.
+	
+        Generally speaking, if the replacement value is a function
+        reference, the called function receives the remainder of the
+        arguments which follow it, in this order:
+	
+	1) all the arguments following the function reference in the
+	replaceText() call, in the same order;
+	
+	2) the string that matches the filter argument.
+	
+	See also substituteText(), which should be preferred in most
+	situations.
+
+=head3	replicateElement(original_element, position_object [, options]])
+
+        Makes a copy of the first given element and inserts it into the
+	current document at a position which depends on the second argument
+	and an optional parameter.
+
+	If the second argument is an existing object in the document, then
+	the copy is inserted according to an optional 'position' parameter:
+	
+	- if no 'position' option is provided, then the copy is appended
+	as the last child of the position object;
+	
+	- if 'position' => 'before' or 'after', then the copy is inserted at
+	the same hierarchical level as the position object, according to the
+	same logic as for insertElement().
+		
+	If the second argument is not an object, but simply 'end', then the
+	new element is appended as the very last child of the physical root
+	of the document. See getRoot(). This option should generally be
+	avoided.
+
+        If the second argument is given as 'body', then the new element
+        is appended at the end of the document body (see getBody), as it was
+	created through appendElement().
+
+        Example:
+
+            my $template = $doc_source->selectElementByAttribute
+            		(
+            		'//style::style',
+            		'style:name',
+            		'Text body'
+            		);
+            my $position = $doc_target->getElement
+            		('//office:styles', 0);
+            $doc_target->replicateElement($template, $position);
+
+        This sequence adds a style 'Text body' to the style set of $doc_target
+        which copies exactly the style of the same name in $doc_source.
+	Obviously, the section of code dealing with the search for the element
+	to copy and its position is the most laborious. (In a real application,
+	thanks to OODoc::Styles, a more user-friendly coding would be allowed
+	for style replication.)
+
+        This method creates a new element which is an exact copy of the given
+	element, but which is physically separate from it.
+
+        This method is slower than simply modifying an existing element or
+        inserting an element reference.
+
+	If the user needs only a "free" copy of the element (out of the
+	document structure, to be later attached), the XML::Twig::Elt copy()
+	method should be preferred:
+	
+	    my $new_element = $old_element->copy;
+
+=head3	resetCurrentContext()
+
+	Resets the search context to its default value, which is the root of
+	the document. See currentContext().
+
+=head3	save([filename])
+
+	Saves the content of the current document through a physical
+	output.
+	
+	The behaviour of this method depends on the way the current
+	OpenOffice::OODoc::XPath object has been created.
+	
+	If the document is explicitly linked (through the 'file' option
+	of it's constructor) to a regular OOo or OpenDocument file, the
+	document is saved either in the source file, or (if a filename
+	is provided as an argument) in a new file.
+	
+	If the document is linked to the same file interface as one or
+	more other OpenOffice::OODoc::XPath objects, the behaviour is
+	the same as in the previous case, but all the changes made by
+	all the linked objects are automatically saved in the target
+	file. Example:
+	
+		my $content	= odfXPath
+				(
+				file		=> 'source.odt',
+				part		=> 'content'
+				);
+		my $styles	= odfXPath
+				(
+				container	=> $content,
+				part		=> 'styles'
+				)
+		my $meta	= odfXPath
+				(
+				container	=> $content,
+				part		=> 'meta'
+				);
+		# ... a lot of content processing
+		# ... a lot of style processing
+		# ... a lot of metadata processing
+		$content->save('target.odt');
+	
+	At the end of the sequence above, all the changes made through
+	the $content, $styles and $meta objects are saved in 'target.odt'
+	because these objects share a common file interface. Note that
+	in such a situation, the save() method can be issued from anyone
+	of the objects sharing the file interface (i.e. $content->save
+	could be replaced by $styles->save or $meta->save).
+	
+	However, any XML part (content, styles, meta, ...) whose
+	'read_only' property is set to "true" is not saved. In the example
+	above, if, say, the $meta object is created (through odfXPath())
+	with a "read_only" option set to "true", only $content and $styles
+	are really saved by the last instruction.
+
+	Note: OpenOffice::OODoc::XPath doesn't really know anything about
+	the physical archive file; here save() is only a stub method and
+	the real job is done by the save() method of the associated container,
+	which is an OpenOffice::OODoc::File object.
+			
+	If the document is not associated with a regular OpenDocument
+	compressed file (used through an OODoc::File object), it's saved
+	as "flat XML" to the given file. In such a situation, if the file name
+	is not provided, the source XML file (if any) is used as the target.
+	If the file is "flat XML", OODoc::XPath really effects the physical
+	output, without using any OODoc::File connector.
+
+	Note: if you need to save a document as flat XML while it's associated
+	with an OpenDocument file, you should use exportXMLContent() with an
+	application-provided file handle.
+
+=head3	selectChildElementByName(path, position [, filter])
+
+=head3	selectChildElementByName(element [, filter])
+
+        Returns the first (or only) element whose name matches "filter" from
+        within the child elements of the given element indicated by [path,
+        position] or by reference.
+
+        "filter" is taken to be a regular expression. If several values
+        match the filter, the first of these is returned (in the XML's
+        physical order which is not necessarily the logical order of the
+        document). See the comments about selectElementByAttribute if
+        wanting to select an exact name.
+
+        Returns undef if no elements match the condition.
+
+        Returns the first (or only) child (if there are more than one)
+        without anything else if no filter is given or if the filter uses
+        wildcards (".*").
+
+=head3	selectChildElementsByName(path, position [, filter])
+
+=head3	selectChildElementsByName(element [, filter])
+
+        Like selectChildElementByName, but returns a list of all elements
+        which match the condition.
+
+        Example:
+
+            my @search_words =
+            	$doc->selectChildElementsByName
+            		('//text:p', 4, 'text:span');
+
+        returns a list of elements from paragraph 4 which correspond to text
+        which has particular attributes which distinguish it from the rest
+        of the paragraph (colour, font, etc.)
+
+=head3	selectElements([context,] path, filter)
+
+=head3	selectElements([context,] path, filter, replacement)
+
+=head3	selectElements([context,] path, filter, action [, arg1, ...])
+
+        Returns a list of elements corresponding to a given XPath path and
+        whose text matches the filter (regular expression). The "context"
+        argument, if given, is an element reference which limits the search
+        to its own child elements. The search is carried out in the entire
+        document by default.
+
+        An element is selected if the search string is found in its own text
+        or in the text of any element descended from it. E.g. An image
+        element (draw:image) can be selected from the value of its attached
+        "description" field.
+
+        You can replace all strings matching the search criteria with the
+        'replacement' string, on the fly, if the latter is given as an
+        argument after the filter.
+
+        Lastly, instead of a replacement string, you can pass a subroutine's
+        reference which will run (in call back mode) each time the search
+        string is matched. If this subroutine returns a defined value, this
+        value is used as the replacement string. The subroutine will
+        automatically receive the rest of the arguments, in this order:
+
+	Caution: this method can't retrieve a character string which is
+	split into more than one text element or text span. So, for example,
+	it will never retrieve "My String" as long as "My" and "String" are
+	presented with different styles, even if the two parts of the string
+	belong to the same paragraph.
+	
+        If, as is generally the case, you are working exclusively with text
+        elements (paragraphs, headers, etc.), you would be better to use
+        selectElementsByContent() of the Text module which is easier to use
+        and does not require an XPath expression.
+
+        Here is an example which returns the list of images whose
+        descriptors contain the word "landscape" and displays the name of
+        each selected image:
+
+            sub	printMessage
+        	{
+        	my $doc		= shift;
+        	my $element	= shift;
+        	my $image = $element->parentNode;
+        	print "Name: " . $image->find('@draw:name') . "\n";
+        	}
+            my @list = $doc->selectElements
+            	(
+            	'//draw:image/svg:desc',
+            	'landscape',
+            	\&printMessage,
+            	$doc
+            	);
+
+        Never use this example of code in a real application as it is both
+        purely for demonstration and unnecessarily complex. You can perform
+        the same operation much more simply using the OODoc::Image module.
+
+=head3	selectElementsByAttribute(path, attribute, filter)
+
+        In a list context, returns a list of elements at the given path with
+        the given attribute which contain a value matching the filter's
+        regular expression.
+
+        In a scalar context, returns the first (or only) element which
+        matches the same condition.
+
+        Returns undef if no elements match the condition.
+
+        Example:
+
+            my @paragraph_styles =
+             $doc->selectElementsByAttribute
+            	('style:style', 'style:family', 'paragraph');
+
+        returns the list of elements which describe the paragraph styles of
+        document $doc.
+
+        Caution: the filter is treated as a regular expression and not as a
+        classic string. This means that the above piece of code might not
+        only return the elements whose "style:family" attribute equals
+        "paragraph", but also all those in which the same attribute contains
+        the word "paragraph". You must therefore use the appropriate syntax
+        (in regexp language) if you want to select an exact value, which in
+        this case would be "^paragraph$".
+
+=head3	selectElementByAttribute(path, attribute, value)
+
+        Like selectElementsByAttribute in a scalar context. Returns the
+        first (or only) element at the given path which has the given
+        attribute containing the given value.
+
+        Returns undef if no element matches the condition.
+
+=head3	selectNodesByXPath(xpath_expression)
+
+        This low-level method returns a list of nodes (which are not
+        necessarily elements) which match the give XPath expression. See
+        getNodeByXPath() for options and comments.
+
+=head3	setAttributes(path, position, attributes_table)
+
+=head3	setAttributes(element, attributes_table)
+
+        Modifies or adds one or more attributes to an element.
+
+        The element is indicated by reference or by [path, position].
+
+        The list of attributes is given in the form of a hash name => value.
+
+        Example:
+
+            my $h = $doc->getElement('//text:h', 12);
+            my %attributes =
+            	(
+            	'text:style-name'	=> 'My Header',
+            	'text:level		=> '3'
+            	);
+            $doc->setAttributes($h, %attributes);
+
+        This sequence gives the 'My Header' style and level 3 to the 13th
+        "header" element in the document.
+
+=head3	setFlatText(path, position, text)
+
+=head3	setFlatText(element, text)
+
+	Like setText() described below, but without translation of "\t"
+	and "\n".
+	
+	For exceptional use only. Allows, for example, the use of the OODoc
+	API with non-OpenDocument XML files.
+
+=head3	setObjectCoordinates(object, coordinates)
+
+	Updates or creates the coordinates (X, Y) attributes of a visible
+	object (ex: image, text box, frame). See createFrameElement() for the
+	coordinates units and notation.
+	
+=head3	setObjectDescription(object, description)
+
+	Updates or creates the litteral description of the given object.
+	
+	Should be used for frames, images or text boxes. Caution: the
+	description is not the same as the printable content of a text
+	box.
+	
+=head3	setObjectSize(object, size)
+
+	Updates or creates the width and height attributes of a given object.
+	
+	This method makes sense for visible, rectangular objects only, such
+	as the frames, images or text boxes.
+	
+	See createFrameElement() for details about the size units and
+	notation. 
+		
+=head3	setText(path, position, text)
+
+=head3	setText(element, text)
+
+	Uses the given text as the content of the given element.
+
+	Any previous content (including formatting markup, bookmarks,
+	notes, references, etc) is replaced by the given text.
+	
+	If the given text includes tab stops ("\t") or line breaks ("\n"),
+	they are replaced by the appropriate OpenDocument tags. If this
+	translation must be avoided, use setFlatText() instead.
+	
+	Note: The strings containing repeated whitespaces are not properly
+	processed by default. A sequence of repeated spaces, whatever its
+	length, is replaced by a single space in the target document. So
+
+		$doc->setText($p, "Begin        End");
+	
+	produces the same visible result as
+	
+		$doc->setText($p, "Begin End");
+
+	It's possible to override this default behaviour using the
+	'multiple_spaces' document property. If 'multiple_spaces' is
+	set to 'on', the repeated spaces in the example above are properly
+	recorded. However, this optional feature is a the price of some
+	other features and, above all, it have a negative impact on the
+	performances (due to an additional processing of *every* space).
+	Of course, a temporary activation of the 'multiple_spaces'
+	feature is allowed, like in the following example, which sets
+	a content including multiples whitespaces:
+
+		$doc->{'multiple_spaces'} = 'on';
+		$doc->setText($p, "Begin        End");
+		$doc->{'multiple_spaces'} = undef;
+
+	See spaces() and extendText() for a workaround if you
+	need to insert repeated spaces without using the 'multiple_spaces'
+	property.
+	
+=head3	spaces(length)
+
+	Returns a special element, available for insertion within a text
+	element, representing repeated contiguous blank spaces (knowing
+	that repeated spaces can't be properly displayed by an OpenDocument-
+	compliant application if stored as a flat string). The returned
+	element is free, so it could/should be inserted later within a text
+	element. See extendText() for an example of use.
+
+=head3	splitElement(element, offset)
+
+	Splits a text element at a given offset. This method is a wrapper
+	of the XML::Twig::Elt split_at() method, so, as said by Michel
+	Rodriguez in his documentation, it splits "a text element in 2" at
+	the given offset so "the original element now holds the first part
+	of the string and a new element holds the right part".
+	
+	In addition, the new element is created with the same attributes (ex:
+	the style or the heading level, if any) as the original one. 
+	
+	The method returns both the original and the new elements in a list
+	context. In a scalar context, the new element only is returned.
+	
+	The new element is "free", i.e. it doesn't belong to the document.
+	It's available for later use with any element attachment method,
+	provided by OpenOffice::OODoc (appendElement(), insertElement()) or
+	by XML::Twig (paste()). Example:
+	
+		my $new_elt = $doc->splitElement($para, 12);
+		$doc->insertElement($para, $new_elt, position => 'after');
+	
+	This example splits the given paragraph in two consecutive paragraphs.
+
+	Caution: splitElement() works properly on elements containing "flat
+	text" only. It's a bit complicated to use and probably doesn't
+	produce the right effects on elements containing line breaks, tab
+	stops, "styled spans" or any kind of structure. So, it should be used
+	on flat paragraphs or headings only.
+	
+=head3	substituteText(element, filter, replacement)
+
+	Replaces any substring in a given element and its descendants,
+	matching a given filter (regexp) by a given replacement string.
+	
+	It "replacement" is a string, this method produces the same result as
+	replaceText(), and it should be preferred.
+	
+	If "replacement" is a function reference, the replacement value is the
+	return value of the function. But, unlike replaceText(), any argument
+	after "replacement" is ignored.
+	
+	This method is a wrapper for the subs_text() method provided by the
+	XML::Twig::Elt class. See the XML::Twig documentation for advanced
+	details.
+
+=head3	tabStop
+
+	Returns a special tabulation mark element, available for insertion
+	within an existing text element (knowing that "\t" is not recognized
+	as a tab stop if stored "as is"). The returned element is free, so
+	it could/should be inserted later within a text element.
+	
+=head2	Element methods
+
+	Every document element is an OpenOffice::OODoc::Element object,
+	and OpenOffice::OODoc::Element inherits all the rich features of
+	XML::Twig::Elt, including the very powerful copy(), cut(), paste(),
+	move() and replace() methods (look at the XML::Twig documentation
+	for details). Some additional methods, provided in the ::Element
+	package, are described below.
+	
+	The "element methods" should be regarded as reserved for advanced
+	uses, possibly in combination with native XML::Twig::Elt methods
+	(not documented here, but the XML::Twig package itself is well
+	documented).
+	
+	Remember these methods belong to the element and not to the
+	document...!
+	
+=head3	appendChild(newnode)
+
+	Appends a node as the last child of the calling node.
+	
+	If the argument is an existing node, it's appended as is.
+	If the argument is a string, a new node is created, with the
+	given string as the XML tag name.
+
+=head3	appendTextChild(text)
+
+	Appends a text node (PCDATA) as the last child of the calling
+	element.
+
+=head3	flatten()
+
+	Converts in place the content of the calling element to a flat string,
+	removing any structure. All the children of the calling element are
+	removed and their text content is concatenated. The resulting string
+	becomes the only content of the element. For example, if the calling
+	element is a table, the tabular structure disappears and is replaced
+	by the concatenated contents of all the cells. Any possible internal
+	tab stop or line break element is removed, as well as any "styled"
+	text span (see setSpan() and removeSpan() is the OODoc::Text chapter
+	for information about styled text spans).
+	
+	Be careful, a lot of elements are not displayed by the OpenDocument
+	compliant software. For example, a section element becomes invisible
+	if it directly contains its text, without structure elements such as
+	paragraphs, headings, tables, and so on. In order to make visible the
+	"flattened" content of a previously complex element, the XML tag
+	should be replaced by the tag of a "displayable" element. In the
+	following example, a section is flattened, then tagged as a
+	paragraph, so its content remains visible:
+	
+		my $s = $doc->getSection("AnySection");
+		$s->flatten;
+		$s->set_tag('text:p');
+		
+	Note: getSection() belongs to OpenOffice::OODoc::Text and set_tag()
+	is provided by the underlying XML::Twig::Elt package.
+	
+	The text flattening is sometimes required in order to allow the
+	applications to retrieve strings which are split into more than one
+	text container. For example, a string such as "OpenDocument" can't
+	be retrieved using selectElements() or any other string search method
+	of the API if, say, "Open" and "Office" don't belong to the same text
+	span (i.e. if they have different styles; look at setSpan() in
+	OpenOffice::OODoc::Text to know more about text spans). In such a
+	situation, flatten() removes any text span markup, so the whole text
+	content of the element can be processed as a regular character string.
+	
+	Caution, this method can produce terrific results when misused.
+	
+=head3	getLocalPosition([regexp])
+
+	Returns	the position of the current element in the list of all
+	the children of the same parent with the same type.
+
+	Example:
+
+		$cell->getLocalPosition();
+
+	Assuming $cell is a table cell, this example returns the position
+	of the cell in the row without counting the covered cells (if any).
+
+	If a regular expression is provided as the optional argument, all
+	the siblings matching the expression are counted; but the method
+	returns zero if the calling element itself doesn't match the
+	expression.
+
+	Example:
+
+		$cell->getLocalPosition(qr'table:(covered-|)table-cell');
+
+	returns the position of the cell among all the cells (covered or not)
+	in the row.
+
+	Note: This method is a wrapper of the pos() method of XML::Twig::Elt,
+	but the returned values are zero-based in order to be consistent
+	with the other element addressing features of OpenOffice::OODoc.
+
+=head3	insertNewNode(xml_tag, position_flag [, offset])
+
+	Creates a new XML element, whose tag is passed as the 1st argument,
+	before, after or within the calling element. The 2nd argument
+	must be set to 'before', 'after', 'within', or any other value
+	accepted by the paste() method of XML::Twig. If the 2nd argument
+	is 'within', a 3rd one must be provided and indicate the offset.
+	
+=head3	replicateNode(count, position)
+
+	Produces one or more copies of the calling element and inserts
+	the copies before or after it. The position argument should be
+	'before' or 'after'; its default is 'after'. Technically, the
+	position argument could be anyone of the position options of
+	the XML::Twig::Elt->paste method, including 'first_child',
+	'last_child' or 'within'; but any other than 'before' and 'after'
+	probably don't make sense in an OpenDocument-compliant data
+	structure.
+
+	Without any argument, the calling element is replicated once.
+	But if the count argument is provided and set to zero or a
+	negative value, nothing is done.
+	
+	Example :
+	
+		my $row = $doc->getTableRow("Table1", -1);
+		$row->replicateNode(5);
+		
+	This sequence appends 5 more rows to a table; each new row is a
+	copy of the last original row, including each individual cell
+	and its content.
+	
+=head3	selectChildElement(filter)
+
+	Like selectChildElements() below, but returns only the first node
+	matching the filter.
+	
+	Note: the first_child() method of XML::Twig::Elt should be preferred
+	when the filter is the exact tag name of the needed element.
+	
+=head3	selectChildElements(filter)
+
+	Selects the children with XML tag names matching a given filter.
+	The filter is processed as a regexp.
+	
+	Note: the children() method of XML::Twig::Elt should be preferred
+	if the filter is the exact tag name of the needed elements.
+
+=head3	selectFrameElementByName(name)
+
+	Selects the first frame element whose name is exactly the given
+	argument. A frame is an OpenDocument container which can host a
+	rectangular object, such as an image or a text box.
+			
+=head2	Properties
+
+        No class variables are exported; the applications, if needed,
+	must access them using their full name ($OpenOffice::OODoc::XPath:XXX)
+
+        The following names should be prefixed explicitly with
+	"$OpenOffice::OODoc::XPath::"
+
+            CHARS_TO_ESCAPE
+
+        contains the list of reserved characters which, in XML, should be
+        replaced by escape sequences.
+
+            OO_CHARSET
+
+        indicates the character set used for OpenDocument document
+        encoding and whose default value is 'utf8' (it should not be changed).
+
+            LOCAL_CHARSET
+
+        indicates the user's character set, by default 'iso-8859-1'; it must
+	be changed according to the real user's needs (warning: there is no
+	kind of automatic adaptation to the user's locales, so the application
+	must explicitly load the right value in this variable); it should be
+	done using the odfLocalEncoding() accessor (see the OpenOffice::OODoc
+	man page and, for the list of supported character sets, the Encode
+	module's documentation).
+
+        The content of these three variables should not normally be directly
+        modified by the applications.
+
+        Instance hash variables are :
+
+            'container'		=> <oodoc_file_object>
+            'file'		=> <OpenDocument file>
+            'part'		=> <name of the XML part in the ODF package>
+	    'readable_XML'	=> <'true' or 'false'>
+	    'local_encoding'	=> <user's output encoding>
+	    'multiple_spaces'	=> <'on' or undef, see setText()>
+            'element'		=> <name of loaded XML element>
+	    'xpath'		=> <XML::Twig, XPath-capable object>
+	    'twig_options'	=> <XML::Twig options as a hash reference>
+	    'opendocument'	=> <'true' or 'false'>
+
+        However, the 'xml' variable is cleared almost immediately after a
+        successful constructor call, in order to save memory. As soon as the
+        corresponding XPath object has been created, the XML source is no
+        longer required.
+
+        The 'xpath' variable of an OODoc::XPath object contains a reference
+        to the document structure as it's made available through XML::Twig
+	(see CPAN documentation). This object encompasses the entire current
+	XML tree. Each access to XML using OODoc::XPath objects is done via
+	XML::Twig. So, after having run the following command:
+
+            my $xp = $doc->{'xpath'};
+
+        the experienced programmer will be able to use $xp to access all the
+        functionality of the XML::Twig API, bearing in mind that all
+        operations using this interface will have a direct effect on the
+        content of the $doc object.
+	
+	'twig_options' allows the user to provide a hash reference of
+	additional options to XML::Twig. These options can modify the way the
+	document is parsed during the execution of odfXPath(). For special
+	applications only (see the XML::Twig reference manual).
+
+	The 'opendocument' property, if true, means that the document is
+	declared as an OASIS Open Document. If this property is false or
+	undef, the document format is OpenOffice.org version 1. This property
+	should not be changed (as long as OpenOffice::OODoc can't change the
+	format of an existing document).
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+
+Contact: jmgdoc@cpan.org
+
+Copyright 2004-2008 by Genicorp, S.A. L<http://www.genicorp.com>
+
+Initial English version of the reference manual by Graeme A. Hunter
+(graeme.hunter@zen.co.uk).
+
+License: GNU Lesser General Public License v2.1
+
+=cut

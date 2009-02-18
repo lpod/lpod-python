@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+#-----------------------------------------------------------------------------
+#	$Id : odfbuild 0.2 2008-05-04 JMG$
+#-----------------------------------------------------------------------------
+
+=head1	NAME
+
+odfbuild - OpenDocument file creation utility
+
+=head1	SYNOPSIS
+
+odfbuild filename.odt
+
+odfbuild filename.odt --title "My Document" --subject "Test"
+
+odfbuild filename.ods --class spreadsheet --source "data.csv" --tablesize "8x16"
+
+cat data.txt | odfbuild filename.odt -
+
+=head1	OPTIONS
+
+	--class		Document class (text, spreadsheet, drawing, presentation)
+			Default: text
+	--opendocument	(no value). If this option is on, the document will be in
+			OpenDocument format. Without this option, the format will
+			be selected according to the general configuration of the
+			OpenOffice::OODoc installation.
+	--creator	The author of the document. Default: the current user's
+			login name.
+	--date		Creation date. Default is current local time.
+			If provided, must be in ISO-8601 format
+			(YYYY-MM-DDTHH:MM:SS)
+	--description	The description (abstract) of the document. Default: none.
+	--force		(no value). If this option is on, any existing file with
+			the same path as the target file will be replaced. Without
+			this option, the program will fail if the target exists.
+	--generator	Software signature to be stored in the file (not visible
+			for the end user).
+			Default: "Genicorp OpenOffice::OODoc <version>"
+	--keywords	A list of comma-separated keywords. Default: none.
+	--source	A text file, to be used as the content of the document.
+			If the document class is 'text', each line is loaded as a new
+			paragraph with the standard style. If the document class is
+			'spreadsheet', the file is processed as CSV data and loaded
+			in one sheet. If the document class is neither 'text' nor
+			'spreadsheet', the file is not processed.
+			If source = '-', or if a '-' argument is provided, the data
+			file is read through the standard input.
+	--subject	The subject of the document. Default: none.
+	--tablename	The name of the sheet to be created if the document class is
+			'spreadsheet' and if a data file is provided. Default: the name
+			of the data file, or "Unnamed Sheet" if the data is read from
+			the standard input.
+	--tablesize	The size of the sheet to be created if the document class is
+			'spreadsheet' and if a data file is provided, in 'HxW' format
+			where H is the number of lines and W the number of columns.
+			Default: '16x8'
+	--title		The title of the document. Default: "Untitled".
+	--readable_XML	(no value). For debugging only. If this option is on, the XML
+			content of the target file is indented, in order to be later
+			edited.
+
+=cut
+
+#----------------------------------------------------------------------------------------
+
+use OpenOffice::OODoc	2.101;
+use Getopt::Long;
+
+my $INPUT	= undef;
+my $input	= undef;
+
+my $generator	= 'OpenOffice::OODoc ' . $OpenOffice::OODoc::VERSION;
+my $title	= "Generated document";
+my $description	= "This file has been created with $generator";
+
+my $targetfile = $ARGV[0]
+	or die "Usage: oobuild <filename> [--options]\n";
+
+GetOptions
+	(
+	''			=> \(my $stdin = undef),
+	'class=s'		=> \(my $class = 'text'),
+	'date=s'		=> \(my $date = odfLocaltime),
+	'generator=s'		=> \$generator,
+	'title=s'		=> \$title,
+	'subject=s'		=> \(my $subject = ''),
+	'description=s'		=> \$description,
+	'keywords=s'		=> \(my $keywords = ''),
+	'creator=s'		=> \(my $creator = scalar getpwuid($<)),
+	'source=s'		=> \(my $source = undef),
+	'tablesize=s'		=> \(my $tablesize = '16x8'),
+	'tablename=s'		=> \(my $tablename = undef),
+	'force'			=> \(my $force = undef),
+	'opendocument'		=> \(my $odf = undef),
+	'readable_XML'		=> \(my $rxml = undef)
+	);
+
+if ( -e $targetfile && ! defined $force)
+	{
+	die	"File $targetfile exists. I don't create it.\n"	.
+		"Use --force to replace it.\n";
+	}
+my $odf_flag = $odf ? 'on' : undef;
+my $rxml_flag = $rxml ? 'on' : undef;
+
+my $archive	= odfContainer
+			(
+			$targetfile,
+			create		=> $class,
+			opendocument	=> $odf_flag
+			)
+	or die "File creation failure\n";
+
+#----------------------------------------------------------------------------------------
+
+my $meta	= odfMeta(container => $archive, readable_XML => $rxml_flag);
+$meta->creation_date($date);
+$meta->date($date);
+$meta->generator($generator);
+$meta->initial_creator($creator);
+$meta->creator($creator);
+$meta->title($title);
+$meta->subject($subject);
+$meta->description($description);
+$meta->keywords(split ',', $keywords) if $keywords;
+
+#----------------------------------------------------------------------------------------
+
+if ($stdin || $source)
+	{
+	my $INPUT = undef;
+	if ($stdin || ($source eq '-'))
+		{
+		$INPUT = *STDIN;
+		$source = '-';
+		}
+	else
+		{
+		if ( -e $source && -r $source )
+			{
+			open(SOURCE, "<", $source);
+			$INPUT = *SOURCE;
+			}
+		}
+	my $content = odfDocument
+			(container => $archive, readable_XML => $rxml_flag);
+	if ($class eq 'text')
+		{
+		my $first_para = $content->getParagraph(0);
+		while (my $para = <$INPUT>)
+			{
+			$content->appendParagraph(text => $para);
+			}
+		$content->removeElement($first_para) if $first_para;
+		}
+	elsif ($class eq 'spreadsheet')
+		{
+		my ($cols, $lns) = split 'x', $tablesize;
+		unless ($tablename)
+			{
+			if ($source gt '-')
+				{
+				$tablename = $source;
+				}
+			else
+				{
+				$tablename = 'Unnamed Sheet';
+				}
+			}
+		my $first_sheet = $content->getTable(0);
+		my $sheet = $content->appendTable($tablename, $cols, $lns);
+		$content->removeElement($first_sheet) if $first_sheet;
+		ROW: for (my $i = 0; my $record = <$INPUT>; $i++)
+			{
+			last ROW unless $record;
+			chomp $record;
+			my @data = split ';', $record;
+			my $row = $content->getTableRow($sheet, $i);
+			CELL: for (my $j = 0; my $value = shift @data; $j++)
+				{
+				last CELL unless defined $value;
+				$content->cellValue($row, $j, $value);
+				}
+			}
+		}
+	else
+		{
+		warn "Source text loading not allowed for this class\n";
+		}
+	close $INPUT unless ($source eq '-');
+	}
+
+#----------------------------------------------------------------------------------------
+
+$archive->save;
+exit;
+
+#----------------------------------------------------------------------------------------

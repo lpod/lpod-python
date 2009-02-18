@@ -1,0 +1,134 @@
+#!/usr/bin/perl
+#-----------------------------------------------------------------------------
+#	$Id : odffindbasic 0.2 2008-05-04 JMG$
+#-----------------------------------------------------------------------------
+
+=head1	NAME
+
+odffindbasic - Basic macro removal from OpenOffice.org files
+
+=head1	USAGE
+
+odffindbasic [options] <sourcefile> [<targetfile>]
+
+=head1	DESCRIPTION
+
+A simple command that allows the user to detect, export or remove the
+Basic modules from a regular OpenOffice.org file.
+
+Without option, the program displays the number of Basic modules found
+in the file.
+
+The 2nd filename is used in combination with the --delete option.
+
+=head1	OPTIONS
+
+	--nocount
+		Prevents the program from displaying the number of Basic
+		modules found.
+ 
+	--delete -d
+		If this option is set, the Basic modules are physically
+		deleted. The file manifest is updated accordingly.
+		However, the document content remains unchanged, even if
+		it contains some references to the deleted macros. The
+		code is removed (so the macros are no longer executable).
+		If a target file name is provided as a 2nd argument, the
+		changes are saved in it and the source file remains
+		unchanged.
+		
+	--export -e
+		Exports the macros. Every Basic module is extracted and
+		converted to a flat Basic source file in the current
+		directory. The name of each created file is constructed
+		according to the corresponding path in the ODF file, and
+		its suffix is "bas".
+		
+	--list -l
+		The Basic modules are listed through the standard
+		output.
+
+	--verbose
+		Some information messages are printed.
+
+=cut
+
+use OpenOffice::OODoc	2.101;
+use Getopt::Long;
+
+my $show_count	= 1;
+GetOptions
+	(
+	'nocount'	=> sub	{ $show_count = 0; },
+	'list'		=> \(my $list		= undef),
+	'delete'	=> \(my $delete		= undef),
+	'export'	=> \(my $export		= undef),
+	'verbose'	=> \(my $verbose	= undef)
+	);
+
+exit unless $ARGV[0];
+my $input	= $ARGV[0]
+	or die "Usage: oofindbasic <source_odf> [<target_odf>]\n";
+my $output	= $ARGV[1] || $input;
+print "Loading $input\n" if $verbose;
+my $archive	= odfFile($input) or die "Unavailable file\n";
+my $manifest	= undef;
+if ($delete)
+	{
+	print "Extracting the manifest\n" if $verbose;
+	$manifest = odfManifest(file => $archive);
+	}
+my $deleted	= 0;
+my $count	= 0;
+foreach my $m (@{$archive->{members}})
+	{
+	next unless $m =~ /^Basic/;
+	if ($delete)
+		{
+		push @to_be_deleted, $m;
+		$deleted++;
+		}
+	next if $m =~ /\/script\-[A-Za-z]*\.xml$/;
+	print "$m\n" if $list;
+	$count++;
+	if ($export)
+		{
+		my $module = odfDocument
+			(
+			container	=> $archive,
+			part		=> $m,
+			read_only	=> 'true',
+			element		=> 'script:module'
+			);
+		my $filename = $m;
+		$filename =~ s/[\/\\]/_/g;
+		$filename =~ s/\.xml$/.bas/i;
+		print "Exporting $filename\n" if $verbose;
+		open BASIC, ">", $filename;
+		print BASIC $module->{xpath}->root->string_value();
+		close BASIC;
+		$module->dispose;
+		}
+	}
+
+if ($show_count)
+	{
+	if ($verbose)
+		{
+		print "Number of BASIC modules in the file: ";
+		}
+	print "$count\n";
+	}
+
+if ($deleted)
+	{
+	foreach my $member (@to_be_deleted)
+		{
+		print "Deleting $member\n" if $verbose;
+		$archive->raw_delete($member);
+		$manifest->removeEntry($member);
+		}
+	print "Writing the changes to $output\n" if $verbose;
+	$archive->save($output);
+	}
+exit;

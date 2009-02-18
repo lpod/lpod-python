@@ -1,0 +1,571 @@
+=head1	NAME
+
+OpenOffice::OODoc - The Perl Open OpenDocument Connector
+
+=head1	SYNOPSIS
+
+	use OpenOffice::OODoc;
+
+			# get global access to the content of an OOo file
+	my $document = odfDocument(file => "MyFile.odt");
+			# select a text element containing a given string
+	my $place = $document->selectElementByContent("my search string");
+			# insert a new text element before the selected one
+	my $newparagraph = $document->insertParagraph
+			(
+			$place,
+			position	=> 'before',
+			text		=> 'A new paragraph to be inserted',
+			style		=> 'Text body'
+			);
+			# define a new graphic style, to display images
+			# with 20% extra luminance and color inversion
+	$document->createImageStyle
+			(
+			"NewImageStyle",
+			properties	=>
+				{
+				'draw:luminance'	=> '20%',
+				'draw:color-inversion'	=> 'true'
+				}
+			);
+			# import an image from an external file, attach it
+			# to the newly inserted paragraph, to be displayed
+			# using the newly created style
+	$document->createImageElement
+			(
+			"Image1",
+			style		=> "NewImageStyle",
+			attachment	=> $newparagraph,
+			import		=> "D:\Images\Landscape.jpg"
+			);
+			# save the modified document
+	$document->save;
+
+=head1	DESCRIPTION
+
+This toolbox is an extensible Perl interface allowing direct read/write
+operations on files which comply with the OASIS Open Document Format for
+Office Applications (ODF), i.e. the ISO/IEC 26300:2006 standard.
+
+It provides a high-level, document-oriented language, and isolates the
+programmer from the details of the file format. It can process different
+document classes (texts, spreadsheets, presentations, and drawings).
+It can retrieve or update styles and images, document metadata, as well as
+text content.
+
+OpenOffice::OODoc is designed for data retrieval and update in existing
+documents, as well as full document generation.
+
+=head1	HOW TO USE THE DOCUMENTATION
+
+The present chapter, then the OpenOffice::OODoc::Intro one, should be
+read before any attempt to dig in the detailed documentation.
+
+The reference manual is provided in several separate chapters as
+described below.
+
+The OpenOffice::OODoc documentation, as the API itself, is distributed
+amongst several manual pages on a thematic and technical basis. The present
+section is a general foreword.
+
+Each manual page corresponds to a Perl module, with the exception of
+OpenOffice::OODoc::Intro. It's strongly recommended to have a look at the
+Intro before any other manual chapter, in order to get a quick and practical
+knowledge of the big picture. Another possible introductory reading has been
+published in The Perl Review (issue #3.1, dec. 2006)
+L<http://www.theperlreview.com>, while an alternative presentation article,
+intended for French-reading users, can be downloaded at
+L<http://jean.marie.gouarne.online.fr/doc/perl_odf_connector.pdf>
+
+The API is object-oriented and, with the exception of the main module
+(OpenOffice::OODoc itself), each module defines a class. The features of each
+module are documented in a manual page with the same name. But, while some
+classes inherit from other ones, they bring a lot of features that are not
+documented in the corresponding manual page. The best example is
+OpenOffice::OODoc::Document: it contains a few method definitions by itself,
+but it's the most powerful class, because it inherits from four other classes,
+so its features are documented in five manual pages. Fortunately, the classes
+are defined on a functional basis. So, for example, to know the text-related
+capabilities of a Document object, the user should select the Text manual page
+before the Document one.
+
+The detailed documentation of the API is distributed according to the
+following list:
+
+=head2	OpenOffice::OODoc
+
+The present manual page contains (in the GENERAL FUNCTIONS section below) the
+description of a small number of miscellaneous functions, dedicated to control
+some general parameters, to create the main objects of the applications, or to
+provide the user with some basic utilities.
+
+=head2	OpenOffice::OODoc::File
+
+This manual page contains detailed information about the physical access to
+the OpenOffice.org files. In some simple applications, this page can be
+ignored without risk.
+
+=head2	OpenOffice::OODoc::XPath
+
+It describes all the common features, that are provided by the corresponding
+class, and available in every other class with the exception of OODoc::File.
+This manual page describes the low level, XPath-based XML API of
+OpenOffice::OODoc. It can be necessary for advanced applications, but can be
+ignored at first look. However, the Text, Image, Styles, Document and Meta
+objects inherit all the features of the XPath object, so this manual page
+can be useful even if the user don't need to work with explicit XPath objects.
+
+=head2	OpenOffice::OODoc::Text
+
+This manual page describes all the high level text processing methods and
+allows the user's program to deal with all the text containers (headers,
+paragraphs, item lists, tables, and footnotes). OpenOffice::OODoc::Text is
+dedicated to the text content and structure of any kind of document, and *NOT*
+to the so-called "text documents". As a consequence, this chapter describes
+all the methods which process ODF text containers in spreadsheets and
+presentations as well as in text documents.
+
+=head2	OpenOffice::OODoc::Image
+
+This manual page describes all the graphics manipulation API, i.e. all the
+available syntax dedicated to insert or remove images in the documents, and
+to control the presentation of these images.
+
+=head2	OpenOffice::OODoc::Styles
+
+This manual page describes the methods to be used to control the styles
+of a document, knowing that each page layout, each text element, and each
+image is displayed or printed according to a style. This part of the
+documentation can be ignored if the user's programs are strictly content-
+focused and don't care with the presentation.
+
+Note that some style definitions, such as master pages, can include text
+containers or images, which can be processed through methods provides by
+OpenOffice::OODoc::Text or OpenOffice::OODoc::Image.
+
+=head2	OpenOffice::OODoc::Document
+
+This manual page describe some miscellaneous methods that deal simultaneously
+with text, presentation and/or images. So, in order to discover the capabilities
+of a "Document" object (created with ooDocument), the user should use the Text,
+Image, Styles AND Document manual pages. The OpenOffice::OODoc::Document class
+inherits all the features provided by the other classes with the exceptions of
+OpenOffice::OODoc::File and OpenOffice::OODoc::Meta.
+
+=head2	OpenOffice::OODoc::Meta
+
+This manual page describes all the available methods to be used in order to
+control the global properties (or "metadata") of a document. Most of these
+properties are those an end-user can get or set through the "File/Properties"
+command with the OpenOffice.org desktop software.
+
+=head2	OpenOffice::OODoc::Manifest
+
+This manual page describes the manifest management API, knowing that the
+manifest, in an OpenOffice.org file, contains the list of the file components
+(or "members") and the media type (or MIME) of each one. The text content,
+the style definitions, the embedded images, etc. are each one stored as a
+separate "member".
+
+=head1	GENERAL FUNCTIONS (EXPORTED)
+
+=head3	odfConnector()
+
+	Synonym: odfDocument()
+
+=head3	odfContainer($filename)
+
+	Shortcut for OpenOffice::OODoc::File->new().
+
+	This function returns a File object, that is the object representation
+	of the physical package containing the text, the images and the style
+	definitions of an ODF document.
+
+	See the OpenOffice::OODoc::File manual page for detailed syntax.
+	See the OpenOffice::OODoc::Intro manual page to know why, in some
+	situations, the using applications need or don't need to deal with
+	explicit File objects.
+
+	Synonyms: odfFile(), odfPackage().
+
+=head3	odfDecodeText($ootext)
+
+	Returns the translation of a raw OpenOffice.org (UTF-8) in
+	the local character set. While the right translation is automatically
+	done by the regular text read/write methods of OpenOffice::OODoc, this
+	function is useful only if the user's application needs to bypass the
+	API.
+
+=head3	odfDocument()
+
+	Shortcut for OpenOffice::OODoc::Document->new().
+
+	This function is the most general document constructor. It creates
+	and returns a new Document object. It can be instantiated on the basis of
+	an existing OpenOffice.org file, or using XML, OpenOffice-compliant
+	data previously loaded in memory. With an appropriate "create"
+	parameter, it can be used in order to create a new document from scratch
+	as well. The Document class provides methods allowing a lot of read/update
+	operations in the text content, the graphics, and the presentation.
+	So ooDocument() is the recommended first call to get access to a document
+	for further processing.
+
+	See the OpenOffice::OODoc::Document manual page for detailed syntax.
+
+
+=head3	odfEncodeText($ootext)
+
+	Returns the translation of an application-provided string,
+	made of local characters, in an OpenOffice.org (UTF-8) string.
+	The given string must comply with the active local encoding (see
+	odfLocalEncoding()). While the right translation is automatically done
+	by the regular text read/write methods of OpenOffice::OODoc, this
+	function is useful only if the user's application needs to bypass the
+	API.
+
+=head3	odfFile($filename)
+
+	Synonyms: odfContainer(), odfPackage().
+
+=head3	odfImage()
+
+	Shortcut for OpenOffice::OODoc::Image->new().
+
+	Generally not used explicitly by the applications.
+
+	This function returns a document object whose features are related to
+	image element processing, which is a subset of the Document object.
+
+	See the OpenOffice::OODoc::Image manual page for detailed syntax.
+
+=head3	odfLocalEncoding([character_set])
+
+	Accessor to get/set the user's local character set
+	(see $OpenOffice::OODoc::XPath::LOCAL_CHARSET in the
+	OpenOffice::OODoc::XPath man page).
+
+	Example:
+
+		$old_charset = odfLocalEncoding();
+		odfLocalEncoding('iso-8859-15');
+
+	If the given argument is an unsupported encoding, an error
+	message is produced and the old encoding is preserved. So
+	this accessor is safer than a direct update of the
+	$OpenOffice::OODoc::XPath::LOCAL_CHARSET variable.
+
+	The default local character set is fixed according to the
+	"OODoc/config.xml" file of your local OpenOffice::OODoc installation
+	(see readConfig() below), or to "iso-8859-1" if this file is missing
+	or doesn't say anything about the local character set. By calling
+	ooLocalEncoding() with an argument, the user's programs can override
+	this default.
+
+	Note: the user can override this setting for a particular document,
+	using the 'local_encoding' property of the document object (see the
+	OpenOffice::OODoc::XPath manual page).
+
+	See the Encode::Supported (Perl) documentation for the list
+	of supported encodings.
+
+=head3	odfLocaltime()
+
+	Converts the numeric time given in argument to an ISO-8601 date
+	(aaaa-mm-jjThh:mm:ss), knowing that this format is required for
+	the stored content of any ODF-compliant date element or attribute.
+	
+	The argument type is the same as for the standard Perl localtime()
+	function, i.e. a number of seconds since the "epoch". It can be, for
+	example, a value previously returned by a time() call.
+
+	Without argument, returns the current local time in ISO-8601 format.
+
+	Beware: The resolution of this function is limited to the second,
+	unlike the ISO-8601 standard which supports an optional subsecond
+	field.
+
+=head3	odfManifest()
+
+	Short cut for OpenOffice::OODoc::Manifest->new().
+
+	This function returns a Manifest object, giving access to the
+	meta-information of the physical archive containing the document.
+
+=head3	odfMeta()
+
+	Shortcut for OpenOffice::OODoc::Meta->new().
+
+	This function returns a Meta object. Such an object represents the
+	global properties, or "metadata", of a document. It brings a set of
+	accessors allowing the user to get or set some properties such as
+	the title, the keyword, the description, the creator, etc.
+
+	See the OpenOffice::OODoc::Meta manual page for details.
+
+=head3	odfPackage($filename)
+
+	Synonyms: odfContainer(), odfFile().
+
+=head3	odfReadConfig([filename])
+
+	Creates or resets some variables of the API according to the
+	content of an XML configuration file. Without argument, this
+	function looks for 'OODoc/config.xml' under the installation
+	directory of OpenOffice::OODoc. In any case, the provided file
+	must have the same XML structure as the config.xml file included
+	in the distribution, so:
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<config>
+	    <OpenOffice-OODoc>
+		<XPath-LOCAL_CHARSET>my_charset</XPath-LOCAL_CHARSET>
+		<Styles-COLORMAP>my_colormap_file</Styles-COLORMAP>
+		<File-WORKING_DIRECTORY>my_path</File-WORKING_DIRECTORY>
+		<File-DEFAULT_OFFICE_FORMAT>2</File-DEFAULT_OFFICE_FORMAT>
+		<BUILD_DATE>cpan_package_build_date</BUILD_DATE>
+		<INSTALLATION_DATE>my_installation_date</INSTALLATION_DATE>
+	    </OpenOffice-OODoc>
+	</config>
+
+	In the example above, "my_oo_date" should be replaced by a regular
+	ISO-8601 date (YYYY-MM-DDThh:mm:ss).
+
+	Elements out of the <OpenOffice-OODoc> element are ignored.
+	Any element included in <OpenOffice-OODoc> sets or update a variable
+	with the same name and the given value in the space of the
+	OpenOffice::OODoc package. So, for example an element like
+
+		<strange_thing>a strange value</strange_thing>
+
+	will make a new $OpenOffice::OODoc::strange_thing variable,
+	initialized with the string "a strange value", available for any
+	program using OpenOffice::OODoc.
+
+	Attributes and sub-elements are ignored.
+
+	Strings with characters larger than 7 bits must be encoded in UTF-8.
+
+	Any '-' character appearing in the name of an element is replaced
+	by '::' in the name of the corresponding variable, so, for example,
+	the <XPath-LOCAL_CHARSET> element controls the initial value of
+	$OpenOffice::OODoc::XPath::LOCAL_CHARSET.
+
+	All the variables defined in this file, are the file itself, are
+	optional.
+
+	The <INSTALLATION_DATE> element is not used by the API; it's provided
+	for information only. It allows the user to get (in OpenOffice format)
+	the date of the last installation of OpenOffice::OODoc, through the
+	variable $OpenOffice::OODoc::INSTALLATION_DATE. In the default
+	config.xml provided with the distribution, this element contains the
+	package generation date.
+
+	The <BUILD_DATE> element is the date of the CPAN package.
+
+	This function is automatically executed as soon as OpenOffice::OODoc
+	is used, if the OODoc/config.xml configuration file exists.
+
+=head3	odfStyles()
+
+	Shortcut for OpenOffice::OODoc::Styles->new().
+
+	Generally not used explicitly by the applications.
+
+	This function returns a Styles object, that brings a subset of the
+	Document object. In can be used in place of odfDocument() if the
+	calling application needs some style/presentation manipulation
+	methods only. Note the 's' at the end of 'Styles': this object doesn't
+	represent a particular style; it represents a set of styles related
+	to a document.
+
+	See the OpenOffice:OODoc::Styles manual page for detailed syntax.
+
+=head3	odfTemplatePath([path])
+
+	Shortcut for OpenOffice::OODoc::File::templatePath().
+
+	Accessor to get/set an alternative path for the ODF template files
+	used to create new documents.
+
+	The template path must designate a directory containing 4 regular
+	ODF files, each one corresponding to an supported ODF document class,
+	i.e. "template.odt", "template.ods", "template.odp", "template.odg".
+
+=head3	odfText()
+
+	Shortcut for OpenOffice::OODoc::Text->new().
+
+	Generally not used explicitly by the applications.
+
+	This function returns a Text object, that brings a subset ot the
+	Document object. It can be used in place of ooDocument() if the
+	calling application is only text-focused (i.e. if it doesn't need
+	to deal with graphics and styles). The processed document can contain
+	(and probably contains) graphics and styles, but the methods to
+	process them are simply not loaded.
+
+	See the OpenOffice::OODoc::Text manual page for detailed syntax.
+
+=head3	odfTimelocal()
+
+	Translates an ODF-formatted date (ISO-8601) into a regular Perl
+	numeric time format, i.e. a number of seconds since the "epoch". So,
+	the returned value can be processed with any Perl date formatting or
+	calculation function.
+
+	Example:
+
+		my $date_created = odfTimelocal($meta->creation_date());
+		$lt = localtime($date_created);
+		$elapsed = time() - $date_created;
+		print "This document has been created $date_created\n";
+		print "$elapsed seconds ago";
+	
+	This sequence prints the creation date of a document in local time
+	string format, then prints the number of seconds between the creation
+	date and now. Note that the creation_date() method used here works
+	with the meta-data document part only (see OpenOffice::OODoc::Meta for
+	details about this method).
+
+	Note: This function requires the Time::Local Perl module.
+
+=head3	odfWorkingDirectory([path])
+
+	Accessor to get/set the working directory to use for temporary
+	files. Short-lived temporary files are generated each time the save()
+	function (see OpenOffice::OOdoc::File) is called. If case of success,
+	these files are automatically removed when the call returns, so the
+	user can't view them. If something goes wrong during the I/O
+	processing, the temporary files remain available for debugging. In any
+	case, a working directory is necessary to create or update documents.
+	However, OpenOffice::OODoc can be used without available working
+	directory in a read-only application.
+
+	The default working directory depends on the "OODoc/config.xml" file
+	of your local OpenOffice::OODoc installation. If this file is missing
+	or if it doesn't contain a <File-WORKING_DIRECTORY> element, the
+	working directory is "." (i.e. the current working directory of the
+	user's application).
+
+	If an argument is given, it replaces the current working
+	directory.
+
+	A warning is issued if the (existing or newly set) path is not
+	a directory with write permission. After this warning, the user's
+	application can run, but any attempted file update or creation
+	fails.
+
+	This accessor sets only the default working directory for the
+	application. A special, separate working directory can be set
+	for each OOo document (see the manual page for OpenOffice::OODoc::File
+	for details, if needed).
+
+	CAUTION: a odfWorkingDirectory() call can't change the working
+	directory of a previously created File object. So, consider the
+	following code sequence:
+
+		my $doc0 = ooDocument(file => 'doc0.odt');
+		odfWorkingDirectory('C:\TMP');
+		my $doc1 = ooDocument(file => 'doc1.odt');
+
+	In this example, all the write operations related to the $doc0
+	document will use the default working directory, while the ones
+	related to $doc1 will use "C:\TMP".
+
+=head3	odfXPath()
+
+	Shortcut for OpenOffice::OODoc::XPath->new().
+
+	Generally not used explicitly by the applications.
+
+	This function returns an XPath object, that brings all the low level
+	XML navigation, retrieve, read and write methods of the API. The XPath
+	class (in the OpenOffice::OODoc context) is an OpenOffice-aware
+	wrapper for the general XML::Twig API. Unless you are a very advanced
+	user and you have a particular hack in mind, you should never need to
+	explicitly create an XPath object. But you must know that every method
+	or property of this class is inherited by the Text, Image, Styles,
+	Document and Meta objects. So the knowledge of the corresponding
+	manual page could be useful.
+
+	See the OpenOffice::OODoc::XPath manual page for detailed syntax.
+
+=head3	ooDocument()
+
+	Synonyms: odfDocument(), odfConnector().
+
+=head3	ooDecodeText()
+
+	See odfDecodeText().
+
+=head3	ooEncodeText()
+
+	See odfEncodeText().
+
+=head3	ooFile($filename)
+
+	Synonyms: odfContainer(), odfPackage(), odfFile().
+
+=head3	ooImage()
+
+	Synonym: odfImage().
+
+=head3	ooLocalEncoding()
+
+	See odfLocalEncoding().
+
+=head3	ooLocaltime([$time_value])
+
+	See odfLocaltime()
+
+=head3	ooManifest()
+
+	Synonym: odfManifest().
+
+=head3	ooMeta()
+
+	Synonym: odfMeta().
+
+=head3	ooReadConfig()
+
+	See odfReadConfig().
+
+=head3	ooStyles()
+
+	Synonym: odfStyles().
+
+=head3	ooTemplatePath()
+
+	See odfTemplatePath().
+
+=head3	ooText()
+
+	Synonym: odfText().
+
+=head3	ooTimelocal($oodate)
+
+	See odfTimelocal()
+
+=head3	ooWorkingDirectory()
+
+	See odfWorkingDirectory().
+
+=head3	ooXPath()
+
+	Synonym: odfXPath().
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+
+Contact: jmgdoc@cpan.org
+
+Copyright 2004-2008 by Genicorp, S.A. L<http://www.genicorp.com>
+
+Initial English version of the reference manual by Graeme A. Hunter
+(graeme.hunter@zen.co.uk).
+
+License: GNU Lesser General Public License v2.1
+
+=cut

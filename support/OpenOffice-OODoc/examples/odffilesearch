@@ -1,0 +1,305 @@
+#!/usr/bin/perl
+#-----------------------------------------------------------------------------
+#	$Id: odffilesearch 0.007 2008-05-04$
+#-----------------------------------------------------------------------------
+
+=head1	NAME
+
+	odffilesearch - File selection by keywords
+
+=head1	SYNOPSIS
+
+	odffilesearch -R "D:\Documents\*.odt" openoffice desktop XML
+	
+	produces the list of the ODF Text documents present in the given
+	directory and its subdirectories, and containing the words
+	"openoffice", "desktop" AND "XML"
+	
+	odffilesearch -command "rm -f %f" "*.ods *.odt" lost dismiss cancel
+
+	executes the "rm -f filename" (i.e. deletes the file in a Unix system)
+	for each ODT or ODS file present in the current directory
+	and containing the words "lost", "dismiss" AND "cancel"
+
+=head1	USAGE
+
+	odffilesearch [-options] <file filter> <keyword list>
+
+=head1	DESCRIPTION
+
+	This utility allows the user to retrieve a list of files matching
+	a given set of keywords or regular expressions. A file is selected
+	when it contains, in its text and/or in its metadata (title, subject,
+	keywords or description), all the given search strings.
+
+	The selected files are echoed to the standard output (one file per
+	line), so this utility can be used as a filter piping its results
+	to another program. Alternatively, a given shell command can be
+	launched by the script each time a file matches, allowing on-the-fly
+	processing of the selected documents.
+
+	The files filter may content one or more space-separated paths.
+	Each path may content jokers. So it's possible to explore several
+	directories and/or several filename patterns. 
+
+	All the arguments after the file filter are processed as search
+	criteria.
+
+=head1	OPTIONS
+
+	-R -recursive
+		include the subdirectories of each given search directory
+	-verbose -trace -debug
+		echo some processing comments
+	-warnings
+		activate the warning messages of the OpenOffice::OODoc API
+	-log <file>
+		like -verbose, but then messages are sent to the given file
+		and don't pollute the standard output
+	-result <file>
+	-output <file>
+		send the list of matching files to the given file and not
+		to the standard output
+	-criteria <file>
+		get search criteria from a file (one per line); the loaded
+		search keywords may be combined with additional criteria
+		passed with the command line, if any.
+	-command <command> -exec <command>
+		execute a shell command for each matching file ; if the
+		command string contains "%f", this substring is replaced
+		with the name of the selected file ; if this option is
+		provided, the selection list is not echoed to the standard
+		output ; if -verbose is on, the value returned by the
+		command is echoed
+	-encoding <encoding>
+		selects the user's character set ; this option is mandatory
+		if one or more search criteria contain characters not
+		belonging to the default character set
+
+=cut
+
+#=============================================================================
+
+use	OpenOffice::OODoc	2.101;
+use	Getopt::Long;
+
+our	$VERSION		= 0.007;
+
+#=============================================================================
+
+
+my	$recursive	= undef;
+my	$verbose	= undef;
+my	$warnings	= undef;
+my	$command	= undef;
+my	$result		= undef;
+my	$log		= undef;
+my	$list		= undef;
+my	$character_set	= undef;
+my	$RESULT		= *STDOUT;
+my	$LOG		= *STDOUT;
+
+GetOptions
+	(
+	'R|recursive'			=> \$recursive,
+	'verbose|trace|debug'		=> \$verbose,
+	'warnings'			=> \$warnings,
+	'log=s'				=> \$log,
+	'result|output=s'		=> \$result,
+	'command|exec=s'		=> \$command,
+	'criteria=s'			=> \$list,
+	'encoding=s'			=> \$character_set
+	);
+
+#=============================================================================
+
+my	@keywords	= ();
+my	$count		= 0;
+
+#=============================================================================
+
+sub	horodate
+	{
+	my @d = localtime();
+	return sprintf
+		(
+		"[%02d/%02d/%04d %02d:%02d:%02d] ",
+		$d[3], $d[4] + 1, $d[5] + 1900, $d[2], $d[1], $d[0]
+		);
+	}
+
+sub	message
+	{
+	my $text = shift;
+	return unless ($verbose);
+	print $LOG horodate() . "$text\n";
+	print $LOG "\t$_\n" for @_;
+	}
+
+#-----------------------------------------------------------------------------
+
+sub	matching_file
+	{
+	my $file	= shift;
+	my @words	= @_;
+	my $n		= scalar @words;
+	my $text	= "";
+
+	my $oof	= ooFile($file);
+	unless ($oof)
+		{
+		message	"$file doesn't look like an ODF file";
+		return undef;
+		}
+	my $meta	= odfMeta(container => $oof) or message
+				"$file doesn't contain metadata";
+	if ($meta)
+		{
+		my $title = $meta->title;
+		if ($title)
+			{
+			message "Title: \"$title\"";
+			$text .= $title;
+			}
+		else
+			{
+			message "Title: <UNTITLED>";
+			}
+		$text .= ($meta->keywords || "");
+		$text .= ($meta->subject || "");
+		$text .= ($meta->description || "");
+
+		$meta->dispose;
+		}
+	my $content	= odfText(container => $oof) or message
+				"$file doesn't have a regular content";
+	if ($content)
+		{
+		$text .= ($content->getTextContent || "");
+
+		$content->dispose;
+		}
+
+	return undef unless $text;
+	while (@words)
+		{
+		my $word = shift @words or next;
+		return undef unless $text =~ /$word/i;
+		}
+	return 1;
+	}
+
+#-----------------------------------------------------------------------------
+
+sub	file_selection
+	{
+	my @list = @_;
+	my $number = scalar @list;
+
+	message "$number file(s) in the search list";
+	FILE: foreach my $file (@list)
+		{
+		unless (-r $file)
+			{
+			message "$file : unreadable";
+			next FILE;
+			}
+		if (-l $file)
+			{
+			message "$file : symbolic link, ignored";
+			next FILE;
+			}
+		if ((-d $file) && $recursive)
+			{
+			message "Searching in $file";
+			file_selection(glob("$file/*"));
+			next FILE;
+			}
+		unless (-s $file)
+			{
+			message "$file : empty";
+			next FILE;
+			}
+		unless (-f $file)
+			{
+			message "$file is not a regular file";
+			next FILE;
+			}
+		message "Processing $file";
+		if (matching_file($file, @keywords))
+			{
+			message "OK! $file matches all the criteria";
+			if ($command)	
+				{
+				my $cmd = $command;
+				$cmd =~ s/\%f/$file/g;
+				message "Executing command: $cmd";
+				my $r = system $cmd;
+				message "Command result is $r";
+				}
+			else	
+				{
+				print $RESULT "$file\n";
+				}
+			$count++;
+			}
+		else
+			{
+			message "file $file doesn't match";
+			}
+		}
+	}
+
+#=============================================================================
+# main program
+
+if ($result)
+	{
+	open RESULT, ">", $result
+		or die "output file $result is unwritable\n";
+	$RESULT = *RESULT;
+	}
+
+if ($log)
+	{
+	open OUTPUT, ">>", $log
+		or die "log file $log is unwritable\n";
+	$LOG = *OUTPUT;
+	$verbose = 1;
+	}
+
+if ($list)
+	{
+	message "Loading a keyword list from $list";
+	my $m;
+	open LIST, "<", $list or warn "file $list is unreadable\n";
+	while ($m = <LIST>)
+		{
+		chomp $m;
+		push @keywords, $m;
+		}
+	close LIST;
+	}
+
+localEncoding($character_set)	if $character_set;
+
+die "Usage: odffilesearch [-options] <filefilter> [keywords]\n"
+		unless $ARGV[0];
+
+message "Starting the search...";
+
+my $filter = shift @ARGV;
+push @keywords, @ARGV;
+die "Empty keword list.\n" unless @keywords;
+message "Keyword list:", @keywords;
+unless ($warnings)
+	{
+	$SIG{'__WARN__'} = sub {};
+	}
+file_selection(glob($filter));
+
+message "Finished - $count file(s) selected";
+exit;
+
+#=============================================================================
+

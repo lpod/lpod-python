@@ -1,0 +1,377 @@
+#!/usr/bin/perl -w
+#-----------------------------------------------------------------------------
+#	$Id : odfmetadoc 0.3 2008-05-04 JMG$
+#-----------------------------------------------------------------------------
+
+=head1	NAME
+
+odfmetadoc - Document properties management interface
+
+=head1	SYNOPSIS
+
+	odfmetadoc <directory>
+
+=head1	DESCRIPTION
+
+Simple graphical user interface allowing the user to get and set the metadata
+of the OpenDocument and OpenOffice.org files (ODT, ODP, ODS, SXW, SXI, SXC,...)
+in a given directory.
+
+The list of the files is shown in the main window. Each time the user selects
+a file (by double-clic or OK button), another window appears, with some
+property fields: title, author, subject, description, keywords. The flat text
+content is shown in a read-only field. The user can update any property, or
+insert/delete any keyword. A double-click on a word in the text content field
+appends the word to the keword list. 'OK' saves the changes in the file.
+
+=head1	LIMITS
+
+This script is provided as a demo and test tool, with a very basic user
+interface. There is no directory selection dialog box. Some file names with
+blank spaces and/or non-ASCII characters are not properly processed by the
+graphical user interface (even if the OODoc API does support the same character
+sets as the local Perl installation).
+
+=head1	REQUIREMENTS
+
+Requires Tk and some Tk extensions (TK::Dialog, Tk::LabFrame, Tk::LabEntry)
+
+=cut
+
+#------------------------------------------------------------------------------
+
+use Tk;
+use Tk::Dialog;
+use OpenOffice::OODoc	2.101;
+
+#------------------------------------------------------------------------------
+
+our $sv_chemin		= $ARGV[0] || $ENV{'HOME'} || '.';
+our $chemin		= $sv_chemin;
+our $D			= undef;
+our $f			= undef;
+our $F			= undef;
+our $boite_liste	= undef;
+our @liste		= ();
+our $couleur_saisie	= 'ivory';
+our $couleur_lecture	= 'LightSkyBlue';
+our %delimiteurs	=
+	(
+	'text:p'	=>
+		{
+		begin	=> undef,
+		end	=> "\n"
+		},
+	'text:h'	=>
+		{
+		begin	=> '[Titre] ',
+		end	=> "\n"
+		},
+	'text:list-item' =>
+		{
+		begin	=> "\t* "
+		},
+	%OpenOffice::OODoc::Text::DEFAULT_DELIMITERS
+	);
+
+#------------------------------------------------------------------------------
+
+sub	place_fenetre
+	{
+	my $fenetre	= shift;
+	my $x	= int(($fenetre->screenwidth - $fenetre->reqwidth) / 2);
+	my $y	= int(($fenetre->screenheight - $fenetre->reqheight) / 2);
+	$fenetre->geometry("+$x+$y");
+	$fenetre->resizable(0, 0);
+	}
+
+#------------------------------------------------------------------------------
+
+sub	accesMeta
+	{
+	require Tk::LabFrame;
+	require Tk::LabEntry;
+
+	my $fichier	= shift;
+	my $oo_archive = odfContainer($fichier);
+	return undef unless $oo_archive;
+	my $doc	= odfMeta(container => $oo_archive);
+	return undef unless $doc;
+	my $txt = odfText
+		(container => $oo_archive, delimiters => { %delimiteurs });
+	my ($titre, $auteur, $sujet, $description, @clefs, $mot);
+
+	$f->idletasks;
+	$D = $f->Toplevel
+		(
+		-title		=> $fichier,
+		);
+	$D->withdraw;
+	my $fr2 = $D->Frame
+		-> pack(-side => 'bottom', -expand => 1, -fill => 'x');
+	my $fr1 = $D->Frame
+		->pack(-side => 'left', -anchor => 'n');
+	my $fr3	= $D->LabFrame
+		(
+		-label		=> 'Keywords',
+		-labelside	=> 'acrosstop'
+		)
+		->pack(-side => 'right', -expand => 1, -fill => 'y');
+	$fr1->LabEntry
+		(
+		-label			=> 'Title',
+		-textvariable		=> \$titre,
+		-width			=> 40,
+		-bg			=> $couleur_saisie
+		)
+		-> pack(-side => 'top', -fill => 'x');
+	$fr1->LabEntry
+		(
+		-label			=> 'Author',
+		-textvariable		=> \$auteur,
+		-width			=> 40,
+		-bg			=> $couleur_saisie
+		)
+		-> pack(-side => 'top', -fill => 'x');
+	$fr1->LabEntry
+		(
+		-label			=> 'Subject',
+		-textvariable		=> \$sujet,
+		-width			=> 40,
+		-bg			=> $couleur_saisie
+		)
+		-> pack(-side => 'top', -fill => 'x');
+	my $fr4 = $fr1->LabFrame
+		(
+		-label		=> 'Description',
+		)
+		-> pack(-side => 'top', -fill => 'x');
+	$description = $fr4->Scrolled
+		(
+		'Text',
+		-scrollbars		=> 'ose',
+		-height			=> 3,
+		-width			=> 80,
+		-bg			=> $couleur_saisie,
+		-exportselection	=> 'yes'
+		)
+		-> pack(-side => 'top', -fill => 'both');
+	my $fr5 = $fr1->LabFrame
+		(
+		-label		=> 'Content',
+		)
+		-> pack(-side => 'top', -fill => 'x');
+	my $texte = $fr5->Scrolled
+		(
+		'Text',
+		-scrollbars		=> 'ose',
+		-height			=> 20,
+		-width			=> 90,
+		-bg			=> $couleur_lecture,
+		-exportselection	=> 'yes'
+		)
+		-> pack(-side => 'top', -fill => 'both');
+	my $l = $fr3->Scrolled
+		(
+		'Listbox',
+		-scrollbars	=> 'ose',
+		-height		=> 20,
+		-bg		=> $couleur_saisie,
+		-exportselection => 'yes'
+		)
+		-> pack(-side => 'top', -expand => 1, -fill => 'x');
+	$texte->bind
+		(
+		'<Double-Button-1>'	=> sub
+			{
+			push @clefs, $texte->get
+				('insert wordstart', 'insert wordend');
+			$l->see('end');
+			}
+		);
+	my $nm = $fr3->Entry
+		(
+		-textvariable	=> \$mot,
+		-width		=> 18,
+		-bg		=> $couleur_saisie
+		)
+		-> pack(-side => 'bottom', -fill => 'x');
+	$nm->bind	(
+			'<Return>'	=> sub
+					{
+					if ($mot)
+						{
+						push @clefs, $mot;
+						$l->see('end');
+						$mot = "";
+						}
+					}
+			);
+	$l->bind	( '<1>' => sub { $l->focus; });
+	$l->bind	(
+			'<FocusOut>'	=> sub
+					{
+					my $s = $l->curselection;
+					$l->selectionClear($s) if defined $s;
+					}
+			);
+	$l->bind	(
+			'<Delete>'	=> sub
+					{
+					my $s = $l->curselection;
+					$l->delete($s) if defined $s;
+					}
+			);
+	$fr2->Button
+		(
+		-text		=> 'OK',
+		-command	=> sub
+					{
+					$doc->title($titre);
+					$doc->creator($auteur);
+					$doc->subject($sujet);
+					$doc->description
+						(
+						$description->get('1.0', 'end')
+						);
+					$doc->removeKeywords;
+					$doc->keywords(@clefs);
+					$doc->save;
+					$doc->dispose; $txt->dispose;
+					$D->destroy;
+					}
+		)
+		-> pack(-side => 'left', -expand => 1, -fill => 'x');
+	$fr2->Button
+		(
+		-text		=> 'Cancel',
+		-command	=> sub
+					{
+					$doc->dispose; $txt->dispose;
+					$D->destroy;
+					}
+		)
+		-> pack(-side => 'left', -expand => 1, -fill => 'x');
+	$D->bind('<KeyPress-Escape>' => sub { $D->destroy });
+	$D->bind('<Destroy>' => sub { $f->deiconify; });
+	$D->update;			
+	place_fenetre($D);
+	$f->withdraw;
+	$D->deiconify;
+	tie @clefs, "Tk::Listbox", $l;
+	@clefs		= $doc->keywords; shift @clefs unless $clefs[0];
+	$titre		= $doc->title;
+	$auteur		= $doc->creator;
+	$sujet		= $doc->subject;
+	$description->delete('1.0', 'end');
+	$description->insert('end', $doc->description);
+	if ($txt)
+		{
+		$texte->insert('end', "Loading the text...");
+		$D->idletasks;
+		$texte->delete('1.0', 'end');
+		foreach my $contenu ($txt->selectTextContent)
+			{
+			$texte->insert('end', ($contenu . "\n"));
+			}
+		}
+	else
+		{
+		$texte->insert('end', "**** CONTENT NOT AVAILABLE ****");
+		}
+	$texte->configure(-state => 'disabled');
+	$D->grab;
+	}
+
+#------------------------------------------------------------------------------
+
+sub	listeFichiers
+	{
+	$chemin	= $sv_chemin unless $chemin;
+	my $r = chdir $chemin;
+	unless ($r)
+		{
+		warn "$chemin is not available ; back to $sv_chemin\n";
+		$chemin = $sv_chemin;
+		chdir $chemin or warn "$chemin is not available\n";
+		}
+	return $OpenOffice::OODoc::VERSION >= 2 ? <*.sx? *.od?> : <*.sx?>;
+	}
+
+#------------------------------------------------------------------------------
+
+$f	= MainWindow->new
+	(
+	title	=> 'Documents',
+	);
+$r1	= $f->Frame->pack(-side => 'bottom', -fill => 'x');
+my $dir	= $f->Entry(-width => 32, -textvariable => \$chemin)
+		->pack(-side => 'bottom', -expand => 'yes');
+$dir->bind('<Return>', sub { @liste = listeFichiers; });
+$boite_liste	= $f->Scrolled
+		(
+		'Listbox',
+		-scrollbars	=> 'oe',
+		-width		=> 32,
+		-height		=> 16,
+		-bg		=> $couleur_saisie
+		)
+		->pack(-side => 'top', -expand => 'yes');
+my $OK		= $r1->Button
+		(
+		-text	=> 'OK',
+		)
+		->pack(-side => 'left', -expand => 1, -fill => 'x');
+$OK->configure
+		(
+		-command	=> sub
+			{
+			my $f = $liste[($boite_liste->curselection)[0]];
+			$OK->configure
+				(
+				-text	=> 'Loading...'
+				);
+			accesMeta($f) if ($f);
+			$OK->configure
+				(
+				-text	=> 'OK'
+				);
+			}
+		);
+$boite_liste->bind
+		(
+		'<Double-Button-1>' => sub
+			{
+			my $f = $liste[($boite_liste->curselection)[0]];
+			$OK->configure
+				(
+				-text	=> 'Loading...'
+				);
+			accesMeta($f) if ($f);
+			$OK->configure
+				(
+				-text	=> 'OK'
+				);
+			}
+		);
+my $Annuler	= $r1->Button
+		(
+		-text	=> 'Cancel',
+		-command => [ $f => 'destroy' ]
+		)
+		->pack(-side => 'left', -fill => 'x');
+$f->bind('<KeyPress-Escape>' => sub { $f->destroy });
+
+tie @liste, "Tk::Listbox", $boite_liste;
+@liste	= listeFichiers;
+$boite_liste->selectionSet(0);
+
+place_fenetre($f);
+$OK->focus;
+
+#------------------------------------------------------------------------------
+
+MainLoop;
+exit;
+
+#------------------------------------------------------------------------------

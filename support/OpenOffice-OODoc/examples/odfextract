@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+#-----------------------------------------------------------------------------
+#	$Id : odfextract 0.4 2008-05-04 JMG$
+#-----------------------------------------------------------------------------
+
+=head1	NAME
+
+odfextract - Text selection and copy from one document to another one
+
+=head1	SYNOPSIS
+
+This sample script extracts every text element matching a given
+pattern (string or regex) from a source document and appends it
+to a target document. The target document must be an existing one
+(empty or not).
+
+The first argument of the command line is the source file name,
+the second one is the target file, the third one is the selection
+filter (i.e. any quoted string or Perl regular expression)
+
+=cut
+
+use OpenOffice::OODoc	2.101;
+
+die "Usage : odfextract source_file target_file filter\n"
+	unless ($ARGV[0] && $ARGV[1] && $ARGV[2]);
+
+	# document objects initialization
+print "Opening $ARGV[0] as source document...\n";
+my $source_doc = odfText(file => $ARGV[0])
+	or die "$ARGV[0] is not a regular ODF file\n";
+print "Opening $ARGV[1] as target document...\n";
+my $target_doc = odfText(file => $ARGV[1])
+	or die "$ARGV[1] is not a regular ODF file\n";
+
+	# the imported elements will be appended to the document body
+my $root_element = $target_doc->getBody;
+
+	# selection & transfer are done here
+print "Selecting the content matching $ARGV[2]...\n";
+$target_doc->appendElement($root_element, $_)
+	for $source_doc->selectElementsByContent($ARGV[2])->copy;
+
+	# commit the changes in target file
+print "Saving the selection in $ARGV[1]...\n";
+$target_doc->save;
+
+print "Job complete\n";
+exit;
+
+#----------------------------------------------------------------------

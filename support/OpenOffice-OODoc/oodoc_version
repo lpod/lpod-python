@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+use OpenOffice::OODoc;
+
+sub	display_date
+	{
+	return localtime(odfTimelocal(shift));
+	}
+
+my $version	= $OpenOffice::OODoc::VERSION;
+my $pkgdate	= display_date $OpenOffice::OODoc::BUILD_DATE;
+my $instpath	= $OpenOffice::OODoc::INSTALLATION_PATH;
+
+print	"OpenOffice::OODoc\n  Version\t\t$version\n"	.
+	"  Build date\t\t$pkgdate\n"		.
+	"  Installation path\t$instpath\n";
+exit;
+

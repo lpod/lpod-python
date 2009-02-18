@@ -1,0 +1,40 @@
+------------------------------------------------------------------------
+
+OpenOffice::OODoc - The Open OpenDocument Connector
+(http://search.cpan.org/dist/OpenOffice-OODoc)
+
+-------------------------------------------------------------------------
+
+For a introductory description of the purposes and capabilities of
+OpenOffice::OODoc, please read the OpenOffice::OODoc::Intro manual
+page. This page in contained in the OODoc/Intro.pod file of the CPAN
+distribution. It can be read on line using the following link:
+
+http://search.cpan.org/dist/OpenOffice-OODoc/OODoc/Intro.pod
+
+There is an alternative intro for french-reading users. It's available in
+ODF (http://jean.marie.gouarne.online.fr/doc/oodoc_guide.odt) or PDF
+format (http://jean.marie.gouarne.online.fr/doc/oodoc_guide.pdf).
+
+See INSTALL for system requirements and installation instructions for
+the CPAN original distribution.
+
+The present version supports both the OpenOffice.org 1.0 document format
+and the OASIS OpenDocument Format (ODF) 1.0. It works with ODF 1.1 and
+1.2 as well, knowing that its present features are not directly impacted
+by the changes between the successive versions of the ODF specification.
+In addition, advanced users can rely on OpenOffice::OODoc to process any
+kind of flat or zipped XML files, in order to combine ODF documents with
+non-ODF XML data through a single application programming interface.
+
+-------------------------------------------------------------------------
+
+This software is free software. For more information about the licence,
+see LICENCE.
+
+Comments are welcome. They should be posted through the public forum
+(http://www.cpanforum.com/dist/OpenOffice-OODoc).
+
+Bug reports should be registered through the CPAN Request Tracker (http://rt.cpan.org/Public/Dist/Display.html?Name=OpenOffice-OODoc)
+
+-------------------------------------------------------------------------
