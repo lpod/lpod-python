@@ -2,3 +2,4 @@ MANIFEST
 version.txt
 build
 dist
+*.pyc
