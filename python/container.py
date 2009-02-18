@@ -4,6 +4,7 @@
 # Import from the Standard Library
 
 # Import from itools
+from itools import vfs
 from itools.core import get_abspath
 
 
@@ -23,8 +24,8 @@ ODF_CLASSES = {
 class odf_container(object):
 
     def __init__(self, uri):
-        # TODO use vfs/gio
-        open(uri)
+        # TODO just for testing
+        file = vfs.open(uri)
 
         self.uri = uri
 
