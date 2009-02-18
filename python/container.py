@@ -23,6 +23,9 @@ ODF_CLASSES = {
 class odf_container(object):
 
     def __init__(self, uri):
+        # TODO use vfs/gio
+        open(uri)
+
         self.uri = uri
 
 

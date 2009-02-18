@@ -44,7 +44,7 @@ class NewContainerTestCase(TestCase):
 class GetContainerTestCase(TestCase):
 
     def test_filesystem(self):
-        path = 'examples/example.odt'
+        path = 'samples/example.odt'
         container = get_odf_container(path)
 
 
