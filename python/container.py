@@ -8,7 +8,7 @@ from zipfile import ZipFile
 # Import from itools
 from itools import vfs
 from itools.core import get_abspath
-from itools.xml import XMLParser
+from itools.xml import XMLParser, get_element
 
 
 # Classes and their default template
@@ -43,7 +43,9 @@ ODF_MIMETYPES = {
         'application/vnd.oasis.opendocument.presentation': 'odp',
         'application/vnd.oasis.opendocument.presentation-template': 'otp',
         'application/vnd.oasis.opendocument.graphics': 'odg',
-        'application/vnd.oasis.opendocument.graphics-template': 'otg'
+        'application/vnd.oasis.opendocument.graphics-template': 'otg',
+        # XML-only document
+        'application/xml': 'xml',
 }
 
 
@@ -64,17 +66,13 @@ class odf_container(object):
             raise NotImplementedError, ("reading uncompressed ODF "
                                         "is not supported")
 
-        self.uri = uri
-        # TODO XML
-        self.file = vfs.open(uri)
-
-        mimetype = self.get_part('mimetype')
-        if mimetype is None:
-            mimetype = vfs.get_mimetype(uri)
+        mimetype = vfs.get_mimetype(uri)
         if not mimetype in ODF_MIMETYPES:
             raise ValueError, "mimetype '%s' is unknown" % mimetype
 
+        self.uri = uri
         self.mimetype = mimetype
+        self.file = vfs.open(uri)
 
 
     def clone(self):
@@ -91,15 +89,25 @@ class odf_container(object):
 
 
     def get_part(self, part_name):
-        # TODO XML
-        archive = ZipFile(self.file)
-        if part_name in ODF_PARTS and part_name != 'mimetype':
-            data = archive.read('%s.xml' % part_name)
-            part = list(XMLParser(data))
+        if self.mimetype == 'application/xml':
+            if part_name not in ODF_PARTS:
+                raise ValueError, ("Third-party parts are not supported "
+                                   "in an XML-only ODF document")
+            if part_name == 'mimetype':
+                part = self.mimetype
+            else:
+                events = XMLParser(self.file.read())
+                element = get_element(list(events),
+                                      'document-%s' % part_name)
+                return list(element.get_content_elements())
         else:
-            part = archive.read(part_name)
-
-        archive.close()
+            archive = ZipFile(self.file)
+            if part_name in ODF_PARTS and part_name != 'mimetype':
+                data = archive.read('%s.xml' % part_name)
+                part = list(XMLParser(data))
+            else:
+                part = archive.read(part_name)
+            archive.close()
         return part
 
 

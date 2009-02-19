@@ -72,8 +72,7 @@ class ContainerTestCase(TestCase):
 
 
     def test_odf_xml(self):
-        self.assertRaises(ValueError, get_odf_container,
-                          'samples/example.xml')
+        container = get_odf_container('samples/example.xml')
 
 
     def test_get_part_xml(self):
@@ -87,3 +86,16 @@ class ContainerTestCase(TestCase):
         container = get_odf_container('samples/example.odt')
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
+
+
+    def test_odf_xml_bad_part(self):
+        container = get_odf_container('samples/example.xml')
+        self.assertRaises(ValueError, container.get_part, 'Pictures/a.jpg')
+
+
+    def test_odf_xml_part_xml(self):
+        container = get_odf_container('samples/example.xml')
+        meta = container.get_part('meta')
+        expected = ('urn:oasis:names:tc:opendocument:xmlns:office:1.0',
+                    'meta', {})
+        self.assertEqual(meta[1][1], expected)
