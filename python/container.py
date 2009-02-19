@@ -7,6 +7,7 @@ from copy import deepcopy
 # Import from itools
 from itools import vfs
 from itools.core import get_abspath
+from itools.xml import XMLParser
 
 
 # Classes and their default template
@@ -45,6 +46,10 @@ ODF_MIMETYPES = {
 }
 
 
+# Standard parts in the archive (other are regular paths)
+ODF_PARTS = ['content', 'meta', 'mimetype', 'settings', 'styles']
+
+
 class odf_container(object):
     """Representation of the ODF document.
     """
@@ -58,27 +63,51 @@ class odf_container(object):
             raise NotImplementedError, ("reading uncompressed ODF "
                                         "is not supported")
 
-        mimetype = vfs.get_mimetype(uri)
-        if mimetype not in ODF_MIMETYPES:
+        self.uri = uri
+        # TODO XML
+        self.file = vfs.mount_archive(uri)
+
+        mimetype = self.get_part('mimetype')
+        if mimetype is None:
+            mimetype = vfs.get_mimetype(uri)
+        if not mimetype in ODF_MIMETYPES:
             raise ValueError, "mimetype '%s' is unknown" % mimetype
 
-        # If all is OK
-        self.uri = uri
         self.mimetype = mimetype
-        self.file = vfs.open(uri)
 
 
-    def _clone(self):
+    def clone(self):
         clone = object.__new__(self.__class__)
         for name in self.__dict__:
             if name in ('uri', 'file'):
-                setattr(clone, 'uri', None)
+                setattr(clone, name, None)
             else:
                 value = getattr(self, name)
                 value = deepcopy(value)
                 setattr(clone, name, value)
 
         return clone
+
+
+    def get_part(self, part_name):
+        archive = self.file
+        if part_name in ODF_PARTS and part_name != 'mimetype':
+            # TODO XML
+            file = archive.open('%s.xml' % part_name)
+            part = XMLParser(file)
+            file.close()
+        else:
+            # TODO XML
+            file = archive.open(part_name)
+            part = file.read()
+            file.close()
+
+        return part
+
+
+    def __del__(self):
+        if getattr(self, 'file', None) is not None:
+            self.file.unmount()
 
 
 
@@ -99,7 +128,7 @@ def new_odf_container(odf_class=None, template_uri=None):
     template = get_odf_container(template_uri)
 
     # Return a copy of the template
-    return template._clone()
+    return template.clone()
 
 
 

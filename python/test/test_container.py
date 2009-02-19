@@ -7,6 +7,7 @@ from unittest import TestCase
 
 # Import from lpod
 from lpod.container import new_odf_container, get_odf_container
+from lpod.container import ODF_EXTENSIONS
 
 
 class NewContainerTestCase(TestCase):
@@ -63,5 +64,23 @@ class ContainerTestCase(TestCase):
 
     def test_clone(self):
         container = new_odf_container(odf_class='text')
-        clone = container._clone()
+        clone = container.clone()
         self.assertEqual(clone.uri, None)
+
+
+    def test_odf_xml(self):
+        self.assertRaises(ValueError, get_odf_container,
+                          'samples/example.xml')
+
+
+    def test_get_part_xml(self):
+        container = get_odf_container('samples/example.odt')
+        content = container.get_part('content')
+        self.assert_(isinstance(content, list))
+        self.assert_(isinstance(content[0], list))
+
+
+    def test_get_part_mimetype(self):
+        container = get_odf_container('samples/example.odt')
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
