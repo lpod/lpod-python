@@ -3,6 +3,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from zipfile import ZipFile
 
 # Import from itools
 from itools import vfs
@@ -46,7 +47,7 @@ ODF_MIMETYPES = {
 }
 
 
-# Standard parts in the archive (other are regular paths)
+# Standard parts in the container (other are regular paths)
 ODF_PARTS = ['content', 'meta', 'mimetype', 'settings', 'styles']
 
 
@@ -65,7 +66,7 @@ class odf_container(object):
 
         self.uri = uri
         # TODO XML
-        self.file = vfs.mount_archive(uri)
+        self.file = vfs.open(uri)
 
         mimetype = self.get_part('mimetype')
         if mimetype is None:
@@ -90,24 +91,16 @@ class odf_container(object):
 
 
     def get_part(self, part_name):
-        archive = self.file
+        # TODO XML
+        archive = ZipFile(self.file)
         if part_name in ODF_PARTS and part_name != 'mimetype':
-            # TODO XML
-            file = archive.open('%s.xml' % part_name)
-            part = XMLParser(file)
-            file.close()
+            data = archive.read('%s.xml' % part_name)
+            part = XMLParser(data)
         else:
-            # TODO XML
-            file = archive.open(part_name)
-            part = file.read()
-            file.close()
+            part = archive.read(part_name)
 
+        archive.close()
         return part
-
-
-    def __del__(self):
-        if getattr(self, 'file', None) is not None:
-            self.file.unmount()
 
 
 
