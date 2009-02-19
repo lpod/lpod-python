@@ -95,7 +95,7 @@ class odf_container(object):
         archive = ZipFile(self.file)
         if part_name in ODF_PARTS and part_name != 'mimetype':
             data = archive.read('%s.xml' % part_name)
-            part = XMLParser(data)
+            part = list(XMLParser(data))
         else:
             part = archive.read(part_name)
 

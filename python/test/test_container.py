@@ -5,6 +5,9 @@
 import unittest
 from unittest import TestCase
 
+# Import from itools
+from itools.xml import XML_DECL
+
 # Import from lpod
 from lpod.container import new_odf_container, get_odf_container
 from lpod.container import ODF_EXTENSIONS
@@ -77,7 +80,7 @@ class ContainerTestCase(TestCase):
         container = get_odf_container('samples/example.odt')
         content = container.get_part('content')
         self.assert_(isinstance(content, list))
-        self.assert_(isinstance(content[0], list))
+        self.assertEqual(content[0][0], XML_DECL)
 
 
     def test_get_part_mimetype(self):
