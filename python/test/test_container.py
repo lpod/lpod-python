@@ -6,7 +6,7 @@ import unittest
 from unittest import TestCase
 
 # Import from itools
-from itools.xml import XML_DECL
+from itools.xml import XML_DECL, START_ELEMENT
 
 # Import from lpod
 from lpod.container import new_odf_container, get_odf_container
@@ -98,4 +98,8 @@ class ContainerTestCase(TestCase):
         meta = container.get_part('meta')
         expected = ('urn:oasis:names:tc:opendocument:xmlns:office:1.0',
                     'meta', {})
-        self.assertEqual(meta[1][1], expected)
+        for event, value, line in meta:
+            if event == START_ELEMENT:
+                self.assertEqual(value, expected)
+                break
+        self.fail('part "meta" not found')
