@@ -88,27 +88,37 @@ class odf_container(object):
         return clone
 
 
+    def __get_part_xml(self, part_name):
+        if part_name not in ODF_PARTS:
+            raise ValueError, ("Third-party parts are not supported "
+                               "in an XML-only ODF document")
+        if part_name == 'mimetype':
+            part = self.mimetype
+        else:
+            events = XMLParser(self.file.read())
+            element = get_element(list(events),
+                                  'document-%s' % part_name)
+            part = list(element.get_content_elements())
+        return part
+
+
+
+    def __get_part_zip(self, part_name):
+        archive = ZipFile(self.file)
+        if part_name in ODF_PARTS and part_name != 'mimetype':
+            data = archive.read('%s.xml' % part_name)
+            part = list(XMLParser(data))
+        else:
+            part = archive.read(part_name)
+        archive.close()
+        return part
+
+
     def get_part(self, part_name):
         if self.mimetype == 'application/xml':
-            if part_name not in ODF_PARTS:
-                raise ValueError, ("Third-party parts are not supported "
-                                   "in an XML-only ODF document")
-            if part_name == 'mimetype':
-                part = self.mimetype
-            else:
-                events = XMLParser(self.file.read())
-                element = get_element(list(events),
-                                      'document-%s' % part_name)
-                return list(element.get_content_elements())
+            return self.__get_part_xml(part_name)
         else:
-            archive = ZipFile(self.file)
-            if part_name in ODF_PARTS and part_name != 'mimetype':
-                data = archive.read('%s.xml' % part_name)
-                part = list(XMLParser(data))
-            else:
-                part = archive.read(part_name)
-            archive.close()
-        return part
+            return self.__get_part_zip(part_name)
 
 
 
