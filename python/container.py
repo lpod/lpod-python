@@ -73,6 +73,10 @@ class odf_container(object):
         self.uri = uri
         self.mimetype = mimetype
         self.file = vfs.open(uri)
+        # Internal state
+        self.__archive = None
+        self.__parts = {}
+
 
 
     def clone(self):
@@ -95,22 +99,31 @@ class odf_container(object):
         if part_name == 'mimetype':
             part = self.mimetype
         else:
+            loaded_parts = self.__parts
+            if part_name in loaded_parts:
+                return loaded_parts[part_name]
             events = XMLParser(self.file.read())
             element = get_element(list(events),
                                   'document-%s' % part_name)
             part = list(element.get_content_elements())
+            loaded_parts[part_name] = part
         return part
 
 
 
     def __get_part_zip(self, part_name):
-        archive = ZipFile(self.file)
+        loaded_parts = self.__parts
+        if part_name in loaded_parts:
+            return loaded_parts[part_name]
+        if self.__archive is None:
+            self.__archive = ZipFile(self.file)
+        archive = self.__archive
         if part_name in ODF_PARTS and part_name != 'mimetype':
             data = archive.read('%s.xml' % part_name)
             part = list(XMLParser(data))
         else:
             part = archive.read(part_name)
-        archive.close()
+        loaded_parts[part_name] = part
         return part
 
 
