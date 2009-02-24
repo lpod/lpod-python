@@ -1,0 +1,71 @@
+Level 0
+=======
+
+Level 0.0
+---------
+
+odf_container container;
+
+container = new_odf_container(odf_class);
+container = new_odf_container(template);
+                    
+container = get_odf_container(url);
+
+odf_container copy = container.clone();
+str bytestring = container.get_part(part_name);
+container.set_part(part_name, bytestring);
+container.del_part(part_name);
+
+TODO
+~~~~
+
+container.save();
+container.save(packaging);
+container.save(url);
+container.save(url, packaging);
+
+Level 0.1
+---------
+
+context ctx;
+
+ctx = context(container);
+
+ctx.events;
+ctx.container;
+ctx.serialize();
+
+list l_elt = ctx.get_element_list("xpath");
+
+element elt = l_elt[0];
+
+elt.get_element_list("xpath");
+
+value = elt.get_attribute(name);
+elt.set_attribute(name, value);
+
+unicode text = elt.get_text();
+elt.set_text(text);
+
+element e2 = create_element('xml');
+elt.insert_element(e2, {previous_sibling, next_sibling, ..., first_child,
+    last_child}, <N>);
+e3 = elt.copy();
+
+elt.delete();
+
+Level 1
+=======
+
+TODO
+====
+
+manifest?
+
+XPath Requirements
+==================
+
+/text:p[4]
+/toto[4]/text:p[5]
+/toto[@attr=value]
+/toto[@attr=value]/titi[4]
