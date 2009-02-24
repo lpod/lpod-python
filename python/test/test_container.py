@@ -52,6 +52,11 @@ class GetContainerTestCase(TestCase):
         container = get_odf_container(path)
 
 
+    def test_odf_xml(self):
+        path = 'samples/example.xml'
+        container = get_odf_container(path)
+
+
     def test_http(self):
         uri = 'http://test.lpod-project.org/example.odt'
         container = get_odf_container(uri)
@@ -69,10 +74,6 @@ class ContainerTestCase(TestCase):
         container = new_odf_container(odf_class='text')
         clone = container.clone()
         self.assertEqual(clone.uri, None)
-
-
-    def test_odf_xml(self):
-        container = get_odf_container('samples/example.xml')
 
 
     def test_get_part_xml(self):
