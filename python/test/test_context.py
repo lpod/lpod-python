@@ -2,8 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-import unittest
-from unittest import TestCase
+from unittest import TestCase, main
 
 # Import from itools
 from itools.xml import XML_DECL, START_ELEMENT
@@ -63,3 +62,8 @@ class ContextTestCase(TestCase):
 
     def serialize(self):
         raise NotImplementedError
+
+
+
+if __name__ == '__main__':
+    main()

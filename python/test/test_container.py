@@ -2,8 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-import unittest
-from unittest import TestCase
+from unittest import TestCase, main
 
 # Import from itools
 from itools.xml import XML_DECL, START_ELEMENT
@@ -114,3 +113,8 @@ class ContainerTestCase(TestCase):
         path = 'content'
         container.del_part(path)
         self.assertRaises(ValueError, container.get_part, path)
+
+
+
+if __name__ == '__main__':
+    main()
