@@ -3,8 +3,6 @@
 
 # Import from the Standard Library
 from copy import deepcopy
-from zipfile import ZipFile
-from cStringIO import StringIO
 
 # Import from itools
 from itools import vfs
@@ -102,9 +100,7 @@ class odf_container(object):
 
     def __get_archive(self):
         if self.__archive is None:
-            data = self.__get_data()
-            archive = StringIO(data)
-            self.__archive = ZipFile(archive)
+            self.__archive = vfs.mount_archive(self.uri)
         return self.__archive
 
 
@@ -128,9 +124,13 @@ class odf_container(object):
     def __get_part_zip(self, part_name):
         archive = self.__get_archive()
         if part_name in ODF_PARTS and part_name != 'mimetype':
-            part = archive.read('%s.xml' % part_name)
+            file = archive.open('%s.xml' % part_name)
+            part = file.read()
+            file.close()
         else:
-            part = archive.read(part_name)
+            file = archive.open(part_name)
+            part = file.read()
+            file.close()
         return part
 
 
