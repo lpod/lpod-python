@@ -79,8 +79,8 @@ class ContainerTestCase(TestCase):
     def test_get_part_xml(self):
         container = get_odf_container('samples/example.odt')
         content = container.get_part('content')
-        self.assert_(isinstance(content, list))
-        self.assertEqual(content[0][0], XML_DECL)
+        xml_decl = '<?xml version="1.0" encoding="UTF-8"?>'
+        self.assert_(content.startswith(xml_decl))
 
 
     def test_get_part_mimetype(self):
@@ -97,10 +97,4 @@ class ContainerTestCase(TestCase):
     def test_odf_xml_part_xml(self):
         container = get_odf_container('samples/example.xml')
         meta = container.get_part('meta')
-        expected = ('urn:oasis:names:tc:opendocument:xmlns:office:1.0',
-                    'meta', {})
-        for event, value, line in meta:
-            if event == START_ELEMENT:
-                self.assertEqual(value, expected)
-                break
-        self.fail('part "meta" not found')
+        self.assert_(meta.startswith('<office:document-meta>'))

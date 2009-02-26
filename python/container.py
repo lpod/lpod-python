@@ -4,11 +4,11 @@
 # Import from the Standard Library
 from copy import deepcopy
 from zipfile import ZipFile
+from cStringIO import StringIO
 
 # Import from itools
 from itools import vfs
 from itools.core import get_abspath
-from itools.xml import XMLParser, get_element
 
 
 # Classes and their default template
@@ -72,8 +72,8 @@ class odf_container(object):
 
         self.uri = uri
         self.mimetype = mimetype
-        self.file = vfs.open(uri)
         # Internal state
+        self.__data = None
         self.__archive = None
         self.__parts = {}
 
@@ -82,7 +82,7 @@ class odf_container(object):
     def clone(self):
         clone = object.__new__(self.__class__)
         for name in self.__dict__:
-            if name in ('uri', 'file'):
+            if name == 'uri':
                 setattr(clone, name, None)
             else:
                 value = getattr(self, name)
@@ -90,6 +90,22 @@ class odf_container(object):
                 setattr(clone, name, value)
 
         return clone
+
+
+    def __get_data(self):
+        if self.__data is None:
+            file = vfs.open(self.uri)
+            self.__data = file.read()
+            file.close()
+        return self.__data
+
+
+    def __get_archive(self):
+        if self.__archive is None:
+            data = self.__get_data()
+            archive = StringIO(data)
+            self.__archive = ZipFile(archive)
+        return self.__archive
 
 
     def __get_part_xml(self, part_name):
@@ -102,10 +118,12 @@ class odf_container(object):
             loaded_parts = self.__parts
             if part_name in loaded_parts:
                 return loaded_parts[part_name]
-            events = XMLParser(self.file.read())
-            element = get_element(list(events),
-                                  'document-%s' % part_name)
-            part = list(element.get_content_elements())
+            data = self.__get_data()
+            start_tag = '<office:document-%s>' % part_name
+            start = data.index(start_tag)
+            end_tag = '</office:document-%s>' % part_name
+            end = data.index(end_tag)
+            part = data[start:end + len(end_tag)]
             loaded_parts[part_name] = part
         return part
 
@@ -115,12 +133,9 @@ class odf_container(object):
         loaded_parts = self.__parts
         if part_name in loaded_parts:
             return loaded_parts[part_name]
-        if self.__archive is None:
-            self.__archive = ZipFile(self.file)
-        archive = self.__archive
+        archive = self.__get_archive()
         if part_name in ODF_PARTS and part_name != 'mimetype':
-            data = archive.read('%s.xml' % part_name)
-            part = list(XMLParser(data))
+            part = archive.read('%s.xml' % part_name)
         else:
             part = archive.read(part_name)
         loaded_parts[part_name] = part
