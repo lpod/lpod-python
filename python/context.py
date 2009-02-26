@@ -1,15 +1,8 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
-# Import from the Standard Library
-from copy import deepcopy
-from zipfile import ZipFile
-from cStringIO import StringIO
-
 # Import from itools
-from itools import vfs
-from itools.core import get_abspath
-from itools.xml import XMLParser
+from itools.xml import XMLParser, stream_to_str
 
 
 
@@ -51,7 +44,6 @@ class odf_element(object):
         raise NotImplementedError
 
 
-
     def delete(self):
         raise NotImplementedError
 
@@ -83,4 +75,4 @@ class odf_context(object):
 
 
     def serialize(self):
-        raise NotImplementedError
+        return stream_to_str(self.__get_events())
