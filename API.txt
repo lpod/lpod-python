@@ -27,9 +27,9 @@ container.save(url, packaging);
 Level 0.1
 ---------
 
-context ctx;
+odf_context ctx;
 
-ctx = context(container);
+ctx = odf_context(part_name, container);
 
 ctx.events;
 ctx.container;

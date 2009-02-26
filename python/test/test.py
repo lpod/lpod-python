@@ -6,9 +6,10 @@ from unittest import TestCase, TestLoader, TestSuite, TextTestRunner
 
 # Import tests
 import test_container
+import test_context
 
 
-test_modules = [test_container]
+test_modules = [test_container, test_context]
 
 
 loader = TestLoader()
