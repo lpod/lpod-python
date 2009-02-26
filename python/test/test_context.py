@@ -9,8 +9,8 @@ from unittest import TestCase
 from itools.xml import XML_DECL, START_ELEMENT
 
 # Import from lpod
-from lpod.container import new_odf_container, get_odf_container
-from lpod.container import ODF_EXTENSIONS
+from lpod.context import create_element
+from lpod.context import odf_element, odf_context
 
 
 class CreateElementTestCase(TestCase):
