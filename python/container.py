@@ -115,38 +115,47 @@ class odf_container(object):
         if part_name == 'mimetype':
             part = self.mimetype
         else:
-            loaded_parts = self.__parts
-            if part_name in loaded_parts:
-                return loaded_parts[part_name]
             data = self.__get_data()
             start_tag = '<office:document-%s>' % part_name
             start = data.index(start_tag)
             end_tag = '</office:document-%s>' % part_name
             end = data.index(end_tag)
             part = data[start:end + len(end_tag)]
-            loaded_parts[part_name] = part
         return part
 
 
 
     def __get_part_zip(self, part_name):
-        loaded_parts = self.__parts
-        if part_name in loaded_parts:
-            return loaded_parts[part_name]
         archive = self.__get_archive()
         if part_name in ODF_PARTS and part_name != 'mimetype':
             part = archive.read('%s.xml' % part_name)
         else:
             part = archive.read(part_name)
-        loaded_parts[part_name] = part
         return part
 
 
     def get_part(self, part_name):
+        loaded_parts = self.__parts
+        if part_name in loaded_parts:
+            part = loaded_parts[part_name]
+            if part is None:
+                raise ValueError, "part is deleted"
+            return part
         if self.mimetype == 'application/xml':
-            return self.__get_part_xml(part_name)
+            part = self.__get_part_xml(part_name)
         else:
-            return self.__get_part_zip(part_name)
+            part = self.__get_part_zip(part_name)
+        loaded_parts[part_name] = part
+        return part
+
+
+    def set_part(self, part_name, data):
+        self.__parts[part_name] = data
+
+
+    def del_part(self, part_name):
+        # Mark for deletion
+        self.__parts[part_name] = None
 
 
 

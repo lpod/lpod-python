@@ -98,3 +98,19 @@ class ContainerTestCase(TestCase):
         container = get_odf_container('samples/example.xml')
         meta = container.get_part('meta')
         self.assert_(meta.startswith('<office:document-meta>'))
+
+
+    def test_set_part(self):
+        container = get_odf_container('samples/example.odt')
+        path = 'Pictures/a.jpg'
+        data = 'JFIFIThinkImAnImage'
+        container.set_part(path, data)
+        self.assertEqual(container.get_part(path), data)
+
+
+    def test_del_part(self):
+        container = get_odf_container('samples/example.odt')
+        # Not a realistic test
+        path = 'content'
+        container.del_part(path)
+        self.assertRaises(ValueError, container.get_part, path)

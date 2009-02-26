@@ -12,8 +12,8 @@ container = new_odf_container(template);
 container = get_odf_container(url);
 
 odf_container copy = container.clone();
-str bytestring = container.get_part(part_name);
-container.set_part(part_name, bytestring);
+str data = container.get_part(part_name);
+container.set_part(part_name, data);
 container.del_part(part_name);
 
 TODO
