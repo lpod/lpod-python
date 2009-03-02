@@ -68,7 +68,7 @@ class odf_element(object):
         element = self.__element
         element.setProp(name, value)
 
-    
+
     def get_text(self):
         # XXX all text recursively is need?
         element = self.__element

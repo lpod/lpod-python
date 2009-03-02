@@ -40,7 +40,8 @@ class ElementTestCase(TestCase):
 
 
     def test_get_element_list(self):
-        raise NotImplementedError
+        elements = self.content_context.get_element_list('//text:p')
+        self.assertEqual(len(elements), 1)
 
 
     def test_get_attribute(self):
@@ -86,7 +87,9 @@ class ContextTestCase(TestCase):
 
 
     def test_get_element_list(self):
-        raise NotImplementedError
+        content_context = odf_context('content', self.container)
+        elements = content_context.get_element_list('//text:p')
+        self.assertEqual(len(elements), 1)
 
 
     def serialize(self):
