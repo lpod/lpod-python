@@ -8,6 +8,7 @@ from unittest import TestCase, main
 from itools.xml import XML_DECL, START_ELEMENT
 
 # Import from lpod
+from lpod.container import get_odf_container
 from lpod.context import create_element
 from lpod.context import odf_element, odf_context
 
@@ -55,6 +56,14 @@ class ElementTestCase(TestCase):
 
 
 class ContextTestCase(TestCase):
+
+    def setUp(self):
+        self.container = get_odf_container('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.container
+
 
     def test_get_element_list(self):
         raise NotImplementedError
