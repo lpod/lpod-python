@@ -58,10 +58,10 @@ class odf_element(object):
 
     def get_attribute(self, name):
         element = self.__element
-        properties = element.properties
-        if properties is None:
+        property = element.hasProp(name)
+        if property is None:
             return None
-        return properties.get(name)
+        return property.getContent()
 
 
     def set_attribute(self, name, value):
