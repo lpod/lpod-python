@@ -70,7 +70,10 @@ class ContextTestCase(TestCase):
 
 
     def serialize(self):
-        raise NotImplementedError
+        container = self.container
+        content_bytes = container.get_part('content')
+        context = odf_context('content', container)
+        self.assertEqual(content_bytes, context.serialize())
 
 
 
