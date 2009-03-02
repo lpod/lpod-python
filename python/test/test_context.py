@@ -22,12 +22,30 @@ class CreateElementTestCase(TestCase):
 
 class ElementTestCase(TestCase):
 
+    def setUp(self):
+        container = get_odf_container('samples/example.odt')
+        self.container = container
+        content_context = odf_context('content', container)
+        self.content_context = content_context
+        # TODO make "//text:p[0]" pass
+        paragraph_element = content_context.get_element_list('//text:p')
+        self.paragraph_element = paragraph_element[0]
+
+
+    def tearDown(self):
+        del self.paragraph_element
+        del self.content_context
+        del self.container
+
+
     def test_get_element_list(self):
         raise NotImplementedError
 
 
     def test_get_attribute(self):
-        raise NotImplementedError
+        element = self.paragraph_element
+        self.assertEqual(element.get_attribute('text:style-name'),
+                         'Standard')
 
 
     def test_set_attribute(self):
@@ -35,7 +53,8 @@ class ElementTestCase(TestCase):
 
 
     def test_get_text(self):
-        raise NotImplementedError
+        element = self.paragraph_element
+        self.assertEqual(element.get_text(), u"This is an example.")
 
 
     def test_set_text(self):
