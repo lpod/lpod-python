@@ -5,6 +5,37 @@
 from libxml2 import parseMemory
 
 
+ODF_NAMESPACES = {
+        'office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+        'style': "urn:oasis:names:tc:opendocument:xmlns:style:1.0",
+        'text': "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
+        'table': "urn:oasis:names:tc:opendocument:xmlns:table:1.0",
+        'draw': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
+        'fo': "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0",
+        'xlink': "http://www.w3.org/1999/xlink",
+        'dc': "http://purl.org/dc/elements/1.1/",
+        'meta': "urn:oasis:names:tc:opendocument:xmlns:meta:1.0",
+        'number': "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0",
+        'svg': "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0",
+        'chart': "urn:oasis:names:tc:opendocument:xmlns:chart:1.0",
+        'dr3d': "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0",
+        'math': "http://www.w3.org/1998/Math/MathML",
+        'form': "urn:oasis:names:tc:opendocument:xmlns:form:1.0",
+        'script': "urn:oasis:names:tc:opendocument:xmlns:script:1.0",
+        'ooo': "http://openoffice.org/2004/office",
+        'ooow': "http://openoffice.org/2004/writer",
+        'oooc': "http://openoffice.org/2004/calc",
+        'dom': "http://www.w3.org/2001/xml-events",
+        'xforms': "http://www.w3.org/2002/xforms",
+        'xsd': "http://www.w3.org/2001/XMLSchema",
+        'xsi': "http://www.w3.org/2001/XMLSchema-instance",
+        'rpt': "http://openoffice.org/2005/report",
+        'of': "urn:oasis:names:tc:opendocument:xmlns:of:1.2",
+        'rdfa': "http://docs.oasis-open.org/opendocument/meta/rdfa#",
+        'config': "urn:oasis:names:tc:opendocument:xmlns:config:1.0",
+        }
+
+
 
 class odf_element(object):
     """Representation of an XML element.
@@ -78,9 +109,12 @@ class odf_context(object):
 
         # Internal state
         self.__document = None
+        self.__xpath_context = None
 
 
     def __del__(self):
+        if self.__xpath_context is not None:
+            self.__xpath_context.xpathFreeContext()
         if self.__document is not None:
             self.__document.freeDoc()
 
@@ -93,11 +127,20 @@ class odf_context(object):
         return self.__document
 
 
+    def __get_xpath_context(self):
+        if self.__xpath_context is None:
+            document = self.__get_document()
+            xpath_context = document.xpathNewContext()
+            # XXX needs to be filled with all the ODF namespaces or something
+            for name, uri in ODF_NAMESPACES.items():
+                xpath_context.xpathRegisterNs(name, uri)
+            self.__xpath_context = xpath_context
+        return self.__xpath_context
+
+
     def get_element_list(self, xpath_expression):
-        document = self.__get_document()
-        xpath_context = document.xpathNewContext()
+        xpath_context = self.__get_xpath_context()
         result = xpath_context.xpathEval(xpath_expression)
-        xpath_context.xpathFreeContext()
         # TODO only element nodes
         return [odf_element(e) for e in result]
 
