@@ -16,7 +16,9 @@ from lpod.context import odf_element, odf_context
 class CreateElementTestCase(TestCase):
 
     def test_simple(self):
-        element = create_element('<office:document></office:document>')
+        data = '<text:p>Template Element</text:p>'
+        element = create_element(data)
+        self.assertEqual(element.serialize(), data)
 
 
 

@@ -93,6 +93,11 @@ class odf_element(object):
         return [odf_element(e) for e in element.copyNodeList()]
 
 
+    def serialize(self):
+        element = self.__element
+        return str(element)
+
+
     def delete(self):
         raise NotImplementedError
 
