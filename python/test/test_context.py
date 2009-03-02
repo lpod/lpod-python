@@ -27,8 +27,7 @@ class ElementTestCase(TestCase):
         self.container = container
         content_context = odf_context('content', container)
         self.content_context = content_context
-        # TODO make "//text:p[0]" pass
-        paragraph_element = content_context.get_element_list('//text:p')
+        paragraph_element = content_context.get_element_list('//text:p[1]')
         self.paragraph_element = paragraph_element[0]
 
 
