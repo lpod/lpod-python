@@ -106,8 +106,9 @@ class odf_element(object):
 
     def copy(self):
         element = self.__element
-        # TODO only element nodes
-        return [odf_element(e) for e in element.copyNodeList()]
+        # TODO only element nList()]List()]odes
+        doc = element.doc
+        return odf_element(doc.copyNodeList(element))
 
 
     def serialize(self):

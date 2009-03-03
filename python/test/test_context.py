@@ -102,7 +102,10 @@ class ElementTestCase(TestCase):
 
 
     def test_copy(self):
-        raise NotImplementedError
+        element = self.paragraph_element
+        copy = element.copy()
+        self.assertNotEqual(id(element), id(copy))
+        self.assertEqual(element.get_text(), copy.get_text())
 
 
     def test_delete(self):
