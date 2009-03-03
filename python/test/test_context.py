@@ -13,7 +13,14 @@ from lpod.context import CHILD, SIBLING, NEXT_SIBLING, PREV_SIBLING
 class CreateElementTestCase(TestCase):
 
     def test_simple(self):
-        data = '<text:p>Template Element</text:p>'
+        data = '<p>Template Element</p>'
+        element = create_element(data)
+        self.assertEqual(element.serialize(), data)
+
+
+    def test_namespace(self):
+        ns = 'xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"'
+        data = '<text:p %s>Template Element</text:p>' % ns
         element = create_element(data)
         self.assertEqual(element.serialize(), data)
 
@@ -144,7 +151,10 @@ class ElementTestCase(TestCase):
 
 
     def test_delete(self):
-        raise NotImplementedError
+        element = create_element('<toto><titi/></toto>')
+        titi = element.get_element_list('//titi')[0]
+        titi.delete()
+        self.assertEqual(element.serialize(), '<toto/>')
 
 
 

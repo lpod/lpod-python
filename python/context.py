@@ -50,9 +50,20 @@ class odf_element(object):
         self.__element = internal_element
 
 
+    def __del__(self):
+        element = self.__element
+        document = element.doc
+        if getattr(document, '__lpod_must_free', False) is True:
+            # It's an element created ex nihilo
+            document.freeDoc()
+        # FIXME raises a segmentation fault
+        #element.freeNode()
+
+
     def get_element_list(self, xpath_expression):
         element = self.__element
-        xpath_context = element.xpathNewContext()
+        document = element.doc
+        xpath_context = document.xpathNewContext()
         result = xpath_context.xpathEval(xpath_expression)
         xpath_context.xpathFreeContext()
         # TODO only element nodes
@@ -133,7 +144,8 @@ class odf_element(object):
 
 
     def delete(self):
-        raise NotImplementedError
+        element = self.__element
+        element.unlinkNode()
 
 
 
@@ -192,6 +204,6 @@ class odf_context(object):
 
 def create_element(data):
     document = parseMemory(data, len(data))
-    copy = document.children.copyNodeList()
-    document.freeDoc()
-    return odf_element(copy)
+    # XXX must free it along with the element
+    document.__lpod_must_free = True
+    return odf_element(document.children)
