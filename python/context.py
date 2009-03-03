@@ -72,14 +72,20 @@ class odf_element(object):
     def get_text(self):
         # XXX all text recursively is need?
         element = self.__element
-        # FIXME encoding?
+        # FIXME str or unicode?
         return element.getContent()
 
 
     def set_text(self, text):
         element = self.__element
-        # TODO apply the warning in help(elt.setContent)
-        # FIXME encoding?
+        if isinstance(text, unicode):
+            text = text.encode('utf_8')
+        if not isinstance(text, str):
+            raise TypeError, 'text is not str'
+        # Encode entites and special characters
+        doc = element.doc
+        text = doc.encodeEntitiesReentrant(text)
+        text = doc.encodeSpecialChars(text)
         element.setContent(text)
 
 

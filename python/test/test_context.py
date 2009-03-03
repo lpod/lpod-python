@@ -4,13 +4,10 @@
 # Import from the Standard Library
 from unittest import TestCase, main
 
-# Import from itools
-from itools.xml import XML_DECL, START_ELEMENT
-
 # Import from lpod
 from lpod.container import get_odf_container
 from lpod.context import create_element
-from lpod.context import odf_element, odf_context
+from lpod.context import odf_context
 
 
 class CreateElementTestCase(TestCase):
@@ -70,6 +67,15 @@ class ElementTestCase(TestCase):
         self.assertEqual(element.get_text(), new_text)
         element.set_text(old_text)
         self.assertEqual(element.get_text(), old_text)
+
+
+    def test_set_text_special(self):
+        element = self.paragraph_element
+        old_text = element.get_text()
+        new_text = 'using < & " characters'
+        element.set_text(new_text)
+        self.assertEqual(element.get_text(), 'using &lt; &amp; " characters')
+        element.set_text(old_text)
 
 
     def test_insert_element(self):
