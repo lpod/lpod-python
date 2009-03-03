@@ -9,7 +9,7 @@ odf_container container;
 container = new_odf_container(odf_class);
 container = new_odf_container(template);
                     
-container = get_odf_container(url);
+container = get_odf_container(uri);
 
 odf_container copy = container.clone();
 str data = container.get_part(part_name);
@@ -21,15 +21,15 @@ TODO
 
 container.save();
 container.save(packaging);
-container.save(url);
-container.save(url, packaging);
+container.save(uri);
+container.save(uri, packaging);
 
 Level 0.1
 ---------
 
-odf_xml_part part;
+odf_xmlpart part;
 
-part = xml_part(part_name, container);
+part = odf_xmlpart(part_name, container);
 
 part.events;
 part.container;
@@ -37,7 +37,7 @@ part.serialize();
 
 list l_elt = part.get_element_list("xpath");
 
-element elt = l_elt[0];
+odf_element elt = l_elt[0];
 
 elt.get_element_list("xpath");
 
@@ -47,7 +47,7 @@ elt.set_attribute(name, value);
 unicode text = elt.get_text();
 elt.set_text(text);
 
-element e2 = create_element('xml');
+odf_element e2 = create_element('xml');
 elt.insert_element(e2, {previous_sibling, next_sibling, ..., first_child,
     last_child}, <N>);
 e3 = elt.copy();
@@ -59,51 +59,88 @@ Level 1
 
 odf_document document;
 
-- access an element by position
-- access elements by attribute
-- access an element by attribute then position
+document = odf_document(uri);
+document = odf_document(odf_class);
+document = odf_document(template);
 
-get_paragraph_list(context, style=None)
-=> '//text:p[@text:style-name="%s"]' % style
+document.get_paragraph_list();
+document.get_paragraph_list(style);
+document.get_paragraph_list(context);
+document.get_paragraph_list(style, context);
 
-get_heading_list(context, style=None, level=None)
-assert level >= 1
-=> '//text:h[@text:style-name="%s"]' % style
-=> '//text:h[@text:level="%s"]' % level
+  => '//text:p[@text:style-name="$style"]'
 
-get_paragraph(context, position)
-=> '//text:p[%s]' % position
+document.get_heading_list();
+document.get_heading_list(style);
+document.get_heading_list(level);
+document.get_heading_list(context);
+document.get_heading_list(style, level);
+document.get_heading_list(style, level, context);
 
-get_heading(context, position, level=None)
-=> '//text:h[@text:level="%s"][%s]' % (level, position)
+  => assert level >= 1
+  => '//text:h[@text:style-name="%s"]' % style
+  => '//text:h[@text:level="%s"]' % level
 
-style type: font face, default style...
-style family: font family, text, paragraph, graphics, number...
-style parent (inheritance)
-[style class: ... ?]
+document.get_paragraph(position)
+document.get_paragraph(position, context)
 
-get_style(name, [...])
+  => assert position >= 1
+  => '//text:p[%s]' % position
 
-Simple case: search a paragraph style (family=paragraph):
+document.get_heading(position);
+document.get_heading(position, level);
+document.get_heading(position, context);
+document.get_heading(position, level, context);
 
-  => same part, automatic styles
-  => same part, named styles
-  => styles part, named styles
-  => default style of the same family
+  => assert position >= 1
+  => assert level >= 1
+  => '//text:h[@text:level="%s"][%s]' % (level, position)
 
-create_paragraph(text='', style)
+document.get_style(name);
 
-  <text:p text:style-name="$style">$text</text:p>
+  => only paragraph styles for now (family=paragraph)
+  => search algorithm:
+    - same part, automatic styles
+    - same part, named styles
+    - styles part, named styles
+    - default style of the same family
 
-create_heading(text='', style, level)
+odf_element elt = create_paragraph(style);
 
-  <text:h text:style-name="$style" text:level="$level">$text</text:h>
+  => '<text:p text:style-name="$style"></text:p>'
 
-document.insert_paragraph(context, text='', style)
+odf_element elt = create_paragraph(style, text);
 
-document.insert_heading(context, text='', style, level)
+  => '<text:p text:style-name="$style">$text</text:p>'
 
-(Preload the body, etc. for fast access to default contexts)
+odf_element elt = create_heading(style, level);
+
+  => '<text:h text:style-name="$style" text:level="$level"></text:h>'
+
+odf_element elt = create_heading(style, level, text);
+
+  => '<text:h text:style-name="$style" text:level="$level">$text</text:h>'
+
+document.insert_paragraph(style);
+document.insert_paragraph(style, context);
+document.insert_paragraph(style, text);
+document.insert_paragraph(style, text, context);
+
+document.insert_heading(style, level);
+document.insert_heading(style, level, text);
+document.insert_heading(style, level, context);
+document.insert_heading(style, level, text, context);
+
+Hint: preload the body, etc. for fast access to default contexts.
+
+Styles
+-------
+
+- style type: font face, default style...
+- style family: font family, text, paragraph, graphics, number...
+- style parent (inheritance)
+- [style class: ... ?]
+
 
 TODO
 ====
@@ -118,8 +155,9 @@ manifest?
 XPath Requirements
 ==================
 
+//text:p
 //text:p[4]
-//toto[4]/text:p[5]
-//toto[@attr=value]
-//toto[@attr=value]/titi[4]
+//text:section[4]/text:p[5]
+//text:p[@text:style-name="Note"]
+//draw:frame[@draw:name="image1"]/draw:image
 //text:p[@text:style-name="Note"][4]
