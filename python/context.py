@@ -36,6 +36,9 @@ ODF_NAMESPACES = {
         }
 
 
+CHILD, SIBLING, NEXT_SIBLING, PREV_SIBLING = range(4)
+
+
 
 class odf_element(object):
     """Representation of an XML element.
@@ -101,7 +104,20 @@ class odf_element(object):
 
 
     def insert_element(self, element, position):
-        raise NotImplementedError
+        if not isinstance(element, odf_element):
+            raise ValueError, "element is not of type odf_element"
+        current = self.__element
+        element = element.__element
+        if position == CHILD:
+            current.addChild(element)
+        elif position == SIBLING:
+            current.addSibling(element)
+        elif position == NEXT_SIBLING:
+            current.addNextSibling(element)
+        elif position == PREV_SIBLING:
+            current.addPrevSibling(element)
+        else:
+            raise ValueError, "invalid positioning"
 
 
     def copy(self):
