@@ -95,8 +95,8 @@ class ContextTestCase(TestCase):
     def serialize(self):
         container = self.container
         content_bytes = container.get_part('content')
-        context = odf_context('content', container)
-        self.assertEqual(content_bytes, context.serialize())
+        content_context = odf_context('content', container)
+        self.assertEqual(content_bytes, content_context.serialize())
 
 
 
