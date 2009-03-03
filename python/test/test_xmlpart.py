@@ -123,14 +123,14 @@ class ElementTestCase(TestCase):
         element = root.get_element_list('//a')[0]
         sibling = create_element('<c/>')
         element.insert_element(sibling, NEXT_SIBLING)
-        self.assertEqual(root.serialize(), '<root><a/><b/><c/></root>')
+        self.assertEqual(root.serialize(), '<root><a/><c/><b/></root>')
 
 
     def test_insert_element_prev_sibling(self):
         root = create_element('<root><a/><b/></root>')
         element = root.get_element_list('//a')[0]
         sibling = create_element('<c/>')
-        element.insert_element(sibling, NEXT_SIBLING)
+        element.insert_element(sibling, PREV_SIBLING)
         self.assertEqual(root.serialize(), '<root><c/><a/><b/></root>')
 
 
