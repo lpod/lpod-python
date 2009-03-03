@@ -46,8 +46,9 @@ class ElementTestCase(TestCase):
 
     def test_get_attribute(self):
         element = self.paragraph_element
-        self.assertEqual(element.get_attribute('style-name'),
-                         'Standard')
+        text = element.get_attribute('style-name')
+        self.assert_(isinstance(text, str))
+        self.assertEqual(text, 'Standard')
 
 
     def test_set_attribute(self):
