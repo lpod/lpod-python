@@ -52,7 +52,9 @@ class ElementTestCase(TestCase):
 
 
     def test_set_attribute(self):
-        raise NotImplementedError
+        element = self.paragraph_element
+        element.set_attribute('test', 'a value')
+        self.assertEqual(element.get_attribute('test'), 'a value')
 
 
     def test_get_text(self):
@@ -61,7 +63,13 @@ class ElementTestCase(TestCase):
 
 
     def test_set_text(self):
-        raise NotImplementedError
+        element = self.paragraph_element
+        old_text = element.get_text()
+        new_text = u'A test'
+        element.set_text(new_text)
+        self.assertEqual(element.get_text(), new_text)
+        element.set_text(old_text)
+        self.assertEqual(element.get_text(), old_text)
 
 
     def test_insert_element(self):
