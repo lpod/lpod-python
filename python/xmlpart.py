@@ -36,7 +36,7 @@ ODF_NAMESPACES = {
         }
 
 
-CHILD, NEXT_SIBLING, PREV_SIBLING = range(3)
+FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING = range(4)
 
 
 
@@ -116,23 +116,25 @@ class odf_element(object):
 
     def insert_element(self, element, position):
         if not isinstance(element, odf_element):
-            raise TypeError, "element is not of type odf_element"
+            raise TypeError, "element is not odf_element"
         current = self.__element
         element = element.__element
-        if position == CHILD:
-            current = current.addChild(element)
-        elif position == NEXT_SIBLING:
+        if position is FIRST_CHILD:
+            raise NotImplementedError
+        elif position is LAST_CHILD:
+            raise NotImplementedError
+        elif position is NEXT_SIBLING:
             current = current.addNextSibling(element)
-        elif position == PREV_SIBLING:
+        elif position is PREV_SIBLING:
             current = current.addPrevSibling(element)
         else:
-            raise ValueError, "invalid positioning"
+            raise ValueError, "invalid position"
         return odf_element(current)
 
 
     def copy(self):
         element = self.__element
-        # TODO only element nList()]List()]odes
+        # TODO only element nodes
         doc = element.doc
         return odf_element(doc.copyNodeList(element))
 

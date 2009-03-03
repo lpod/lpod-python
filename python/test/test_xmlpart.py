@@ -7,7 +7,7 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.container import get_odf_container
 from lpod.xmlpart import create_element, odf_xmlpart
-from lpod.xmlpart import CHILD, NEXT_SIBLING, PREV_SIBLING
+from lpod.xmlpart import FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING
 
 
 class CreateElementTestCase(TestCase):
@@ -104,36 +104,46 @@ class ElementTestCase(TestCase):
         element.set_text(old_text)
 
 
-    def test_insert_element_child(self):
-        element = create_element('<toto/>')
-        child = create_element('<titi/>')
-        element.insert_element(child, CHILD)
-        self.assertEqual(element.serialize(), '<toto><titi/></toto>')
+    def test_insert_element_first_child(self):
+        element = create_element('<root><a/></root>')
+        child = create_element('<b/>')
+        element.insert_element(child, FIRST_CHILD)
+        self.assertEqual(element.serialize(), '<root><b/><a/></root>')
+
+
+    def test_insert_element_last_child(self):
+        element = create_element('<root><a/></root>')
+        child = create_element('<b/>')
+        element.insert_element(child, LAST_CHILD)
+        self.assertEqual(element.serialize(), '<root><a/><b/></root>')
 
 
     def test_insert_element_next_sibling(self):
-        element = create_element('<toto/>')
-        sibling = create_element('<titi/>')
+        root = create_element('<root><a/><b/></root>')
+        element = root.get_element_list('//a')[0]
+        sibling = create_element('<c/>')
         element.insert_element(sibling, NEXT_SIBLING)
-        self.assertEqual(element.serialize(), '<toto/><titi/>')
+        self.assertEqual(root.serialize(), '<root><a/><b/><c/></root>')
 
 
     def test_insert_element_prev_sibling(self):
-        element = create_element('<toto/>')
-        sibling = create_element('<titi/>')
-        element.insert_element(sibling, PREV_SIBLING)
-        self.assertEqual(element.serialize(), '<titi/><toto/>')
+        root = create_element('<root><a/><b/></root>')
+        element = root.get_element_list('//a')[0]
+        sibling = create_element('<c/>')
+        element.insert_element(sibling, NEXT_SIBLING)
+        self.assertEqual(root.serialize(), '<root><c/><a/><b/></root>')
 
 
     def test_insert_element_bad_element(self):
-        element = create_element('<toto/>')
-        self.assertRaises(TypeError, element.insert_element, None, CHILD)
+        element = create_element('<a/>')
+        self.assertRaises(TypeError, element.insert_element, '<b/>',
+                          FIRST_CHILD)
 
 
     def test_insert_element_bad_position(self):
-        element = create_element('<toto/>')
-        child = create_element('<titi/>')
-        self.assertRaises(ValueError, element.insert_element, child, None)
+        element = create_element('<a/>')
+        child = create_element('<b/>')
+        self.assertRaises(ValueError, element.insert_element, child, 999)
 
 
     def test_copy(self):
@@ -144,10 +154,10 @@ class ElementTestCase(TestCase):
 
 
     def test_delete(self):
-        element = create_element('<toto><titi/></toto>')
-        titi = element.get_element_list('//titi')[0]
-        titi.delete()
-        self.assertEqual(element.serialize(), '<toto/>')
+        element = create_element('<a><b/></a>')
+        child = element.get_element_list('//b')[0]
+        child.delete()
+        self.assertEqual(element.serialize(), '<a/>')
 
 
 
