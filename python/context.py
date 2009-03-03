@@ -36,7 +36,7 @@ ODF_NAMESPACES = {
         }
 
 
-CHILD, SIBLING, NEXT_SIBLING, PREV_SIBLING = range(4)
+CHILD, NEXT_SIBLING, PREV_SIBLING = range(3)
 
 
 
@@ -120,15 +120,14 @@ class odf_element(object):
         current = self.__element
         element = element.__element
         if position == CHILD:
-            current.addChild(element)
-        elif position == SIBLING:
-            current.addSibling(element)
+            current = current.addChild(element)
         elif position == NEXT_SIBLING:
-            current.addNextSibling(element)
+            current = current.addNextSibling(element)
         elif position == PREV_SIBLING:
-            current.addPrevSibling(element)
+            current = current.addPrevSibling(element)
         else:
             raise ValueError, "invalid positioning"
+        return odf_element(current)
 
 
     def copy(self):

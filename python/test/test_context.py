@@ -7,7 +7,7 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.container import get_odf_container
 from lpod.context import create_element, odf_context
-from lpod.context import CHILD, SIBLING, NEXT_SIBLING, PREV_SIBLING
+from lpod.context import CHILD, NEXT_SIBLING, PREV_SIBLING
 
 
 class CreateElementTestCase(TestCase):
@@ -111,25 +111,18 @@ class ElementTestCase(TestCase):
         self.assertEqual(element.serialize(), '<toto><titi/></toto>')
 
 
-    def test_insert_element_sibling(self):
-        element = create_element('<toto/>')
-        child = create_element('<titi/>')
-        element.insert_element(child, CHILD)
-        self.assertEqual(element.serialize(), '<toto><titi/></toto>')
-
-
     def test_insert_element_next_sibling(self):
         element = create_element('<toto/>')
-        child = create_element('<titi/>')
-        element.insert_element(child, CHILD)
-        self.assertEqual(element.serialize(), '<toto><titi/></toto>')
+        sibling = create_element('<titi/>')
+        element.insert_element(sibling, NEXT_SIBLING)
+        self.assertEqual(element.serialize(), '<toto/><titi/>')
 
 
     def test_insert_element_prev_sibling(self):
         element = create_element('<toto/>')
-        child = create_element('<titi/>')
-        element.insert_element(child, CHILD)
-        self.assertEqual(element.serialize(), '<toto><titi/></toto>')
+        sibling = create_element('<titi/>')
+        element.insert_element(sibling, PREV_SIBLING)
+        self.assertEqual(element.serialize(), '<titi/><toto/>')
 
 
     def test_insert_element_bad_element(self):
