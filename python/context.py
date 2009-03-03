@@ -61,12 +61,23 @@ class odf_element(object):
         property = element.hasProp(name)
         if property is None:
             return None
+        # Entites and special characters seem to be decoded internally
         return property.getContent()
 
 
     def set_attribute(self, name, value):
         element = self.__element
+        if isinstance(value, unicode):
+            value = value.encode('utf_8')
+        if not isinstance(value, str):
+            raise TypeError, 'value is not str'
+        # Entites and special characters seem to be encoded internally
         element.setProp(name, value)
+
+
+    def del_attribute(self, name):
+        element = self.__element
+        element.unsetProp(name)
 
 
     def get_text(self):

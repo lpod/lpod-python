@@ -21,6 +21,10 @@ class CreateElementTestCase(TestCase):
 
 class ElementTestCase(TestCase):
 
+    special_text = 'using < & " characters'
+    quoted_text = 'using &lt; &amp; " characters'
+
+
     def setUp(self):
         container = get_odf_container('samples/example.odt')
         self.container = container
@@ -52,6 +56,22 @@ class ElementTestCase(TestCase):
         element = self.paragraph_element
         element.set_attribute('test', 'a value')
         self.assertEqual(element.get_attribute('test'), 'a value')
+        element.del_attribute('test')
+
+
+    def test_set_attribute_special(self):
+        element = self.paragraph_element
+        element.set_attribute('test', self.special_text)
+        self.assertEqual(element.get_attribute('test'), self.special_text)
+        element.del_attribute('test')
+
+
+    def test_del_attribute(self):
+        element = self.paragraph_element
+        element.set_attribute('test', 'test')
+        self.assertEqual(element.get_attribute('test'), 'test')
+        element.del_attribute('test')
+        self.assertEqual(element.get_attribute('test'), None)
 
 
     def test_get_text(self):
@@ -72,9 +92,8 @@ class ElementTestCase(TestCase):
     def test_set_text_special(self):
         element = self.paragraph_element
         old_text = element.get_text()
-        new_text = 'using < & " characters'
-        element.set_text(new_text)
-        self.assertEqual(element.get_text(), 'using &lt; &amp; " characters')
+        element.set_text(self.special_text)
+        self.assertEqual(element.get_text(), self.quoted_text)
         element.set_text(old_text)
 
 
