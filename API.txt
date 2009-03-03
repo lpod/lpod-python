@@ -27,15 +27,15 @@ container.save(url, packaging);
 Level 0.1
 ---------
 
-odf_context ctx;
+odf_xml_part part;
 
-ctx = odf_context(part_name, container);
+part = xml_part(part_name, container);
 
-ctx.events;
-ctx.container;
-ctx.serialize();
+part.events;
+part.container;
+part.serialize();
 
-list l_elt = ctx.get_element_list("xpath");
+list l_elt = part.get_element_list("xpath");
 
 element elt = l_elt[0];
 
@@ -57,15 +57,69 @@ elt.delete();
 Level 1
 =======
 
+odf_document document;
+
+- access an element by position
+- access elements by attribute
+- access an element by attribute then position
+
+get_paragraph_list(context, style=None)
+=> '//text:p[@text:style-name="%s"]' % style
+
+get_heading_list(context, style=None, level=None)
+assert level >= 1
+=> '//text:h[@text:style-name="%s"]' % style
+=> '//text:h[@text:level="%s"]' % level
+
+get_paragraph(context, position)
+=> '//text:p[%s]' % position
+
+get_heading(context, position, level=None)
+=> '//text:h[@text:level="%s"][%s]' % (level, position)
+
+style type: font face, default style...
+style family: font family, text, paragraph, graphics, number...
+style parent (inheritance)
+[style class: ... ?]
+
+get_style(name, [...])
+
+Simple case: search a paragraph style (family=paragraph):
+
+  => same part, automatic styles
+  => same part, named styles
+  => styles part, named styles
+  => default style of the same family
+
+create_paragraph(text='', style)
+
+  <text:p text:style-name="$style">$text</text:p>
+
+create_heading(text='', style, level)
+
+  <text:h text:style-name="$style" text:level="$level">$text</text:h>
+
+document.insert_paragraph(context, text='', style)
+
+document.insert_heading(context, text='', style, level)
+
+(Preload the body, etc. for fast access to default contexts)
+
 TODO
 ====
+
+list items, tables, table cells...
+
+named styles, automatic styles
+style families: 
 
 manifest?
 
 XPath Requirements
 ==================
 
-/text:p[4]
-/toto[4]/text:p[5]
-/toto[@attr=value]
-/toto[@attr=value]/titi[4]
+//text:p[4]
+//toto[4]/text:p[5]
+//toto[@attr=value]
+//toto[@attr=value]/titi[4]
+//text:p[@text:style-name="Note"][4]
