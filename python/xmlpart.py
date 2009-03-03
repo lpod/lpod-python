@@ -148,7 +148,7 @@ class odf_element(object):
 
 
 
-class odf_context(object):
+class odf_xmlpart(object):
     """Representation of an XML part.
     Abstraction of the XML library behind.
     """

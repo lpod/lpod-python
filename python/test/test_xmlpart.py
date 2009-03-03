@@ -6,8 +6,8 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.container import get_odf_container
-from lpod.context import create_element, odf_context
-from lpod.context import CHILD, NEXT_SIBLING, PREV_SIBLING
+from lpod.xmlpart import create_element, odf_xmlpart
+from lpod.xmlpart import CHILD, NEXT_SIBLING, PREV_SIBLING
 
 
 class CreateElementTestCase(TestCase):
@@ -35,7 +35,7 @@ class ElementTestCase(TestCase):
     def setUp(self):
         container = get_odf_container('samples/example.odt')
         self.container = container
-        content_context = odf_context('content', container)
+        content_context = odf_xmlpart('content', container)
         self.content_context = content_context
         paragraph_element = content_context.get_element_list('//text:p[1]')
         self.paragraph_element = paragraph_element[0]
@@ -151,7 +151,7 @@ class ElementTestCase(TestCase):
 
 
 
-class ContextTestCase(TestCase):
+class XmlPartTestCase(TestCase):
 
     def setUp(self):
         self.container = get_odf_container('samples/example.odt')
@@ -162,7 +162,7 @@ class ContextTestCase(TestCase):
 
 
     def test_get_element_list(self):
-        content_context = odf_context('content', self.container)
+        content_context = odf_xmlpart('content', self.container)
         elements = content_context.get_element_list('//text:p')
         self.assertEqual(len(elements), 1)
 
@@ -170,7 +170,7 @@ class ContextTestCase(TestCase):
     def serialize(self):
         container = self.container
         content_bytes = container.get_part('content')
-        content_context = odf_context('content', container)
+        content_context = odf_xmlpart('content', container)
         self.assertEqual(content_bytes, content_context.serialize())
 
 
