@@ -105,15 +105,35 @@ class ElementTestCase(TestCase):
 
 
     def test_insert_element_sibling(self):
-        raise NotImplementedError
+        element = create_element('<toto/>')
+        child = create_element('<titi/>')
+        element.insert_element(child, CHILD)
+        self.assertEqual(element.serialize(), '<toto><titi/></toto>')
 
 
     def test_insert_element_next_sibling(self):
-        raise NotImplementedError
+        element = create_element('<toto/>')
+        child = create_element('<titi/>')
+        element.insert_element(child, CHILD)
+        self.assertEqual(element.serialize(), '<toto><titi/></toto>')
 
 
     def test_insert_element_prev_sibling(self):
-        raise NotImplementedError
+        element = create_element('<toto/>')
+        child = create_element('<titi/>')
+        element.insert_element(child, CHILD)
+        self.assertEqual(element.serialize(), '<toto><titi/></toto>')
+
+
+    def test_insert_element_bad_element(self):
+        element = create_element('<toto/>')
+        self.assertRaises(TypeError, element.insert_element, None, CHILD)
+
+
+    def test_insert_element_bad_position(self):
+        element = create_element('<toto/>')
+        child = create_element('<titi/>')
+        self.assertRaises(ValueError, element.insert_element, child, None)
 
 
     def test_copy(self):

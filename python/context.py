@@ -105,7 +105,7 @@ class odf_element(object):
 
     def insert_element(self, element, position):
         if not isinstance(element, odf_element):
-            raise ValueError, "element is not of type odf_element"
+            raise TypeError, "element is not of type odf_element"
         current = self.__element
         element = element.__element
         if position == CHILD:
