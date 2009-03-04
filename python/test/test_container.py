@@ -5,39 +5,56 @@
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.container import new_odf_container, get_odf_container
 from lpod.container import ODF_EXTENSIONS
+from lpod.container import new_odf_container_from_template
+from lpod.container import new_odf_container_from_class
+from lpod.container import get_odf_container
 
 
-class NewContainerTestCase(TestCase):
+class NewContainerFromTemplateTestCase(TestCase):
 
-    def test_no_parameters(self):
-        self.assertRaises(ValueError, new_odf_container)
-
-
-    def test_bad_class(self):
-        self.assertRaises(ValueError, new_odf_container, odf_class='foobar')
-
-
-    def test_all_parameters(self):
-        self.assertRaises(ValueError, new_odf_container, odf_class='text',
-                          template_uri='templates/text.ott')
-
+    def test_bad_template(self):
+        self.assertRaises(ValueError, new_odf_container_from_template,
+                          '../templates/notexisting')
 
     def test_text_template(self):
-        new_odf_container(odf_class='text')
+        new_odf_container_from_template('../templates/text.ott')
 
 
     def test_spreadsheet_template(self):
-        new_odf_container(odf_class='spreadsheet')
+        new_odf_container_from_template('../templates/spreadsheet.ots')
 
 
     def test_presentation_template(self):
-        new_odf_container(odf_class='presentation')
+        new_odf_container_from_template('../templates/presentation.otp')
 
 
     def test_drawing_template(self):
-        new_odf_container(odf_class='drawing')
+        new_odf_container_from_template('../templates/drawing.otg')
+
+
+
+class NewContainerFromClassTestCase(TestCase):
+
+    def test_bad_class(self):
+        self.assertRaises(ValueError, new_odf_container_from_class,
+                          'foobar')
+
+
+    def test_text_class(self):
+        new_odf_container_from_class('text')
+
+
+    def test_spreadsheet_class(self):
+        new_odf_container_from_class('spreadsheet')
+
+
+    def test_presentation_class(self):
+        new_odf_container_from_class('presentation')
+
+
+    def test_drawing_class(self):
+        new_odf_container_from_class('drawing')
 
 
 
@@ -67,7 +84,7 @@ class GetContainerTestCase(TestCase):
 class ContainerTestCase(TestCase):
 
     def test_clone(self):
-        container = new_odf_container(odf_class='text')
+        container = new_odf_container_from_class('text')
         clone = container.clone()
         self.assertEqual(clone.uri, None)
 

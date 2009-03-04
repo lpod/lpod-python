@@ -57,16 +57,16 @@ class odf_container(object):
 
     def __init__(self, uri):
         if not vfs.exists(uri):
-            raise ValueError, "URI is not found"
+            raise ValueError, 'URI "%s" is not found' % uri
         if not vfs.can_read(uri):
-            raise ValueError, "URI is not readable"
+            raise ValueError, 'URI "%s" is not readable' % uri
         if vfs.is_folder(uri):
             raise NotImplementedError, ("reading uncompressed ODF "
                                         "is not supported")
 
         mimetype = vfs.get_mimetype(uri)
         if not mimetype in ODF_MIMETYPES:
-            raise ValueError, "mimetype '%s' is unknown" % mimetype
+            raise ValueError, 'mimetype "%s" is unknown' % mimetype
 
         self.uri = uri
         self.mimetype = mimetype
@@ -159,29 +159,28 @@ class odf_container(object):
 
 
 
-def new_odf_container(odf_class=None, template_uri=None):
-    """Return an "odf_container" instance of a new ODF document, from a
-    default template or from the given template.
-    """
-    if ((odf_class is None and template_uri is None)
-         or (odf_class is not None and template_uri is not None)):
-        raise ValueError, "either 'odf_class' or 'template_uri' is mandatory"
-    if odf_class not in ODF_CLASSES:
-        raise ValueError, "unknown ODF class '%s'" % odf_class
-
-    if odf_class is not None:
-        template_path = ODF_CLASSES[odf_class]
-        template_uri = get_abspath(template_path)
-
-    template = get_odf_container(template_uri)
-
-    # Return a copy of the template
-    return template.clone()
-
-
-
 def get_odf_container(uri):
     """Return an "odf_container" instance of the ODF document stored at the
     given URI.
     """
     return odf_container(uri)
+
+
+
+def new_odf_container_from_template(template_uri):
+    """Return an "odf_container" instance using the given template.
+    """
+    template = get_odf_container(template_uri)
+    # Return a copy of the template
+    return template.clone()
+
+
+
+def new_odf_container_from_class(odf_class):
+    """Return an "odf_container" instance of the given class.
+    """
+    if odf_class not in ODF_CLASSES:
+        raise ValueError, 'unknown ODF class "%s"' % odf_class
+    template_path = ODF_CLASSES[odf_class]
+    template_uri = get_abspath(template_path)
+    return new_odf_container_from_template(template_uri)
