@@ -4,9 +4,6 @@
 # Import from the Standard Library
 from unittest import TestCase, main
 
-# Import from itools
-from itools.xml import XML_DECL, START_ELEMENT
-
 # Import from lpod
 from lpod.container import new_odf_container, get_odf_container
 from lpod.container import ODF_EXTENSIONS
