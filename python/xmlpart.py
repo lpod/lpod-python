@@ -184,7 +184,7 @@ def create_element(element_data):
         raise TypeError, "element data is not str"
     if not element_data.strip():
         raise ValueError, "element data is empty"
-    data = ns_document_data % element_data
+    data = ns_document_data.format(element_data)
     document = parseDoc(data)
     root = document.children
     element = root.children

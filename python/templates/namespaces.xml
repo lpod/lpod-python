@@ -27,4 +27,4 @@
   xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2"
   xmlns:rdfa="http://docs.oasis-open.org/opendocument/meta/rdfa#"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-  office:version="1.2">%s</office:document>
+  office:version="1.2">{element}</office:document>
