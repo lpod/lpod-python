@@ -4,6 +4,7 @@
 # Import from lpod
 from container import get_odf_container, new_odf_container_from_template
 from container import new_odf_container_from_class, odf_container
+from xmlpart import odf_element
 
 
 def create_paragraph(style, text=''):
@@ -13,6 +14,39 @@ def create_paragraph(style, text=''):
 
 def create_heading(style, level, text=''):
     raise NotImplementedError
+
+
+def generate_xpath_query(element_name, attributes={}, position=None):
+    query = ['//']
+    query.append(element_name)
+    for name, value in attributes.items():
+        if value is not None:
+            query.append('[@{name}="{value}"]'.format(name, str(value)))
+        else:
+            query.append('[@{name}]'.format(name))
+    if position is not None:
+        query.append('[{position}]'.format(str(position)))
+    return ''.join(query)
+
+
+def check_arguments(context=None, position=None, style=None, level=None):
+    if context is not None:
+        if not isinstance(context, odf_element):
+            raise TypeError, "an odf element is expected"
+    if position is not None:
+        if not isinstance(position, int):
+            raise TypeError, "an integer position is expected"
+        if position < 1:
+            raise ValueError, "position count begin at 1"
+    if style is not None:
+        if not isinstance(style, str):
+            raise TypeError, "a style name is expected"
+    if level is not None:
+        if not isinstance(level, int):
+            raise TypeError, "an integer level is expected"
+        if level < 1:
+            raise ValueError, "level count begin at 1"
+
 
 
 
@@ -28,11 +62,20 @@ class odf_document(object):
     #
 
     def get_paragraph_list(self, style=None, context=None):
-        raise NotImplementedError
+        check_arguments(style=style, context=context)
+        container = self.container
+        attributes = {}
+        if style:
+            attributes['text:style-name'] = style
+        query = generate_xpath_query('text:p', attributes)
+        return container.get_element_list(query, context=context)
 
 
     def get_paragraph(self, position, context=None):
-        raise NotImplementedError
+        check_arguments(position=position, context=context)
+        container = self.container
+        query = generate_xpath_query('text:p', position)
+        return container.get_element_list(query, context=context)
 
 
     def insert_paragraph(self, element, context=None):
@@ -44,11 +87,22 @@ class odf_document(object):
     #
 
     def get_heading_list(self, style=None, level=None, context=None):
-        raise NotImplementedError
+        check_arguments(style=style, level=level, context=context)
+        container = self.container
+        attributes = {}
+        if style:
+            attributes['text:style-name'] = style
+        if level:
+            attributes['text:level'] = level
+        query = generate_xpath_query('text:h', attributes)
+        return container.get_element_list(query, context=context)
 
 
     def get_heading(self, position, level=None, context=None):
-        raise NotImplementedError
+        check_arguments(position=position, level=level, context=context)
+        container = self.container
+        query = generate_xpath_query('text:h', position)
+        return container.get_element_list(query, context=context)
 
 
     def insert_heading(self, element, context=None):

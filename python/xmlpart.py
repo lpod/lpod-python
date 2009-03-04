@@ -69,11 +69,13 @@ class odf_element(object):
         return namespace, uri, name
 
 
-    def get_element_list(self, xpath_expression):
+    def get_element_list(self, xpath_query, context=None):
+        if context is not None:
+            raise NotImplementedError
         element = self.__element
         document = element.doc
         xpath_context = document.xpathNewContext()
-        result = xpath_context.xpathEval(xpath_expression)
+        result = xpath_context.xpathEval(xpath_query)
         xpath_context.xpathFreeContext()
         return [odf_element(e) for e in result]
 
@@ -230,9 +232,11 @@ class odf_xmlpart(object):
         return self.__xpath_context
 
 
-    def get_element_list(self, xpath_expression):
+    def get_element_list(self, xpath_query, context=None):
+        if context is not None:
+            raise NotImplementedError
         xpath_context = self.__get_xpath_context()
-        result = xpath_context.xpathEval(xpath_expression)
+        result = xpath_context.xpathEval(xpath_query)
         return [odf_element(e) for e in result]
 
 

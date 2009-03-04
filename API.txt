@@ -36,11 +36,11 @@ part.events;
 part.container;
 part.serialize();
 
-list l_elt = part.get_element_list("xpath");
+list l_elt = part.get_element_list("//xpath...");
 
 odf_element elt = l_elt[0];
 
-elt.get_element_list("xpath");
+elt.get_element_list("//xpath...");
 
 value = elt.get_attribute(name);
 elt.set_attribute(name, value);
