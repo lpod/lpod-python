@@ -170,9 +170,9 @@ def get_odf_container(uri):
 def new_odf_container_from_template(template_uri):
     """Return an "odf_container" instance using the given template.
     """
-    template = get_odf_container(template_uri)
-    # Return a copy of the template
-    return template.clone()
+    template_container = get_odf_container(template_uri)
+    # Return a copy of the template container
+    return template_container.clone()
 
 
 
