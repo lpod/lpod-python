@@ -140,13 +140,14 @@ class odf_element(object):
         current = self.__element
         element = element.__element
         if position is FIRST_CHILD:
-            raise NotImplementedError
+            first_child = current.children
+            first_child.addPrevSibling(element)
         elif position is LAST_CHILD:
-            raise NotImplementedError
+            current.addChild(element)
         elif position is NEXT_SIBLING:
-            current = current.addNextSibling(element)
+            current.addNextSibling(element)
         elif position is PREV_SIBLING:
-            current = current.addPrevSibling(element)
+            current.addPrevSibling(element)
         else:
             raise ValueError, "invalid position"
         return odf_element(current)
