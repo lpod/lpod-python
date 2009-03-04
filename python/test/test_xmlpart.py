@@ -19,8 +19,7 @@ class CreateElementTestCase(TestCase):
 
 
     def test_namespace(self):
-        ns = 'xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"'
-        data = '<text:p %s>Template Element</text:p>' % ns
+        data = '<text:p>Template Element</text:p>'
         element = create_element(data)
         self.assertEqual(element.serialize(), data)
 
@@ -56,14 +55,28 @@ class ElementTestCase(TestCase):
         element = self.paragraph_element
         text = element.get_attribute('style-name')
         self.assert_(isinstance(text, str))
-        self.assertEqual(text, 'Standard')
+        self.assertEqual(text, "Standard")
+
+
+    def test_get_attribute_namespace(self):
+        element = self.paragraph_element
+        text = element.get_attribute('text:style-name')
+        self.assert_(isinstance(text, str))
+        self.assertEqual(text, "Standard")
 
 
     def test_set_attribute(self):
         element = self.paragraph_element
-        element.set_attribute('test', 'a value')
-        self.assertEqual(element.get_attribute('test'), 'a value')
+        element.set_attribute('test', "a value")
+        self.assertEqual(element.get_attribute('test'), "a value")
         element.del_attribute('test')
+
+
+    def test_set_attribute_namespace(self):
+        element = self.paragraph_element
+        element.set_attribute('text:style-name', "Note")
+        self.assertEqual(element.get_attribute('text:style-name'), "Note")
+        element.del_attribute('text:style-name')
 
 
     def test_set_attribute_special(self):
@@ -75,10 +88,16 @@ class ElementTestCase(TestCase):
 
     def test_del_attribute(self):
         element = self.paragraph_element
-        element.set_attribute('test', 'test')
-        self.assertEqual(element.get_attribute('test'), 'test')
+        element.set_attribute('test', "test")
         element.del_attribute('test')
         self.assertEqual(element.get_attribute('test'), None)
+
+
+    def test_del_attribute_namespace(self):
+        element = self.paragraph_element
+        element.set_attribute('text:style-name', "Note")
+        element.del_attribute('text:style-name')
+        self.assertEqual(element.get_attribute('text:style-name'), None)
 
 
     def test_get_text(self):

@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
+# Import from itools
+from itools.core import get_abspath
+
 # Import from libxml2
-from libxml2 import parseMemory
+from libxml2 import parseDoc
 
 
 ODF_NAMESPACES = {
@@ -50,14 +53,18 @@ class odf_element(object):
         self.__element = internal_element
 
 
-    def __del__(self):
-        element = self.__element
-        document = element.doc
-        if getattr(document, '__lpod_must_free', False) is True:
-            # It's an element created ex nihilo
-            document.freeDoc()
-        # FIXME raises a segmentation fault
-        #element.freeNode()
+    def __decode_qname(self, qname):
+        if ':' in qname:
+            prefix, name = qname.split(':')
+            try:
+                uri = ODF_NAMESPACES[prefix]
+            except IndexError:
+                raise ValueError, "XML prefix '%s' is unknown" % prefix
+            element = self.__element
+            namespace = element.searchNsByHref(element.doc, uri)
+        else:
+            namespace, uri, name = None, None, qname
+        return namespace, uri, name
 
 
     def get_element_list(self, xpath_expression):
@@ -72,7 +79,11 @@ class odf_element(object):
 
     def get_attribute(self, name):
         element = self.__element
-        property = element.hasProp(name)
+        namespace, uri, name = self.__decode_qname(name)
+        if namespace is not None:
+            property = element.hasNsProp(name, uri)
+        else:
+            property = element.hasProp(name)
         if property is None:
             return None
         # Entites and special characters seem to be decoded internally
@@ -85,12 +96,21 @@ class odf_element(object):
             value = value.encode('utf_8')
         if not isinstance(value, str):
             raise TypeError, 'value is not str'
+        namespace, uri, name = self.__decode_qname(name)
+        if namespace is not None:
+            element.setNsProp(namespace, name, value)
+        else:
+            element.setProp(name, value)
         # Entites and special characters seem to be encoded internally
-        element.setProp(name, value)
 
 
     def del_attribute(self, name):
         element = self.__element
+        namespace, uri, name = self.__decode_qname(name)
+        if namespace is not None:
+            element.unsetNsProp(namespace, name)
+        else:
+            element.unsetProp(name)
         element.unsetProp(name)
 
 
@@ -175,7 +195,7 @@ class odf_xmlpart(object):
         if self.__document is None:
             container = self.container
             part = container.get_part(self.part_name)
-            self.__document = parseMemory(part, len(part))
+            self.__document = parseDoc(part)
         return self.__document
 
 
@@ -184,8 +204,8 @@ class odf_xmlpart(object):
             document = self.__get_document()
             xpath_context = document.xpathNewContext()
             # XXX needs to be filled with all the ODF namespaces or something
-            for name, uri in ODF_NAMESPACES.items():
-                xpath_context.xpathRegisterNs(name, uri)
+            for prefix, uri in ODF_NAMESPACES.items():
+                xpath_context.xpathRegisterNs(prefix, uri)
             self.__xpath_context = xpath_context
         return self.__xpath_context
 
@@ -202,9 +222,20 @@ class odf_xmlpart(object):
         return str(self.__get_document())
 
 
+# An empty XML document with all namespaces declared
+ns_document_path = get_abspath('templates/namespaces.xml')
+with open(ns_document_path, 'rb') as file:
+    ns_document_data = file.read()
 
-def create_element(data):
-    document = parseMemory(data, len(data))
-    # XXX must free it along with the element
-    document.__lpod_must_free = True
-    return odf_element(document.children)
+
+
+def create_element(element_data):
+    if not isinstance(element_data, str):
+        raise TypeError, "element data is not str"
+    if not element_data.strip():
+        raise ValueError, "element data is empty"
+    data = ns_document_data % element_data
+    document = parseDoc(data)
+    root = document.children
+    element = root.children
+    return odf_element(element)
