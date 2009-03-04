@@ -2,14 +2,14 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from unittest import TestCase, TestLoader, TestSuite, TextTestRunner
+from unittest import TestLoader, TestSuite, TextTestRunner
 
 # Import tests
 import test_container
-import test_context
+import test_xmlpart
 
 
-test_modules = [test_container, test_context]
+test_modules = [test_container, test_xmlpart]
 
 
 loader = TestLoader()
