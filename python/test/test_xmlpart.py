@@ -6,7 +6,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.container import get_odf_container
-from lpod.xmlpart import create_element, odf_xmlpart
+from lpod.xmlpart import create_element, odf_element, odf_xmlpart
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING
 
 
@@ -44,6 +44,18 @@ class ElementTestCase(TestCase):
         del self.paragraph_element
         del self.content_context
         del self.container
+
+
+    def test_bad_python_element(self):
+        self.assertRaises(TypeError, odf_element, '<text:p/>')
+
+
+    def test_bad_native_element(self):
+        # XXX this test purposely knows the XML library behind
+        element = self.paragraph_element
+        element_node = element._odf_element__element
+        text_node = element_node.children
+        self.assertRaises(TypeError, odf_element, text_node)
 
 
     def test_get_element_list(self):

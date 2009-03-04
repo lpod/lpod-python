@@ -5,7 +5,7 @@
 from itools.core import get_abspath
 
 # Import from libxml2
-from libxml2 import parseDoc
+from libxml2 import parseDoc, xmlNode
 
 
 ODF_NAMESPACES = {
@@ -49,7 +49,9 @@ class odf_element(object):
     """
 
     def __init__(self, internal_element):
-        # TODO check is element node
+        if (not isinstance(internal_element, xmlNode)
+                or internal_element.type != 'element'):
+            raise TypeError, "node is not an element node"
         self.__element = internal_element
 
 
@@ -73,7 +75,6 @@ class odf_element(object):
         xpath_context = document.xpathNewContext()
         result = xpath_context.xpathEval(xpath_expression)
         xpath_context.xpathFreeContext()
-        # TODO only element nodes
         return [odf_element(e) for e in result]
 
 
@@ -155,7 +156,6 @@ class odf_element(object):
 
     def copy(self):
         element = self.__element
-        # TODO only element nodes
         doc = element.doc
         return odf_element(doc.copyNodeList(element))
 
@@ -214,7 +214,6 @@ class odf_xmlpart(object):
     def get_element_list(self, xpath_expression):
         xpath_context = self.__get_xpath_context()
         result = xpath_context.xpathEval(xpath_expression)
-        # TODO only element nodes
         return [odf_element(e) for e in result]
 
 
