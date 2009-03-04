@@ -122,15 +122,11 @@ odf_element elt = create_heading(style, level, text);
 
   => '<text:h text:style-name="$style" text:level="$level">$text</text:h>'
 
-document.insert_paragraph(style);
-document.insert_paragraph(style, context);
-document.insert_paragraph(style, text);
-document.insert_paragraph(style, text, context);
+document.insert_paragraph(element);
+document.insert_paragraph(element, context);
 
-document.insert_heading(style, level);
-document.insert_heading(style, level, text);
-document.insert_heading(style, level, context);
-document.insert_heading(style, level, text, context);
+document.insert_heading(element);
+document.insert_heading(element, context);
 
 Hint: preload the body, etc. for fast access to default contexts.
 

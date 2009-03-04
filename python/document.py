@@ -6,12 +6,63 @@ from container import get_odf_container, new_odf_container_from_template
 from container import new_odf_container_from_class, odf_container
 
 
+def create_paragraph(style, text=''):
+    raise NotImplementedError
+
+
+
+def create_heading(style, level, text=''):
+    raise NotImplementedError
+
+
+
 class odf_document(object):
 
     def __init__(self, container):
         if not isinstance(container, odf_container):
             raise TypeError, "container is not an ODF container"
         self.container = container
+
+    #
+    # Paragraphs
+    #
+
+    def get_paragraph_list(self, style=None, context=None):
+        raise NotImplementedError
+
+
+    def get_paragraph(self, position, context=None):
+        raise NotImplementedError
+
+
+    def insert_paragraph(self, element, context=None):
+        raise NotImplementedError
+
+
+    #
+    # Headings
+    #
+
+    def get_heading_list(self, style=None, level=None, context=None):
+        raise NotImplementedError
+
+
+    def get_heading(self, position, level=None, context=None):
+        raise NotImplementedError
+
+
+    def insert_heading(self, element, context=None):
+        raise NotImplementedError
+
+
+    #
+    # Styles
+    #
+
+    def get_style(name):
+        """Only paragraph styles for now.
+        """
+        raise NotImplementedError
 
 
 

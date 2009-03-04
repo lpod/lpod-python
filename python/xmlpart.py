@@ -170,6 +170,25 @@ class odf_element(object):
         element.unlinkNode()
 
 
+# An empty XML document with all namespaces declared
+ns_document_path = get_abspath('templates/namespaces.xml')
+with open(ns_document_path, 'rb') as file:
+    ns_document_data = file.read()
+
+
+
+def create_element(element_data):
+    if not isinstance(element_data, str):
+        raise TypeError, "element data is not str"
+    if not element_data.strip():
+        raise ValueError, "element data is empty"
+    data = ns_document_data % element_data
+    document = parseDoc(data)
+    root = document.children
+    element = root.children
+    return odf_element(element)
+
+
 
 class odf_xmlpart(object):
     """Representation of an XML part.
@@ -220,22 +239,3 @@ class odf_xmlpart(object):
     def serialize(self):
         # TODO another method to write back in the container?
         return str(self.__get_document())
-
-
-# An empty XML document with all namespaces declared
-ns_document_path = get_abspath('templates/namespaces.xml')
-with open(ns_document_path, 'rb') as file:
-    ns_document_data = file.read()
-
-
-
-def create_element(element_data):
-    if not isinstance(element_data, str):
-        raise TypeError, "element data is not str"
-    if not element_data.strip():
-        raise ValueError, "element data is empty"
-    data = ns_document_data % element_data
-    document = parseDoc(data)
-    root = document.children
-    element = root.children
-    return odf_element(element)
