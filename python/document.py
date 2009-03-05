@@ -16,6 +16,7 @@ def create_heading(style, level, text=''):
     raise NotImplementedError
 
 
+
 def generate_xpath_query(element_name, attributes={}, position=None):
     query = ['//']
     query.append(element_name)
@@ -27,6 +28,7 @@ def generate_xpath_query(element_name, attributes={}, position=None):
     if position is not None:
         query.append('[{position}]'.format(str(position)))
     return ''.join(query)
+
 
 
 def check_arguments(context=None, position=None, style=None, level=None):
@@ -46,7 +48,6 @@ def check_arguments(context=None, position=None, style=None, level=None):
             raise TypeError, "an integer level is expected"
         if level < 1:
             raise ValueError, "level count begin at 1"
-
 
 
 
