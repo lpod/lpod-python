@@ -33,6 +33,8 @@ TODO
     container.save(uri)
     container.save(uri, packaging)
 
+with ``packaging = {flat, zip}``
+
 
 Level 0.1
 ---------
