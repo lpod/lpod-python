@@ -3,4 +3,13 @@
 
 Here the doc!
 
-TODO specify which version of the ODF standard we comply to.
+TODO
+----
+specify which version of the ODF standard we comply to.
+
+How to insert a new doc
+-----------------------
+
+1. Create a new file with the ".rst" extension.
+2. Add it in a "toctree" directive. (by example in index.rst)
+
