@@ -104,11 +104,11 @@ class CheckArgumentsTestCase(TestCase):
 
 
     def test_str_position(self):
-        raise NotImplementedError
+        self.assertRaises(TypeError, check_arguments, position='foo')
 
 
     def test_position_zero(self):
-        raise NotImplementedError
+        self.assertRaises(ValueError, check_arguments, position=0)
 
 
     def test_bad_style(self):
