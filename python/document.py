@@ -22,11 +22,12 @@ def generate_xpath_query(element_name, attributes={}, position=None):
     query.append(element_name)
     for name, value in attributes.items():
         if value is not None:
-            query.append('[@{name}="{value}"]'.format(name, str(value)))
+            query.append('[@{name}="{value}"]'.format(name=name,
+                                                      value=str(value)))
         else:
-            query.append('[@{name}]'.format(name))
+            query.append('[@{name}]'.format(name=name))
     if position is not None:
-        query.append('[{position}]'.format(str(position)))
+        query.append('[{position}]'.format(position=str(position)))
     return ''.join(query)
 
 
