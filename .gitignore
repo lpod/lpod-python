@@ -1,1 +1,3 @@
 *.swp
+doc/.build
+doc/lpod-docs-*.tgz
