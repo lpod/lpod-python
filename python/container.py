@@ -159,7 +159,7 @@ class odf_container(object):
 
 
 
-def get_odf_container(uri):
+def odf_get_container(uri):
     """Return an "odf_container" instance of the ODF document stored at the
     given URI.
     """
@@ -167,20 +167,20 @@ def get_odf_container(uri):
 
 
 
-def new_odf_container_from_template(template_uri):
+def odf_new_container_from_template(template_uri):
     """Return an "odf_container" instance using the given template.
     """
-    template_container = get_odf_container(template_uri)
+    template_container = odf_get_container(template_uri)
     # Return a copy of the template container
     return template_container.clone()
 
 
 
-def new_odf_container_from_class(odf_class):
+def odf_new_container_from_class(odf_class):
     """Return an "odf_container" instance of the given class.
     """
     if odf_class not in ODF_CLASSES:
         raise ValueError, 'unknown ODF class "%s"' % odf_class
     template_path = ODF_CLASSES[odf_class]
     template_uri = get_abspath(template_path)
-    return new_odf_container_from_template(template_uri)
+    return odf_new_container_from_template(template_uri)

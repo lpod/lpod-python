@@ -11,11 +11,11 @@ Level 0.0
 
     odf_container container
 
-    container = new_odf_container_from_class({text, spreadsheet, presentation,
+    container = odf_new_container_from_class({text, spreadsheet, presentation,
                                               drawing})
-    container = new_odf_container_from_template(template_uri)
-
-    container = get_odf_container(uri)
+    container = odf_new_container_from_template(template_uri)
+                    
+    container = odf_get_container(uri)
 
     odf_container copy = container.clone()
     str data = container.get_part(part_name)
@@ -60,7 +60,7 @@ Level 0.1
     unicode text = elt.get_text()
     elt.set_text(text)
 
-    odf_element e2 = create_element('<element[...]')
+    odf_element e2 = odf_create_element('<element[...]')
     elt.insert_element(e2, {previous_sibling, next_sibling, first_child,
                             last_child, <N>})
     e3 = elt.copy()
@@ -74,9 +74,9 @@ Level 1
 
     odf_document document
 
-    document = get_odf_document(uri)
-    document = new_odf_document_from_class(odf_class)
-    document = new_odf_document_from_template(template_uri)
+    document = odf_get_document(uri)
+    document = odf_new_document_from_class(odf_class)
+    document = odf_new_document_from_template(template_uri)
 
     document.get_paragraph_list()
     document.get_paragraph_list(style)
@@ -120,19 +120,19 @@ Level 1
         - styles part, named styles
         - default style of the same family
 
-    odf_element elt = create_paragraph(style)
+    odf_element elt = odf_create_paragraph(style)
 
       => '<text:p text:style-name="$style"></text:p>'
 
-    odf_element elt = create_paragraph(style, text)
+    odf_element elt = odf_create_paragraph(style, text)
 
       => '<text:p text:style-name="$style">$text</text:p>'
 
-    odf_element elt = create_heading(style, level)
+    odf_element elt = odf_create_heading(style, level)
 
       => '<text:h text:style-name="$style" text:level="$level"></text:h>'
 
-    odf_element elt = create_heading(style, level, text)
+    odf_element elt = odf_create_heading(style, level, text)
 
       => '<text:h text:style-name="$style" text:level="$level">$text</text:h>'
 

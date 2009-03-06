@@ -5,8 +5,8 @@
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.container import get_odf_container
-from lpod.xmlpart import create_element, odf_element, odf_xmlpart
+from lpod.container import odf_get_container
+from lpod.xmlpart import odf_create_element, odf_element, odf_xmlpart
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING
 
 
@@ -14,13 +14,13 @@ class CreateElementTestCase(TestCase):
 
     def test_simple(self):
         data = '<p>Template Element</p>'
-        element = create_element(data)
+        element = odf_create_element(data)
         self.assertEqual(element.serialize(), data)
 
 
     def test_namespace(self):
         data = '<text:p>Template Element</text:p>'
-        element = create_element(data)
+        element = odf_create_element(data)
         self.assertEqual(element.serialize(), data)
 
 
@@ -32,7 +32,7 @@ class ElementTestCase(TestCase):
 
 
     def setUp(self):
-        container = get_odf_container('samples/example.odt')
+        container = odf_get_container('samples/example.odt')
         self.container = container
         content_context = odf_xmlpart('content', container)
         self.content_context = content_context
@@ -136,44 +136,44 @@ class ElementTestCase(TestCase):
 
 
     def test_insert_element_first_child(self):
-        element = create_element('<root><a/></root>')
-        child = create_element('<b/>')
+        element = odf_create_element('<root><a/></root>')
+        child = odf_create_element('<b/>')
         element.insert_element(child, FIRST_CHILD)
         self.assertEqual(element.serialize(), '<root><b/><a/></root>')
 
 
     def test_insert_element_last_child(self):
-        element = create_element('<root><a/></root>')
-        child = create_element('<b/>')
+        element = odf_create_element('<root><a/></root>')
+        child = odf_create_element('<b/>')
         element.insert_element(child, LAST_CHILD)
         self.assertEqual(element.serialize(), '<root><a/><b/></root>')
 
 
     def test_insert_element_next_sibling(self):
-        root = create_element('<root><a/><b/></root>')
+        root = odf_create_element('<root><a/><b/></root>')
         element = root.get_element_list('//a')[0]
-        sibling = create_element('<c/>')
+        sibling = odf_create_element('<c/>')
         element.insert_element(sibling, NEXT_SIBLING)
         self.assertEqual(root.serialize(), '<root><a/><c/><b/></root>')
 
 
     def test_insert_element_prev_sibling(self):
-        root = create_element('<root><a/><b/></root>')
+        root = odf_create_element('<root><a/><b/></root>')
         element = root.get_element_list('//a')[0]
-        sibling = create_element('<c/>')
+        sibling = odf_create_element('<c/>')
         element.insert_element(sibling, PREV_SIBLING)
         self.assertEqual(root.serialize(), '<root><c/><a/><b/></root>')
 
 
     def test_insert_element_bad_element(self):
-        element = create_element('<a/>')
+        element = odf_create_element('<a/>')
         self.assertRaises(TypeError, element.insert_element, '<b/>',
                           FIRST_CHILD)
 
 
     def test_insert_element_bad_position(self):
-        element = create_element('<a/>')
-        child = create_element('<b/>')
+        element = odf_create_element('<a/>')
+        child = odf_create_element('<b/>')
         self.assertRaises(ValueError, element.insert_element, child, 999)
 
 
@@ -185,7 +185,7 @@ class ElementTestCase(TestCase):
 
 
     def test_delete(self):
-        element = create_element('<a><b/></a>')
+        element = odf_create_element('<a><b/></a>')
         child = element.get_element_list('//b')[0]
         child.delete()
         self.assertEqual(element.serialize(), '<a/>')
@@ -195,7 +195,7 @@ class ElementTestCase(TestCase):
 class XmlPartTestCase(TestCase):
 
     def setUp(self):
-        self.container = get_odf_container('samples/example.odt')
+        self.container = odf_get_container('samples/example.odt')
 
 
     def tearDown(self):
