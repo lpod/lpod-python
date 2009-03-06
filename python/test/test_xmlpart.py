@@ -60,21 +60,21 @@ class ElementTestCase(TestCase):
 
     def test_get_element_list(self):
         elements = self.content_context.get_element_list('//text:p')
-        self.assertEqual(len(elements), 1)
+        self.assertEqual(len(elements), 5)
 
 
     def test_get_attribute(self):
         element = self.paragraph_element
         text = element.get_attribute('style-name')
         self.assert_(isinstance(text, str))
-        self.assertEqual(text, "Standard")
+        self.assertEqual(text, "Text_20_body")
 
 
     def test_get_attribute_namespace(self):
         element = self.paragraph_element
         text = element.get_attribute('text:style-name')
         self.assert_(isinstance(text, str))
-        self.assertEqual(text, "Standard")
+        self.assertEqual(text, "Text_20_body")
 
 
     def test_set_attribute(self):
@@ -114,7 +114,7 @@ class ElementTestCase(TestCase):
 
     def test_get_text(self):
         element = self.paragraph_element
-        self.assertEqual(element.get_text(), u"This is an example.")
+        self.assertEqual(element.get_text(), 'This is the first paragraph.')
 
 
     def test_set_text(self):
@@ -205,7 +205,7 @@ class XmlPartTestCase(TestCase):
     def test_get_element_list(self):
         content_context = odf_xmlpart('content', self.container)
         elements = content_context.get_element_list('//text:p')
-        self.assertEqual(len(elements), 1)
+        self.assertEqual(len(elements), 5)
 
 
     def serialize(self):
