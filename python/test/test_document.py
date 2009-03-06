@@ -200,6 +200,12 @@ class DocumentTestCase(TestCase):
         self.assertEqual(text, expected)
 
 
+    def test_get_paragraph_missed(self):
+        document = self.document
+        paragraph = document.get_paragraph(999)
+        self.assertEqual(paragraph, None)
+
+
     def test_insert_paragraph(self):
         raise NotImplementedError
 
@@ -249,6 +255,12 @@ class DocumentTestCase(TestCase):
         heading = document.get_heading(2)
         text = heading.get_text()
         self.assertEqual(text, 'Level 2 Title')
+
+
+    def test_get_heading_missed(self):
+        document = self.document
+        heading = document.get_heading(999)
+        self.assertEqual(heading, None)
 
 
     def test_get_heading_level(self):
