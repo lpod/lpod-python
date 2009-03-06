@@ -34,15 +34,15 @@ class ElementTestCase(TestCase):
     def setUp(self):
         container = odf_get_container('samples/example.odt')
         self.container = container
-        content_context = odf_xmlpart('content', container)
-        self.content_context = content_context
-        paragraph_element = content_context.get_element_list('//text:p[1]')
+        content_part = odf_xmlpart('content', container)
+        self.content_part = content_part
+        paragraph_element = content_part.get_element_list('//text:p[1]')
         self.paragraph_element = paragraph_element[0]
 
 
     def tearDown(self):
         del self.paragraph_element
-        del self.content_context
+        del self.content_part
         del self.container
 
 
@@ -59,7 +59,7 @@ class ElementTestCase(TestCase):
 
 
     def test_get_element_list(self):
-        elements = self.content_context.get_element_list('//text:p')
+        elements = self.content_part.get_element_list('//text:p')
         self.assertEqual(len(elements), 5)
 
 
@@ -203,16 +203,16 @@ class XmlPartTestCase(TestCase):
 
 
     def test_get_element_list(self):
-        content_context = odf_xmlpart('content', self.container)
-        elements = content_context.get_element_list('//text:p')
+        content_part = odf_xmlpart('content', self.container)
+        elements = content_part.get_element_list('//text:p')
         self.assertEqual(len(elements), 5)
 
 
     def serialize(self):
         container = self.container
         content_bytes = container.get_part('content')
-        content_context = odf_xmlpart('content', container)
-        self.assertEqual(content_bytes, content_context.serialize())
+        content_part = odf_xmlpart('content', container)
+        self.assertEqual(content_bytes, content_part.serialize())
 
 
 
