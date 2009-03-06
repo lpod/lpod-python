@@ -7,12 +7,12 @@ from container import new_odf_container_from_class, odf_container
 from xmlpart import odf_element
 
 
-def create_paragraph(style, text=''):
+def odf_create_paragraph(style, text=''):
     raise NotImplementedError
 
 
 
-def create_heading(style, level, text=''):
+def odf_create_heading(style, level, text=''):
     raise NotImplementedError
 
 

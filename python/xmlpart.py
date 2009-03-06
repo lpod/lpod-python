@@ -179,7 +179,7 @@ with open(ns_document_path, 'rb') as file:
 
 
 
-def create_element(element_data):
+def odf_create_element(element_data):
     if not isinstance(element_data, str):
         raise TypeError, "element data is not str"
     if not element_data.strip():

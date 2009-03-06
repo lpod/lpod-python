@@ -8,6 +8,7 @@ from unittest import TestCase, main
 from lpod.document import new_odf_document_from_template
 from lpod.document import new_odf_document_from_class, get_odf_document
 from lpod.document import generate_xpath_query, check_arguments
+from lpod.xmlpart import odf_create_element
 
 
 class NewDocumentFromTemplateTestCase(TestCase):
@@ -141,15 +142,19 @@ class CheckArgumentsTestCase(TestCase):
 
 
     def test_bad_style(self):
-        raise NotImplementedError
+        data = ('<style:master-page '
+                'style:name="Standard" '
+                'style:page-layout-name="Mpm1"/>')
+        element = odf_create_element(data)
+        self.assertRaises(TypeError, check_arguments, style=element)
 
 
     def test_str_level(self):
-        raise NotImplementedError
+        self.assertRaises(TypeError, check_arguments, level='1')
 
 
     def test_level_zero(self):
-        raise NotImplementedError
+        self.assertRaises(ValueError, check_arguments, level=0)
 
 
 
