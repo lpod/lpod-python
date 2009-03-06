@@ -189,7 +189,12 @@ class DocumentTestCase(TestCase):
 
 
     def test_get_paragraph_list_context(self):
-        raise NotImplementedError
+        document = self.document
+        paragraphs = document.get_paragraph_list(style='Hanging_20_indent')
+        paragraph = paragraphs[0]
+        paragraphs = document.get_paragraph_list(style='Hanging_20_indent',
+                                                 context=paragraph)
+        self.assertEqual(len(paragraphs), 0)
 
 
     def test_get_paragraph(self):

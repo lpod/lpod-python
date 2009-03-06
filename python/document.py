@@ -17,8 +17,12 @@ def odf_create_heading(style, level, text=''):
 
 
 
-def _generate_xpath_query(element_name, attributes={}, position=None):
-    query = ['//']
+def _generate_xpath_query(element_name, attributes={}, position=None,
+                          context=None):
+    if context is not None:
+        query = [context._get_xpath_path(), '//']
+    else:
+        query = ['//']
     query.append(element_name)
     # Sort attributes for reproducible test cases
     for name in sorted(attributes):
@@ -85,15 +89,16 @@ class odf_document(object):
         attributes = {}
         if style:
             attributes['text:style-name'] = style
-        query = _generate_xpath_query('text:p', attributes)
-        return content.get_element_list(query, context=context)
+        query = _generate_xpath_query('text:p', attributes, context=context)
+        return content.get_element_list(query)
 
 
     def get_paragraph(self, position, context=None):
         _check_arguments(position=position, context=context)
         content = self.__get_xmlpart('content')
-        query = _generate_xpath_query('text:p', position=position)
-        result = content.get_element_list(query, context=context)
+        query = _generate_xpath_query('text:p', position=position,
+                                      context=context)
+        result = content.get_element_list(query)
         if not result:
             return None
         return result[0]
@@ -115,8 +120,8 @@ class odf_document(object):
             attributes['text:style-name'] = style
         if level:
             attributes['text:outline-level'] = level
-        query = _generate_xpath_query('text:h', attributes)
-        return content.get_element_list(query, context=context)
+        query = _generate_xpath_query('text:h', attributes, context=context)
+        return content.get_element_list(query)
 
 
     def get_heading(self, position, level=None, context=None):
@@ -126,8 +131,9 @@ class odf_document(object):
         if level:
             attributes['text:outline-level'] = level
         query = _generate_xpath_query('text:h', attributes,
-                                      position=position)
-        result = content.get_element_list(query, context=context)
+                                      position=position,
+                                      context=context)
+        result = content.get_element_list(query)
         if not result:
             return None
         return result[0]
