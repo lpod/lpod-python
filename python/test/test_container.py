@@ -18,19 +18,23 @@ class NewContainerFromTemplateTestCase(TestCase):
                           '../templates/notexisting')
 
     def test_text_template(self):
-        new_odf_container_from_template('../templates/text.ott')
+        uri = '../templates/text.ott'
+        self.assert_(new_odf_container_from_template(uri))
 
 
     def test_spreadsheet_template(self):
-        new_odf_container_from_template('../templates/spreadsheet.ots')
+        uri = '../templates/spreadsheet.ots'
+        self.assert_(new_odf_container_from_template(uri))
 
 
     def test_presentation_template(self):
-        new_odf_container_from_template('../templates/presentation.otp')
+        uri = '../templates/presentation.otp'
+        self.assert_(new_odf_container_from_template(uri))
 
 
     def test_drawing_template(self):
-        new_odf_container_from_template('../templates/drawing.otg')
+        uri = '../templates/drawing.otg'
+        self.assert_(new_odf_container_from_template(uri))
 
 
 
@@ -42,19 +46,19 @@ class NewContainerFromClassTestCase(TestCase):
 
 
     def test_text_class(self):
-        new_odf_container_from_class('text')
+        self.assert_(new_odf_container_from_class('text'))
 
 
     def test_spreadsheet_class(self):
-        new_odf_container_from_class('spreadsheet')
+        self.assert_(new_odf_container_from_class('spreadsheet'))
 
 
     def test_presentation_class(self):
-        new_odf_container_from_class('presentation')
+        self.assert_(new_odf_container_from_class('presentation'))
 
 
     def test_drawing_class(self):
-        new_odf_container_from_class('drawing')
+        self.assert_(new_odf_container_from_class('drawing'))
 
 
 
@@ -62,22 +66,22 @@ class GetContainerTestCase(TestCase):
 
     def test_filesystem(self):
         path = 'samples/example.odt'
-        container = get_odf_container(path)
+        self.assert_(get_odf_container(path))
 
 
     def test_odf_xml(self):
         path = 'samples/example.xml'
-        container = get_odf_container(path)
+        self.assert_(get_odf_container(path))
 
 
     def test_http(self):
         uri = 'http://test.lpod-project.org/example.odt'
-        container = get_odf_container(uri)
+        self.assert_(get_odf_container(uri))
 
 
     def test_ftp(self):
         uri = 'ftp://test.lpod-project.org/example.odt'
-        container = get_odf_container(uri)
+        self.assert_(get_odf_container(uri))
 
 
 

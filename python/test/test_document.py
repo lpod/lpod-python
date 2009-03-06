@@ -17,19 +17,23 @@ class NewDocumentFromTemplateTestCase(TestCase):
                           '../templates/notexisting')
 
     def test_text_template(self):
-        new_odf_document_from_template('../templates/text.ott')
+        uri = '../templates/text.ott'
+        self.assert_(new_odf_document_from_template(uri))
 
 
     def test_spreadsheet_template(self):
-        new_odf_document_from_template('../templates/spreadsheet.ots')
+        uri = '../templates/spreadsheet.ots'
+        self.assert_(new_odf_document_from_template(uri))
 
 
     def test_presentation_template(self):
-        new_odf_document_from_template('../templates/presentation.otp')
+        uri = '../templates/presentation.otp'
+        self.assert_(new_odf_document_from_template(uri))
 
 
     def test_drawing_template(self):
-        new_odf_document_from_template('../templates/drawing.otg')
+        uri = '../templates/drawing.otg'
+        self.assert_(new_odf_document_from_template(uri))
 
 
 
@@ -41,19 +45,19 @@ class NewdocumentFromClassTestCase(TestCase):
 
 
     def test_text_class(self):
-        new_odf_document_from_class('text')
+        self.assert_(new_odf_document_from_class('text'))
 
 
     def test_spreadsheet_class(self):
-        new_odf_document_from_class('spreadsheet')
+        self.assert_(new_odf_document_from_class('spreadsheet'))
 
 
     def test_presentation_class(self):
-        new_odf_document_from_class('presentation')
+        self.assert_(new_odf_document_from_class('presentation'))
 
 
     def test_drawing_class(self):
-        new_odf_document_from_class('drawing')
+        self.assert_(new_odf_document_from_class('drawing'))
 
 
 
@@ -61,22 +65,22 @@ class GetDocumentTestCase(TestCase):
 
     def test_filesystem(self):
         path = 'samples/example.odt'
-        document = get_odf_document(path)
+        self.assert_(get_odf_document(path))
 
 
     def test_odf_xml(self):
         path = 'samples/example.xml'
-        document = get_odf_document(path)
+        self.assert_(get_odf_document(path))
 
 
     def test_http(self):
         uri = 'http://test.lpod-project.org/example.odt'
-        document = get_odf_document(uri)
+        self.assert_(get_odf_document(uri))
 
 
     def test_ftp(self):
         uri = 'ftp://test.lpod-project.org/example.odt'
-        document = get_odf_document(uri)
+        self.assert_(get_odf_document(uri))
 
 
 
