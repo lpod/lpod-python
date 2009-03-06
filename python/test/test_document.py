@@ -100,9 +100,10 @@ class GenerateXPathTestCase(TestCase):
 
     def test_two_attributes(self):
         attributes = {'text:style-name': 'Standard',
-                      'text:level': 1}
+                      'text:outline-level': 1}
         query = _generate_xpath_query('text:h', attributes)
-        expected = '//text:h[@text:style-name="Standard"][@text:level="1"]'
+        expected = ('//text:h[@text:outline-level="1"]'
+                    '[@text:style-name="Standard"]')
         self.assertEqual(query, expected)
 
 
@@ -119,9 +120,10 @@ class GenerateXPathTestCase(TestCase):
 
     def test_two_attributes_position(self):
         attributes = {'text:style-name': 'Standard',
-                      'text:level': 1}
+                      'text:outline-level': 1}
         query = _generate_xpath_query('text:h', attributes, position=2)
-        expected = '//text:h[@text:style-name="Standard"][@text:level="1"][2]'
+        expected = ('//text:h[@text:outline-level="1"]'
+                    '[@text:style-name="Standard"][2]')
         self.assertEqual(query, expected)
 
 
@@ -166,6 +168,98 @@ class DocumentTestCase(TestCase):
 
     def tearDown(self):
         del self.document
+
+
+    def test_get_paragraph_list(self):
+        document = self.document
+        paragraphs = document.get_paragraph_list()
+        self.assertEqual(len(paragraphs), 5)
+        second = paragraphs[1]
+        text = second.get_text()
+        self.assertEqual(text, 'This is the second paragraph.')
+
+
+    def test_get_paragraph_list_style(self):
+        document = self.document
+        paragraphs = document.get_paragraph_list(style='Hanging_20_indent')
+        self.assertEqual(len(paragraphs), 1)
+        paragraph = paragraphs[0]
+        text = paragraph.get_text()
+        self.assertEqual(text, 'This is a paragraph with a named style.')
+
+
+    def test_get_paragraph_list_context(self):
+        raise NotImplementedError
+
+
+    def test_get_paragraph(self):
+        document = self.document
+        paragraph = document.get_paragraph(4)
+        text = paragraph.get_text()
+        expected = 'This is the first paragraph of the second title.'
+        self.assertEqual(text, expected)
+
+
+    def test_insert_paragraph(self):
+        raise NotImplementedError
+
+
+    def test_get_heading_list(self):
+        document = self.document
+        headings = document.get_heading_list()
+        self.assertEqual(len(headings), 2)
+        second = headings[1]
+        text = second.get_text()
+        self.assertEqual(text, 'Level 2 Title')
+
+
+    def test_get_heading_list_style(self):
+        document = self.document
+        headings = document.get_heading_list(style='Heading_20_2')
+        self.assertEqual(len(headings), 1)
+        heading = headings[0]
+        text = heading.get_text()
+        self.assertEqual(text, 'Level 2 Title')
+
+
+    def test_get_heading_list_level(self):
+        document = self.document
+        headings = document.get_heading_list(level=2)
+        self.assertEqual(len(headings), 1)
+        heading = headings[0]
+        text = heading.get_text()
+        self.assertEqual(text, 'Level 2 Title')
+
+
+    def test_get_heading_list_style_level(self):
+        document = self.document
+        headings = document.get_heading_list(style='Heading_20_2', level=2)
+        self.assertEqual(len(headings), 1)
+        heading = headings[0]
+        text = heading.get_text()
+        self.assertEqual(text, 'Level 2 Title')
+
+
+    def test_get_heading_list_context(self):
+        raise NotImplementedError
+
+
+    def test_get_heading(self):
+        document = self.document
+        heading = document.get_heading(2)
+        text = heading.get_text()
+        self.assertEqual(text, 'Level 2 Title')
+
+
+    def test_get_heading_level(self):
+        document = self.document
+        heading = document.get_heading(1, level=2)
+        text = heading.get_text()
+        self.assertEqual(text, 'Level 2 Title')
+
+
+    def test_insert_heading(self):
+        raise NotImplementedError
 
 
 

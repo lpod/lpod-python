@@ -20,7 +20,9 @@ def odf_create_heading(style, level, text=''):
 def _generate_xpath_query(element_name, attributes={}, position=None):
     query = ['//']
     query.append(element_name)
-    for name, value in attributes.items():
+    # Sort attributes for reproducible test cases
+    for name in sorted(attributes):
+        value = attributes[name]
         if value is not None:
             query.append('[@{name}="{value}"]'.format(name=name,
                                                       value=str(value)))
@@ -90,8 +92,11 @@ class odf_document(object):
     def get_paragraph(self, position, context=None):
         _check_arguments(position=position, context=context)
         content = self.__get_xmlpart('content')
-        query = _generate_xpath_query('text:p', position)
-        return content.get_element_list(query, context=context)
+        query = _generate_xpath_query('text:p', position=position)
+        result = content.get_element_list(query, context=context)
+        if not result:
+            return None
+        return result[0]
 
 
     def insert_paragraph(self, element, context=None):
@@ -109,7 +114,7 @@ class odf_document(object):
         if style:
             attributes['text:style-name'] = style
         if level:
-            attributes['text:level'] = level
+            attributes['text:outline-level'] = level
         query = _generate_xpath_query('text:h', attributes)
         return content.get_element_list(query, context=context)
 
@@ -117,8 +122,15 @@ class odf_document(object):
     def get_heading(self, position, level=None, context=None):
         _check_arguments(position=position, level=level, context=context)
         content = self.__get_xmlpart('content')
-        query = _generate_xpath_query('text:h', position)
-        return content.get_element_list(query, context=context)
+        attributes = {}
+        if level:
+            attributes['text:outline-level'] = level
+        query = _generate_xpath_query('text:h', attributes,
+                                      position=position)
+        result = content.get_element_list(query, context=context)
+        if not result:
+            return None
+        return result[0]
 
 
     def insert_heading(self, element, context=None):
