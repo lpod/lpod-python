@@ -104,7 +104,7 @@ class CheckArgumentsTestCase(TestCase):
 
 
     def test_str_position(self):
-        self.assertRaises(TypeError, check_arguments, position='foo')
+        self.assertRaises(TypeError, check_arguments, position='1')
 
 
     def test_position_zero(self):
