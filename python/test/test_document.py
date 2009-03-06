@@ -91,12 +91,37 @@ class GenerateXPathTestCase(TestCase):
         self.assertEqual(query, '//text:p')
 
 
-    def test_attributes(self):
-        raise NotImplementedError
+    def test_attribute(self):
+        attributes = {'text:style-name': 'Standard'}
+        query = generate_xpath_query('text:p', attributes)
+        self.assertEqual(query, '//text:p[@text:style-name="Standard"]')
+
+
+    def test_two_attributes(self):
+        attributes = {'text:style-name': 'Standard',
+                      'text:level': 1}
+        query = generate_xpath_query('text:h', attributes)
+        expected = '//text:h[@text:style-name="Standard"][@text:level="1"]'
+        self.assertEqual(query, expected)
 
 
     def test_position(self):
-        raise NotImplementedError
+        query = generate_xpath_query('text:h', position=2)
+        self.assertEqual(query, '//text:h[2]')
+
+
+    def test_attribute_position(self):
+        attributes = {'text:style-name': 'Standard'}
+        query = generate_xpath_query('text:p', attributes, position=2)
+        self.assertEqual(query, '//text:p[@text:style-name="Standard"][2]')
+
+
+    def test_two_attributes_position(self):
+        attributes = {'text:style-name': 'Standard',
+                      'text:level': 1}
+        query = generate_xpath_query('text:h', attributes, position=2)
+        expected = '//text:h[@text:style-name="Standard"][@text:level="1"][2]'
+        self.assertEqual(query, expected)
 
 
 
