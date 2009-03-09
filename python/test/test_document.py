@@ -8,6 +8,7 @@ from unittest import TestCase, main
 from lpod.document import odf_new_document_from_template
 from lpod.document import odf_new_document_from_class, odf_get_document
 from lpod.document import _generate_xpath_query, _check_arguments
+from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.xmlpart import odf_create_element
 
 
@@ -212,7 +213,13 @@ class DocumentTestCase(TestCase):
 
 
     def test_insert_paragraph(self):
-        raise NotImplementedError
+        document = self.document
+        paragraph = odf_create_paragraph('Text_20_body',
+                                         'An inserted test')
+        document.insert_paragraph(paragraph)
+        last_paragraph = document.get_paragraph_list()[-1]
+        self.assertEqual(last_paragraph.get_text(), 'An inserted test')
+
 
 
     def test_get_heading_list(self):
@@ -276,7 +283,12 @@ class DocumentTestCase(TestCase):
 
 
     def test_insert_heading(self):
-        raise NotImplementedError
+        document = self.document
+        heading = odf_create_heading('Heading_20_2', 2,
+                                       'An inserted heading')
+        document.insert_heading(heading)
+        last_heading = document.get_heading_list()[-1]
+        self.assertEqual(last_heading.get_text(), 'An inserted heading')
 
 
 
