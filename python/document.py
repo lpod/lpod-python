@@ -4,16 +4,25 @@
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
-from xmlpart import odf_element, odf_xmlpart
+from xmlpart import odf_element, odf_xmlpart, LAST_CHILD, NEXT_SIBLING
+from libxml2 import newNode
+
 
 
 def odf_create_paragraph(style, text=''):
-    raise NotImplementedError
+    paragraph = newNode('text:p')
+    paragraph.newProp('text:style-name', style)
+    paragraph.setContent(text)
+    return odf_element(paragraph)
 
 
 
 def odf_create_heading(style, level, text=''):
-    raise NotImplementedError
+    heading = newNode('text:h')
+    heading.newProp('text:style-name', style)
+    heading.newProp('text:outline-level', str(level))
+    heading.setContent(text)
+    return odf_element(heading)
 
 
 
@@ -79,6 +88,7 @@ class odf_document(object):
             setattr(self, '__' + part_name, part)
         return part
 
+
     #
     # Paragraphs
     #
@@ -105,7 +115,14 @@ class odf_document(object):
 
 
     def insert_paragraph(self, element, context=None):
-        raise NotImplementedError
+        if context is not None:
+            # XXX Verify me: NEXT_SIBLING or LAST_CHILD
+            context.insert_element(element, NEXT_SIBLING)
+        else:
+            # We insert it in the last office:text
+            content = self.__get_xmlpart('content')
+            office_text = content.get_element_list('//office:text')[-1]
+            office_text.insert_element(element, LAST_CHILD)
 
 
     #
@@ -140,7 +157,14 @@ class odf_document(object):
 
 
     def insert_heading(self, element, context=None):
-        raise NotImplementedError
+        if context is not None:
+            # XXX Verify me: NEXT_SIBLING or LAST_CHILD
+            context.insert_element(element, NEXT_SIBLING)
+        else:
+            # We insert it in the last office:text
+            content = self.__get_xmlpart('content')
+            office_text = content.get_element_list('//office:text')[-1]
+            office_text.insert_element(element, LAST_CHILD)
 
 
     #
