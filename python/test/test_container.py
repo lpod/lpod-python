@@ -4,6 +4,9 @@
 # Import from the Standard Library
 from unittest import TestCase, main
 
+# Import from itools
+from itools import vfs
+
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
 from lpod.container import odf_new_container_from_template
@@ -136,20 +139,29 @@ class ContainerTestCase(TestCase):
 
 class ContainerSaveTestCase(TestCase):
 
-
-    def test_save(self):
-        raise NotImplementedError
-
-
-    def test_save_packaging(self):
-        raise NotImplementedError
+    def setUp(self):
+        vfs.make_folder('trash')
 
 
-    def test_save_uri(self):
-        raise NotImplementedError
+    def tearDown(self):
+        vfs.remove('trash')
 
 
-    def test_save_uri_packaging(self):
+    def test_save_zip(self):
+        """TODO: 2 cases
+           1. from "zip" to "zip"
+           2. from "flat" to "zip"
+        """
+        container = odf_get_container('samples/example.odt')
+        container.save('trash/example.odt')
+        # TODO FINISH ME
+
+
+    def test_save_flat(self):
+        """TODO: 2 cases
+           1. from "zip" to "flat"
+           2. from "flat" to "flat"
+        """
         raise NotImplementedError
 
 
