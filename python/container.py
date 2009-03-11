@@ -3,9 +3,12 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from zipfile import ZipFile
+from cStringIO import StringIO
 
 # Import from itools
 from itools import vfs
+from itools.vfs import WRITE
 from itools.core import get_abspath
 
 
@@ -72,7 +75,7 @@ class odf_container(object):
         self.mimetype = mimetype
         # Internal state
         self.__data = None
-        self.__archive = None
+        self.__zipfile = None
         self.__parts = {}
 
 
@@ -98,12 +101,6 @@ class odf_container(object):
         return self.__data
 
 
-    def __get_archive(self):
-        if self.__archive is None:
-            self.__archive = vfs.mount_archive(self.uri)
-        return self.__archive
-
-
     def __get_part_xml(self, part_name):
         if part_name not in ODF_PARTS:
             raise ValueError, ("Third-party parts are not supported "
@@ -120,18 +117,46 @@ class odf_container(object):
         return part
 
 
+    def __get_zipfile(self):
+        if self.__zipfile is None:
+            self.__zipfile = ZipFile(StringIO(self.__get_data()))
+        return self.__zipfile
+
 
     def __get_part_zip(self, part_name):
-        archive = self.__get_archive()
+        zipfile = self.__get_zipfile()
         if part_name in ODF_PARTS and part_name != 'mimetype':
-            file = archive.open('%s.xml' % part_name)
+            file = zipfile.open('%s.xml' % part_name)
             part = file.read()
             file.close()
         else:
-            file = archive.open(part_name)
+            file = zipfile.open(part_name)
             part = file.read()
             file.close()
         return part
+
+
+    def __get_zip_contents(self):
+        zipfile = self.__get_zipfile()
+        result = []
+        for part in zipfile.infolist():
+            filename = part.filename
+            if filename.endswith('.xml') and filename[:-4] in ODF_PARTS:
+                result.append(filename[:-4])
+            else:
+                result.append(filename)
+        return result
+
+
+    def __get_xml_contents(self):
+        raise NotImplementedError
+
+
+    def __get_contents(self):
+        if self.mimetype == 'application/xml':
+            return self.__get_xml_contents()
+        else:
+            return self.__get_zip_contents()
 
 
     def get_part(self, part_name):
@@ -156,6 +181,48 @@ class odf_container(object):
     def del_part(self, part_name):
         # Mark for deletion
         self.__parts[part_name] = None
+
+
+    def __get_xml(self):
+        raise NotImplementedError
+
+
+    def __get_zip(self):
+        data = StringIO()
+        filezip = ZipFile(data, 'w')
+
+        for name, part_data in self.__parts.iteritems():
+            if name in ODF_PARTS and name != 'mimetype':
+                name += '.xml'
+            filezip.writestr(name, part_data)
+
+        filezip.close()
+        return data.getvalue()
+
+
+    def save(self, uri=None, packaging=None):
+        parts = self.__parts
+        # Get all parts
+        for part in self.__get_contents():
+            if part not in parts:
+                self.get_part(part)
+        # Uri / Packaging
+        if uri is None:
+            uri = self.uri
+        if packaging is None:
+            packaging = ('flat' if self.mimetype == 'application/xml' else
+                         'zip')
+        # Get data
+        if packaging == 'flat':
+            data = self.__get_xml()
+        elif packaging == 'zip':
+            data = self.__get_zip()
+        else:
+            raise ValueError, '"%s" packaging type not supported' % packaging
+        # Save it
+        container = vfs.open(uri, WRITE)
+        container.write(data)
+        container.close()
 
 
 
