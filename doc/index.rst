@@ -10,7 +10,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   notes
+   notes.rst
+
 
 Indices and tables
 ==================

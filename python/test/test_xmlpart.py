@@ -192,6 +192,11 @@ class ElementTestCase(TestCase):
 
 
 
+class XmlNamespaceTestCase(TestCase):
+    """We must be able to use the API with unknown prefix/namespace"""
+
+
+
 class XmlPartTestCase(TestCase):
 
     def setUp(self):

@@ -14,7 +14,7 @@ Level 0.0
     container = odf_new_container_from_class({text, spreadsheet, presentation,
                                               drawing})
     container = odf_new_container_from_template(template_uri)
-                    
+
     container = odf_get_container(uri)
 
     odf_container copy = container.clone()
@@ -145,6 +145,7 @@ Level 1
 Hint: preload the body, etc. for fast access to default contexts.
 
 
+
 Styles
 -------
 
@@ -154,16 +155,120 @@ Styles
 - [style class: ... ?]
 
 
+Image
+-----
+
+::
+
+    odf_element <= odf_create_frame(name, style, width, height,
+                                    page=None, x=None, y=None)
+    if page is None => anchor = paragraph
+
+    document.insert_frame(frame)
+    document.insert_frame(frame, context)
+
+    odf_element <= odf_create_image(link)
+
+    document.insert_image(element, context)
+    (here the context is a frame)
+      or
+    document.insert_image(element)
+    => We create automatically a frame
+
+
+    name must be unique
+    => "draw:frame"
+
+    <draw:frame draw:name="Logo" draw:style-name="Centered Image"
+                draw:z-index="1" svg:height="53mm" svg:width="91mm"
+                text:anchor-page-number="1" text:anchor-type="page">
+        <draw:image xlink:href="Pictures/image.png"/>
+    </draw:frame>
+
+    text:anchor-type = {page|paragraph}
+      if page => text:anchor-page-number="..."
+                 svg:x="..." \
+                               give the position
+                 svg:y="..." /
+
+      if paragraph => nothing
+
+
+
+Table
+-----
+
+::
+
+  No column in odf, just lines
+  The columns are only used to define the style for a group of cells
+
+      <table:table table:name="..." table:style-name="...">
+        <table:table-column table:style-name="..."/>
+        <table:table-column table:style-name="..."/>
+
+        <table:table-row>
+
+          <table:table-cell office:value-type="String">
+
+          </table:table-cell>
+
+
+        </table:table-row>
+
+      </table:table>
+
+      In a cell, we cannot have a cell or a line. But we can have paragraphs,
+      sections, ...
+
+
+  odt_element <= odf_create_cell()
+  odt_element <= odf_create_row(width=None)
+  odt_element <= odf_create_column()
+
+  odt_element <= odf_create_table(name, style, width=None, height=None)
+
+  document.insert_table(element, context=None, position=None)
+
+  document.insert_row(table, context, position)
+  document.insert_column(table, context, position)
+  document.insert_cell(row, context, position)
+
+
+List
+----
+::
+
+  odt_element <= odt_create_item()
+  odt_element <= odf_create_list(style)
+
+  <text:list text:style-name="Standard">
+    <text:list-item>
+      ...
+    </text:list-item>
+  </text:list>
+
+  document.insert_list(element, context, position)
+  document.insert_item(element, list, position)
+
+
+
+
+
 TODO
 ====
-
-list items, tables, table cells...
 
 named styles, automatic styles
 style families:
 
 manifest?
 
+
+Make this use case:
+  - Read a directory
+    for each file =>
+        if image => insert it
+        if csv => make a table
 
 XPath Requirements
 ==================

@@ -134,5 +134,25 @@ class ContainerTestCase(TestCase):
 
 
 
+class ContainerSaveTestCase(TestCase):
+
+
+    def test_save(self):
+        raise NotImplementedError
+
+
+    def test_save_packaging(self):
+        raise NotImplementedError
+
+
+    def test_save_uri(self):
+        raise NotImplementedError
+
+
+    def test_save_uri_packaging(self):
+        raise NotImplementedError
+
+
+
 if __name__ == '__main__':
     main()
