@@ -40,6 +40,37 @@ def odf_create_image(link):
     return odf_create_element('<draw:image xlink:href="%s"/>' % link)
 
 
+def odf_create_cell():
+    return odf_create_element(
+                    '<table:table-cell office:value-type="String"/>')
+
+
+def odf_create_row(width=None):
+    row = odf_create_element('<table:table-row/>')
+    if width is not None:
+        for i in xrange(width):
+            cell = odf_create_cell()
+            row.insert_element(cell, LAST_CHILD)
+    return row
+
+
+def odf_create_column(style):
+    data = '<table:table-column table:style-name="%s"/>'
+    return odf_create_element(data % style)
+
+
+def odf_create_table(name, style, width=None, height=None):
+    data = '<table:table table:name="%s" table:style-name="%s"/>'
+    table = odf_create_element(data % (name, style))
+    if width is not None or height is not None:
+        width = width if width is not None else 1
+        height = height if height is not None else 1
+        for i in xrange(height):
+            row = odf_create_row(width)
+            table.insert_element(row, LAST_CHILD)
+    return table
+
+
 
 def _generate_xpath_query(element_name, attributes={}, position=None,
                           context=None):
@@ -104,9 +135,9 @@ class odf_document(object):
         return part
 
 
-    def __insert_element(self, element, context):
+    def __insert_element(self, element, context, position):
         if context is not None:
-            context.insert_element(element, LAST_CHILD)
+            context.insert_element(element, position)
         else:
             # We insert it in the last office:text
             content = self.__get_xmlpart('content')
@@ -139,8 +170,8 @@ class odf_document(object):
         return result[0]
 
 
-    def insert_paragraph(self, element, context=None):
-        self.__insert_element(element, context)
+    def insert_paragraph(self, element, context=None, position=LAST_CHILD):
+        self.__insert_element(element, context, position)
 
 
     #
@@ -174,29 +205,49 @@ class odf_document(object):
         return result[0]
 
 
-    def insert_heading(self, element, context=None):
-        self.__insert_element(element, context)
+    def insert_heading(self, element, context=None, position=LAST_CHILD):
+        self.__insert_element(element, context, position)
 
 
     #
     # Frames
     #
 
-    def insert_frame(self, element, context=None):
-        self.__insert_element(element, context)
+    def insert_frame(self, element, context=None, position=LAST_CHILD):
+        self.__insert_element(element, context, position)
 
 
     #
     # Images
     #
 
-    def insert_image(self, element, context=None):
+    def insert_image(self, element, context=None, position=LAST_CHILD):
         # XXX If context is None
         #     => auto create a frame with the good dimensions
         if context is None:
             raise NotImplementedError
 
-        self.__insert_element(element, context)
+        self.__insert_element(element, context, position)
+
+
+    #
+    # Tables
+    #
+
+    def insert_table(self, element, context=None, position=LAST_CHILD):
+        self.__insert_element(element, context, position)
+
+
+    def insert_column(self, element, context, position=LAST_CHILD):
+        context.insert_element(element, position)
+
+
+    def insert_row(self, element, context, position=LAST_CHILD):
+        context.insert_element(element, position)
+
+
+    def insert_cell(self, element, context, position=LAST_CHILD):
+        context.insert_element(element, position)
 
 
     #

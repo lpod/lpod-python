@@ -10,6 +10,8 @@ from lpod.document import odf_new_document_from_class, odf_get_document
 from lpod.document import _generate_xpath_query, _check_arguments
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
+from lpod.document import odf_create_cell, odf_create_row
+from lpod.document import odf_create_column, odf_create_table
 from lpod.xmlpart import odf_create_element
 
 
@@ -324,6 +326,75 @@ class DocumentTestCase(TestCase):
         self.document.insert_image(image, frame)
 
 
+    def test_cell(self):
+        # Test create
+        cell = odf_create_cell()
+        expected = '<table:table-cell office:value-type="String"/>'
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_row(self):
+        # Test 1
+        row = odf_create_row()
+        expected = '<table:table-row/>'
+        self.assertEqual(row.serialize(), expected)
+
+        # Test 2
+        row = odf_create_row(1)
+        expected = ('<table:table-row>'
+                    '<table:table-cell office:value-type="String"/>'
+                    '</table:table-row>')
+        self.assertEqual(row.serialize(), expected)
+
+
+    def test_column(self):
+        # Test create
+        column = odf_create_column('a_style')
+        expected = '<table:table-column table:style-name="a_style"/>'
+        self.assertEqual(column.serialize(), expected)
+
+
+    def test_table(self):
+        # Test 1
+        table = odf_create_table('a_table', 'a_style')
+        expected = ('<table:table table:name="a_table" '
+                    'table:style-name="a_style"/>')
+        self.assertEqual(table.serialize(), expected)
+
+        # Test 2
+        table = odf_create_table('a_table', 'a_style', 1, 2)
+        expected = ('<table:table table:name="a_table" '
+                    'table:style-name="a_style">'
+                    '<table:table-row>'
+                    '<table:table-cell office:value-type="String"/>'
+                    '</table:table-row>'
+                    '<table:table-row>'
+                    '<table:table-cell office:value-type="String"/>'
+                    '</table:table-row>'
+                    '</table:table>')
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_insert_table(self):
+        table = odf_create_table('a_table', 'a_style')
+        column = odf_create_column('a_column_style')
+        row = odf_create_row()
+        cell = odf_create_cell()
+
+        document = self.document
+        document.insert_table(table)
+        document.insert_column(column, table)
+        document.insert_row(row, table)
+        document.insert_cell(cell, row)
+
+        expected = ('<table:table table:name="a_table" '
+                    'table:style-name="a_style">'
+                    '<table:table-column table:style-name="a_column_style"/>'
+                    '<table:table-row>'
+                    '<table:table-cell office:value-type="String"/>'
+                    '</table:table-row>'
+                    '</table:table>')
+        self.assertEqual(table.serialize(), expected)
 
 
 if __name__ == '__main__':
