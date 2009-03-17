@@ -79,22 +79,13 @@ class odf_container(object):
         self.__parts = {}
 
 
-
-    def clone(self):
-        self.__get_data()
-        clone = object.__new__(self.__class__)
-        for name in self.__dict__:
-            if name == 'uri':
-                setattr(clone, name, None)
-            else:
-                value = getattr(self, name)
-                value = deepcopy(value)
-                setattr(clone, name, value)
-
-        return clone
-
+    #
+    # Private API (internal helpers)
+    #
 
     def __get_data(self):
+        """Store bytes of the ODF in memory.
+        """
         if self.__data is None:
             file = vfs.open(self.uri)
             self.__data = file.read()
@@ -102,7 +93,20 @@ class odf_container(object):
         return self.__data
 
 
+    def __get_zipfile(self):
+        """Open a Zip object on the archive ODF.
+        """
+        data = self.__get_data()
+        # This is efficient because the data is not duplicated
+        filelike = StringIO(data)
+        if self.__zipfile is None:
+            self.__zipfile = ZipFile(filelike)
+        return self.__zipfile
+
+
     def __get_part_xml(self, part_name):
+        """Get bytes of a part from the XML-only ODF.
+        """
         if part_name not in ODF_PARTS:
             raise ValueError, ("Third-party parts are not supported "
                                "in an XML-only ODF document")
@@ -118,13 +122,9 @@ class odf_container(object):
         return part
 
 
-    def __get_zipfile(self):
-        if self.__zipfile is None:
-            self.__zipfile = ZipFile(StringIO(self.__get_data()))
-        return self.__zipfile
-
-
     def __get_part_zip(self, part_name):
+        """Get bytes of a part from the archive ODF.
+        """
         zipfile = self.__get_zipfile()
         if part_name in ODF_PARTS and part_name != 'mimetype':
             file = zipfile.open('%s.xml' % part_name)
@@ -137,7 +137,15 @@ class odf_container(object):
         return part
 
 
+    def __get_xml_contents(self):
+        """Get the list of members in the XML-only ODF.
+        """
+        raise NotImplementedError
+
+
     def __get_zip_contents(self):
+        """Get the list of members in the archive ODF.
+        """
         zipfile = self.__get_zipfile()
         result = []
         for part in zipfile.infolist():
@@ -149,18 +157,60 @@ class odf_container(object):
         return result
 
 
-    def __get_xml_contents(self):
-        raise NotImplementedError
-
-
     def __get_contents(self):
+        """Get the list of members.
+        """
         if self.mimetype == 'application/xml':
             return self.__get_xml_contents()
         else:
             return self.__get_zip_contents()
 
 
+    def __make_xml(self):
+        """Make an XML-only ODF from the available parts.
+        """
+        raise NotImplementedError
+
+
+    def __make_zip(self):
+        """Make an archive ODF from the available parts.
+        """
+        data = StringIO()
+        filezip = ZipFile(data, 'w')
+
+        for name, part_data in self.__parts.iteritems():
+            if name in ODF_PARTS and name != 'mimetype':
+                name += '.xml'
+            filezip.writestr(name, part_data)
+
+        filezip.close()
+        return data.getvalue()
+
+
+    #
+    # Public API
+    #
+
+    def clone(self):
+        """Make a copy of this container with no URI.
+        """
+        clone = object.__new__(self.__class__)
+        for name in self.__dict__:
+            # "__zipfile" is not safe to copy
+            # but can be recreated from "__data"
+            if name in ('uri', '__zipfile'):
+                setattr(clone, name, None)
+            else:
+                value = getattr(self, name)
+                value = deepcopy(value)
+                setattr(clone, name, value)
+
+        return clone
+
+
     def get_part(self, part_name):
+        """Get the bytes of a part of the ODF.
+        """
         loaded_parts = self.__parts
         if part_name in loaded_parts:
             part = loaded_parts[part_name]
@@ -176,32 +226,20 @@ class odf_container(object):
 
 
     def set_part(self, part_name, data):
+        """Replace or add a new part.
+        """
         self.__parts[part_name] = data
 
 
     def del_part(self, part_name):
-        # Mark for deletion
+        """Mark a part for deletion.
+        """
         self.__parts[part_name] = None
 
 
-    def __get_xml(self):
-        raise NotImplementedError
-
-
-    def __get_zip(self):
-        data = StringIO()
-        filezip = ZipFile(data, 'w')
-
-        for name, part_data in self.__parts.iteritems():
-            if name in ODF_PARTS and name != 'mimetype':
-                name += '.xml'
-            filezip.writestr(name, part_data)
-
-        filezip.close()
-        return data.getvalue()
-
-
     def save(self, uri=None, packaging=None):
+        """Save the container to the given URI (if supported).
+        """
         parts = self.__parts
         # Get all parts
         for part in self.__get_contents():
@@ -215,9 +253,9 @@ class odf_container(object):
                          'zip')
         # Get data
         if packaging == 'flat':
-            data = self.__get_xml()
+            data = self.__make_xml()
         elif packaging == 'zip':
-            data = self.__get_zip()
+            data = self.__make_zip()
         else:
             raise ValueError, '"%s" packaging type not supported' % packaging
         # Save it
