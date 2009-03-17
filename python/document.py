@@ -150,6 +150,13 @@ class odf_document(object):
     #
 
     def save(self, uri=None, packaging=None):
+        # Synchronize data with container
+        for part_name in ['content', 'styles', 'meta']:
+            part = getattr(self, '__' + part_name, None)
+            if part is not None:
+                self.container.set_part(part_name, part.serialize())
+
+        # Save the container
         self.container.save(uri, packaging)
 
 
