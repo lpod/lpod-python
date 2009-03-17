@@ -21,6 +21,22 @@ def odf_create_heading(style, level, text=''):
 
 
 
+def odf_create_frame(name, style, width, height, page=None, x=None, y=None):
+    if page is None:
+        anchor = 'text:anchor-type="paragraph"'
+    else:
+        anchor = 'text:anchor-type="page" text:anchor-page-number="%d"' % page
+        if x is not None:
+            anchor += ' svg:x="%s"' % x
+        if y is not None:
+            anchor += ' svg:y="%s"' % y
+    data = ('<draw:frame draw:name="%s" draw:style-name="%s" '
+            'svg:width="%s" svg:height="%s" %s/>')
+
+    return odf_create_element(data % (name, style, width, height, anchor))
+
+
+
 def _generate_xpath_query(element_name, attributes={}, position=None,
                           context=None):
     if context is not None:
@@ -84,6 +100,16 @@ class odf_document(object):
         return part
 
 
+    def __insert_element(self, element, context):
+        if context is not None:
+            context.insert_element(element, LAST_CHILD)
+        else:
+            # We insert it in the last office:text
+            content = self.__get_xmlpart('content')
+            office_text = content.get_element_list('//office:text')[-1]
+            office_text.insert_element(element, LAST_CHILD)
+
+
     #
     # Paragraphs
     #
@@ -110,13 +136,7 @@ class odf_document(object):
 
 
     def insert_paragraph(self, element, context=None):
-        if context is not None:
-            context.insert_element(element, LAST_CHILD)
-        else:
-            # We insert it in the last office:text
-            content = self.__get_xmlpart('content')
-            office_text = content.get_element_list('//office:text')[-1]
-            office_text.insert_element(element, LAST_CHILD)
+        self.__insert_element(element, context)
 
 
     #
@@ -151,13 +171,15 @@ class odf_document(object):
 
 
     def insert_heading(self, element, context=None):
-        if context is not None:
-            context.insert_element(element, LAST_CHILD)
-        else:
-            # We insert it in the last office:text
-            content = self.__get_xmlpart('content')
-            office_text = content.get_element_list('//office:text')[-1]
-            office_text.insert_element(element, LAST_CHILD)
+        self.__insert_element(element, context)
+
+
+    #
+    # Frames
+    #
+
+    def insert_frame(self, element, context=None):
+        self.__insert_element(element, context)
 
 
     #

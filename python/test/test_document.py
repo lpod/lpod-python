@@ -9,6 +9,7 @@ from lpod.document import odf_new_document_from_template
 from lpod.document import odf_new_document_from_class, odf_get_document
 from lpod.document import _generate_xpath_query, _check_arguments
 from lpod.document import odf_create_paragraph, odf_create_heading
+from lpod.document import odf_create_frame
 from lpod.xmlpart import odf_create_element
 
 
@@ -289,6 +290,28 @@ class DocumentTestCase(TestCase):
         document.insert_heading(heading)
         last_heading = document.get_heading_list()[-1]
         self.assertEqual(last_heading.get_text(), 'An inserted heading')
+
+
+    def test_frame(self):
+        # Test 1
+        frame = odf_create_frame('frame1', 'Graphics', '10cm', '10cm')
+        expected = ('<draw:frame draw:name="frame1" '
+                    'draw:style-name="Graphics" svg:width="10cm" '
+                    'svg:height="10cm" text:anchor-type="paragraph"/>')
+        self.assertEqual(frame.serialize(), expected)
+
+        # Test 2
+        frame = odf_create_frame('frame1', 'Graphics', '10cm', '10cm',
+                                 page=1, x='10mm', y='10mm')
+        expected = ('<draw:frame draw:name="frame1" '
+                    'draw:style-name="Graphics" svg:width="10cm" '
+                    'svg:height="10cm" text:anchor-type="page" '
+                    'text:anchor-page-number="1" svg:x="10mm" svg:y="10mm"/>')
+        self.assertEqual(frame.serialize(), expected)
+
+        # Insert OK ?
+        self.document.insert_frame(frame)
+
 
 
 
