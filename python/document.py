@@ -5,24 +5,19 @@
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
 from xmlpart import odf_element, odf_xmlpart, LAST_CHILD, NEXT_SIBLING
-from libxml2 import newNode
+from xmlpart import odf_create_element
 
 
 
 def odf_create_paragraph(style, text=''):
-    paragraph = newNode('text:p')
-    paragraph.newProp('text:style-name', style)
-    paragraph.setContent(text)
-    return odf_element(paragraph)
+    return odf_create_element('<text:p text:style-name="%s">%s</text:p>' %
+                              (style, text))
 
 
 
 def odf_create_heading(style, level, text=''):
-    heading = newNode('text:h')
-    heading.newProp('text:style-name', style)
-    heading.newProp('text:outline-level', str(level))
-    heading.setContent(text)
-    return odf_element(heading)
+    data = '<text:h text:style-name="%s" text:outline-level="%d">%s</text:h>'
+    return odf_create_element(data % (style, level, text))
 
 
 
@@ -192,6 +187,7 @@ def odf_new_document_from_template(template_uri):
     """
     container = odf_new_container_from_template(template_uri)
     return odf_document(container)
+
 
 
 def odf_new_document_from_class(odf_class):
