@@ -201,6 +201,12 @@ class DocumentTestCase(TestCase):
         self.assertEqual(len(paragraphs), 0)
 
 
+    def test_get_paragraph_list_bad_context(self):
+        document = self.document
+        self.assertRaises(TypeError, document.get_paragraph_list,
+                          context=document)
+
+
     def test_get_paragraph(self):
         document = self.document
         paragraph = document.get_paragraph(4)
@@ -268,6 +274,12 @@ class DocumentTestCase(TestCase):
         heading = headings[0]
         headings = document.get_heading_list(context=heading)
         self.assertEqual(len(headings), 0)
+
+
+    def test_get_heading_list_bad_context(self):
+        document = self.document
+        self.assertRaises(TypeError, document.get_heading_list,
+                          context=document)
 
 
     def test_get_heading(self):
