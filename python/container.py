@@ -81,6 +81,7 @@ class odf_container(object):
 
 
     def clone(self):
+        self.__get_data()
         clone = object.__new__(self.__class__)
         for name in self.__dict__:
             if name == 'uri':

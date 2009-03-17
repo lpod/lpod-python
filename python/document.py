@@ -146,6 +146,14 @@ class odf_document(object):
 
 
     #
+    # Save
+    #
+
+    def save(self, uri=None, packaging=None):
+        self.container.save(uri, packaging)
+
+
+    #
     # Paragraphs
     #
 
