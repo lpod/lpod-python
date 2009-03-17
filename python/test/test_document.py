@@ -193,11 +193,11 @@ class DocumentTestCase(TestCase):
 
 
     def test_get_paragraph_list_context(self):
+        # TODO Search inside a given section
         document = self.document
-        paragraphs = document.get_paragraph_list(style='Hanging_20_indent')
+        paragraphs = document.get_paragraph_list()
         paragraph = paragraphs[0]
-        paragraphs = document.get_paragraph_list(style='Hanging_20_indent',
-                                                 context=paragraph)
+        paragraphs = document.get_paragraph_list(context=paragraph)
         self.assertEqual(len(paragraphs), 0)
 
 
@@ -262,7 +262,12 @@ class DocumentTestCase(TestCase):
 
 
     def test_get_heading_list_context(self):
-        raise NotImplementedError
+        # TODO Search inside a given section
+        document = self.document
+        headings = document.get_heading_list()
+        heading = headings[0]
+        headings = document.get_heading_list(context=heading)
+        self.assertEqual(len(headings), 0)
 
 
     def test_get_heading(self):
