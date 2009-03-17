@@ -9,7 +9,7 @@ from lpod.document import odf_new_document_from_template
 from lpod.document import odf_new_document_from_class, odf_get_document
 from lpod.document import _generate_xpath_query, _check_arguments
 from lpod.document import odf_create_paragraph, odf_create_heading
-from lpod.document import odf_create_frame
+from lpod.document import odf_create_frame, odf_create_image
 from lpod.xmlpart import odf_create_element
 
 
@@ -311,6 +311,17 @@ class DocumentTestCase(TestCase):
 
         # Insert OK ?
         self.document.insert_frame(frame)
+
+
+    def test_image(self):
+        # Test create
+        image = odf_create_image('path')
+        expected = '<draw:image xlink:href="path"/>'
+        self.assertEqual(image.serialize(), expected)
+
+        # Insert OK ?
+        frame = odf_create_frame('frame_image', 'Graphics', '0cm', '0cm')
+        self.document.insert_image(image, frame)
 
 
 

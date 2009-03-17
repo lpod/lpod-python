@@ -36,6 +36,10 @@ def odf_create_frame(name, style, width, height, page=None, x=None, y=None):
     return odf_create_element(data % (name, style, width, height, anchor))
 
 
+def odf_create_image(link):
+    return odf_create_element('<draw:image xlink:href="%s"/>' % link)
+
+
 
 def _generate_xpath_query(element_name, attributes={}, position=None,
                           context=None):
@@ -179,6 +183,19 @@ class odf_document(object):
     #
 
     def insert_frame(self, element, context=None):
+        self.__insert_element(element, context)
+
+
+    #
+    # Images
+    #
+
+    def insert_image(self, element, context=None):
+        # XXX If context is None
+        #     => auto create a frame with the good dimensions
+        if context is None:
+            raise NotImplementedError
+
         self.__insert_element(element, context)
 
 
