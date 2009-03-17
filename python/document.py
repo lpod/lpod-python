@@ -4,7 +4,7 @@
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
-from xmlpart import odf_element, odf_xmlpart, LAST_CHILD, NEXT_SIBLING
+from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
 
 
@@ -111,8 +111,7 @@ class odf_document(object):
 
     def insert_paragraph(self, element, context=None):
         if context is not None:
-            # XXX Verify me: NEXT_SIBLING or LAST_CHILD
-            context.insert_element(element, NEXT_SIBLING)
+            context.insert_element(element, LAST_CHILD)
         else:
             # We insert it in the last office:text
             content = self.__get_xmlpart('content')
@@ -153,8 +152,7 @@ class odf_document(object):
 
     def insert_heading(self, element, context=None):
         if context is not None:
-            # XXX Verify me: NEXT_SIBLING or LAST_CHILD
-            context.insert_element(element, NEXT_SIBLING)
+            context.insert_element(element, LAST_CHILD)
         else:
             # We insert it in the last office:text
             content = self.__get_xmlpart('content')
