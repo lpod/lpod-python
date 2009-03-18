@@ -80,6 +80,14 @@ def odf_create_table(name, style, width=None, height=None):
     return table
 
 
+def odf_create_item():
+    return odf_create_element('<text:list-item/>')
+
+
+def odf_create_list(style):
+    return odf_create_element('<text:list text:style-name="%s"/>' % style)
+
+
 
 def _generate_xpath_query(element_name, attributes={}, position=None,
                           context=None):
@@ -295,6 +303,18 @@ class odf_document(object):
 
 
     def insert_cell(self, element, context, position=LAST_CHILD):
+        context.insert_element(element, position)
+
+
+    #
+    # Lists
+    #
+
+    def insert_list(self, element, context=None, position=LAST_CHILD):
+        self.__insert_element(element, context, position)
+
+
+    def insert_item(self, element, context, position=LAST_CHILD):
         context.insert_element(element, position)
 
 

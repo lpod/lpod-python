@@ -12,6 +12,7 @@ from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
+from lpod.document import odf_create_item, odf_create_list
 from lpod.xmlpart import odf_create_element
 
 
@@ -456,6 +457,28 @@ class CreateTestCase(TestCase):
                     '</table:table-row>'
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
+
+
+    def test_create_item(self):
+        # Test create
+        item = odf_create_item()
+        expected = '<text:list-item/>'
+        self.assertEqual(item.serialize(), expected)
+
+
+    def test_create_insert_list(self):
+        # Test create / insert
+        item = odf_create_item()
+        a_list = odf_create_list('a_style')
+        document = self.document
+        document.insert_item(item, a_list)
+        document.insert_list(a_list)
+
+        expected = ('<text:list text:style-name="a_style">'
+                    '<text:list-item/>'
+                    '</text:list>')
+        self.assertEqual(a_list.serialize(), expected)
+
 
 
 if __name__ == '__main__':
