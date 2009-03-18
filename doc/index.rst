@@ -11,6 +11,7 @@ Contents:
    :maxdepth: 2
 
    notes.rst
+   level0.rst
 
 
 Indices and tables
