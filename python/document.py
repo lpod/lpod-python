@@ -151,7 +151,8 @@ class odf_document(object):
         return part
 
 
-    def __get_element_list(self, name, style=None, level=None, context=None):
+    def __get_element_list(self, name, style=None, level=None,
+                           frame_style=None, context=None):
         _check_arguments(style=style, level=level, context=context)
         content = self.__get_xmlpart('content')
         attributes = {}
@@ -159,6 +160,8 @@ class odf_document(object):
             attributes['text:style-name'] = style
         if level:
             attributes['text:outline-level'] = level
+        if frame_style:
+            attributes['draw:style-name'] = frame_style
         query = _generate_xpath_query(name, attributes=attributes,
                                       context=context)
         return content.get_element_list(query)
@@ -268,6 +271,15 @@ class odf_document(object):
     #
     # Frames
     #
+
+    def get_frame_list(self, style=None, context=None):
+        return self.__get_element_list('draw:frame', frame_style=style,
+                                       context=context)
+
+
+    def get_frame(self, position, context=None):
+        return self.__get_element('draw:frame', position, context=context)
+
 
     def insert_frame(self, element, context=None, position=LAST_CHILD):
         self.__insert_element(element, context, position)
