@@ -303,17 +303,38 @@ class odf_document(object):
     # Tables
     #
 
+    def get_table_list(self, style=None, context=None):
+        return self.__get_element_list('table:table', style=style,
+                                       context=context)
+
+
+    def get_table(self, position, context=None):
+        return self.__get_element('table:table', position, context=context)
+
+
     def insert_table(self, element, context=None, xmlposition=LAST_CHILD):
         self.__insert_element(element, context, xmlposition)
 
+
+    #
+    # Columns
+    #
 
     def insert_column(self, element, context, xmlposition=LAST_CHILD):
         context.insert_element(element, xmlposition)
 
 
+    #
+    # Rows
+    #
+
     def insert_row(self, element, context, xmlposition=LAST_CHILD):
         context.insert_element(element, xmlposition)
 
+
+    #
+    # Cells
+    #
 
     def insert_cell(self, element, context, xmlposition=LAST_CHILD):
         context.insert_element(element, xmlposition)
