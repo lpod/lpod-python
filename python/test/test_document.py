@@ -174,6 +174,16 @@ class DocumentTestCase(TestCase):
         del self.document
 
 
+    def test_clone(self):
+        document = self.document
+        document._odf_document__get_xmlpart('content')
+        self.assertNotEqual(document._odf_document__xmlparts, {})
+        clone = document.clone()
+        self.assertEqual(clone._odf_document__xmlparts, {})
+        container = clone.container
+        self.assertEqual(container.uri, None)
+
+
     def test_get_element_list_bad_context(self):
         document = self.document
         self.assertRaises(TypeError, document.get_paragraph_list,

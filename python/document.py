@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
+# Import from the Standard Library
+from copy import deepcopy
+
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
@@ -127,17 +130,16 @@ class odf_document(object):
         self.container = container
 
         # Cache of XML parts
-        self.__content = None
-        self.__styles = None
-        self.__meta = None
+        self.__xmlparts = {}
 
 
     def __get_xmlpart(self, part_name):
-        part = getattr(self, '__' + part_name, None)
+        parts = self.__xmlparts
+        part = parts.get(part_name)
         if part is None:
             container = self.container
             part = odf_xmlpart(part_name, container)
-            setattr(self, '__' + part_name, part)
+            parts[part_name] = part
         return part
 
 
@@ -178,20 +180,29 @@ class odf_document(object):
             office_text.insert_element(element, LAST_CHILD)
 
 
-    #
-    # Save
-    #
+    def clone(self):
+        clone = object.__new__(self.__class__)
+        for name in self.__dict__:
+            if name == 'container':
+                setattr(clone, name, self.container.clone())
+            elif name == '_odf_document__xmlparts':
+                # TODO odf_xmlpart.clone
+                setattr(clone, name, {})
+            else:
+                value = getattr(self, name)
+                value = deepcopy(value)
+                setattr(clone, name, value)
+        return clone
+
 
     def save(self, uri=None, packaging=None):
         # Synchronize data with container
-        for part_name in ['content', 'styles', 'meta']:
-            part = getattr(self, '__' + part_name, None)
+        for part_name, part in self.__xmlparts:
             if part is not None:
                 self.container.set_part(part_name, part.serialize())
 
         # Save the container
         self.container.save(uri, packaging)
-
 
 
     #
