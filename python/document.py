@@ -181,9 +181,9 @@ class odf_document(object):
         return result[0]
 
 
-    def __insert_element(self, element, context, position):
+    def __insert_element(self, element, context, xmlposition):
         if context is not None:
-            context.insert_element(element, position)
+            context.insert_element(element, xmlposition)
         else:
             # We insert it in the last office:text
             content = self.__get_xmlpart('content')
@@ -229,8 +229,8 @@ class odf_document(object):
         return self.__get_element('text:section', position, context=context)
 
 
-    def insert_section(self, element, context=None, position=LAST_CHILD):
-        self.__insert_element(element, context, position)
+    def insert_section(self, element, context=None, xmlposition=LAST_CHILD):
+        self.__insert_element(element, context, xmlposition)
 
 
     #
@@ -246,8 +246,9 @@ class odf_document(object):
         return self.__get_element('text:p', position, context=context)
 
 
-    def insert_paragraph(self, element, context=None, position=LAST_CHILD):
-        self.__insert_element(element, context, position)
+    def insert_paragraph(self, element, context=None,
+                         xmlposition=LAST_CHILD):
+        self.__insert_element(element, context, xmlposition)
 
 
     #
@@ -264,8 +265,8 @@ class odf_document(object):
                                   context=context)
 
 
-    def insert_heading(self, element, context=None, position=LAST_CHILD):
-        self.__insert_element(element, context, position)
+    def insert_heading(self, element, context=None, xmlposition=LAST_CHILD):
+        self.__insert_element(element, context, xmlposition)
 
 
     #
@@ -289,45 +290,45 @@ class odf_document(object):
     # Images
     #
 
-    def insert_image(self, element, context=None, position=LAST_CHILD):
+    def insert_image(self, element, context=None, xmlposition=LAST_CHILD):
         # XXX If context is None
         #     => auto create a frame with the good dimensions
         if context is None:
             raise NotImplementedError
 
-        self.__insert_element(element, context, position)
+        self.__insert_element(element, context, xmlposition)
 
 
     #
     # Tables
     #
 
-    def insert_table(self, element, context=None, position=LAST_CHILD):
-        self.__insert_element(element, context, position)
+    def insert_table(self, element, context=None, xmlposition=LAST_CHILD):
+        self.__insert_element(element, context, xmlposition)
 
 
-    def insert_column(self, element, context, position=LAST_CHILD):
-        context.insert_element(element, position)
+    def insert_column(self, element, context, xmlposition=LAST_CHILD):
+        context.insert_element(element, xmlposition)
 
 
-    def insert_row(self, element, context, position=LAST_CHILD):
-        context.insert_element(element, position)
+    def insert_row(self, element, context, xmlposition=LAST_CHILD):
+        context.insert_element(element, xmlposition)
 
 
-    def insert_cell(self, element, context, position=LAST_CHILD):
-        context.insert_element(element, position)
+    def insert_cell(self, element, context, xmlposition=LAST_CHILD):
+        context.insert_element(element, xmlposition)
 
 
     #
     # Lists
     #
 
-    def insert_list(self, element, context=None, position=LAST_CHILD):
-        self.__insert_element(element, context, position)
+    def insert_list(self, element, context=None, xmlposition=LAST_CHILD):
+        self.__insert_element(element, context, xmlposition)
 
 
-    def insert_item(self, element, context, position=LAST_CHILD):
-        context.insert_element(element, position)
+    def insert_item(self, element, context, xmlposition=LAST_CHILD):
+        context.insert_element(element, xmlposition)
 
 
     #

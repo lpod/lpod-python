@@ -139,22 +139,22 @@ class odf_element(object):
         element.setContent(text)
 
 
-    def insert_element(self, element, position):
+    def insert_element(self, element, xmlposition):
         if not isinstance(element, odf_element):
             raise TypeError, "element is not odf_element"
         current = self.__element
         element = element.__element
-        if position is FIRST_CHILD:
+        if xmlposition is FIRST_CHILD:
             first_child = current.children
             first_child.addPrevSibling(element)
-        elif position is LAST_CHILD:
+        elif xmlposition is LAST_CHILD:
             current.addChild(element)
-        elif position is NEXT_SIBLING:
+        elif xmlposition is NEXT_SIBLING:
             current.addNextSibling(element)
-        elif position is PREV_SIBLING:
+        elif xmlposition is PREV_SIBLING:
             current.addPrevSibling(element)
         else:
-            raise ValueError, "invalid position"
+            raise ValueError, "invalid XML position"
         return odf_element(current)
 
 
