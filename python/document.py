@@ -97,13 +97,13 @@ def _generate_xpath_query(element_name, attributes={}, position=None,
         query = ['//']
     query.append(element_name)
     # Sort attributes for reproducible test cases
-    for name in sorted(attributes):
-        value = attributes[name]
+    for qname in sorted(attributes):
+        value = attributes[qname]
         if value is not None:
-            query.append('[@{name}="{value}"]'.format(name=name,
+            query.append('[@{qname}="{value}"]'.format(qname=qname,
                                                       value=str(value)))
         else:
-            query.append('[@{name}]'.format(name=name))
+            query.append('[@{qname}]'.format(qname=qname))
     if position is not None:
         query.append('[{position}]'.format(position=str(position)))
     return ''.join(query)
@@ -151,7 +151,7 @@ class odf_document(object):
         return part
 
 
-    def __get_element_list(self, name, style=None, level=None,
+    def __get_element_list(self, qname, style=None, level=None,
                            frame_style=None, context=None):
         _check_arguments(style=style, level=level, context=context)
         content = self.__get_xmlpart('content')
@@ -162,18 +162,18 @@ class odf_document(object):
             attributes['text:outline-level'] = level
         if frame_style:
             attributes['draw:style-name'] = frame_style
-        query = _generate_xpath_query(name, attributes=attributes,
+        query = _generate_xpath_query(qname, attributes=attributes,
                                       context=context)
         return content.get_element_list(query)
 
 
-    def __get_element(self, name, position, level=None, context=None):
+    def __get_element(self, qname, position, level=None, context=None):
         _check_arguments(position=position, context=context)
         content = self.__get_xmlpart('content')
         attributes = {}
         if level:
             attributes['text:outline-level'] = level
-        query = _generate_xpath_query(name, attributes=attributes,
+        query = _generate_xpath_query(qname, attributes=attributes,
                                       position=position, context=context)
         result = content.get_element_list(query)
         if not result:
