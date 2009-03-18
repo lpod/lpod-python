@@ -94,6 +94,7 @@ class ContainerTestCase(TestCase):
         container = odf_new_container_from_class('text')
         clone = container.clone()
         self.assertEqual(clone.uri, None)
+        self.assertNotEqual(clone._odf_container__data, None)
 
 
     def test_get_part_xml(self):

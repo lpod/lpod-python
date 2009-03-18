@@ -205,7 +205,7 @@ class odf_document(object):
 
     def save(self, uri=None, packaging=None):
         # Synchronize data with container
-        for part_name, part in self.__xmlparts:
+        for part_name, part in self.__xmlparts.items():
             if part is not None:
                 self.container.set_part(part_name, part.serialize())
 

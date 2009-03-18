@@ -195,6 +195,8 @@ class odf_container(object):
         """Make a copy of this container with no URI.
         """
         clone = object.__new__(self.__class__)
+        # Load state
+        self.__get_data()
         for name in self.__dict__:
             # "__zipfile" is not safe to copy
             # but can be recreated from "__data"
@@ -204,7 +206,6 @@ class odf_container(object):
                 value = getattr(self, name)
                 value = deepcopy(value)
                 setattr(clone, name, value)
-
         return clone
 
 

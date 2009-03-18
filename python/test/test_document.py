@@ -268,10 +268,11 @@ class DocumentTestCase(TestCase):
 
     def test_insert_paragraph(self):
         document = self.document
+        clone = document.clone()
         paragraph = odf_create_paragraph('Text_20_body',
                                          'An inserted test')
-        document.insert_paragraph(paragraph)
-        last_paragraph = document.get_paragraph_list()[-1]
+        clone.insert_paragraph(paragraph)
+        last_paragraph = clone.get_paragraph_list()[-1]
         self.assertEqual(last_paragraph.get_text(), 'An inserted test')
 
 
@@ -338,10 +339,11 @@ class DocumentTestCase(TestCase):
 
     def test_insert_heading(self):
         document = self.document
+        clone = document.clone()
         heading = odf_create_heading('Heading_20_2', 2,
                                        'An inserted heading')
-        document.insert_heading(heading)
-        last_heading = document.get_heading_list()[-1]
+        clone.insert_heading(heading)
+        last_heading = clone.get_heading_list()[-1]
         self.assertEqual(last_heading.get_text(), 'An inserted heading')
 
 
