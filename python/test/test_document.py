@@ -334,7 +334,18 @@ class DocumentTestCase(TestCase):
         self.assertEqual(last_heading.get_text(), 'An inserted heading')
 
 
-    def test_frame(self):
+
+class CreateTestCase(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
+    def test_create_frame(self):
         # Test 1
         frame = odf_create_frame('frame1', 'Graphics', '10cm', '10cm')
         expected = ('<draw:frame draw:name="frame1" '
@@ -355,7 +366,7 @@ class DocumentTestCase(TestCase):
         self.document.insert_frame(frame)
 
 
-    def test_image(self):
+    def test_create_image(self):
         # Test create
         image = odf_create_image('path')
         expected = '<draw:image xlink:href="path"/>'
@@ -366,14 +377,14 @@ class DocumentTestCase(TestCase):
         self.document.insert_image(image, frame)
 
 
-    def test_cell(self):
+    def test_create_cell(self):
         # Test create
         cell = odf_create_cell()
         expected = '<table:table-cell office:value-type="String"/>'
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_row(self):
+    def test_create_row(self):
         # Test 1
         row = odf_create_row()
         expected = '<table:table-row/>'
@@ -387,14 +398,14 @@ class DocumentTestCase(TestCase):
         self.assertEqual(row.serialize(), expected)
 
 
-    def test_column(self):
+    def test_create_column(self):
         # Test create
         column = odf_create_column('a_style')
         expected = '<table:table-column table:style-name="a_style"/>'
         self.assertEqual(column.serialize(), expected)
 
 
-    def test_table(self):
+    def test_create_table(self):
         # Test 1
         table = odf_create_table('a_table', 'a_style')
         expected = ('<table:table table:name="a_table" '
@@ -415,7 +426,7 @@ class DocumentTestCase(TestCase):
         self.assertEqual(table.serialize(), expected)
 
 
-    def test_insert_table(self):
+    def test_create_insert_table(self):
         table = odf_create_table('a_table', 'a_style')
         column = odf_create_column('a_column_style')
         row = odf_create_row()
