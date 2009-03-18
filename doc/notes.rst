@@ -195,6 +195,21 @@ Image
 
 
 
+    get_image_list
+    get_image_by_position
+    get_image_by_name
+
+
+
+Frame
+-----
+
+    get_frame_list
+    get_frame_by_position
+    get_frame_by_name
+
+
+
 Table
 -----
 
@@ -228,11 +243,14 @@ Table
 
   odt_element <= odf_create_table(name, style, width=None, height=None)
 
-  document.insert_table(element, context=None, position=None)
+  document.insert_table(element, context=None, xmlposition=None)
 
-  document.insert_row(table, context, position)
-  document.insert_column(table, context, position)
-  document.insert_cell(row, context, position)
+  document.insert_row(table, context, xmlposition)
+  document.insert_column(table, context, xmlposition)
+  document.insert_cell(row, context, xmlposition)
+
+
+  Getting a cell from its table, its line, its column
 
 
 List
@@ -248,11 +266,52 @@ List
     </text:list-item>
   </text:list>
 
-  document.insert_list(element, context, position)
-  document.insert_item(element, list, position)
+  document.insert_list(element, context, xmlposition)
+  document.insert_item(element, list, xmlposition)
 
 
 
+Sections
+--------
+
+odf_document.get_section_by_position(position)
+odf_document.get_section_by_position(position, context)
+
+odf_document.get_section_by_name(name)
+odf_document.get_section_by_name(name, context)
+
+odf_document.get_section_external_resource(name)
+odf_document.get_section_external_resource(name, context)
+
+
+Footnotes and Endnotes
+----------------------
+
+get_note_list(class, context)
+
+get_note(id, context)
+
+The citation is not reliable
+
+
+Annotations
+-----------
+
+No name or id
+Search by creator
+Search by date or date range
+
+
+get_annotation_list(author, start_date, end_date...)
+
+
+insert_annotation(author, date, offset, text, style)
+
+
+Common
+------
+
+odf_document.get_external_uri(name, context)
 
 
 TODO
