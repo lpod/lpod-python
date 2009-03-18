@@ -174,10 +174,55 @@ class DocumentTestCase(TestCase):
         del self.document
 
 
+    def test_get_element_list_bad_context(self):
+        document = self.document
+        self.assertRaises(TypeError, document.get_paragraph_list,
+                          context=document)
+
+
+    def test_get_element_missed(self):
+        document = self.document
+        paragraph = document.get_paragraph(999)
+        self.assertEqual(paragraph, None)
+
+
+    #
+    # Sections
+    #
+
+    def test_get_section_list(self):
+        document = self.document
+        sections = document.get_section_list()
+        self.assertEqual(len(sections), 2)
+        second = sections[1]
+        name = second.get_attribute('text:name')
+        self.assertEqual(name, "Section2")
+
+
+    def test_get_section_list_style(self):
+        document = self.document
+        sections = document.get_section_list(style='Sect1')
+        self.assertEqual(len(sections), 2)
+        section = sections[0]
+        name = section.get_attribute('text:name')
+        self.assertEqual(name, "Section1")
+
+
+    def test_get_section(self):
+        document = self.document
+        section = document.get_section(2)
+        name = section.get_attribute('text:name')
+        self.assertEqual(name, "Section2")
+
+
+    #
+    # Paragraphs
+    #
+
     def test_get_paragraph_list(self):
         document = self.document
         paragraphs = document.get_paragraph_list()
-        self.assertEqual(len(paragraphs), 5)
+        self.assertEqual(len(paragraphs), 6)
         second = paragraphs[1]
         text = second.get_text()
         self.assertEqual(text, 'This is the second paragraph.')
@@ -193,18 +238,13 @@ class DocumentTestCase(TestCase):
 
 
     def test_get_paragraph_list_context(self):
-        # TODO Search inside a given section
         document = self.document
-        paragraphs = document.get_paragraph_list()
+        section2 = document.get_section(2)
+        paragraphs = document.get_paragraph_list(context=section2)
+        self.assertEqual(len(paragraphs), 1)
         paragraph = paragraphs[0]
-        paragraphs = document.get_paragraph_list(context=paragraph)
-        self.assertEqual(len(paragraphs), 0)
-
-
-    def test_get_paragraph_list_bad_context(self):
-        document = self.document
-        self.assertRaises(TypeError, document.get_paragraph_list,
-                          context=document)
+        text = paragraph.get_text()
+        self.assertEqual(text, "First paragraph of the second section.")
 
 
     def test_get_paragraph(self):
@@ -213,12 +253,6 @@ class DocumentTestCase(TestCase):
         text = paragraph.get_text()
         expected = 'This is the first paragraph of the second title.'
         self.assertEqual(text, expected)
-
-
-    def test_get_paragraph_missed(self):
-        document = self.document
-        paragraph = document.get_paragraph(999)
-        self.assertEqual(paragraph, None)
 
 
     def test_insert_paragraph(self):
@@ -234,7 +268,7 @@ class DocumentTestCase(TestCase):
     def test_get_heading_list(self):
         document = self.document
         headings = document.get_heading_list()
-        self.assertEqual(len(headings), 2)
+        self.assertEqual(len(headings), 3)
         second = headings[1]
         text = second.get_text()
         self.assertEqual(text, 'Level 2 Title')
@@ -268,18 +302,13 @@ class DocumentTestCase(TestCase):
 
 
     def test_get_heading_list_context(self):
-        # TODO Search inside a given section
         document = self.document
-        headings = document.get_heading_list()
+        section2 = document.get_section(2)
+        headings = document.get_heading_list(context=section2)
+        self.assertEqual(len(headings), 1)
         heading = headings[0]
-        headings = document.get_heading_list(context=heading)
-        self.assertEqual(len(headings), 0)
-
-
-    def test_get_heading_list_bad_context(self):
-        document = self.document
-        self.assertRaises(TypeError, document.get_heading_list,
-                          context=document)
+        text = heading.get_text()
+        self.assertEqual(text, "First Title of the Second Section");
 
 
     def test_get_heading(self):
@@ -287,12 +316,6 @@ class DocumentTestCase(TestCase):
         heading = document.get_heading(2)
         text = heading.get_text()
         self.assertEqual(text, 'Level 2 Title')
-
-
-    def test_get_heading_missed(self):
-        document = self.document
-        heading = document.get_heading(999)
-        self.assertEqual(heading, None)
 
 
     def test_get_heading_level(self):

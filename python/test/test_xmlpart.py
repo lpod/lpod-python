@@ -60,7 +60,7 @@ class ElementTestCase(TestCase):
 
     def test_get_element_list(self):
         elements = self.content_part.get_element_list('//text:p')
-        self.assertEqual(len(elements), 5)
+        self.assertEqual(len(elements), 6)
 
 
     def test_get_attribute(self):
@@ -210,7 +210,7 @@ class XmlPartTestCase(TestCase):
     def test_get_element_list(self):
         content_part = odf_xmlpart('content', self.container)
         elements = content_part.get_element_list('//text:p')
-        self.assertEqual(len(elements), 5)
+        self.assertEqual(len(elements), 6)
 
 
     def serialize(self):

@@ -9,6 +9,12 @@ from xmlpart import odf_create_element
 
 
 
+def odf_create_section(style):
+    data = '<text:section text:style-name="%s"></text:section>' % style
+    return odf_create_element(data)
+
+
+
 def odf_create_paragraph(style, text=''):
     data = '<text:p text:style-name="%s">%s</text:p>' % (style, text)
     return odf_create_element(data)
@@ -186,6 +192,23 @@ class odf_document(object):
         # Save the container
         self.container.save(uri, packaging)
 
+
+
+    #
+    # Sections
+    #
+
+    def get_section_list(self, style=None, context=None):
+        return self.__get_element_list('text:section', style=style,
+                                       context=context)
+
+
+    def get_section(self, position, context=None):
+        return self.__get_element('text:section', position, context=context)
+
+
+    def insert_section(self, element, context=None, position=LAST_CHILD):
+        self.__insert_element(element, context, position)
 
 
     #
