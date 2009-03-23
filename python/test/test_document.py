@@ -174,6 +174,14 @@ class CheckArgumentsTestCase(TestCase):
         self.assertRaises(ValueError, document.get_heading_list, level=0)
 
 
+    def test_position_name(self):
+        document = self.document
+        self.assertRaises(ValueError, document.get_frame, position=1,
+                          name='foo')
+        self.assertRaises(ValueError, document.get_frame, position=None,
+                          name=None)
+
+
 
 class DocumentTestCase(TestCase):
 
@@ -369,24 +377,34 @@ class CreateTestCase(TestCase):
 
 
     def test_create_frame(self):
+        document = self.document
+
         # Test 1
-        frame = odf_create_frame('frame1', 'Graphics', '10cm', '10cm')
+        frame1 = odf_create_frame('frame1', 'Graphics', '10cm', '10cm')
         expected = ('<draw:frame draw:name="frame1" '
                     'draw:style-name="Graphics" svg:width="10cm" '
                     'svg:height="10cm" text:anchor-type="paragraph"/>')
-        self.assertEqual(frame.serialize(), expected)
+        self.assertEqual(frame1.serialize(), expected)
 
         # Test 2
-        frame = odf_create_frame('frame1', 'Graphics', '10cm', '10cm',
-                                 page=1, x='10mm', y='10mm')
-        expected = ('<draw:frame draw:name="frame1" '
+        frame2 = odf_create_frame('frame2', 'Graphics', '10cm', '10cm',
+                                  page=1, x='10mm', y='10mm')
+        expected = ('<draw:frame draw:name="frame2" '
                     'draw:style-name="Graphics" svg:width="10cm" '
                     'svg:height="10cm" text:anchor-type="page" '
                     'text:anchor-page-number="1" svg:x="10mm" svg:y="10mm"/>')
-        self.assertEqual(frame.serialize(), expected)
+        self.assertEqual(frame2.serialize(), expected)
 
         # Insert OK ?
-        self.document.insert_frame(frame)
+        document.insert_frame(frame1)
+        document.insert_frame(frame2)
+
+        # Get OK ?
+        get = document.get_frame(name='frame1')
+        self.assertEqual(get.get_attribute('draw:name'), 'frame1')
+
+        get = document.get_frame(position=2)
+        self.assertEqual(get.get_attribute('draw:name'), 'frame2')
 
 
     def test_create_image(self):

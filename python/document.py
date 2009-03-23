@@ -12,6 +12,10 @@ from xmlpart import odf_create_element
 
 
 
+#
+# odf creation functions
+#
+
 def odf_create_section(style):
     data = '<text:section text:style-name="%s"></text:section>' % style
     return odf_create_element(data)
@@ -89,6 +93,10 @@ def odf_create_list(style):
 
 
 
+#
+# Some private functions
+#
+
 def _generate_xpath_query(element_name, attributes={}, position=None,
                           context=None):
     if context is not None:
@@ -124,12 +132,24 @@ def _check_arguments(context=None, position=None, style=None):
             raise TypeError, "a style name is expected"
 
 
+
 def _check_level(level):
     if not isinstance(level, int):
         raise TypeError, "an integer level is expected"
     if level < 1:
         raise ValueError, "level count begin at 1"
 
+
+
+def _check_position_name(position, name):
+    if not ((position is None) ^ (name is None)):
+        raise ValueError, 'You must choose position "xor" name'
+
+
+
+#
+# The odf_document object
+#
 
 class odf_document(object):
 
@@ -289,8 +309,12 @@ class odf_document(object):
                                        context=context)
 
 
-    def get_frame(self, position, context=None):
-        return self.__get_element('draw:frame', position, context=context)
+    def get_frame(self, position=None, name=None, context=None):
+        _check_position_name(position, name)
+        attributes = {'draw:name': name} if name is not None else {}
+        return self.__get_element('draw:frame', position,
+                                  attributes=attributes,
+                                  context=context)
 
 
     def insert_frame(self, element, context=None, position=LAST_CHILD):
@@ -373,6 +397,10 @@ class odf_document(object):
         raise NotImplementedError
 
 
+
+#
+# odf_document factories
+#
 
 def odf_get_document(uri):
     """Return an "odf_document" instance of the ODF document stored at the
