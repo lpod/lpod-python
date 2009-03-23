@@ -473,6 +473,7 @@ class CreateTestCase(TestCase):
         row = odf_create_row()
         cell = odf_create_cell()
 
+        # Insert OK ?
         document = self.document
         document.insert_table(table)
         document.insert_column(column, table)
@@ -487,6 +488,13 @@ class CreateTestCase(TestCase):
                     '</table:table-row>'
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
+
+        # Get OK ?
+        get = document.get_table(name='a_table')
+        self.assertEqual(get.get_attribute('table:name'), 'a_table')
+
+        get = document.get_table(position=1)
+        self.assertEqual(get.get_attribute('table:name'), 'a_table')
 
 
     def test_create_item(self):

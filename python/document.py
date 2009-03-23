@@ -343,8 +343,11 @@ class odf_document(object):
                                        context=context)
 
 
-    def get_table(self, position, context=None):
-        return self.__get_element('table:table', position, context=context)
+    def get_table(self, position=None, name=None, context=None):
+        _check_position_name(position, name)
+        attributes = {'table:name': name} if name is not None else {}
+        return self.__get_element('table:table', position,
+                                  attributes=attributes, context=context)
 
 
     def insert_table(self, element, context=None, xmlposition=LAST_CHILD):
