@@ -203,6 +203,7 @@ Image
 
 Frame
 -----
+::
 
     get_frame_list
     get_frame_by_position
@@ -215,103 +216,107 @@ Table
 
 ::
 
-  No column in odf, just lines
-  The columns are only used to define the style for a group of cells
+    No column in odf, just lines
+    The columns are only used to define the style for a group of cells
 
-      <table:table table:name="..." table:style-name="...">
-        <table:table-column table:style-name="..."/>
-        <table:table-column table:style-name="..."/>
+        <table:table table:name="..." table:style-name="...">
+          <table:table-column table:style-name="..."/>
+          <table:table-column table:style-name="..."/>
 
-        <table:table-row>
+          <table:table-row>
 
-          <table:table-cell office:value-type="String">
+            <table:table-cell office:value-type="String">
 
-          </table:table-cell>
-
-
-        </table:table-row>
-
-      </table:table>
-
-      In a cell, we cannot have a cell or a line. But we can have paragraphs,
-      sections, ...
+            </table:table-cell>
 
 
-  odt_element <= odf_create_cell()
-  odt_element <= odf_create_row(width=None)
-  odt_element <= odf_create_column()
+          </table:table-row>
 
-  odt_element <= odf_create_table(name, style, width=None, height=None)
+        </table:table>
 
-  document.insert_table(element, context=None, xmlposition=None)
-
-  document.insert_row(table, context, xmlposition)
-  document.insert_column(table, context, xmlposition)
-  document.insert_cell(row, context, xmlposition)
+        In a cell, we cannot have a cell or a line. But we can have
+        paragraphs, sections, ...
 
 
-  Getting a cell from its table, its line, its column
+    odt_element <= odf_create_cell()
+    odt_element <= odf_create_row(width=None)
+    odt_element <= odf_create_column()
+
+    odt_element <= odf_create_table(name, style, width=None, height=None)
+
+    document.insert_table(element, context=None, xmlposition=None)
+
+    document.insert_row(table, context, xmlposition)
+    document.insert_column(table, context, xmlposition)
+    document.insert_cell(row, context, xmlposition)
+
+
+    Getting a cell from its table, its line, its column
 
 
 List
 ----
 ::
 
-  odt_element <= odt_create_item()
-  odt_element <= odf_create_list(style)
+    odt_element <= odt_create_item()
+    odt_element <= odf_create_list(style)
 
-  <text:list text:style-name="Standard">
-    <text:list-item>
-      ...
-    </text:list-item>
-  </text:list>
+    <text:list text:style-name="Standard">
+      <text:list-item>
+        ...
+      </text:list-item>
+    </text:list>
 
-  document.insert_list(element, context, xmlposition)
-  document.insert_item(element, list, xmlposition)
+    document.insert_list(element, context, xmlposition)
+    document.insert_item(element, list, xmlposition)
 
 
 
 Sections
 --------
+::
 
-odf_document.get_section_by_position(position)
-odf_document.get_section_by_position(position, context)
+    odf_document.get_section_by_position(position)
+    odf_document.get_section_by_position(position, context)
 
-odf_document.get_section_by_name(name)
-odf_document.get_section_by_name(name, context)
+    odf_document.get_section_by_name(name)
+    odf_document.get_section_by_name(name, context)
 
-odf_document.get_section_external_resource(name)
-odf_document.get_section_external_resource(name, context)
+    odf_document.get_section_external_resource(name)
+    odf_document.get_section_external_resource(name, context)
 
 
 Footnotes and Endnotes
 ----------------------
+::
 
-get_note_list(class, context)
+    get_note_list(class, context)
 
-get_note(id, context)
+    get_note(id, context)
 
-The citation is not reliable
+    The citation is not reliable
 
 
 Annotations
 -----------
+::
 
-No name or id
-Search by creator
-Search by date or date range
-
-
-get_annotation_list(author, start_date, end_date...)
+    No name or id
+    Search by creator
+    Search by date or date range
 
 
-insert_annotation(author, date, offset, text, style)
+    get_annotation_list(author, start_date, end_date...)
+
+
+    insert_annotation(author, date, offset, text, style)
 
 
 Common
 ------
+::
 
-odf_document.get_external_uri(name, context)
+    odf_document.get_external_uri(name, context)
 
 
 TODO
