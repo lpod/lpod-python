@@ -110,7 +110,7 @@ def _generate_xpath_query(element_name, attributes={}, position=None,
 
 
 
-def _check_arguments(context=None, position=None, style=None, level=None):
+def _check_arguments(context=None, position=None, style=None):
     if context is not None:
         if not isinstance(context, odf_element):
             raise TypeError, "an odf element is expected"
@@ -122,12 +122,13 @@ def _check_arguments(context=None, position=None, style=None, level=None):
     if style is not None:
         if not isinstance(style, str):
             raise TypeError, "a style name is expected"
-    if level is not None:
-        if not isinstance(level, int):
-            raise TypeError, "an integer level is expected"
-        if level < 1:
-            raise ValueError, "level count begin at 1"
 
+
+def _check_level(level):
+    if not isinstance(level, int):
+        raise TypeError, "an integer level is expected"
+    if level < 1:
+        raise ValueError, "level count begin at 1"
 
 
 class odf_document(object):
@@ -151,15 +152,14 @@ class odf_document(object):
         return part
 
 
-    def __get_element_list(self, qname, style=None, level=None,
+    def __get_element_list(self, qname, style=None, attributes=None,
                            frame_style=None, context=None):
-        _check_arguments(style=style, level=level, context=context)
+        _check_arguments(style=style, context=context)
         content = self.__get_xmlpart('content')
-        attributes = {}
+        if attributes is None:
+            attributes = {}
         if style:
             attributes['text:style-name'] = style
-        if level:
-            attributes['text:outline-level'] = level
         if frame_style:
             attributes['draw:style-name'] = frame_style
         query = _generate_xpath_query(qname, attributes=attributes,
@@ -167,12 +167,12 @@ class odf_document(object):
         return content.get_element_list(query)
 
 
-    def __get_element(self, qname, position, level=None, context=None):
+    def __get_element(self, qname, position=None, attributes=None,
+                      context=None):
         _check_arguments(position=position, context=context)
         content = self.__get_xmlpart('content')
-        attributes = {}
-        if level:
-            attributes['text:outline-level'] = level
+        if attributes is None:
+            attributes = {}
         query = _generate_xpath_query(qname, attributes=attributes,
                                       position=position, context=context)
         result = content.get_element_list(query)
@@ -256,12 +256,23 @@ class odf_document(object):
     #
 
     def get_heading_list(self, style=None, level=None, context=None):
-        return self.__get_element_list('text:h', style=style, level=level,
+        if level is not None:
+            _check_level(level)
+            attributes = {'text:outline-level': level}
+        else:
+            attributes = None
+        return self.__get_element_list('text:h', style=style,
+                                       attributes=attributes,
                                        context=context)
 
 
     def get_heading(self, position, level=None, context=None):
-        return self.__get_element('text:h', position, level=level,
+        if level is not None:
+            _check_level(level)
+            attributes = {'text:outline-level': level}
+        else:
+            attributes = None
+        return self.__get_element('text:h', position, attributes=attributes,
                                   context=context)
 
 

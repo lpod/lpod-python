@@ -135,6 +135,14 @@ class GenerateXPathTestCase(TestCase):
 
 class CheckArgumentsTestCase(TestCase):
 
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
     def test_bad_context(self):
         document = odf_get_document('samples/example.odt')
         self.assertRaises(TypeError, _check_arguments, context=document)
@@ -157,11 +165,13 @@ class CheckArgumentsTestCase(TestCase):
 
 
     def test_str_level(self):
-        self.assertRaises(TypeError, _check_arguments, level='1')
+        document = self.document
+        self.assertRaises(TypeError, document.get_heading_list, level='1')
 
 
     def test_level_zero(self):
-        self.assertRaises(ValueError, _check_arguments, level=0)
+        document = self.document
+        self.assertRaises(ValueError, document.get_heading_list, level=0)
 
 
 
