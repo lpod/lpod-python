@@ -334,6 +334,12 @@ class odf_document(object):
         self.__insert_element(element, context, xmlposition)
 
 
+    def get_image(self, position=None, name=None, context=None):
+        # Automatically get the frame
+        frame = self.get_frame(position, name, context)
+        return self.__get_element('draw:image', context=frame)
+
+
     #
     # Tables
     #

@@ -408,6 +408,8 @@ class CreateTestCase(TestCase):
 
 
     def test_create_image(self):
+        document = self.document
+
         # Test create
         image = odf_create_image('path')
         expected = '<draw:image xlink:href="path"/>'
@@ -415,7 +417,16 @@ class CreateTestCase(TestCase):
 
         # Insert OK ?
         frame = odf_create_frame('frame_image', 'Graphics', '0cm', '0cm')
-        self.document.insert_image(image, frame)
+        document.insert_image(image, frame)
+        document.insert_frame(frame)
+
+        # Get OK ?
+        get = document.get_image(name='frame_image')
+        self.assertEqual(get.get_attribute('xlink:href'), 'path')
+
+        get = document.get_image(position=1)
+        self.assertEqual(get.get_attribute('xlink:href'), 'path')
+
 
 
     def test_create_cell(self):
