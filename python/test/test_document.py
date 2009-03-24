@@ -8,6 +8,7 @@ from unittest import TestCase, main
 from lpod.document import odf_new_document_from_template
 from lpod.document import odf_new_document_from_class, odf_get_document
 from lpod.document import _generate_xpath_query, _check_arguments
+from lpod.document import _get_cell_coordinates
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
@@ -527,6 +528,14 @@ class CreateTestCase(TestCase):
                     '<text:list-item/>'
                     '</text:list>')
         self.assertEqual(a_list.serialize(), expected)
+
+
+
+class TestGetCell(TestCase):
+
+    def test_get_cell_coordinates(self):
+        x, y = _get_cell_coordinates('ABC123')
+        self.assertEqual((x, y), (731, 123))
 
 
 

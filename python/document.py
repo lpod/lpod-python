@@ -117,6 +117,30 @@ def _generate_xpath_query(element_name, attributes={}, position=None,
     return ''.join(query)
 
 
+def _get_cell_coordinates(name):
+    lower = name.lower()
+
+    # First "x"
+    x = 0
+    for p in xrange(len(lower)):
+        c = lower[p]
+        if not c.isalpha():
+            break
+        v = ord(c) - ord('a') + 1
+        x = x * 26 + v
+    if x == 0:
+        raise ValueError, 'Your cell name "%s" is malformed' % name
+
+    # And "y"
+    try:
+        y = int(lower[p:])
+    except ValueError:
+        raise ValueError, 'Your cell name "%s" is malformed' % name
+    if y <= 0:
+        raise ValueError, 'Your cell name "%s" is malformed' % name
+
+    return x, y
+
 
 def _check_arguments(context=None, position=None, style=None):
     if context is not None:
