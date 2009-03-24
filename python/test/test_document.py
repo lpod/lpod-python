@@ -537,7 +537,7 @@ class TestGetCell(TestCase):
         document = odf_new_document_from_class('text')
 
         # Encode this table
-        #   A B D E F G H
+        #   A B C D E F G
         # 1 1 1 1 2 3 3 3
         # 2 1 1 1 2 3 3 3
         # 3 1 1 1 2 3 3 3
@@ -581,13 +581,29 @@ class TestGetCell(TestCase):
 
         document.insert_table(table)
 
+        self.document = document
+
 
     def test_get_cell_coordinates(self):
         x, y = _get_cell_coordinates('ABC123')
         self.assertEqual((x, y), (731, 123))
 
 
+    def test_get_cell(self):
+        document = self.document
+        table = document.get_table(name='a_table')
 
+        cell = document.get_cell('D3', table)
+        paragraph = document.get_paragraph(1, context=cell)
+        self.assertEqual(paragraph.get_text(), '2')
+
+        cell = document.get_cell('F3', table)
+        paragraph = document.get_paragraph(1, context=cell)
+        self.assertEqual(paragraph.get_text(), '3')
+
+        cell = document.get_cell('D4', table)
+        paragraph = document.get_paragraph(1, context=cell)
+        self.assertEqual(paragraph.get_text(), '4')
 
 
 if __name__ == '__main__':

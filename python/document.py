@@ -400,12 +400,52 @@ class odf_document(object):
         context.insert_element(element, xmlposition)
 
 
+    def get_row_list(self, style=None, context=None):
+        return self.__get_element_list('table:table-row', style=style,
+                                       context=context)
+
+
     #
     # Cells
     #
 
     def insert_cell(self, element, context, xmlposition=LAST_CHILD):
         context.insert_element(element, xmlposition)
+
+
+    def get_cell_list(self, style=None, context=None):
+        return self.__get_element_list('table:table-cell', style=style,
+                                       context=context)
+
+
+    # Warning: This function gives just a "read only" odf_element
+    def get_cell(self, name, context):
+        # The coordinates of your cell
+        x, y = _get_cell_coordinates(name)
+
+        # First, we must find the good row
+        cell_y = 0
+        for row in self.get_row_list(context=context):
+            repeat = row.get_attribute('table:number-rows-repeated')
+            repeat = int(repeat) if repeat is not None else 1
+            if cell_y + 1 <= y and y <= (cell_y + repeat):
+                break
+            cell_y += repeat
+        else:
+            raise IndexError, 'i cannot find your cell "%s"' % name
+
+        # Second, we must find the good cell
+        cell_x = 0
+        for cell in self.get_cell_list(context=row):
+            repeat = cell.get_attribute('table:number-columns-repeated')
+            repeat = int(repeat) if repeat is not None else 1
+            if cell_x + 1 <= x and x <= (cell_x + repeat):
+                break
+            cell_x += repeat
+        else:
+            raise IndexError, 'i cannot find your cell "%s"' % name
+
+        return cell
 
 
     #
