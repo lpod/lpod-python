@@ -5,7 +5,7 @@
 from itools.core import get_abspath
 
 # Import from libxml2
-from libxml2 import parseDoc, xmlNode
+from libxml2 import parseDoc, xmlNode, XML_SAVE_FORMAT
 
 
 ODF_NAMESPACES = {
@@ -166,6 +166,7 @@ class odf_element(object):
 
     def serialize(self):
         element = self.__element
+
         return str(element)
 
 
@@ -240,6 +241,6 @@ class odf_xmlpart(object):
         return [odf_element(e) for e in result]
 
 
-    def serialize(self):
-        # TODO another method to write back in the container?
-        return str(self.__get_document())
+    def serialize(self, pretty=False):
+        format = XML_SAVE_FORMAT if pretty else 0
+        return self.__get_document().serialize(format=format)
