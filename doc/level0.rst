@@ -346,12 +346,30 @@ style families:
 
 manifest?
 
-
 Make this use case:
   - Read a directory
     for each file =>
         if image => insert it
         if csv => make a table
+
+
+Element manipulation:
+
+    - Insert a sub-element at a given position: note, annotation, field...
+    - Replace some text of the element by a sub-element: hyperlink, automatic
+      style...
+    - Searching text without couting text:span, text:a, etc. (like a raw
+      search on element.get_content())
+    - Returning the lowest odf_element containing the whole text (if the text
+      is across several span/a, return the p) in the document or the given
+      context, and the offset where the text begins in the content.
+    - Returning the nearest odf_element containing the whole text or the start
+      of the text (if across several span/a) in the odf_element and its
+      sub-elements (the "p" element in the above case), and the offset where
+      the text begins in the content.
+    - Insert a new element at this position, and it may include removing all
+      or part of the text and replacing it in the new element
+
 
 XPath Requirements
 ==================
