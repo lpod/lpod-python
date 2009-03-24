@@ -1,12 +1,16 @@
-#####################
-Level 0 API reference
-#####################
+#####################################
+Level 0 API reference (working draft)
+#####################################
 
 0.0 Physical access & persistence
 =================================
 
-odf_container
--------------
+This level provides the odf_container class only; this class encapsulates
+the required logic for read & write operations regarding the ODF documents
+and associated resources across a virtual file system.				
+
+class: odf_container
+--------------------
 	
 The odf_container represents the physical Open Document package, whatever
 the storage option. The package consists of either a zip compressed archive
@@ -22,7 +26,7 @@ An odf_container instance can be created by several ways:
 
 
 Constructors
-~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 odf_get_container(uri)
 	Instantiates an odf_container object which is a read-write interface to
@@ -75,6 +79,26 @@ get_part(part_name)
 	The return value is null if the given part_name doesn't match an
 	existing part.
 
+save()
+	Commits every change previously done through other odf_container
+	methods and makes them persistent in the underlying physical
+	container. Without argument, the changes are committed in the
+	source container (i.e. the physical file used to create the
+	odf_container instance using get_container()). Without argument,
+	this method fails if the current odf_container has been created
+	using odf_new_container() or odf_new_container_from_template().
+	
+save(packaging)
+	Like save(), but with a specified packaging format, which possibly
+	differs from the packaging format of the source document. Allowed
+	package types are "zip" and "flat". 
+
+save(uri)
+	TODO
+	
+save(uri, packaging)
+	TODO
+
 set_part(part_name, data)
 	Creates or replaces a part in the current odf_container using external
 	raw data.
@@ -96,22 +120,62 @@ save(uri, packaging)
     URI it was loaded from). The container is saved in the same packaging
     format than when it was open, unless it is given "flat" or "zip".
 
-    odf_container container
+0.1 Basic XML access
+====================
 
-    container = odf_new_container_from_class({text, spreadsheet, presentation,
-                                              drawing})
-    container = odf_new_container_from_template(template_uri)
+A physical ODF *container*, accessed through an odf_container object, can
+contain one or more XML or non-XML *parts*. Non-XML parts incuded in ODF
+packages can be referred to as external resources from within XML parts
+(multimedia content), but they are out of the scope of the lpOD level 0
+API. On the other hand, this API provides  in any XML part.
 
-    container = odf_get_container(uri)
+The XML oriented aspect of the level 0 API is provided through the
+odf_xmlpart and odf_element classes.
 
-    odf_container copy = container.clone()
-    str data = container.get_part(part_name)
-    container.set_part(part_name, data)
-    container.del_part(part_name)
+class: odf_xmlpart
+------------------
 
+This class represents an individual XML member of any ODF package, whatever
+its functional role and the global document class (text, spreadsheet,
+presentation, drawing, etc). It provides all the basic logic needed to
+retrieve, update, delete or create any XML element.
 
-0.1 XML Parts
-=============
+The external behaviour of an odf_xmlpart object is the same whatever the ODF
+container from which its content is extracted, knowing that the ODF
+specification allows two packaging types. As a consequence, an instance of
+odf_xmlpart could be created either from an XML member file of an ODF
+compressed archive, or from a particular element in a flat XML ODF file.
+
+An odf_xmlpart is always created using a keyword indicating its functional
+role in the whole document. Typical ODF roles are content, styles, meta and
+settings. The real name of the part depends on the packaging type of the
+container. With a regular ODF zip package, a given "part_name" is stored
+as a "part_name.xml" member file, but with a flat XML package it's stored as
+the "office:document-part_name" element. The lpOD API is able to hide the
+difference; the application has just to know the functional name of the
+part.
+
+Constructor
+~~~~~~~~~~~
+
+odf_xmlpart(part_name, container)
+	Instantiates an odf_xmlpart object from the XML content of a given
+	part in a previously created odf_container object. The given part_name
+	must correspond to an existing ODF XML part name. The given name is
+	just the functional name of the part, not the real storage name which
+	depends on the packaging type of the container. The return value is
+	an odf_xmlpart instance, or null if case of failure for any reason. 
+
+Methods
+~~~~~~~
+
+container()
+	Returns the odf_container object from which the current instance has
+	been extracted.
+
+events()
+	**TBD**
+
 
 odf_xmlpart
 -----------
