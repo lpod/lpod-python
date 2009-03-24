@@ -533,9 +533,60 @@ class CreateTestCase(TestCase):
 
 class TestGetCell(TestCase):
 
+    def setUp(self):
+        document = odf_new_document_from_class('text')
+
+        # Encode this table
+        #   A B D E F G H
+        # 1 1 1 1 2 3 3 3
+        # 2 1 1 1 2 3 3 3
+        # 3 1 1 1 2 3 3 3
+        # 4 1 2 3 4 5 6 7
+        table = odf_create_table('a_table', 'Standard')
+        column = odf_create_column('Standard')
+        column.set_attribute('table:number-columns-repeated', '7')
+        document.insert_column(column, table)
+
+        # 3 x "1 1 1 2 3 3 3"
+        row = odf_create_row()
+        row.set_attribute('table:number-rows-repeated', '3')
+        # 3 x "1"
+        cell = odf_create_cell()
+        cell.set_attribute('table:number-columns-repeated', '3')
+        paragraph = odf_create_paragraph('Standard', '1')
+        document.insert_paragraph(paragraph, cell)
+        document.insert_cell(cell, row)
+        # 1 x "2"
+        cell = odf_create_cell()
+        paragraph = odf_create_paragraph('Standard', '2')
+        document.insert_paragraph(paragraph, cell)
+        document.insert_cell(cell, row)
+        # 3 x "3"
+        cell = odf_create_cell()
+        cell.set_attribute('table:number-columns-repeated', '3')
+        paragraph = odf_create_paragraph('Standard', '3')
+        document.insert_paragraph(paragraph, cell)
+        document.insert_cell(cell, row)
+
+        document.insert_row(row, table)
+
+        # 1 x "1 2 3 4 5 6 7"
+        row = odf_create_row()
+        for i in xrange(1, 8):
+            cell = odf_create_cell()
+            paragraph = odf_create_paragraph('Standard', str(i))
+            document.insert_paragraph(paragraph, cell)
+            document.insert_cell(cell, row)
+        document.insert_row(row, table)
+
+        document.insert_table(table)
+
+
     def test_get_cell_coordinates(self):
         x, y = _get_cell_coordinates('ABC123')
         self.assertEqual((x, y), (731, 123))
+
+
 
 
 
