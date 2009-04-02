@@ -94,10 +94,15 @@ save(packaging)
 	package types are "zip" and "flat". 
 
 save(uri)
-	TODO
+	Like save(), but with an explicit target which is not the source
+	container. The source container remains unchanged. Behaves just like
+	the "save as..." feature of a typical desktop application.
 	
 save(uri, packaging)
-	TODO
+	Like save(), but with an explicit target which is not the source
+	container and a specified packaging format, which possibly
+	differs from the packaging format of the source document. Allowed
+	package types are "zip" and "flat".
 
 set_part(part_name, data)
 	Creates or replaces a part in the current odf_container using external
@@ -138,7 +143,8 @@ class: odf_xmlpart
 This class represents an individual XML member of any ODF package, whatever
 its functional role and the global document class (text, spreadsheet,
 presentation, drawing, etc). It provides all the basic logic needed to
-retrieve, update, delete or create any XML element.
+retrieve, update, delete or create any XML element. The element retrieval
+is implemented through an encapsulated XPath engine.
 
 The external behaviour of an odf_xmlpart object is the same whatever the ODF
 container from which its content is extracted, knowing that the ODF
@@ -151,7 +157,7 @@ role in the whole document. Typical ODF roles are content, styles, meta and
 settings. The real name of the part depends on the packaging type of the
 container. With a regular ODF zip package, a given "part_name" is stored
 as a "part_name.xml" member file, but with a flat XML package it's stored as
-the "office:document-part_name" element. The lpOD API is able to hide the
+a "office:document-part_name" XML element. The lpOD API is able to hide the
 difference; the application has just to know the functional name of the
 part.
 
@@ -166,8 +172,8 @@ odf_xmlpart(part_name, container)
 	depends on the packaging type of the container. The return value is
 	an odf_xmlpart instance, or null if case of failure for any reason. 
 
-Methods
-~~~~~~~
+General I/O Methods
+~~~~~~~~~~~~~~~~~~~
 
 container()
 	Returns the odf_container object from which the current instance has
