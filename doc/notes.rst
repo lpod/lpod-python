@@ -145,6 +145,14 @@ Level 1
 Hint: preload the body, etc. for fast access to default contexts.
 
 
+TODO
+----
+
+    - Move implementation to specific classes: odf_content, odf_meta,
+      odf_styles, odf_settings
+    - Define API in odf_document, but then call the implementation in the
+      part instance.
+
 
 Styles
 -------
@@ -250,8 +258,38 @@ Table
     document.insert_column(table, context, xmlposition)
     document.insert_cell(row, context, xmlposition)
 
-
     Getting a cell from its table, its line, its column
+
+    cell type: office:value-type="{boolean, currency, date, float,
+                                   percentage, string, time}"
+
+    boolean: office-boolean-value="{true,false}"
+
+    currency: office:currency="EUR"
+
+    date: office:date-value="YYYY-MM-DD"
+
+    datetime: office:date-value="YYYY-MM-DDTHH:MM:SS"
+
+    float: office:value="3.14"
+
+    percentage: office:value="0.5"
+
+    string: office-string-value="toto"
+
+    time: office:time-value="PT12H33M00S"
+
+    formula: table:formula="of:AVERAGE([.D4:.E5])"
+
+    cell style: table:style-name="ce1"
+
+    repetition: table:number-columns-repeated="..."
+
+    cell representation: <text:p>...</text:p>
+
+    possibly an annotation
+
+    /!\ expanding cells to easily address and modify them
 
 
 List
@@ -310,6 +348,14 @@ Annotations
 
 
     insert_annotation(author, date, offset, text, style)
+
+
+Meta
+----
+
+    - Easy
+    - Regroup keywords in a list
+    - User-defined metadata (type: boolean, date, float, string and time)
 
 
 Common
