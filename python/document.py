@@ -432,7 +432,7 @@ class odf_document(object):
                 break
             cell_y += repeat
         else:
-            raise IndexError, 'i cannot find your cell "%s"' % name
+            raise IndexError, 'I cannot find cell "%s"' % name
 
         # Second, we must find the good cell
         cell_x = 0

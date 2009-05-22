@@ -70,7 +70,8 @@ class odf_element(object):
 
 
     def _get_xpath_path(self):
-        return self.__element.nodePath()
+        element = self.__element
+        return element.nodePath()
 
 
     def get_element_list(self, xpath_query):
@@ -120,7 +121,7 @@ class odf_element(object):
 
 
     def get_text(self):
-        # XXX all text recursively is need?
+        # XXX all text recursively is needed?
         element = self.__element
         # FIXME str or unicode?
         return element.getContent()
@@ -166,7 +167,6 @@ class odf_element(object):
 
     def serialize(self):
         element = self.__element
-
         return str(element)
 
 
