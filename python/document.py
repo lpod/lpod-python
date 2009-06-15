@@ -92,6 +92,15 @@ def odf_create_list(style):
     return odf_create_element('<text:list text:style-name="%s"/>' % style)
 
 
+def odf_create_style(name, family):
+    data = '<style:style style:name="%s" style:family="%s"/>'
+    return odf_create_element(data % (name, family))
+
+
+def odf_create_style_text_properties():
+    return odf_create_element('<style:text-properties/>')
+
+
 
 #
 # Some private functions
@@ -463,6 +472,16 @@ class odf_document(object):
     #
     # Styles
     #
+
+    def insert_style(self, element):
+        styles = self.__get_xmlpart('styles')
+        office_styles = styles.get_element_list('//office:styles')[-1]
+        office_styles.insert_element(element, LAST_CHILD)
+
+
+    def insert_style_properties(self, element, context):
+        context.insert_element(element, LAST_CHILD)
+
 
     def get_style(name):
         """Only paragraph styles for now.
