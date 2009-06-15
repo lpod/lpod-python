@@ -17,6 +17,7 @@ from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
+from lpod.document import odf_create_style, odf_create_style_text_properties
 
 
 
@@ -47,31 +48,17 @@ container.set_part(internal_name, image_file.to_str())
 heading = odf_create_heading('Heading', 1, 'Congratulations !')
 document.insert_heading(heading)
 
-#$styles->createStyle
-#	(
-#	"Colour",
-#	family		=> 'paragraph',
-#	parent		=> 'Standard',
-#	properties	=>
-#			{
-#			-area			=> 'paragraph',
-#			'fo:color'		=> odfColor(0,0,128),
-#			'fo:background-color'	=> odfColor("yellow"),
-#			'fo:text-align'		=> 'justify'
-#			}
-#	);
-#if ($doc->isOpenDocument)
-#	{
-#	$styles->styleProperties
-#		("Colour", -area => 'text', 'fo:color' => '#000080');
-#	}
+# The style
+style = odf_create_style('style1', 'paragraph')
+style.set_attribute('style:parent-style-name', 'Standard')
+properties = odf_create_style_text_properties()
+properties.set_attribute('fo:color', '#0000ff')
+properties.set_attribute('fo:background-color', '#ff0000')
+document.insert_style_properties(properties, style)
+document.insert_style(style)
 
-# <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
-#  <style:text-properties fo:color="#0000ff" fo:background-color="#ff0000"/>
-# </style:style>
-
-
-paragraph = odf_create_paragraph('Standard', 'Hello world!')
+# The paragraph
+paragraph = odf_create_paragraph('style1', 'A paragraph with a new style.')
 document.insert_paragraph(paragraph)
 
 # 3- the table
