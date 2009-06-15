@@ -64,6 +64,6 @@ for numero, filename in enumerate(samples.get_names()):
         document.insert_paragraph(paragraph)
 
 vfs.make_folder('trash')
-document.save('trash/use_case1.odt')
+document.save('trash/use_case1.odt', pretty=True)
 
 
