@@ -53,9 +53,9 @@ def odf_create_image(link):
     return odf_create_element('<draw:image xlink:href="%s"/>' % link)
 
 
-def odf_create_cell():
+def odf_create_cell(type='string'):
     return odf_create_element(
-                    '<table:table-cell office:value-type="String"/>')
+                    '<table:table-cell office:value-type="%s"/>' % type)
 
 
 def odf_create_row(width=None):
