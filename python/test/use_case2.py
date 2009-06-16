@@ -18,6 +18,7 @@ from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_style, odf_create_style_text_properties
+from lpod.document import odf_create_note
 
 
 
@@ -60,6 +61,7 @@ document.insert_style(style)
 # The paragraph
 paragraph = odf_create_paragraph('style1', 'A paragraph with a new style.')
 document.insert_paragraph(paragraph)
+
 
 # 3- the table
 # ------------
@@ -104,8 +106,6 @@ document.insert_cell(cell, row)
 
 document.insert_row(row, table)
 
-
-
 # Columns => Standard
 for i in range(2):
     column = odf_create_column('Standard')
@@ -113,6 +113,21 @@ for i in range(2):
 document.insert_table(table)
 
 
+# 4- A footnote
+# -------------
+
+heading = odf_create_heading('Heading', 1, 'A paragraph with a footnote')
+document.insert_heading(heading)
+
+paragraph = odf_create_paragraph('Standard', 'An other paragraph.')
+document.insert_paragraph(paragraph)
+
+note = odf_create_note('1', id='note1')
+body =  odf_create_paragraph('Standard', 'a footnote')
+document.insert_note_body(body, note)
+
+document.insert_note(note, paragraph)
+document.insert_paragraph(paragraph)
 
 
 vfs.make_folder('trash')

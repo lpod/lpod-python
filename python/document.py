@@ -101,10 +101,26 @@ def odf_create_style_text_properties():
     return odf_create_element('<style:text-properties/>')
 
 
+def odf_create_note(citation, note_class='footnote', id=None):
+    """note_class = {footnote|endnote}
+    """
+    data = ('<text:note text:note-class="%s">'
+              '<text:note-citation>%s</text:note-citation>'
+              '<text:note-body/>'
+            '</text:note>')
+    note = odf_create_element(data % (note_class, citation))
+
+    if id is not None:
+        note.set_attribute('text:id', id)
+
+    return note
+
+
 
 #
 # Some private functions
 #
+
 
 def _generate_xpath_query(element_name, attributes={}, position=None,
                           context=None):
@@ -467,6 +483,35 @@ class odf_document(object):
 
     def insert_item(self, element, context, xmlposition=LAST_CHILD):
         context.insert_element(element, xmlposition)
+
+
+    #
+    # Notes
+    #
+
+    def get_note_list(self, note_class=None, context=None):
+
+        if note_class is not None:
+            attributes = {'text:note-class': note_class}
+        else:
+            attributes = None
+        return self.__get_element_list('text:note', attributes=attributes,
+                                       context=context)
+
+
+    def get_note(self, id, context=None):
+        attributes = {'text:id': id}
+        return self.__get_element('text:note', attributes=attributes,
+                                  context=context)
+
+
+    def insert_note(self, element, context=None, xmlposition=LAST_CHILD):
+        self.__insert_element(element, context, xmlposition)
+
+
+    def insert_note_body(self, element, context):
+        body = context.get_element_list('//text:note-body')[-1]
+        body.insert_element(element, LAST_CHILD)
 
 
     #

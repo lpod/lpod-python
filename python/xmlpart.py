@@ -53,6 +53,7 @@ class odf_element(object):
                 or internal_element.type != 'element'):
             raise TypeError, "node is not an element node"
         self.__element = internal_element
+        self.__xpath_context = None
 
 
     def __decode_qname(self, qname):
@@ -74,12 +75,21 @@ class odf_element(object):
         return element.nodePath()
 
 
+    def __get_xpath_context(self):
+        if self.__xpath_context is None:
+            element = self.__element
+            document = element.doc
+            xpath_context = document.xpathNewContext()
+            # XXX needs to be filled with all the ODF namespaces or something
+            for prefix, uri in ODF_NAMESPACES.items():
+                xpath_context.xpathRegisterNs(prefix, uri)
+            self.__xpath_context = xpath_context
+        return self.__xpath_context
+
+
     def get_element_list(self, xpath_query):
-        element = self.__element
-        document = element.doc
-        xpath_context = document.xpathNewContext()
+        xpath_context = self.__get_xpath_context()
         result = xpath_context.xpathEval(xpath_query)
-        xpath_context.xpathFreeContext()
         return [odf_element(e) for e in result]
 
 
