@@ -23,6 +23,7 @@ help:
 	@echo "  pdf       to make PDF files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  changes   to make an overview over all changed/added/deprecated items"
 	@echo "  linkcheck to check all external links for integrity"
+	@echo "  release   to make html/pdf and store the files in two tar.gz"
 
 clean:
 	-rm -rf .build
