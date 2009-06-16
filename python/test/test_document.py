@@ -14,6 +14,8 @@ from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_item, odf_create_list
+from lpod.document import odf_create_style, odf_create_style_text_properties
+from lpod.document import odf_create_note
 from lpod.xmlpart import odf_create_element
 
 
@@ -433,7 +435,7 @@ class CreateTestCase(TestCase):
     def test_create_cell(self):
         # Test create
         cell = odf_create_cell()
-        expected = '<table:table-cell office:value-type="String"/>'
+        expected = '<table:table-cell office:value-type="string"/>'
         self.assertEqual(cell.serialize(), expected)
 
 
@@ -446,7 +448,7 @@ class CreateTestCase(TestCase):
         # Test 2
         row = odf_create_row(1)
         expected = ('<table:table-row>'
-                    '<table:table-cell office:value-type="String"/>'
+                    '<table:table-cell office:value-type="string"/>'
                     '</table:table-row>')
         self.assertEqual(row.serialize(), expected)
 
@@ -470,10 +472,10 @@ class CreateTestCase(TestCase):
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style">'
                     '<table:table-row>'
-                    '<table:table-cell office:value-type="String"/>'
+                    '<table:table-cell office:value-type="string"/>'
                     '</table:table-row>'
                     '<table:table-row>'
-                    '<table:table-cell office:value-type="String"/>'
+                    '<table:table-cell office:value-type="string"/>'
                     '</table:table-row>'
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
@@ -496,7 +498,7 @@ class CreateTestCase(TestCase):
                     'table:style-name="a_style">'
                     '<table:table-column table:style-name="a_column_style"/>'
                     '<table:table-row>'
-                    '<table:table-cell office:value-type="String"/>'
+                    '<table:table-cell office:value-type="string"/>'
                     '</table:table-row>'
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
@@ -528,6 +530,57 @@ class CreateTestCase(TestCase):
                     '<text:list-item/>'
                     '</text:list>')
         self.assertEqual(a_list.serialize(), expected)
+
+
+    def test_create_style(self):
+        document = self.document
+
+        # Create OK ?
+        style = odf_create_style('style1', 'paragraph')
+
+        properties = odf_create_style_text_properties()
+        properties.set_attribute('fo:color', '#0000ff')
+        properties.set_attribute('fo:background-color', '#ff0000')
+
+        # Insert OK ?
+        document.insert_style_properties(properties, style)
+        document.insert_style(style)
+
+        expected = ('<style:style style:name="style1" '
+                                 'style:family="paragraph">'
+                      '<style:text-properties fo:color="#0000ff" '
+                                             'fo:background-color="#ff0000"/>'
+                    '</style:style>')
+        get1 = document.get_style('style1')
+        get2 = document.get_style_list()[-1]
+        self.assertEqual(get1.serialize(), expected)
+        self.assertEqual(get2.serialize(), expected)
+
+
+    def test_create_note(self):
+        document = self.document
+
+        # Create OK ?
+        note = odf_create_note('1', id='note1')
+        body = odf_create_paragraph('Standard', 'a footnote')
+
+        # Insert OK ?
+        document.insert_note_body(body, note)
+        document.insert_note(note)
+
+        # Get OK ?
+        expected = ('<text:note text:note-class="footnote" text:id="note1">'
+                      '<text:note-citation>1</text:note-citation>'
+                      '<text:note-body>'
+                        '<text:p text:style-name="Standard">'
+                          'a footnote'
+                        '</text:p>'
+                      '</text:note-body>'
+                    '</text:note>')
+        get1 = document.get_note('note1')
+        get2 = document.get_note_list(note_class='footnote')[-1]
+        self.assertEqual(get1.serialize(), expected)
+        self.assertEqual(get2.serialize(), expected)
 
 
 
