@@ -92,7 +92,12 @@ def odf_create_list(style):
     return odf_create_element('<text:list text:style-name="%s"/>' % style)
 
 
-def odf_create_style(name, family):
+def odf_create_style(name, family='paragraph'):
+    """family can be:
+         paragraph, text, section, table, tablecolumn, table-row, table-cell,
+         table-page, chart, default, drawing-page, graphic, presentation,
+         control or ruby.
+    """
     data = '<style:style style:name="%s" style:family="%s"/>'
     return odf_create_element(data % (name, family))
 
@@ -222,9 +227,9 @@ class odf_document(object):
 
 
     def __get_element_list(self, qname, style=None, attributes=None,
-                           frame_style=None, context=None):
+                           frame_style=None, context=None, part='content'):
         _check_arguments(style=style, context=context)
-        content = self.__get_xmlpart('content')
+        part = self.__get_xmlpart(part)
         if attributes is None:
             attributes = {}
         if style:
@@ -233,18 +238,18 @@ class odf_document(object):
             attributes['draw:style-name'] = frame_style
         query = _generate_xpath_query(qname, attributes=attributes,
                                       context=context)
-        return content.get_element_list(query)
+        return part.get_element_list(query)
 
 
     def __get_element(self, qname, position=None, attributes=None,
-                      context=None):
+                      context=None, part='content'):
         _check_arguments(position=position, context=context)
-        content = self.__get_xmlpart('content')
+        part = self.__get_xmlpart(part)
         if attributes is None:
             attributes = {}
         query = _generate_xpath_query(qname, attributes=attributes,
                                       position=position, context=context)
-        result = content.get_element_list(query)
+        result = part.get_element_list(query)
         if not result:
             return None
         return result[0]
@@ -518,6 +523,19 @@ class odf_document(object):
     # Styles
     #
 
+    def get_style_list(self, family='paragraph', context=None):
+        attributes = {'style:family': family}
+        return self.__get_element_list('style:style', attributes=attributes,
+                                       context=context, part='styles')
+
+
+    def get_style(self, name, family='paragraph'):
+        attributes = {'style:name': name,
+                      'style:family': family}
+        return self.__get_element('style:style', attributes=attributes,
+                                  part='styles')
+
+
     def insert_style(self, element):
         styles = self.__get_xmlpart('styles')
         office_styles = styles.get_element_list('//office:styles')[-1]
@@ -526,12 +544,6 @@ class odf_document(object):
 
     def insert_style_properties(self, element, context):
         context.insert_element(element, LAST_CHILD)
-
-
-    def get_style(name):
-        """Only paragraph styles for now.
-        """
-        raise NotImplementedError
 
 
 
