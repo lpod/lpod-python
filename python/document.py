@@ -124,8 +124,7 @@ def odf_create_style_text_properties():
 def odf_create_note(text, note_class='footnote', id=None):
     """note_class = {footnote|endnote}
     """
-    if not note_class in NOTE_CLASSES:
-        raise ValueError, '"%s" is not a valid note class' % note_class
+    _check_arguments(note_class=note_class)
     data = ('<text:note text:note-class="%s">'
               '<text:note-citation>%s</text:note-citation>'
               '<text:note-body/>'
@@ -190,7 +189,7 @@ def _get_cell_coordinates(name):
 
 
 def _check_arguments(context=None, position=None, style=None, family=None,
-                     cell_type=None):
+                     cell_type=None, note_class=None):
     if context is not None:
         if not isinstance(context, odf_element):
             raise TypeError, "an odf element is expected"
@@ -213,7 +212,9 @@ def _check_arguments(context=None, position=None, style=None, family=None,
                 raise ValueError, 'currency is mandatory in monetary cells'
             if type(currency) is not str:
                 raise TypeError, 'currency is a three-letter code'
-
+    if note_class is not None:
+        if not note_class in NOTE_CLASSES:
+            raise ValueError, '"%s" is not a valid note class' % note_class
 
 
 
@@ -525,7 +526,7 @@ class odf_document(object):
     #
 
     def get_note_list(self, note_class=None, context=None):
-
+        _check_arguments(note_class=note_class)
         if note_class is not None:
             attributes = {'text:note-class': note_class}
         else:
