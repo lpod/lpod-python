@@ -188,11 +188,14 @@ def _get_cell_coordinates(name):
     return x, y
 
 
-def _check_arguments(context=None, position=None, style=None, family=None,
-                     cell_type=None, note_class=None):
+def _check_arguments(context=None, element=None, position=None, style=None,
+                     family=None, cell_type=None, note_class=None):
     if context is not None:
         if not isinstance(context, odf_element):
-            raise TypeError, "an odf element is expected"
+            raise TypeError, "context must be an odf element"
+    if element is not None:
+        if not isinstance(element, odf_element):
+            raise TypeError, "element must be an odf element"
     if position is not None:
         if not isinstance(position, int):
             raise TypeError, "an integer position is expected"
@@ -287,6 +290,7 @@ class odf_document(object):
 
 
     def __insert_element(self, element, context, xmlposition):
+        _check_arguments(element=element, context=context)
         if context is not None:
             context.insert_element(element, xmlposition)
         else:
@@ -570,12 +574,14 @@ class odf_document(object):
 
 
     def insert_style(self, element):
+        _check_arguments(element=element)
         styles = self.__get_xmlpart('styles')
         office_styles = styles.get_element_list('//office:styles')[-1]
         office_styles.insert_element(element, LAST_CHILD)
 
 
     def insert_style_properties(self, element, context):
+        _check_arguments(element=element, context=context)
         context.insert_element(element, LAST_CHILD)
 
 
