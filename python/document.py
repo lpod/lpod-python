@@ -64,8 +64,7 @@ def odf_create_image(link):
 
 
 def odf_create_cell(cell_type='string', currency=None):
-    if not cell_type in CELL_TYPES:
-        raise ValueError, 'type "%s" is not a valid cell type' % cell_type
+    _check_arguments(cell_type=cell_type)
     data = '<table:table-cell office:value-type="%s"/>'
     cell = odf_create_element(data % cell_type)
     if cell_type == 'currency':
@@ -115,8 +114,7 @@ def odf_create_style(name, family='paragraph'):
          table-page, chart, default, drawing-page, graphic, presentation,
          control or ruby.
     """
-    if not family in STYLE_FAMILIES:
-        raise ValueError, 'family "%s" is not a valid style family' % family
+    _check_arguments(family=family)
     data = '<style:style style:name="%s" style:family="%s"/>'
     return odf_create_element(data % (name, family))
 
@@ -129,7 +127,7 @@ def odf_create_note(text, note_class='footnote', id=None):
     """note_class = {footnote|endnote}
     """
     if not note_class in NOTE_CLASSES:
-        raise ValueError, 'class "%s" is not a valid note class' % note_class
+        raise ValueError, '"%s" is not a valid note class' % note_class
     data = ('<text:note text:note-class="%s">'
               '<text:note-citation>%s</text:note-citation>'
               '<text:note-body/>'
@@ -180,20 +178,21 @@ def _get_cell_coordinates(name):
         v = ord(c) - ord('a') + 1
         x = x * 26 + v
     if x == 0:
-        raise ValueError, 'Your cell name "%s" is malformed' % name
+        raise ValueError, 'cell name "%s" is malformed' % name
 
     # And "y"
     try:
         y = int(lower[p:])
     except ValueError:
-        raise ValueError, 'Your cell name "%s" is malformed' % name
+        raise ValueError, 'cell name "%s" is malformed' % name
     if y <= 0:
-        raise ValueError, 'Your cell name "%s" is malformed' % name
+        raise ValueError, 'cell name "%s" is malformed' % name
 
     return x, y
 
 
-def _check_arguments(context=None, position=None, style=None):
+def _check_arguments(context=None, position=None, style=None, family=None,
+                     cell_type=None):
     if context is not None:
         if not isinstance(context, odf_element):
             raise TypeError, "an odf element is expected"
@@ -205,6 +204,13 @@ def _check_arguments(context=None, position=None, style=None):
     if style is not None:
         if not isinstance(style, str):
             raise TypeError, "a style name is expected"
+    if family is not None:
+        if not family in STYLE_FAMILIES:
+            raise ValueError, '"%s" is not a valid style family' % family
+    if cell_type is not None:
+        if not cell_type in CELL_TYPES:
+            raise ValueError, '"%s" is not a valid cell type' % cell_type
+
 
 
 
@@ -218,7 +224,7 @@ def _check_level(level):
 
 def _check_position_name(position, name):
     if not ((position is None) ^ (name is None)):
-        raise ValueError, 'You must choose position "xor" name'
+        raise ValueError, 'You must choose either position or name'
 
 
 
@@ -545,12 +551,14 @@ class odf_document(object):
     #
 
     def get_style_list(self, family='paragraph', context=None):
+        _check_arguments(family=family, context=context)
         attributes = {'style:family': family}
         return self.__get_element_list('style:style', attributes=attributes,
                                        context=context, part='styles')
 
 
     def get_style(self, name, family='paragraph'):
+        _check_arguments(family=family)
         attributes = {'style:name': name,
                       'style:family': family}
         return self.__get_element('style:style', attributes=attributes,
