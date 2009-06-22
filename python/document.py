@@ -10,9 +10,16 @@ from container import odf_new_container_from_class, odf_container
 from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
 
+
 CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
               'time')
 
+STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'tablecolumn',
+                  'table-row', 'table-cell', 'table-page', 'chart',
+                  'default', 'drawing-page', 'graphic', 'presentation',
+                  'control', 'ruby')
+
+NOTE_CLASSES = ('footnote', 'endnote')
 
 
 #
@@ -108,7 +115,8 @@ def odf_create_style(name, family='paragraph'):
          table-page, chart, default, drawing-page, graphic, presentation,
          control or ruby.
     """
-    # TODO check family is valid
+    if not family in STYLE_FAMILIES:
+        raise ValueError, 'family "%s" is not a valid style family' % family
     data = '<style:style style:name="%s" style:family="%s"/>'
     return odf_create_element(data % (name, family))
 
@@ -120,7 +128,8 @@ def odf_create_style_text_properties():
 def odf_create_note(text, note_class='footnote', id=None):
     """note_class = {footnote|endnote}
     """
-    # TODO check class is valid
+    if not note_class in NOTE_CLASSES:
+        raise ValueError, 'class "%s" is not a valid note class' % note_class
     data = ('<text:note text:note-class="%s">'
               '<text:note-citation>%s</text:note-citation>'
               '<text:note-body/>'
