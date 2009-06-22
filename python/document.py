@@ -3,6 +3,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from datetime import datetime
 
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
@@ -27,19 +28,24 @@ NOTE_CLASSES = ('footnote', 'endnote')
 #
 
 def odf_create_section(style):
+    _check_arguments(style=style)
     data = '<text:section text:style-name="%s"></text:section>' % style
     return odf_create_element(data)
 
 
 
-def odf_create_paragraph(style, text=''):
+def odf_create_paragraph(style, text=u''):
+    _check_arguments(style=style, text=text)
     data = '<text:p text:style-name="%s">%s</text:p>' % (style, text)
+    text = text.encode('utf_8')
     return odf_create_element(data)
 
 
 
-def odf_create_heading(style, level, text=''):
+def odf_create_heading(style, level, text=u''):
+    _check_arguments(style=style, level=level, text=text)
     data = '<text:h text:style-name="%s" text:outline-level="%d">%s</text:h>'
+    text = text.encode('utf_8')
     return odf_create_element(data % (style, level, text))
 
 
@@ -124,11 +130,12 @@ def odf_create_style_text_properties():
 def odf_create_note(text, note_class='footnote', id=None):
     """note_class = {footnote|endnote}
     """
-    _check_arguments(note_class=note_class)
+    _check_arguments(text=text, note_class=note_class)
     data = ('<text:note text:note-class="%s">'
               '<text:note-citation>%s</text:note-citation>'
               '<text:note-body/>'
             '</text:note>')
+    text = text.encode('utf_8')
     note = odf_create_element(data % (note_class, text))
 
     if id is not None:
@@ -136,6 +143,9 @@ def odf_create_note(text, note_class='footnote', id=None):
 
     return note
 
+
+def odf_create_annotation(self, author, text, date=None):
+    raise NotImplementedError
 
 
 #
@@ -188,8 +198,10 @@ def _get_cell_coordinates(name):
     return x, y
 
 
-def _check_arguments(context=None, element=None, position=None, style=None,
-                     family=None, cell_type=None, note_class=None):
+def _check_arguments(context=None, element=None, position=None, level=None,
+                     text=None, style=None, family=None, cell_type=None,
+                     note_class=None, author=None, date=None,
+                     start_date=None, end_date=None):
     if context is not None:
         if not isinstance(context, odf_element):
             raise TypeError, "context must be an odf element"
@@ -197,12 +209,20 @@ def _check_arguments(context=None, element=None, position=None, style=None,
         if not isinstance(element, odf_element):
             raise TypeError, "element must be an odf element"
     if position is not None:
-        if not isinstance(position, int):
+        if type(position) is not int:
             raise TypeError, "an integer position is expected"
         if position < 1:
             raise ValueError, "position count begin at 1"
+    if level is not None:
+        if not isinstance(level, int):
+            raise TypeError, "an integer level is expected"
+        if level < 1:
+            raise ValueError, "level count begin at 1"
+    if text is not None:
+        if type(text) is not unicode:
+            raise TypeError, "text is an unicode string"
     if style is not None:
-        if not isinstance(style, str):
+        if type(style) is not str:
             raise TypeError, "a style name is expected"
     if family is not None:
         if not family in STYLE_FAMILIES:
@@ -218,18 +238,22 @@ def _check_arguments(context=None, element=None, position=None, style=None,
     if note_class is not None:
         if not note_class in NOTE_CLASSES:
             raise ValueError, '"%s" is not a valid note class' % note_class
+    if author is not None:
+        if type(author) is not unicode:
+            raise TypeError, "author is an unicode string"
+    if date is not None:
+        if type(date) is not datetime:
+            raise TypeError, "date is a datetime object"
+    if start_date is not None:
+        if type(start_date) is not datetime:
+            raise TypeError, "start date is a datetime object"
+    if end_date is not None:
+        if type(end_date) is not datetime:
+            raise TypeError, "end date is a datetime object"
 
 
 
-def _check_level(level):
-    if not isinstance(level, int):
-        raise TypeError, "an integer level is expected"
-    if level < 1:
-        raise ValueError, "level count begin at 1"
-
-
-
-def _check_position_name(position, name):
+def _check_position_or_name(position, name):
     if not ((position is None) ^ (name is None)):
         raise ValueError, 'You must choose either position or name'
 
@@ -366,7 +390,7 @@ class odf_document(object):
 
     def get_heading_list(self, style=None, level=None, context=None):
         if level is not None:
-            _check_level(level)
+            _check_arguments(level=level)
             attributes = {'text:outline-level': level}
         else:
             attributes = None
@@ -377,7 +401,7 @@ class odf_document(object):
 
     def get_heading(self, position, level=None, context=None):
         if level is not None:
-            _check_level(level)
+            _check_arguments(level=level)
             attributes = {'text:outline-level': level}
         else:
             attributes = None
@@ -399,7 +423,7 @@ class odf_document(object):
 
 
     def get_frame(self, position=None, name=None, context=None):
-        _check_position_name(position, name)
+        _check_position_or_name(position, name)
         attributes = {'draw:name': name} if name is not None else {}
         return self.__get_element('draw:frame', position,
                                   attributes=attributes,
@@ -439,7 +463,7 @@ class odf_document(object):
 
 
     def get_table(self, position=None, name=None, context=None):
-        _check_position_name(position, name)
+        _check_position_or_name(position, name)
         attributes = {'table:name': name} if name is not None else {}
         return self.__get_element('table:table', position,
                                   attributes=attributes, context=context)
@@ -552,6 +576,19 @@ class odf_document(object):
     def insert_note_body(self, element, context):
         body = context.get_element_list('//text:note-body')[-1]
         body.insert_element(element, LAST_CHILD)
+
+
+    #
+    # Annotations
+    #
+
+    def get_annotation_list(self, author=None, start_date=None,
+                            end_date=None):
+        raise NotImplementedError
+
+
+    def insert_annotation(self, element, offset=0, context=None):
+        raise NotImplementedError
 
 
     #
