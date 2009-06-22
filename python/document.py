@@ -64,12 +64,10 @@ def odf_create_image(link):
 
 
 def odf_create_cell(cell_type='string', currency=None):
-    _check_arguments(cell_type=cell_type)
+    _check_arguments(cell_type=cell_type, currency=currency)
     data = '<table:table-cell office:value-type="%s"/>'
     cell = odf_create_element(data % cell_type)
     if cell_type == 'currency':
-        if currency is None:
-            raise ValueError, 'currency is mandatory in monetary cells'
         cell.set_attribute('office:currency', currency)
     return cell
 
@@ -210,6 +208,11 @@ def _check_arguments(context=None, position=None, style=None, family=None,
     if cell_type is not None:
         if not cell_type in CELL_TYPES:
             raise ValueError, '"%s" is not a valid cell type' % cell_type
+        if cell_type == 'currency':
+            if currency is None:
+                raise ValueError, 'currency is mandatory in monetary cells'
+            if type(currency) is not str:
+                raise TypeError, 'currency is a three-letter code'
 
 
 
