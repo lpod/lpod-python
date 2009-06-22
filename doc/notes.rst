@@ -267,9 +267,9 @@ Table
 
     currency: office:currency="EUR"
 
-    date: office:date-value="YYYY-MM-DD"
+    date: office:date-value="2009-06-22"
 
-    datetime: office:date-value="YYYY-MM-DDTHH:MM:SS"
+    datetime: office:date-value="2009-06-22T12:43:17"
 
     float: office:value="3.14"
 
