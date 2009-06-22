@@ -10,6 +10,9 @@ from container import odf_new_container_from_class, odf_container
 from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
 
+CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
+              'time')
+
 
 
 #
@@ -53,9 +56,16 @@ def odf_create_image(link):
     return odf_create_element('<draw:image xlink:href="%s"/>' % link)
 
 
-def odf_create_cell(type='string'):
-    return odf_create_element(
-                    '<table:table-cell office:value-type="%s"/>' % type)
+def odf_create_cell(cell_type='string', currency=None):
+    if not cell_type in CELL_TYPES:
+        raise ValueError, 'type "%s" is not a valid cell type' % cell_type
+    data = '<table:table-cell office:value-type="%s"/>'
+    cell = odf_create_element(data % cell_type)
+    if cell_type == 'currency':
+        if currency is None:
+            raise ValueError, 'currency is mandatory in monetary cells'
+        cell.set_attribute('office:currency', currency)
+    return cell
 
 
 def odf_create_row(width=None):
@@ -98,6 +108,7 @@ def odf_create_style(name, family='paragraph'):
          table-page, chart, default, drawing-page, graphic, presentation,
          control or ruby.
     """
+    # TODO check family is valid
     data = '<style:style style:name="%s" style:family="%s"/>'
     return odf_create_element(data % (name, family))
 
@@ -106,14 +117,15 @@ def odf_create_style_text_properties():
     return odf_create_element('<style:text-properties/>')
 
 
-def odf_create_note(citation, note_class='footnote', id=None):
+def odf_create_note(text, note_class='footnote', id=None):
     """note_class = {footnote|endnote}
     """
+    # TODO check class is valid
     data = ('<text:note text:note-class="%s">'
               '<text:note-citation>%s</text:note-citation>'
               '<text:note-body/>'
             '</text:note>')
-    note = odf_create_element(data % (note_class, citation))
+    note = odf_create_element(data % (note_class, text))
 
     if id is not None:
         note.set_attribute('text:id', id)
