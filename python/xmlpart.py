@@ -125,10 +125,16 @@ class odf_element(object):
         return text
 
 
-    def set_text(self, text):
+    def set_text(self, text, after=False):
+        """If "after" is true, sets the text at the end of the element, not
+        inside.
+        FIXME maybe too specific to lxml
+        """
         element = self.__element
-        # FIXME We may want the tail
-        element.text = text
+        if after:
+            element.tail = text
+        else:
+            element.text = text
 
 
     def insert_element(self, element, xmlposition):

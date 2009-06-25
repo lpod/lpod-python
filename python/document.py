@@ -135,7 +135,7 @@ def odf_create_note(text, note_class='footnote', id=None):
     return note
 
 
-def odf_create_annotation(self, author, text, date=None):
+def odf_create_annotation(author, text, date=None):
     # TODO allow paragraph and text styles
     _check_arguments(author=author, text=text, date=date)
     data = ('<office:annotation>'
@@ -146,7 +146,7 @@ def odf_create_annotation(self, author, text, date=None):
     author = author.encode('utf_8')
     if date is None:
         date = datetime.now()
-    date = date.strftime('%Y%m%dT%H:%M:%S')
+    date = date.strftime('%Y-%m-%dT%H:%M:%S')
     text = text.encode('utf_8')
     return odf_create_element(data % (author, date, text))
 
@@ -501,10 +501,16 @@ class odf_document(object):
 
 
     def insert_annotation(self, element, context, offset=0):
-        # Offset is the position in the paragraph where the annotation is
-        # inserted
-        # Hence the context is mandatory and the XML position makes no sense.
-        raise NotImplementedError
+        """Offset is the position in the paragraph where the annotation is
+        inserted.
+        Hence the context is mandatory and the XML position makes no sense.
+        """
+        _check_arguments(element=element, context=context, offset=offset)
+        text = context.get_text()
+        before, after = text[:offset], text[offset:]
+        context.set_text(before)
+        context.append(element)
+        element.set_text(after, after=True)
 
 
     #
