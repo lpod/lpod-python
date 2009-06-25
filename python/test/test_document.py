@@ -8,8 +8,6 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.document import odf_new_document_from_template
 from lpod.document import odf_new_document_from_class, odf_get_document
-from lpod.document import _generate_xpath_query, _check_arguments
-from lpod.document import _get_cell_coordinates
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
@@ -17,7 +15,7 @@ from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_annotation
-from lpod.xmlpart import odf_create_element
+from lpod.utils import _get_cell_coordinates
 
 
 class NewDocumentFromTemplateTestCase(TestCase):
@@ -91,99 +89,6 @@ class GetDocumentTestCase(TestCase):
     def test_ftp(self):
         uri = 'ftp://test.lpod-project.org/example.odt'
         self.assert_(odf_get_document(uri))
-
-
-
-class GenerateXPathTestCase(TestCase):
-
-    def test_element(self):
-        query = _generate_xpath_query('text:p')
-        self.assertEqual(query, '//text:p')
-
-
-    def test_attribute(self):
-        attributes = {'text:style-name': 'Standard'}
-        query = _generate_xpath_query('text:p', attributes)
-        self.assertEqual(query, '//text:p[@text:style-name="Standard"]')
-
-
-    def test_two_attributes(self):
-        attributes = {'text:style-name': 'Standard',
-                      'text:outline-level': 1}
-        query = _generate_xpath_query('text:h', attributes)
-        expected = ('//text:h[@text:outline-level="1"]'
-                    '[@text:style-name="Standard"]')
-        self.assertEqual(query, expected)
-
-
-    def test_position(self):
-        query = _generate_xpath_query('text:h', position=2)
-        self.assertEqual(query, '//text:h[2]')
-
-
-    def test_attribute_position(self):
-        attributes = {'text:style-name': 'Standard'}
-        query = _generate_xpath_query('text:p', attributes, position=2)
-        self.assertEqual(query, '//text:p[@text:style-name="Standard"][2]')
-
-
-    def test_two_attributes_position(self):
-        attributes = {'text:style-name': 'Standard',
-                      'text:outline-level': 1}
-        query = _generate_xpath_query('text:h', attributes, position=2)
-        expected = ('//text:h[@text:outline-level="1"]'
-                    '[@text:style-name="Standard"][2]')
-        self.assertEqual(query, expected)
-
-
-
-class CheckArgumentsTestCase(TestCase):
-
-    def setUp(self):
-        self.document = odf_get_document('samples/example.odt')
-
-
-    def tearDown(self):
-        del self.document
-
-
-    def test_bad_context(self):
-        document = odf_get_document('samples/example.odt')
-        self.assertRaises(TypeError, _check_arguments, context=document)
-
-
-    def test_str_position(self):
-        self.assertRaises(TypeError, _check_arguments, position='1')
-
-
-    def test_position_zero(self):
-        self.assertRaises(ValueError, _check_arguments, position=0)
-
-
-    def test_bad_style(self):
-        data = ('<style:master-page '
-                'style:name="Standard" '
-                'style:page-layout-name="Mpm1"/>')
-        element = odf_create_element(data)
-        self.assertRaises(TypeError, _check_arguments, style=element)
-
-
-    def test_str_level(self):
-        document = self.document
-        self.assertRaises(TypeError, document.get_heading_list, level='1')
-
-
-    def test_level_zero(self):
-        document = self.document
-        self.assertRaises(ValueError, document.get_heading_list, level=0)
-
-
-    def test_position_name(self):
-        document = self.document
-        self.assertRaises(ValueError, document.get_frame, position=1,
-                          name='foo')
-        self.assertRaises(ValueError, document.get_frame, position=None,
-                          name=None)
 
 
 

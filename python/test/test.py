@@ -5,12 +5,13 @@
 from unittest import TestLoader, TestSuite, TextTestRunner
 
 # Import tests
+import test_utils
 import test_container
 import test_xmlpart
 import test_document
 
 
-test_modules = [test_container, test_xmlpart, test_document]
+test_modules = [test_utils, test_container, test_xmlpart, test_document]
 
 
 loader = TestLoader()
