@@ -2,6 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
+from datetime import datetime
 from unittest import TestCase, main
 
 # Import from lpod
@@ -15,7 +16,7 @@ from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_style_text_properties
-from lpod.document import odf_create_note
+from lpod.document import odf_create_note, odf_create_annotation
 from lpod.xmlpart import odf_create_element
 
 
@@ -582,6 +583,22 @@ class CreateTestCase(TestCase):
         get2 = document.get_note_list(note_class='footnote')[-1]
         self.assertEqual(get1.serialize(), expected)
         self.assertEqual(get2.serialize(), expected)
+
+
+    def test_create_annotation(self):
+        document = self.document
+
+        # Create
+        annotation = odf_create_annotation(u"Plato", u"Lost Dialogs",
+                datetime(2009, 06, 22, 17, 18, 42))
+        expected = ('<office:annotation>'
+                      '<dc:creator>Plato</dc:creator>'
+                      '<dc:date>2009-06-22T17:18:42</dc:date>'
+                      '<text:p>'
+                        'Lost Dialogs'
+                      '</text:p>'
+                    '</office:annotation>')
+        self.assertEqual(annotation.serialize(), expected)
 
 
 

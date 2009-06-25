@@ -68,7 +68,7 @@ def _check_arguments(context=None, element=None, xmlposition=None,
                      position=None, level=None, text=None, style=None,
                      family=None, cell_type=None, currency=None,
                      note_class=None, author=None, date=None,
-                     start_date=None, end_date=None):
+                     start_date=None, end_date=None, offset=None):
     if context is not None:
         # FIXME cyclic import
         from xmlpart import odf_element
@@ -110,22 +110,25 @@ def _check_arguments(context=None, element=None, xmlposition=None,
             if currency is None:
                 raise ValueError, 'currency is mandatory in monetary cells'
             if type(currency) is not str:
-                raise TypeError, 'currency is a three-letter code'
+                raise TypeError, 'currency must be a three-letter code'
     if note_class is not None:
         if not note_class in NOTE_CLASSES:
             raise ValueError, '"%s" is not a valid note class' % note_class
     if author is not None:
         if type(author) is not unicode:
-            raise TypeError, "author is an unicode string"
+            raise TypeError, "author must be an unicode string"
     if date is not None:
         if type(date) is not datetime:
-            raise TypeError, "date is a datetime object"
+            raise TypeError, "date must be a datetime object"
     if start_date is not None:
         if type(start_date) is not datetime:
-            raise TypeError, "start date is a datetime object"
+            raise TypeError, "start date must be a datetime object"
     if end_date is not None:
         if type(end_date) is not datetime:
-            raise TypeError, "end date is a datetime object"
+            raise TypeError, "end date must be a datetime object"
+    if offset is not None:
+        if type(offset) is not None:
+            raise TypeError, "offset must be an integer"
 
 
 
