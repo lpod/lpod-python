@@ -8,19 +8,10 @@ from datetime import datetime
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
-from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
+from utils import _check_arguments, _generate_xpath_query
+from utils import _check_position_or_name, _get_cell_coordinates
+from xmlpart import odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
-
-
-CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
-              'time')
-
-STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'tablecolumn',
-                  'table-row', 'table-cell', 'table-page', 'chart',
-                  'default', 'drawing-page', 'graphic', 'presentation',
-                  'control', 'ruby')
-
-NOTE_CLASSES = ('footnote', 'endnote')
 
 
 #
@@ -36,9 +27,9 @@ def odf_create_section(style):
 
 def odf_create_paragraph(style, text=u''):
     _check_arguments(style=style, text=text)
-    data = '<text:p text:style-name="%s">%s</text:p>' % (style, text)
+    data = '<text:p text:style-name="%s">%s</text:p>'
     text = text.encode('utf_8')
-    return odf_create_element(data)
+    return odf_create_element(data % (style, text))
 
 
 
@@ -145,118 +136,19 @@ def odf_create_note(text, note_class='footnote', id=None):
 
 
 def odf_create_annotation(self, author, text, date=None):
-    raise NotImplementedError
-
-
-#
-# Some private functions
-#
-
-
-def _generate_xpath_query(element_name, attributes={}, position=None,
-                          context=None):
-    if context is not None:
-        query = [context._get_xpath_path(), '//']
-    else:
-        query = ['//']
-    query.append(element_name)
-    # Sort attributes for reproducible test cases
-    for qname in sorted(attributes):
-        value = attributes[qname]
-        if value is not None:
-            query.append('[@{qname}="{value}"]'.format(qname=qname,
-                                                      value=str(value)))
-        else:
-            query.append('[@{qname}]'.format(qname=qname))
-    if position is not None:
-        query.append('[{position}]'.format(position=str(position)))
-    return ''.join(query)
-
-
-def _get_cell_coordinates(name):
-    lower = name.lower()
-
-    # First "x"
-    x = 0
-    for p in xrange(len(lower)):
-        c = lower[p]
-        if not c.isalpha():
-            break
-        v = ord(c) - ord('a') + 1
-        x = x * 26 + v
-    if x == 0:
-        raise ValueError, 'cell name "%s" is malformed' % name
-
-    # And "y"
-    try:
-        y = int(lower[p:])
-    except ValueError:
-        raise ValueError, 'cell name "%s" is malformed' % name
-    if y <= 0:
-        raise ValueError, 'cell name "%s" is malformed' % name
-
-    return x, y
-
-
-def _check_arguments(context=None, element=None, position=None, level=None,
-                     text=None, style=None, family=None, cell_type=None,
-                     note_class=None, author=None, date=None,
-                     start_date=None, end_date=None):
-    if context is not None:
-        if not isinstance(context, odf_element):
-            raise TypeError, "context must be an odf element"
-    if element is not None:
-        if not isinstance(element, odf_element):
-            raise TypeError, "element must be an odf element"
-    if position is not None:
-        if type(position) is not int:
-            raise TypeError, "an integer position is expected"
-        if position < 1:
-            raise ValueError, "position count begin at 1"
-    if level is not None:
-        if not isinstance(level, int):
-            raise TypeError, "an integer level is expected"
-        if level < 1:
-            raise ValueError, "level count begin at 1"
-    if text is not None:
-        if type(text) is not unicode:
-            raise TypeError, "text is an unicode string"
-    if style is not None:
-        if type(style) is not str:
-            raise TypeError, "a style name is expected"
-    if family is not None:
-        if not family in STYLE_FAMILIES:
-            raise ValueError, '"%s" is not a valid style family' % family
-    if cell_type is not None:
-        if not cell_type in CELL_TYPES:
-            raise ValueError, '"%s" is not a valid cell type' % cell_type
-        if cell_type == 'currency':
-            if currency is None:
-                raise ValueError, 'currency is mandatory in monetary cells'
-            if type(currency) is not str:
-                raise TypeError, 'currency is a three-letter code'
-    if note_class is not None:
-        if not note_class in NOTE_CLASSES:
-            raise ValueError, '"%s" is not a valid note class' % note_class
-    if author is not None:
-        if type(author) is not unicode:
-            raise TypeError, "author is an unicode string"
-    if date is not None:
-        if type(date) is not datetime:
-            raise TypeError, "date is a datetime object"
-    if start_date is not None:
-        if type(start_date) is not datetime:
-            raise TypeError, "start date is a datetime object"
-    if end_date is not None:
-        if type(end_date) is not datetime:
-            raise TypeError, "end date is a datetime object"
-
-
-
-def _check_position_or_name(position, name):
-    if not ((position is None) ^ (name is None)):
-        raise ValueError, 'You must choose either position or name'
-
+    # TODO allow paragraph and text styles
+    _check_arguments(author=author, text=text, date=date)
+    data = ('<office:annotation>'
+               '<dc:creator>%s</dc:creator>'
+               '<dc:date>%s</dc:date>'
+               '<text:p>%s</text:p>'
+            '</office:annotation>')
+    author = author.encode('utf_8')
+    if date is None:
+        date = datetime.now()
+    date = date.strftime('%Y%m%dT%H:%M:%S')
+    text = text.encode('utf_8')
+    return odf_create_element(data % (author, date, text))
 
 
 #
@@ -295,8 +187,10 @@ class odf_document(object):
         if frame_style:
             attributes['draw:style-name'] = frame_style
         query = _generate_xpath_query(qname, attributes=attributes,
-                                      context=context)
-        return part.get_element_list(query)
+                context=context)
+        if context is None:
+            return part.get_element_list(query)
+        return context.get_element_list(query)
 
 
     def __get_element(self, qname, position=None, attributes=None,
@@ -307,14 +201,18 @@ class odf_document(object):
             attributes = {}
         query = _generate_xpath_query(qname, attributes=attributes,
                                       position=position, context=context)
-        result = part.get_element_list(query)
+        if context is None:
+            result = part.get_element_list(query)
+        else:
+            result = context.get_element_list(query)
         if not result:
             return None
         return result[0]
 
 
     def __insert_element(self, element, context, xmlposition):
-        _check_arguments(element=element, context=context)
+        _check_arguments(element=element, context=context,
+                         xmlposition=xmlposition)
         if context is not None:
             context.insert_element(element, xmlposition)
         else:
@@ -583,11 +481,29 @@ class odf_document(object):
     #
 
     def get_annotation_list(self, author=None, start_date=None,
-                            end_date=None):
-        raise NotImplementedError
+                            end_date=None, context=None):
+        """XXX end date is not included (as expected in Python).
+        """
+        _check_arguments(author=author, start_date=start_date,
+                         end_date=end_date)
+        annotations = []
+        for annotation in self.__get_element_list('office:annotation',
+                                               context=context):
+            dc_creator = annotation.get_element('//dc:creator')
+            creator = unicode(dc_creator.get_text(), 'utf_8')
+            if author != creator:
+                continue
+            dc_date = annotation.get_element('//dc:date')
+            date = datetime.strptime(dc_date.get_text(), '%Y%m%dT%H:%M:%S')
+            if date >= start_date and date < end_date:
+                annotations.append(annotation)
+        return annotations
 
 
-    def insert_annotation(self, element, offset=0, context=None):
+    def insert_annotation(self, element, context, offset=0):
+        # Offset is the position in the paragraph where the annotation is
+        # inserted
+        # Hence the context is mandatory and the XML position makes no sense.
         raise NotImplementedError
 
 

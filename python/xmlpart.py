@@ -1,11 +1,18 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
+# Import from the Standard Library
+from copy import deepcopy
+from re import compile
+
 # Import from itools
 from itools.core import get_abspath
 
-# Import from libxml2
-from libxml2 import parseDoc, xmlNode, XML_SAVE_FORMAT
+# Import from lxml
+from lxml.etree import fromstring, tostring, _Element
+
+# Import from lpod
+from utils import _check_arguments
 
 
 ODF_NAMESPACES = {
@@ -39,7 +46,22 @@ ODF_NAMESPACES = {
         }
 
 
-FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING = range(4)
+FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING, STOPMARKER = range(5)
+
+
+ns_stripper = compile(' xmlns:\w*="[\w:\-\/\.#]*"')
+
+
+
+def decode_qname(qname):
+    if ':' in qname:
+        prefix, name = qname.split(':')
+        try:
+            uri = ODF_NAMESPACES[prefix]
+        except IndexError:
+            raise ValueError, "XML prefix '%s' is unknown" % prefix
+        return uri, name
+    return None, qname
 
 
 
@@ -48,141 +70,101 @@ class odf_element(object):
     Abstraction of the XML library behind.
     """
 
-    def __init__(self, internal_element):
-        if (not isinstance(internal_element, xmlNode)
-                or internal_element.type != 'element'):
+    def __init__(self, native_element):
+        if not isinstance(native_element, _Element):
             raise TypeError, "node is not an element node"
-        self.__element = internal_element
-        self.__xpath_context = None
-
-
-    def __decode_qname(self, qname):
-        if ':' in qname:
-            prefix, name = qname.split(':')
-            try:
-                uri = ODF_NAMESPACES[prefix]
-            except IndexError:
-                raise ValueError, "XML prefix '%s' is unknown" % prefix
-            element = self.__element
-            namespace = element.searchNsByHref(element.doc, uri)
-        else:
-            namespace, uri, name = None, None, qname
-        return namespace, uri, name
-
-
-    def _get_xpath_path(self):
-        element = self.__element
-        return element.nodePath()
-
-
-    def __get_xpath_context(self):
-        if self.__xpath_context is None:
-            element = self.__element
-            document = element.doc
-            xpath_context = document.xpathNewContext()
-            # XXX needs to be filled with all the ODF namespaces or something
-            for prefix, uri in ODF_NAMESPACES.items():
-                xpath_context.xpathRegisterNs(prefix, uri)
-            self.__xpath_context = xpath_context
-        return self.__xpath_context
+        self.__element = native_element
 
 
     def get_element_list(self, xpath_query):
-        xpath_context = self.__get_xpath_context()
-        result = xpath_context.xpathEval(xpath_query)
+        element = self.__element
+        result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
         return [odf_element(e) for e in result]
+
+
+    def get_element(self, xpath_query):
+        result = self.get_element_list(xpath_query)
+        if not result:
+            return None
+        return result[0]
 
 
     def get_attribute(self, name):
         element = self.__element
-        namespace, uri, name = self.__decode_qname(name)
-        if namespace is not None:
-            property = element.hasNsProp(name, uri)
-        else:
-            property = element.hasProp(name)
-        if property is None:
-            return None
-        # Entites and special characters seem to be decoded internally
-        return property.getContent()
+        uri, name = decode_qname(name)
+        if uri is None:
+            return element.get(name)
+        return element.get('{%s}%s' % (uri, name))
 
 
     def set_attribute(self, name, value):
         element = self.__element
-        if isinstance(value, unicode):
-            value = value.encode('utf_8')
-        if not isinstance(value, str):
-            raise TypeError, 'value is not str'
-        namespace, uri, name = self.__decode_qname(name)
-        if namespace is not None:
-            element.setNsProp(namespace, name, value)
+        uri, name = decode_qname(name)
+        if uri is None:
+            element.set(name, value)
         else:
-            element.setProp(name, value)
-        # Entites and special characters seem to be encoded internally
+            element.set('{%s}%s' % (uri, name), value)
 
 
     def del_attribute(self, name):
         element = self.__element
-        namespace, uri, name = self.__decode_qname(name)
-        if namespace is not None:
-            element.unsetNsProp(namespace, name)
+        uri, name = decode_qname(name)
+        if uri is None:
+            del element.attrib[name]
         else:
-            element.unsetProp(name)
-        element.unsetProp(name)
+            del element.attrib['{%s}%s' % (uri, name)]
 
 
     def get_text(self):
-        # XXX all text recursively is needed?
         element = self.__element
-        # FIXME str or unicode?
-        return element.getContent()
+        text = element.text
+        if len(element):
+            last_child = element[-1]
+            if last_child.tail is not None:
+                text += last_child.tail
+        return text
 
 
     def set_text(self, text):
         element = self.__element
-        if isinstance(text, unicode):
-            text = text.encode('utf_8')
-        if not isinstance(text, str):
-            raise TypeError, 'text is not str'
-        # Encode entites and special characters
-        doc = element.doc
-        text = doc.encodeEntitiesReentrant(text)
-        text = doc.encodeSpecialChars(text)
-        element.setContent(text)
+        # FIXME We may want the tail
+        element.text = text
 
 
     def insert_element(self, element, xmlposition):
-        if not isinstance(element, odf_element):
-            raise TypeError, "element is not odf_element"
+        _check_arguments(element=element, xmlposition=xmlposition)
         current = self.__element
         element = element.__element
         if xmlposition is FIRST_CHILD:
-            first_child = current.children
-            first_child.addPrevSibling(element)
+            current.insert(0, element)
         elif xmlposition is LAST_CHILD:
-            current.addChild(element)
+            current.append(element)
         elif xmlposition is NEXT_SIBLING:
-            current.addNextSibling(element)
+            parent = current.getparent()
+            index = parent.index(current)
+            parent.insert(index + 1, element)
         elif xmlposition is PREV_SIBLING:
-            current.addPrevSibling(element)
-        else:
-            raise ValueError, "invalid XML position"
-        return odf_element(current)
+            parent = current.getparent()
+            index = parent.index(current)
+            parent.insert(index, element)
 
 
     def copy(self):
         element = self.__element
-        doc = element.doc
-        return odf_element(doc.copyNodeList(element))
+        return odf_element(deepcopy(element))
 
 
     def serialize(self):
         element = self.__element
-        return str(element)
+        data = tostring(element)
+        # XXX hack over lxml: remove namespaces
+        return ns_stripper.sub('', data)
 
 
     def delete(self):
         element = self.__element
-        element.unlinkNode()
+        parent = element.getparent()
+        parent.remove(element)
 
 
 # An empty XML document with all namespaces declared
@@ -198,10 +180,8 @@ def odf_create_element(element_data):
     if not element_data.strip():
         raise ValueError, "element data is empty"
     data = ns_document_data.format(element=element_data)
-    document = parseDoc(data)
-    root = document.children
-    element = root.children
-    return odf_element(element)
+    document = fromstring(data)
+    return odf_element(document[0])
 
 
 
@@ -216,41 +196,22 @@ class odf_xmlpart(object):
 
         # Internal state
         self.__document = None
-        self.__xpath_context = None
-
-
-    def __del__(self):
-        if self.__xpath_context is not None:
-            self.__xpath_context.xpathFreeContext()
-        if self.__document is not None:
-            self.__document.freeDoc()
 
 
     def __get_document(self):
         if self.__document is None:
             container = self.container
             part = container.get_part(self.part_name)
-            self.__document = parseDoc(part)
+            self.__document = fromstring(part)
         return self.__document
 
 
-    def __get_xpath_context(self):
-        if self.__xpath_context is None:
-            document = self.__get_document()
-            xpath_context = document.xpathNewContext()
-            # XXX needs to be filled with all the ODF namespaces or something
-            for prefix, uri in ODF_NAMESPACES.items():
-                xpath_context.xpathRegisterNs(prefix, uri)
-            self.__xpath_context = xpath_context
-        return self.__xpath_context
-
-
     def get_element_list(self, xpath_query):
-        xpath_context = self.__get_xpath_context()
-        result = xpath_context.xpathEval(xpath_query)
+        document = self.__get_document()
+        result = document.xpath(xpath_query, namespaces=ODF_NAMESPACES)
         return [odf_element(e) for e in result]
 
 
     def serialize(self, pretty=False):
-        format = XML_SAVE_FORMAT if pretty else 0
-        return self.__get_document().serialize(format=format)
+        document = self.__get_document()
+        return tostring(document, encoding='UTF-8', pretty_print=pretty)
