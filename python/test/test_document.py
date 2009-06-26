@@ -434,18 +434,18 @@ class TestTable(TestCase):
         self.assertEqual(table.serialize(), expected)
 
 
-    def test_create_insert_table(self):
+    def test_insert_table(self):
+        document = self.document
+        clone = document.clone()
         table = odf_create_table('a_table', 'a_style')
         column = odf_create_column('a_column_style')
         row = odf_create_row()
         cell = odf_create_cell()
 
-        # Insert OK ?
-        document = self.document
-        document.insert_table(table)
-        document.insert_column(column, table)
-        document.insert_row(row, table)
-        document.insert_cell(cell, row)
+        clone.insert_table(table)
+        clone.insert_column(column, table)
+        clone.insert_row(row, table)
+        clone.insert_cell(cell, row)
 
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style">'
@@ -457,10 +457,10 @@ class TestTable(TestCase):
         self.assertEqual(table.serialize(), expected)
 
         # Get OK ?
-        get = document.get_table(name='a_table')
+        get = clone.get_table(name='a_table')
         self.assertEqual(get.get_attribute('table:name'), 'a_table')
 
-        get = document.get_table(position=1)
+        get = clone.get_table(position=1)
         self.assertEqual(get.get_attribute('table:name'), 'a_table')
 
 
