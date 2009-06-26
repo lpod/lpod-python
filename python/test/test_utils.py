@@ -2,6 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
+from datetime import datetime
 from unittest import TestCase, main
 
 # Import from the XML Library
@@ -9,7 +10,7 @@ from lxml.etree import Element
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.utils import _generate_xpath_query, _check_arguments
+from lpod.utils import DATE_FORMAT, _generate_xpath_query, _check_arguments
 from lpod.xmlpart import odf_create_element
 
 
@@ -151,6 +152,14 @@ class CheckArgumentsTestCase(TestCase):
                           name='foo')
         self.assertRaises(ValueError, document.get_frame, position=None,
                           name=None)
+
+
+class FormatsTestCase(TestCase):
+
+
+    def test_date_format(self):
+        date = datetime(2009, 06, 26, 11, 9, 36)
+        self.assertEqual(date.strftime(DATE_FORMAT), '2009-06-26T11:09:36')
 
 
 

@@ -8,7 +8,7 @@ from datetime import datetime
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
-from utils import _check_arguments, _generate_xpath_query
+from utils import DATE_FORMAT, _check_arguments, _generate_xpath_query
 from utils import _check_position_or_name, _get_cell_coordinates
 from xmlpart import odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
@@ -146,7 +146,7 @@ def odf_create_annotation(author, text, date=None):
     author = author.encode('utf_8')
     if date is None:
         date = datetime.now()
-    date = date.strftime('%Y-%m-%dT%H:%M:%S')
+    date = date.strftime(DATE_FORMAT)
     text = text.encode('utf_8')
     return odf_create_element(data % (author, date, text))
 
@@ -494,7 +494,7 @@ class odf_document(object):
             if author != creator:
                 continue
             dc_date = annotation.get_element('//dc:date')
-            date = datetime.strptime(dc_date.get_text(), '%Y%m%dT%H:%M:%S')
+            date = datetime.strptime(dc_date.get_text(), DATE_FORMAT)
             if date >= start_date and date < end_date:
                 annotations.append(annotation)
         return annotations

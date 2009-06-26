@@ -7,6 +7,9 @@ from datetime import datetime
 # Import from lpod
 
 
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+
 CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
               'time')
 
