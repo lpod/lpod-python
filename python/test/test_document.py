@@ -624,6 +624,21 @@ class TestAnnotation(TestCase):
         self.assertEqual(len(annotations), 0)
 
 
+    def test_insert_annotation(self):
+        document = self.document
+        clone = document.clone()
+        creator = u"Plato"
+        text = u"It's like you're in a cave."
+        annotation = odf_create_annotation(creator, text)
+        context = clone.get_paragraph(1)
+        clone.insert_annotation(annotation, context, offset=27)
+        annotations = clone.get_annotation_list()
+        self.assertEqual(len(annotations), 2)
+        first_annotation = annotations[0]
+        self.assertEqual(first_annotation.get_text_content(), text)
+        clone.save('/tmp/toto.odt')
+
+
 
 class TestGetCell(TestCase):
 

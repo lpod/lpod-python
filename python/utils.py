@@ -130,7 +130,7 @@ def _check_arguments(context=None, element=None, xmlposition=None,
         if type(end_date) is not datetime:
             raise TypeError, "end date must be a datetime object"
     if offset is not None:
-        if type(offset) is not None:
+        if type(offset) is not int:
             raise TypeError, "offset must be an integer"
 
 

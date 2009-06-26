@@ -509,7 +509,7 @@ class odf_document(object):
         text = context.get_text()
         before, after = text[:offset], text[offset:]
         context.set_text(before)
-        context.append(element)
+        context.insert_element(element, xmlposition=LAST_CHILD)
         element.set_text(after, after=True)
 
 
