@@ -2,12 +2,15 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import from lpod
 
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+
+DURATION_FORMAT = 'PT%02dH%02dM%02dS'
 
 
 CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
@@ -138,3 +141,55 @@ def _check_arguments(context=None, element=None, xmlposition=None,
 def _check_position_or_name(position, name):
     if not ((position is None) ^ (name is None)):
         raise ValueError, 'You must choose either position or name'
+
+
+
+class DateTime(object):
+
+    @staticmethod
+    def decode(data):
+        return datetime.strptime(data, DATE_FORMAT)
+
+
+    @staticmethod
+    def encode(value):
+        return value.strftime(DATE_FORMAT)
+
+
+
+class Duration(object):
+
+    @staticmethod
+    def decode(data):
+        if not data.startswith('PT'):
+            raise ValueError, "duration is not '%s" % DURATION_FORMAT
+        hours = ''
+        minutes = ''
+        seconds = ''
+        bufffer = ''
+        for c in data:
+            if c.isdigit():
+                bufffer += c
+            elif c == 'H':
+                hours = int(bufffer)
+                bufffer = ''
+            elif c == 'M':
+                minutes = int(bufffer)
+                bufffer = ''
+            elif c == 'S':
+                seconds = int(bufffer)
+                break
+        else:
+            raise ValueError, "duration is not '%s" % DURATION_FORMAT
+        return timedelta(0, seconds, 0, 0, minutes, hours, 0)
+
+
+    @staticmethod
+    def encode(value):
+        if type(value) is not timedelta:
+            raise TypeError, "duration must be a timedelta"
+        days = value.days
+        hours = days * 24
+        minutes = value.seconds / 60
+        seconds = value.seconds % 60
+        return DURATION_FORMAT % (hours, minutes, seconds)

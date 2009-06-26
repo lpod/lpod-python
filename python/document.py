@@ -3,13 +3,14 @@
 
 # Import from the Standard Library
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
-from utils import DATE_FORMAT, _check_arguments, _generate_xpath_query
+from utils import _check_arguments, _generate_xpath_query
 from utils import _check_position_or_name, _get_cell_coordinates
+from utils import DateTime, Duration
 from xmlpart import odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
 
@@ -147,7 +148,7 @@ def odf_create_annotation(creator, text, date=None):
     creator = creator.encode('utf_8')
     if date is None:
         date = datetime.now()
-    date = date.strftime(DATE_FORMAT)
+    date = DateTime.encode(date)
     text = text.encode('utf_8')
     return odf_create_element(data % (creator, date, text))
 
@@ -536,13 +537,118 @@ class odf_document(object):
     def insert_style(self, element):
         _check_arguments(element=element)
         styles = self.__get_xmlpart('styles')
-        office_styles = styles.get_element_list('//office:styles')[-1]
+        office_styles = styles.get_element('//office:styles')
         office_styles.insert_element(element, LAST_CHILD)
 
 
     def insert_style_properties(self, element, context):
         _check_arguments(element=element, context=context)
         context.insert_element(element, LAST_CHILD)
+
+
+    #
+    # Metadata
+    #
+    def get_creation_date(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:creation-date')
+        date = element.get_text()
+        return DateTime.decode(date)
+
+
+    def set_creation_date(self, date):
+        _check_arguments(date=date)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:creation-date')
+        date = DateTime.encode(date)
+        element.set_text(date)
+
+
+    def get_modification_date(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:date')
+        date = element.get_text()
+        return DateTime.decode(date)
+
+
+    def set_modification_date(self, date):
+        _check_arguments(date=date)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:date')
+        date = DateTime.encode(date)
+        element.set_text(date)
+
+
+    def get_editing_duration(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:editing-duration')
+        duration = element.get_text()
+        return Duration.decode(duration)
+
+
+    def set_editing_duration(self, duration):
+        if type(duration) is not timedelta:
+            raise TypeError, u"duration must be a timedelta"
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:editing-duration')
+        duration = Duration.encode(duration)
+        element.set_text(duration)
+
+
+    def get_editing_cycles(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:editing-cycles')
+        cycles = element.get_text()
+        return int(cycles)
+
+
+    def set_editing_cycles(self, cycles):
+        if type(cycles) is not int:
+            raise TypeError, u"cycles must be an int"
+        if cycles < 1:
+            raise ValueError, "cycles must be a positive int"
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:editing-cycles')
+        element.set_text(str(cycles))
+
+
+    def get_generator(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:generator')
+        generator = element.get_text()
+        return unicode(generator, 'utf_8')
+
+
+    def set_generator(self, generator):
+        _check_arguments(text=generator)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:generator')
+        generator = generator.encode('utf_8')
+        element.set_text(generator)
+
+
+    def get_statistic(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:document-statistic')
+        statistic = {}
+        for key, value in element.iteritems():
+            statistic[key] = int(value)
+        return statistic
+
+
+    def set_statistic(self, statistic):
+        if type(statistic) is not dict:
+            raise TypeError, "statistic must be a dict"
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:document-statistic')
+        if element is None:
+            raise NotImplementedError
+        for key, value in statistic.iteritems():
+            if type(key) is not str:
+                raise TypeError, "statistic key must be a str"
+            if type(value) is not int:
+                raise TypeError, "statistic value must be a int"
+            element.set_attribute(key, str(value))
 
 
 

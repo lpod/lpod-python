@@ -3,7 +3,6 @@
 
 # Import from the Standard Library
 from copy import deepcopy
-from datetime import datetime
 from re import compile
 
 # Import from itools
@@ -13,7 +12,7 @@ from itools.core import get_abspath
 from lxml.etree import fromstring, tostring, _Element
 
 # Import from lpod
-from utils import DATE_FORMAT, _check_arguments
+from utils import _check_arguments, DateTime
 
 
 ODF_NAMESPACES = {
@@ -72,6 +71,14 @@ def decode_qname(qname):
 
 
 
+def uri_to_prefix(uri):
+    for key, value in ODF_NAMESPACES.iteritems():
+        if value == uri:
+            return key
+    raise ValueError, 'uri "%s" not found' % uri
+
+
+
 def odf_create_element(element_data):
     if not isinstance(element_data, str):
         raise TypeError, "element data is not str"
@@ -105,6 +112,39 @@ class odf_element(object):
         if not result:
             return None
         return result[0]
+
+
+    def iterkeys(self):
+        element = self.__element
+        # TODO replace "{uri}" by prefix, see "iteritems"
+        return element.attrib.iterkeys()
+
+
+    def keys(self):
+        return list(self.iterkeys())
+
+
+    def itervalues(self):
+        element = self.__element
+        return element.attrib.itervalues()
+
+
+    def values(self):
+        return list(self.itervalues())
+
+
+    def iteritems(self):
+        element = self.__element
+        for key, value in element.attrib.iteritems():
+            # Replace lxml uri with prefix
+            # XXX probably to factorise with "iterkeys"
+            uri, name = key.split('}', 1)
+            prefix = uri_to_prefix(uri[1:])
+            yield '%s:%s' % (prefix, name), value
+
+
+    def items(self):
+        return list(self.iteritems())
 
 
     def get_attribute(self, name):
@@ -168,7 +208,7 @@ class odf_element(object):
         if dc_date is None:
             return None
         date = dc_date.get_text()
-        return datetime.strptime(date, DATE_FORMAT)
+        return DateTime.decode(date)
 
 
     def get_text_content(self):
@@ -243,6 +283,13 @@ class odf_xmlpart(object):
         document = self.__get_document()
         result = document.xpath(xpath_query, namespaces=ODF_NAMESPACES)
         return [odf_element(e) for e in result]
+
+
+    def get_element(self, xpath_query):
+        result = self.get_element_list(xpath_query)
+        if not result:
+            return None
+        return result[0]
 
 
     def serialize(self, pretty=False):

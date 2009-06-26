@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest import TestCase, main
 
 # Import from lpod
@@ -828,6 +828,121 @@ class TestGetCell(TestCase):
         cell = document.get_cell('D4', table)
         paragraph = document.get_paragraph(1, context=cell)
         self.assertEqual(paragraph.get_text(), '4')
+
+
+
+class TestMetadata(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
+    def test_get_creation_date(self):
+        document = self.document
+        date = document.get_creation_date()
+        expected = datetime(2009, 2, 18, 20, 5, 10)
+        self.assertEqual(date, expected)
+
+
+    def test_set_creation_date(self):
+        document = self.document
+        clone = document.clone()
+        now = datetime.now().replace(microsecond=0)
+        clone.set_creation_date(now)
+        self.assertEqual(clone.get_creation_date(), now)
+
+
+    def test_get_modification_date(self):
+        document = self.document
+        date = document.get_modification_date()
+        expected = datetime(2009, 6, 22, 18, 33, 7)
+        self.assertEqual(date, expected)
+
+
+    def test_set_modification_date(self):
+        document = self.document
+        clone = document.clone()
+        now = datetime.now().replace(microsecond=0)
+        clone.set_modification_date(now)
+        self.assertEqual(clone.get_modification_date(), now)
+
+
+    def test_get_editing_duration(self):
+        document = self.document
+        duration = document.get_editing_duration()
+        expected = timedelta(0, 12, 0, 0, 6, 0, 0)
+        self.assertEqual(duration, expected)
+
+
+    def test_set_editing_duration(self):
+        document = self.document
+        clone = document.clone()
+        duration = timedelta(1, 2, 0, 0, 5, 6, 7)
+        clone.set_editing_duration(duration)
+        self.assertEqual(clone.get_editing_duration(), duration)
+
+
+    def test_get_editing_cycles(self):
+        document = self.document
+        cycles = document.get_editing_cycles()
+        expected = 6
+        self.assertEqual(cycles, expected)
+
+
+    def test_set_editing_cycles(self):
+        document = self.document
+        clone = document.clone()
+        cycles = 1 # I swear it was a first shot!
+        clone.set_editing_cycles(cycles)
+        self.assertEqual(clone.get_editing_cycles(), cycles)
+
+
+    def test_get_generator(self):
+        document = self.document
+        generator = document.get_generator()
+        expected = (u"OpenOffice.org/3.1$Unix "
+                    u"OpenOffice.org_project/310m11$Build-9399")
+        self.assertEqual(generator, expected)
+
+
+    def test_set_generator(self):
+        document = self.document
+        clone = document.clone()
+        generator = u"lpOD Project"
+        clone.set_generator(generator)
+        self.assertEqual(clone.get_generator(), generator)
+
+
+    def test_get_statistic(self):
+        document = self.document
+        statistic = document.get_statistic()
+        expected = {'meta:table-count': 0,
+                    'meta:image-count': 0,
+                    'meta:object-count': 0,
+                    'meta:page-count': 1,
+                    'meta:paragraph-count': 9,
+                    'meta:word-count': 51,
+                    'meta:character-count': 279}
+        self.assertEqual(statistic, expected)
+
+
+    def test_set_statistic(self):
+        document = self.document
+        clone = document.clone()
+        statistic = {'meta:table-count': 1,
+                     'meta:image-count': 2,
+                     'meta:object-count': 3,
+                     'meta:page-count': 4,
+                     'meta:paragraph-count': 5,
+                     'meta:word-count': 6,
+                     'meta:character-count': 7}
+        clone.set_statistic(statistic)
+        self.assertEqual(clone.get_statistic(), statistic)
+
 
 
 if __name__ == '__main__':
