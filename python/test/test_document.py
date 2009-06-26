@@ -124,9 +124,16 @@ class DocumentTestCase(TestCase):
         self.assertEqual(paragraph, None)
 
 
-    #
-    # Sections
-    #
+
+class TestSection(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
 
     def test_get_section_list(self):
         document = self.document
@@ -153,9 +160,16 @@ class DocumentTestCase(TestCase):
         self.assertEqual(name, "Section2")
 
 
-    #
-    # Paragraphs
-    #
+
+class TestParagraph(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
 
     def test_get_paragraph_list(self):
         document = self.document
@@ -204,9 +218,16 @@ class DocumentTestCase(TestCase):
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
 
 
-    #
-    # Headings
-    #
+
+class TestHeading(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
 
     def test_get_heading_list(self):
         document = self.document
@@ -279,7 +300,7 @@ class DocumentTestCase(TestCase):
 
 
 
-class CreateTestCase(TestCase):
+class TestFrame(TestCase):
 
     def setUp(self):
         self.document = odf_get_document('samples/example.odt')
@@ -320,6 +341,17 @@ class CreateTestCase(TestCase):
         self.assertEqual(get.get_attribute('draw:name'), 'frame2')
 
 
+
+class TestImage(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
     def test_create_image(self):
         document = self.document
 
@@ -339,6 +371,17 @@ class CreateTestCase(TestCase):
 
         get = document.get_image(position=1)
         self.assertEqual(get.get_attribute('xlink:href'), 'path')
+
+
+
+class TestTable(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
 
 
 
@@ -421,20 +464,37 @@ class CreateTestCase(TestCase):
         self.assertEqual(get.get_attribute('table:name'), 'a_table')
 
 
+
+class TestList(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
     def test_create_item(self):
-        # Test create
         item = odf_create_item()
         expected = '<text:list-item/>'
         self.assertEqual(item.serialize(), expected)
 
 
-    def test_create_insert_list(self):
-        # Test create / insert
+    def test_create_list(self):
         item = odf_create_item()
         a_list = odf_create_list('a_style')
+        expected = '<text:list text:style-name="a_style"/>'
+        self.assertEqual(a_list.serialize(), expected)
+
+
+    def test_insert_list(self):
         document = self.document
-        document.insert_item(item, a_list)
-        document.insert_list(a_list)
+        clone = document.clone()
+        item = odf_create_item()
+        a_list = odf_create_list('a_style')
+        clone.insert_item(item, a_list)
+        clone.insert_list(a_list)
 
         expected = ('<text:list text:style-name="a_style">'
                     '<text:list-item/>'
@@ -442,29 +502,69 @@ class CreateTestCase(TestCase):
         self.assertEqual(a_list.serialize(), expected)
 
 
+
+class TestStyle(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
     def test_create_style(self):
-        document = self.document
-
-        # Create OK ?
         style = odf_create_style('style1', 'paragraph')
+        expected = ('<style:style style:name="style1" '
+                      'style:family="paragraph"/>')
+        self.assertEqual(style.serialize(), expected)
 
+
+    def test_create_properties(self):
         properties = odf_create_style_text_properties()
         properties.set_attribute('fo:color', '#0000ff')
         properties.set_attribute('fo:background-color', '#ff0000')
+        expected = ('<style:text-properties fo:color="#0000ff" '
+                      'fo:background-color="#ff0000"/>')
+        self.assertEqual(properties.serialize(), expected)
 
-        # Insert OK ?
-        document.insert_style_properties(properties, style)
-        document.insert_style(style)
+
+    def test_get_style_list(self):
+        raise NotImplementedError
+
+
+    def test_get_style(self):
+        raise NotImplementedError
+
+
+    def test_insert_style(self):
+        document = self.document
+        clone = document.clone()
+        style = odf_create_style('style1', 'paragraph')
+        properties = odf_create_style_text_properties()
+        properties.set_attribute('fo:color', '#0000ff')
+        properties.set_attribute('fo:background-color', '#ff0000')
+        clone.insert_style_properties(properties, style)
+        clone.insert_style(style)
 
         expected = ('<style:style style:name="style1" '
                                  'style:family="paragraph">'
                       '<style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>'
                     '</style:style>')
-        get1 = document.get_style('style1')
-        get2 = document.get_style_list()[-1]
+        get1 = clone.get_style('style1')
         self.assertEqual(get1.serialize(), expected)
-        self.assertEqual(get2.serialize(), expected)
+
+
+
+class TestNote(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
 
 
     def test_create_note(self):
@@ -473,6 +573,7 @@ class CreateTestCase(TestCase):
         # Create OK ?
         note = odf_create_note(u'1', id='note1')
         body = odf_create_paragraph('Standard', u'a footnote')
+        # TODO stop here and compare to the snippet
 
         # Insert OK ?
         document.insert_note_body(body, note)
@@ -491,6 +592,20 @@ class CreateTestCase(TestCase):
         get2 = document.get_note_list(note_class='footnote')[-1]
         self.assertEqual(get1.serialize(), expected)
         self.assertEqual(get2.serialize(), expected)
+
+
+    def test_get_note(self):
+        raise NotImplementedError
+
+
+    def test_get_note_list(self):
+        raise NotImplementedError
+
+
+    def test_insert_note(self):
+        document = self.document
+        clone = document.clone()
+        raise NotImplementedError
 
 
 
@@ -582,7 +697,7 @@ class TestAnnotation(TestCase):
         self.assertEqual(len(annotations), 1)
 
 
-    def test_get_annotation_list_start_date_end_date(self):
+    def test_get_annotation_list_bad_start_date_end_date(self):
         document = self.document
         start_date = datetime(2009, 5, 1, 0, 0, 0)
         end_date = datetime(2009, 6, 1, 0, 0, 0)
@@ -636,7 +751,7 @@ class TestAnnotation(TestCase):
         self.assertEqual(len(annotations), 2)
         first_annotation = annotations[0]
         self.assertEqual(first_annotation.get_text_content(), text)
-        clone.save('/tmp/toto.odt')
+        del clone
 
 
 

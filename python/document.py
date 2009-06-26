@@ -115,6 +115,7 @@ def odf_create_style(name, family='paragraph'):
 
 
 def odf_create_style_text_properties():
+    # TODO should take parameters
     return odf_create_element('<style:text-properties/>')
 
 
