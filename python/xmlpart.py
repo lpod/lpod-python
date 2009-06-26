@@ -3,6 +3,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from datetime import datetime
 from re import compile
 
 # Import from itools
@@ -12,7 +13,7 @@ from itools.core import get_abspath
 from lxml.etree import fromstring, tostring, _Element
 
 # Import from lpod
-from utils import _check_arguments
+from utils import DATE_FORMAT, _check_arguments
 
 
 ODF_NAMESPACES = {
@@ -52,6 +53,12 @@ FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING, STOPMARKER = range(5)
 ns_stripper = compile(' xmlns:\w*="[\w:\-\/\.#]*"')
 
 
+# An empty XML document with all namespaces declared
+ns_document_path = get_abspath('templates/namespaces.xml')
+with open(ns_document_path, 'rb') as file:
+    ns_document_data = file.read()
+
+
 
 def decode_qname(qname):
     if ':' in qname:
@@ -62,6 +69,17 @@ def decode_qname(qname):
             raise ValueError, "XML prefix '%s' is unknown" % prefix
         return uri, name
     return None, qname
+
+
+
+def odf_create_element(element_data):
+    if not isinstance(element_data, str):
+        raise TypeError, "element data is not str"
+    if not element_data.strip():
+        raise ValueError, "element data is empty"
+    data = ns_document_data.format(element=element_data)
+    document = fromstring(data)
+    return odf_element(document[0])
 
 
 
@@ -137,6 +155,31 @@ class odf_element(object):
             element.text = text
 
 
+    def get_creator(self):
+        dc_creator = self.get_element('//dc:creator')
+        if dc_creator is None:
+            return None
+        creator = dc_creator.get_text()
+        return unicode(dc_creator.get_text(), 'utf_8')
+
+
+    def get_date(self):
+        dc_date = self.get_element('//dc:date')
+        if dc_date is None:
+            return None
+        date = dc_date.get_text()
+        return datetime.strptime(date, DATE_FORMAT)
+
+
+    def get_text_content(self):
+        """Like "get_text" but applied to the embedded paragraph:
+        annotations, cells...
+        """
+        element = self.__element
+        text = element.xpath('string(text:p)', namespaces=ODF_NAMESPACES)
+        return unicode(text, 'utf_8')
+
+
     def insert_element(self, element, xmlposition):
         _check_arguments(element=element, xmlposition=xmlposition)
         current = self.__element
@@ -168,26 +211,10 @@ class odf_element(object):
 
 
     def delete(self):
+        # FIXME this is generally the parent that destroys a child
         element = self.__element
         parent = element.getparent()
         parent.remove(element)
-
-
-# An empty XML document with all namespaces declared
-ns_document_path = get_abspath('templates/namespaces.xml')
-with open(ns_document_path, 'rb') as file:
-    ns_document_data = file.read()
-
-
-
-def odf_create_element(element_data):
-    if not isinstance(element_data, str):
-        raise TypeError, "element data is not str"
-    if not element_data.strip():
-        raise ValueError, "element data is empty"
-    data = ns_document_data.format(element=element_data)
-    document = fromstring(data)
-    return odf_element(document[0])
 
 
 

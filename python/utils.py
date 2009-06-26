@@ -70,7 +70,7 @@ def _get_cell_coordinates(name):
 def _check_arguments(context=None, element=None, xmlposition=None,
                      position=None, level=None, text=None, style=None,
                      family=None, cell_type=None, currency=None,
-                     note_class=None, author=None, date=None,
+                     note_class=None, creator=None, date=None,
                      start_date=None, end_date=None, offset=None):
     if context is not None:
         # FIXME cyclic import
@@ -117,9 +117,9 @@ def _check_arguments(context=None, element=None, xmlposition=None,
     if note_class is not None:
         if not note_class in NOTE_CLASSES:
             raise ValueError, '"%s" is not a valid note class' % note_class
-    if author is not None:
-        if type(author) is not unicode:
-            raise TypeError, "author must be an unicode string"
+    if creator is not None:
+        if type(creator) is not unicode:
+            raise TypeError, "creator must be an unicode string"
     if date is not None:
         if type(date) is not datetime:
             raise TypeError, "date must be a datetime object"

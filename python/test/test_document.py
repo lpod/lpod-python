@@ -204,6 +204,9 @@ class DocumentTestCase(TestCase):
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
 
 
+    #
+    # Headings
+    #
 
     def test_get_heading_list(self):
         document = self.document
@@ -490,12 +493,21 @@ class CreateTestCase(TestCase):
         self.assertEqual(get2.serialize(), expected)
 
 
-    def test_create_annotation(self):
-        document = self.document
 
+class TestAnnotation(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
+    def test_create_annotation(self):
         # Create
         annotation = odf_create_annotation(u"Plato", u"Lost Dialogs",
-                datetime(2009, 06, 22, 17, 18, 42))
+                datetime(2009, 6, 22, 17, 18, 42))
         expected = ('<office:annotation>'
                       '<dc:creator>Plato</dc:creator>'
                       '<dc:date>2009-06-22T17:18:42</dc:date>'
@@ -504,6 +516,112 @@ class CreateTestCase(TestCase):
                       '</text:p>'
                     '</office:annotation>')
         self.assertEqual(annotation.serialize(), expected)
+
+
+    def test_get_annotation_list(self):
+        document = self.document
+        annotations = document.get_annotation_list()
+        self.assertEqual(len(annotations), 1)
+        annotation = annotations[0]
+        creator = annotation.get_creator()
+        self.assertEqual(creator, u"Auteur inconnu")
+        date = annotation.get_date()
+        self.assertEqual(date, datetime(2009, 6, 22, 17, 18, 42))
+        text = annotation.get_text_content()
+        self.assertEqual(text, u"This is an annotation")
+
+
+    def test_get_annotation_list_author(self):
+        document = self.document
+        creator = u"Auteur inconnu"
+        annotations = document.get_annotation_list(creator=creator)
+        self.assertEqual(len(annotations), 1)
+
+
+    def test_get_annotation_list_bad_author(self):
+        document = self.document
+        creator = u"Plato"
+        annotations = document.get_annotation_list(creator=creator)
+        self.assertEqual(len(annotations), 0)
+
+
+    def test_get_annotation_list_start_date(self):
+        document = self.document
+        start_date = datetime(2009, 6, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(start_date=start_date)
+        self.assertEqual(len(annotations), 1)
+
+
+    def test_get_annotation_list_bad_start_date(self):
+        document = self.document
+        start_date = datetime(2009, 7, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(start_date=start_date)
+        self.assertEqual(len(annotations), 0)
+
+
+    def test_get_annotation_list_end_date(self):
+        document = self.document
+        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(end_date=end_date)
+        self.assertEqual(len(annotations), 1)
+
+
+    def test_get_annotation_list_bad_end_date(self):
+        document = self.document
+        end_date = datetime(2009, 6, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(end_date=end_date)
+        self.assertEqual(len(annotations), 0)
+
+
+    def test_get_annotation_list_start_date_end_date(self):
+        document = self.document
+        start_date = datetime(2009, 6, 1, 0, 0, 0)
+        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(start_date=start_date,
+                                                   end_date=end_date)
+        self.assertEqual(len(annotations), 1)
+
+
+    def test_get_annotation_list_start_date_end_date(self):
+        document = self.document
+        start_date = datetime(2009, 5, 1, 0, 0, 0)
+        end_date = datetime(2009, 6, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(start_date=start_date,
+                                                   end_date=end_date)
+        self.assertEqual(len(annotations), 0)
+
+
+    def test_get_annotation_list_author_start_date_end_date(self):
+        document = self.document
+        creator = u"Auteur inconnu"
+        start_date = datetime(2009, 6, 1, 0, 0, 0)
+        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(creator=creator,
+                                                   start_date=start_date,
+                                                   end_date=end_date)
+        self.assertEqual(len(annotations), 1)
+
+
+    def test_get_annotation_list_bad_author_start_date_end_date(self):
+        document = self.document
+        creator = u"Plato"
+        start_date = datetime(2009, 6, 1, 0, 0, 0)
+        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(creator=creator,
+                                                   start_date=start_date,
+                                                   end_date=end_date)
+        self.assertEqual(len(annotations), 0)
+
+
+    def test_get_annotation_list_author_bad_start_date_end_date(self):
+        document = self.document
+        creator = u"Auteur inconnu"
+        start_date = datetime(2009, 6, 23, 0, 0, 0)
+        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        annotations = document.get_annotation_list(creator=creator,
+                                                   start_date=start_date,
+                                                   end_date=end_date)
+        self.assertEqual(len(annotations), 0)
 
 
 

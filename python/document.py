@@ -135,20 +135,20 @@ def odf_create_note(text, note_class='footnote', id=None):
     return note
 
 
-def odf_create_annotation(author, text, date=None):
+def odf_create_annotation(creator, text, date=None):
     # TODO allow paragraph and text styles
-    _check_arguments(author=author, text=text, date=date)
+    _check_arguments(creator=creator, text=text, date=date)
     data = ('<office:annotation>'
                '<dc:creator>%s</dc:creator>'
                '<dc:date>%s</dc:date>'
                '<text:p>%s</text:p>'
             '</office:annotation>')
-    author = author.encode('utf_8')
+    creator = creator.encode('utf_8')
     if date is None:
         date = datetime.now()
     date = date.strftime(DATE_FORMAT)
     text = text.encode('utf_8')
-    return odf_create_element(data % (author, date, text))
+    return odf_create_element(data % (creator, date, text))
 
 
 #
@@ -480,23 +480,23 @@ class odf_document(object):
     # Annotations
     #
 
-    def get_annotation_list(self, author=None, start_date=None,
+    def get_annotation_list(self, creator=None, start_date=None,
                             end_date=None, context=None):
         """XXX end date is not included (as expected in Python).
         """
-        _check_arguments(author=author, start_date=start_date,
+        _check_arguments(creator=creator, start_date=start_date,
                          end_date=end_date)
         annotations = []
         for annotation in self.__get_element_list('office:annotation',
-                                               context=context):
-            dc_creator = annotation.get_element('//dc:creator')
-            creator = unicode(dc_creator.get_text(), 'utf_8')
-            if author != creator:
+                                                  context=context):
+            if creator is not None and creator != annotation.get_creator():
                 continue
-            dc_date = annotation.get_element('//dc:date')
-            date = datetime.strptime(dc_date.get_text(), DATE_FORMAT)
-            if date >= start_date and date < end_date:
-                annotations.append(annotation)
+            date = annotation.get_date()
+            if start_date is not None and date < start_date:
+                continue
+            if end_date is not None and date >= end_date:
+                continue
+            annotations.append(annotation)
         return annotations
 
 
