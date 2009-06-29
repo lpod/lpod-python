@@ -602,6 +602,8 @@ class odf_document(object):
 
 
     def set_language(self, language):
+        if type(language) is not str:
+            raise TypeError, 'language must be "xx-YY" ISO code'
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:language')
         element.set_text(language)
