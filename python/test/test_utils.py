@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest import TestCase, main
 
 # Import from the XML Library
@@ -10,7 +10,8 @@ from lxml.etree import Element
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.utils import DATE_FORMAT, _generate_xpath_query, _check_arguments
+from lpod.utils import _generate_xpath_query, _check_arguments
+from lpod.utils import DateTime, Duration
 from lpod.xmlpart import odf_create_element
 
 
@@ -154,12 +155,34 @@ class CheckArgumentsTestCase(TestCase):
                           name=None)
 
 
-class FormatsTestCase(TestCase):
 
+class DateTimeTestCase(TestCase):
 
-    def test_date_format(self):
+    def test_encode(self):
         date = datetime(2009, 06, 26, 11, 9, 36)
-        self.assertEqual(date.strftime(DATE_FORMAT), '2009-06-26T11:09:36')
+        expected = '2009-06-26T11:09:36'
+        self.assertEqual(DateTime.encode(date), expected)
+
+
+    def test_decode(self):
+        date = '2009-06-29T14:33:21'
+        expected = datetime(2009, 6, 29, 14, 33, 21)
+        self.assertEqual(DateTime.decode(date), expected)
+
+
+
+class DurationTestCase(TestCase):
+
+    def test_encode(self):
+        duration = timedelta(0, 53, 0, 0, 6)
+        expected = 'PT00H06M53S'
+        self.assertEqual(Duration.encode(duration), expected)
+
+
+    def test_decode(self):
+        duration = 'PT12H34M56S'
+        expected = timedelta(0, 56, 0, 0, 34, 12)
+        self.assertEqual(Duration.decode(duration), expected)
 
 
 
