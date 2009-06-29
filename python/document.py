@@ -234,7 +234,7 @@ def odf_create_note(text, note_class='footnote', id=None):
         text -- unicode
         note_class -- 'footnote' or 'endnote'
         id -- str
-    
+
     Return: odf_element
     """
     _check_arguments(text=text, note_class=note_class)
@@ -259,7 +259,7 @@ def odf_create_annotation(creator, text, date=None):
         creator -- unicode
         text -- unicode
         date -- datetime
-    
+
     Return: odf_element
     """
     # TODO allow paragraph and text styles
@@ -688,13 +688,27 @@ class odf_document(object):
     #
 
     def get_title(self):
+        """Get the title of the document.
+        Return: unicode (or None if inexistant)
+
+        This is not the first heading but the title metadata.
+        """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:title')
+        if element is None:
+            return None
         title = element.get_text()
         return unicode(title, 'utf_8')
 
 
     def set_title(self, title):
+        """Set the title of the document.
+        Arguments:
+
+            title -- unicode
+
+        This is not the first heading but the title metadata.
+        """
         _check_arguments(text=title)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:title')
@@ -703,13 +717,23 @@ class odf_document(object):
 
 
     def get_description(self):
+        """Get the description of the document.
+        Return: unicode (or None if inexistant)
+        """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:description')
+        if element is None:
+            return None
         description = element.get_text()
         return unicode(description, 'utf_8')
 
 
     def set_description(self, description):
+        """Set the title of the document.
+        Arguments:
+
+            description -- unicode
+        """
         _check_arguments(text=description)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:description')
@@ -718,13 +742,23 @@ class odf_document(object):
 
 
     def get_subject(self):
+        """Get the subject of the document.
+        Return: unicode (or None if inexistant)
+        """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:subject')
+        if element is None:
+            return None
         subject = element.get_text()
         return unicode(subject, 'utf_8')
 
 
     def set_subject(self, subject):
+        """Set the subject of the document.
+        Arguments:
+
+            subject -- unicode
+        """
         _check_arguments(text=subject)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:subject')
@@ -733,15 +767,30 @@ class odf_document(object):
 
 
     def get_language(self):
-        """Get the language code of the document, e.g. "fr-FR".
+        """Get the language code of the document.
+        Return: str (or None if inexistant)
+
+        Example::
+
+            >>> document.get_language()
+            >>> 'fr-FR'
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:language')
+        if element is None:
+            return None
         return element.get_text()
 
 
     def set_language(self, language):
-        """Set the language code of the document, e.g. "fr-FR".
+        """Set the language code of the document.
+        Arguments:
+
+            language -- str
+
+        Example::
+
+            >>> document.set_language('fr-FR')
         """
         if type(language) is not str:
             raise TypeError, 'language must be "xx-YY" ISO code'
@@ -753,15 +802,21 @@ class odf_document(object):
 
     def get_modification_date(self):
         """Get the last modified date of the document.
+        Return: datetime (or None if inexistant)
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:date')
+        if element is None:
+            return None
         date = element.get_text()
         return DateTime.decode(date)
 
 
     def set_modification_date(self, date):
         """Set the last modified date of the document.
+        Arguments:
+
+            date -- datetime
         """
         _check_arguments(date=date)
         meta = self.__get_xmlpart('meta')
@@ -772,15 +827,21 @@ class odf_document(object):
 
     def get_creation_date(self):
         """Get the creation date of the document.
+        Return: datetime (or None if inexistant)
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:creation-date')
+        if element is None:
+            return None
         date = element.get_text()
         return DateTime.decode(date)
 
 
     def set_creation_date(self, date):
         """Set the creation date of the document.
+        Arguments:
+
+            date -- datetime
         """
         _check_arguments(date=date)
         meta = self.__get_xmlpart('meta')
@@ -791,10 +852,12 @@ class odf_document(object):
 
     def get_keyword(self):
         """Get the keyword(s) of the document.
-        Return: unicode
+        Return: unicode (or None if inexistant)
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:keyword')
+        if element is None:
+            return None
         keyword = element.get_text()
         return unicode(keyword, 'utf_8')
 
@@ -802,7 +865,8 @@ class odf_document(object):
     def set_keyword(self, keyword):
         """Set the keyword(s) of the document.
         Arguments:
-        keyword -- unicode
+
+            keyword -- unicode
         """
         _check_arguments(text=keyword)
         meta = self.__get_xmlpart('meta')
@@ -813,10 +877,12 @@ class odf_document(object):
 
     def get_editing_duration(self):
         """Get the time the document was edited, as reported by the generator.
-        Return: timedelta
+        Return: timedelta (or None if inexistant)
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:editing-duration')
+        if element is None:
+            return None
         duration = element.get_text()
         return Duration.decode(duration)
 
@@ -837,10 +903,12 @@ class odf_document(object):
     def get_editing_cycles(self):
         """Get the number of times the document was edited, as reported by the
         generator.
-        Return: int
+        Return: int (or None if inexistant)
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:editing-cycles')
+        if element is None:
+            return None
         cycles = element.get_text()
         return int(cycles)
 
@@ -862,7 +930,7 @@ class odf_document(object):
 
     def get_generator(self):
         """Get the signature of the software that generated this document.
-        Return: unicode
+        Return: unicode (or None if inexistant)
 
         Example::
 
@@ -870,6 +938,8 @@ class odf_document(object):
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:generator')
+        if element is None:
+            return None
         generator = element.get_text()
         return unicode(generator, 'utf_8')
 
@@ -893,7 +963,7 @@ class odf_document(object):
 
     def get_statistic(self):
         """Get the statistic from the software that generated this document.
-        Return: dict
+        Return: dict (or None if inexistant)
 
         Example::
 
@@ -908,6 +978,8 @@ class odf_document(object):
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:document-statistic')
+        if element is None:
+            return None
         statistic = {}
         for key, value in element.iteritems():
             statistic[key] = int(value)
