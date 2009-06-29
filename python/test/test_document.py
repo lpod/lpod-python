@@ -15,7 +15,7 @@ from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_annotation
-from lpod.utils import _get_cell_coordinates
+from lpod.utils import _get_cell_coordinates, DateTime, Duration
 
 
 class NewDocumentFromTemplateTestCase(TestCase):
@@ -841,6 +841,116 @@ class TestMetadata(TestCase):
         del self.document
 
 
+    def test_get_title(self):
+        document = self.document
+        title = document.get_title()
+        expected = u"This is the title"
+        self.assertEqual(title, expected)
+
+
+    def test_set_title(self):
+        document = self.document
+        clone = document.clone()
+        title = u"A new title"
+        clone.set_title(title)
+        self.assertEqual(clone.get_title(), title)
+
+
+    def test_set_bad_title(self):
+        document = self.document
+        clone = document.clone()
+        title = "This ain't unicode"
+        self.assertRaises(TypeError, clone.set_title, title)
+
+
+    def test_get_description(self):
+        document = self.document
+        description = document.get_description()
+        expected = u"This is the description"
+        self.assertEqual(description, expected)
+
+
+    def test_set_description(self):
+        document = self.document
+        clone = document.clone()
+        description = u"A new description"
+        clone.set_description(description)
+        self.assertEqual(clone.get_description(), description)
+
+
+    def test_set_bad_description(self):
+        document = self.document
+        clone = document.clone()
+        description = "This ain't unicode"
+        self.assertRaises(TypeError, clone.set_description, description)
+
+
+    def test_get_subject(self):
+        document = self.document
+        subject = document.get_subject()
+        expected = u"This is the subject"
+        self.assertEqual(subject, expected)
+
+
+    def test_set_subject(self):
+        document = self.document
+        clone = document.clone()
+        subject = u"A new subject"
+        clone.set_subject(subject)
+        self.assertEqual(clone.get_subject(), subject)
+
+
+    def test_set_bad_subject(self):
+        document = self.document
+        clone = document.clone()
+        subject = "This ain't unicode"
+        self.assertRaises(TypeError, clone.set_subject, subject)
+
+
+    def test_get_language(self):
+        document = self.document
+        language = document.get_language()
+        expected = 'fr-FR'
+        self.assertEqual(language, expected)
+
+
+    def test_set_language(self):
+        document = self.document
+        clone = document.clone()
+        language = 'en-US'
+        clone.set_language(language)
+        self.assertEqual(clone.get_language(), language)
+
+
+    def test_set_bad_language(self):
+        document = self.document
+        clone = document.clone()
+        language = u"English"
+        self.assertRaises(TypeError, clone.set_language, language)
+
+
+    def test_get_modification_date(self):
+        document = self.document
+        date = document.get_modification_date()
+        expected = DateTime.decode('2009-06-29T14:33:21')
+        self.assertEqual(date, expected)
+
+
+    def test_set_modification_date(self):
+        document = self.document
+        clone = document.clone()
+        now = datetime.now().replace(microsecond=0)
+        clone.set_modification_date(now)
+        self.assertEqual(clone.get_modification_date(), now)
+
+
+    def test_set_bad_modication_date(self):
+        document = self.document
+        clone = document.clone()
+        date = '2009-06-29T14:15:45'
+        self.assertRaises(TypeError, clone.set_modification_date, date)
+
+
     def test_get_creation_date(self):
         document = self.document
         date = document.get_creation_date()
@@ -856,25 +966,39 @@ class TestMetadata(TestCase):
         self.assertEqual(clone.get_creation_date(), now)
 
 
-    def test_get_modification_date(self):
-        document = self.document
-        date = document.get_modification_date()
-        expected = datetime(2009, 6, 22, 18, 33, 7)
-        self.assertEqual(date, expected)
-
-
-    def test_set_modification_date(self):
+    def test_set_bad_creation_date(self):
         document = self.document
         clone = document.clone()
-        now = datetime.now().replace(microsecond=0)
-        clone.set_modification_date(now)
-        self.assertEqual(clone.get_modification_date(), now)
+        date = '2009-06-29T14:15:45'
+        self.assertRaises(TypeError, clone.set_creation_date, date)
+
+
+    def test_get_keyword(self):
+        document = self.document
+        keyword = document.get_keyword()
+        expected = u"These are the keywords"
+        self.assertEqual(keyword, expected)
+
+
+    def test_set_keyword(self):
+        document = self.document
+        clone = document.clone()
+        keyword = u"New keywords"
+        clone.set_keyword(keyword)
+        self.assertEqual(clone.get_keyword(), keyword)
+
+
+    def test_set_bad_keyword(self):
+        document = self.document
+        clone = document.clone()
+        keyword = "This ain't unicode"
+        self.assertRaises(TypeError, clone.set_keyword, keyword)
 
 
     def test_get_editing_duration(self):
         document = self.document
         duration = document.get_editing_duration()
-        expected = timedelta(0, 12, 0, 0, 6, 0, 0)
+        expected = Duration.decode('PT00H06M53S')
         self.assertEqual(duration, expected)
 
 
@@ -886,10 +1010,17 @@ class TestMetadata(TestCase):
         self.assertEqual(clone.get_editing_duration(), duration)
 
 
+    def test_set_bad_editing_duration(self):
+        document = self.document
+        clone = document.clone()
+        duration = 'PT00H01M27S'
+        self.assertRaises(TypeError, clone.set_editing_duration, duration)
+
+
     def test_get_editing_cycles(self):
         document = self.document
         cycles = document.get_editing_cycles()
-        expected = 6
+        expected = 8
         self.assertEqual(cycles, expected)
 
 
@@ -899,6 +1030,13 @@ class TestMetadata(TestCase):
         cycles = 1 # I swear it was a first shot!
         clone.set_editing_cycles(cycles)
         self.assertEqual(clone.get_editing_cycles(), cycles)
+
+
+    def test_set_bad_editing_cycles(self):
+        document = self.document
+        clone = document.clone()
+        cycles = '3'
+        self.assertRaises(TypeError, clone.set_editing_duration, cycles)
 
 
     def test_get_generator(self):
@@ -915,6 +1053,13 @@ class TestMetadata(TestCase):
         generator = u"lpOD Project"
         clone.set_generator(generator)
         self.assertEqual(clone.get_generator(), generator)
+
+
+    def test_set_bad_generator(self):
+        document = self.document
+        clone = document.clone()
+        generator = "This ain't unicode"
+        self.assertRaises(TypeError, clone.set_generator, generator)
 
 
     def test_get_statistic(self):
@@ -942,6 +1087,13 @@ class TestMetadata(TestCase):
                      'meta:character-count': 7}
         clone.set_statistic(statistic)
         self.assertEqual(clone.get_statistic(), statistic)
+
+
+    def test_set_bad_statistic(self):
+        document = self.document
+        clone = document.clone()
+        generator = "This ain't unicode"
+        self.assertRaises(TypeError, clone.set_generator, generator)
 
 
 

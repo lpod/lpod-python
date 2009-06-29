@@ -549,19 +549,62 @@ class odf_document(object):
     #
     # Metadata
     #
-    def get_creation_date(self):
+
+    def get_title(self):
         meta = self.__get_xmlpart('meta')
-        element = meta.get_element('//meta:creation-date')
-        date = element.get_text()
-        return DateTime.decode(date)
+        element = meta.get_element('//dc:title')
+        title = element.get_text()
+        return unicode(title, 'utf_8')
 
 
-    def set_creation_date(self, date):
-        _check_arguments(date=date)
+    def set_title(self, title):
+        _check_arguments(text=title)
         meta = self.__get_xmlpart('meta')
-        element = meta.get_element('//meta:creation-date')
-        date = DateTime.encode(date)
-        element.set_text(date)
+        element = meta.get_element('//dc:title')
+        title = title.encode('utf_8')
+        element.set_text(title)
+
+
+    def get_description(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:description')
+        description = element.get_text()
+        return unicode(description, 'utf_8')
+
+
+    def set_description(self, description):
+        _check_arguments(text=description)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:description')
+        description = description.encode('utf_8')
+        element.set_text(description)
+
+
+    def get_subject(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:subject')
+        subject = element.get_text()
+        return unicode(subject, 'utf_8')
+
+
+    def set_subject(self, subject):
+        _check_arguments(text=subject)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:subject')
+        subject = subject.encode('utf_8')
+        element.set_text(subject)
+
+
+    def get_language(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:language')
+        return element.get_text()
+
+
+    def set_language(self, language):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//dc:language')
+        element.set_text(language)
 
 
     def get_modification_date(self):
@@ -577,6 +620,36 @@ class odf_document(object):
         element = meta.get_element('//dc:date')
         date = DateTime.encode(date)
         element.set_text(date)
+
+
+    def get_creation_date(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:creation-date')
+        date = element.get_text()
+        return DateTime.decode(date)
+
+
+    def set_creation_date(self, date):
+        _check_arguments(date=date)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:creation-date')
+        date = DateTime.encode(date)
+        element.set_text(date)
+
+
+    def get_keyword(self):
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:keyword')
+        keyword = element.get_text()
+        return unicode(keyword, 'utf_8')
+
+
+    def set_keyword(self, keyword):
+        _check_arguments(text=keyword)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:keyword')
+        keyword = keyword.encode('utf_8')
+        element.set_text(keyword)
 
 
     def get_editing_duration(self):
@@ -641,8 +714,6 @@ class odf_document(object):
             raise TypeError, "statistic must be a dict"
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:document-statistic')
-        if element is None:
-            raise NotImplementedError
         for key, value in statistic.iteritems():
             if type(key) is not str:
                 raise TypeError, "statistic key must be a str"
