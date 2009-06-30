@@ -712,6 +712,8 @@ class odf_document(object):
         _check_arguments(text=title)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:title')
+        if element is None:
+            raise NotImplementedError
         title = title.encode('utf_8')
         element.set_text(title)
 
@@ -737,6 +739,8 @@ class odf_document(object):
         _check_arguments(text=description)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:description')
+        if element is None:
+            raise NotImplementedError
         description = description.encode('utf_8')
         element.set_text(description)
 
@@ -762,6 +766,8 @@ class odf_document(object):
         _check_arguments(text=subject)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:subject')
+        if element is None:
+            raise NotImplementedError
         subject = subject.encode('utf_8')
         element.set_text(subject)
 
@@ -797,6 +803,8 @@ class odf_document(object):
         # FIXME test validity?
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:language')
+        if element is None:
+            raise NotImplementedError
         element.set_text(language)
 
 
@@ -821,6 +829,8 @@ class odf_document(object):
         _check_arguments(date=date)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:date')
+        if element is None:
+            raise NotImplementedError
         date = DateTime.encode(date)
         element.set_text(date)
 
@@ -846,6 +856,8 @@ class odf_document(object):
         _check_arguments(date=date)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:creation-date')
+        if element is None:
+            raise NotImplementedError
         date = DateTime.encode(date)
         element.set_text(date)
 
@@ -880,6 +892,8 @@ class odf_document(object):
         _check_arguments(text=creator)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:initial-creator')
+        if element is None:
+            raise NotImplementedError
         creator = creator.encode('utf_8')
         element.set_text(creator)
 
@@ -905,6 +919,8 @@ class odf_document(object):
         _check_arguments(text=keyword)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:keyword')
+        if element is None:
+            raise NotImplementedError
         keyword = keyword.encode('utf_8')
         element.set_text(keyword)
 
@@ -930,6 +946,8 @@ class odf_document(object):
             raise TypeError, u"duration must be a timedelta"
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:editing-duration')
+        if element is None:
+            raise NotImplementedError
         duration = Duration.encode(duration)
         element.set_text(duration)
 
@@ -959,7 +977,10 @@ class odf_document(object):
             raise ValueError, "cycles must be a positive int"
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:editing-cycles')
-        element.set_text(str(cycles))
+        if element is None:
+            raise NotImplementedError
+        cycles = str(cycles)
+        element.set_text(cycles)
 
 
     def get_generator(self):
@@ -992,6 +1013,8 @@ class odf_document(object):
         _check_arguments(text=generator)
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:generator')
+        if element is None:
+            raise NotImplementedError
         generator = generator.encode('utf_8')
         element.set_text(generator)
 
