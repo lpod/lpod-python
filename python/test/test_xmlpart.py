@@ -35,11 +35,13 @@ class ElementTestCase(TestCase):
         self.container = container
         content_part = odf_xmlpart('content', container)
         self.content_part = content_part
-        paragraph_element = content_part.get_element_list('//text:p[1]')
-        self.paragraph_element = paragraph_element[0]
+        self.paragraph_element = content_part.get_element('//text:p[1]')
+        self.annotation_element = (
+                content_part.get_element('//office:annotation[1]'))
 
 
     def tearDown(self):
+        del self.annotation_element
         del self.paragraph_element
         del self.content_part
         del self.container
@@ -105,7 +107,8 @@ class ElementTestCase(TestCase):
 
     def test_get_text(self):
         element = self.paragraph_element
-        self.assertEqual(element.get_text(), 'This is the first paragraph.')
+        text = element.get_text()
+        self.assertEqual(text, u"This is the first paragraph.")
 
 
     def test_set_text(self):
@@ -124,6 +127,21 @@ class ElementTestCase(TestCase):
         element.set_text(self.special_text)
         self.assertEqual(element.get_text(), self.special_text)
         element.set_text(old_text)
+
+
+    def test_get_text_content(self):
+        element = self.annotation_element
+        text = element.get_text_content()
+        self.assertEqual(text, u"This is an annotation")
+
+
+    def test_set_text_content(self):
+        element = self.annotation_element
+        old_text = element.get_text_content()
+        text = u"Have a break"
+        element.set_text_content(text)
+        self.assertEqual(element.get_text_content(), text)
+        element.set_text_content
 
 
     def test_insert_element_first_child(self):

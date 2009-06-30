@@ -220,6 +220,20 @@ class odf_element(object):
         return unicode(text, 'utf_8')
 
 
+    def set_text_content(self, text):
+        """Like "set_text" but applied to the embedded paragraph:
+        annotations, cells...
+        """
+        _check_arguments(text=text)
+        paragraph = self.get_element('text:p')
+        if paragraph is None:
+            paragraph = odf_create_element('<text:p/>')
+            self.insert_element(paragraph, FIRST_CHILD)
+        element = paragraph.__element
+        element.clear()
+        element.text = text
+
+
     def insert_element(self, element, xmlposition):
         _check_arguments(element=element, xmlposition=xmlposition)
         current = self.__element
