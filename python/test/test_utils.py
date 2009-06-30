@@ -186,5 +186,28 @@ class DurationTestCase(TestCase):
 
 
 
+class BooleanTestCase(TestCase):
+
+    def test_encode(self):
+        self.assertEqual(Boolean.encode(True), 'true')
+        self.assertEqual(Boolean.encode(False), 'false')
+
+
+    def test_bad_encode(self):
+        self.assertRaises(ValueError, Boolean.encode, 'true')
+        self.assertRaises(ValueError, Boolean.encode, 1)
+
+
+    def test_decode(self):
+        self.assertEqual(Boolean.decode('true', True))
+        self.assertEqual(Boolean.decode('false', False))
+
+
+    def test_bad_decode(self):
+        self.assertRaises(ValueError, Boolean.decode, 'True')
+        self.assertRaises(ValueError, Boolean.decode, '1')
+
+
+
 if __name__ == '__main__':
     main()

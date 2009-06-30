@@ -7,7 +7,10 @@ from datetime import datetime, timedelta
 # Import from lpod
 
 
-DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+DATE_FORMAT = '%Y-%m-%d'
+
+
+DATETIME_FORMAT = DATE_FORMAT + 'T%H:%M:%S'
 
 
 DURATION_FORMAT = 'PT%02dH%02dM%02dS'
@@ -144,7 +147,7 @@ def _check_position_or_name(position, name):
 
 
 
-class DateTime(object):
+class Date(object):
 
     @staticmethod
     def decode(data):
@@ -154,6 +157,19 @@ class DateTime(object):
     @staticmethod
     def encode(value):
         return value.strftime(DATE_FORMAT)
+
+
+
+class DateTime(object):
+
+    @staticmethod
+    def decode(data):
+        return datetime.strptime(data, DATETIME_FORMAT)
+
+
+    @staticmethod
+    def encode(value):
+        return value.strftime(DATETIME_FORMAT)
 
 
 
@@ -193,3 +209,24 @@ class Duration(object):
         minutes = value.seconds / 60
         seconds = value.seconds % 60
         return DURATION_FORMAT % (hours, minutes, seconds)
+
+
+
+class Boolean(object):
+
+    @staticmethod
+    def decode(data):
+        if data == 'true':
+            return True
+        elif data == 'false':
+            return False
+        raise ValueError, 'boolean "%s" is invalid' % data
+
+
+    @staticmethod
+    def encode(value):
+        if value is True:
+            return 'true'
+        elif value is False:
+            return 'false'
+        raise TypeError, '"%s" is not a boolean' % value
