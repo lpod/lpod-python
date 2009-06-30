@@ -11,7 +11,7 @@ from lxml.etree import Element
 # Import from lpod
 from lpod.document import odf_get_document
 from lpod.utils import _generate_xpath_query, _check_arguments
-from lpod.utils import DateTime, Duration
+from lpod.utils import DateTime, Duration, Boolean
 from lpod.xmlpart import odf_create_element
 
 

@@ -2,7 +2,8 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from decimal import Decimal
 from unittest import TestCase, main
 
 # Import from lpod
@@ -385,11 +386,107 @@ class TestTable(TestCase):
 
 
 
-    def test_create_cell(self):
-        # Test create
-        cell = odf_create_cell()
-        expected = '<table:table-cell office:value-type="string"/>'
+    def test_create_cell_bool(self):
+        cell = odf_create_cell(True)
+        expected = ('<table:table-cell office:value-type="boolean" '
+                      'office:boolean-value="true">'
+                      '<text:p>true</text:p>'
+                    '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_int(self):
+        cell = odf_create_cell(23)
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="23">'
+                      '<text:p>23</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_float(self):
+        cell = odf_create_cell(3.141592654)
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="3.141592654">'
+                      '<text:p>3.141592654</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_decimal(self):
+        cell = odf_create_cell(Decimal('2.718281828'))
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="2.718281828">'
+                      '<text:p>2.718281828</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_date(self):
+        cell = odf_create_cell(date(2009, 6, 30))
+        expected = ('<table:table-cell office:value-type="date" '
+                      'office:date-value="2009-06-30">'
+                      '<text:p>2009-06-30</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_datetime(self):
+        cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18))
+        expected = ('<table:table-cell office:value-type="date" '
+                'office:date-value="2009-06-30T17:33:18">'
+                      '<text:p>2009-06-30T17:33:18</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_str(self):
+        cell = odf_create_cell('red')
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="red">'
+                      '<text:p>red</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_unicode(self):
+        cell = odf_create_cell(u"Plato")
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="Plato">'
+                      '<text:p>Plato</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_timedelta(self):
+        cell = odf_create_cell(timedelta(0, 8))
+        expected = ('<table:table-cell office:value-type="time" '
+                      'office:time-value="PT00H00M08S">'
+                      '<text:p>PT00H00M08S</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_percentage(self):
+        cell = odf_create_cell(90, cell_type='percentage')
+        expected = ('<table:table-cell office:value-type="percentage" '
+                      'office:value="90">'
+                      '<text:p>90</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_currency(self):
+        cell = odf_create_cell(1.54, cell_type='currency', currency='EUR')
+        expected = ('<table:table-cell office:value-type="currency" '
+                      'office:value="1.54" office:currency="EUR">'
+                      '<text:p>1.54</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_bad(self):
+        self.assertRaises(TypeError, odf_create_cell, [])
 
 
     def test_create_row(self):
@@ -401,7 +498,10 @@ class TestTable(TestCase):
         # Test 2
         row = odf_create_row(1)
         expected = ('<table:table-row>'
-                    '<table:table-cell office:value-type="string"/>'
+                      '<table:table-cell office:value-type="string" '
+                        'office:string-value="">'
+                        '<text:p></text:p>'
+                      '</table:table-cell>'
                     '</table:table-row>')
         self.assertEqual(row.serialize(), expected)
 
@@ -425,10 +525,16 @@ class TestTable(TestCase):
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style">'
                     '<table:table-row>'
-                    '<table:table-cell office:value-type="string"/>'
+                      '<table:table-cell office:value-type="string" '
+                        'office:string-value="">'
+                        '<text:p></text:p>'
+                      '</table:table-cell>'
                     '</table:table-row>'
                     '<table:table-row>'
-                    '<table:table-cell office:value-type="string"/>'
+                      '<table:table-cell office:value-type="string" '
+                        'office:string-value="">'
+                        '<text:p></text:p>'
+                      '</table:table-cell>'
                     '</table:table-row>'
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
@@ -440,19 +546,23 @@ class TestTable(TestCase):
         table = odf_create_table('a_table', 'a_style')
         column = odf_create_column('a_column_style')
         row = odf_create_row()
-        cell = odf_create_cell()
+        cell = odf_create_cell(u"")
 
-        clone.insert_table(table)
+        clone.insert_cell(cell, row)
         clone.insert_column(column, table)
         clone.insert_row(row, table)
-        clone.insert_cell(cell, row)
+        clone.insert_table(table)
 
         expected = ('<table:table table:name="a_table" '
-                    'table:style-name="a_style">'
-                    '<table:table-column table:style-name="a_column_style"/>'
-                    '<table:table-row>'
-                    '<table:table-cell office:value-type="string"/>'
-                    '</table:table-row>'
+                      'table:style-name="a_style">'
+                      '<table:table-column '
+                        'table:style-name="a_column_style"/>'
+                      '<table:table-row>'
+                        '<table:table-cell office:value-type="string" '
+                          'office:string-value="">'
+                          '<text:p></text:p>'
+                        '</table:table-cell>'
+                      '</table:table-row>'
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
 
@@ -775,21 +885,15 @@ class TestGetCell(TestCase):
         row = odf_create_row()
         row.set_attribute('table:number-rows-repeated', '3')
         # 3 x "1"
-        cell = odf_create_cell()
+        cell = odf_create_cell(u'1')
         cell.set_attribute('table:number-columns-repeated', '3')
-        paragraph = odf_create_paragraph('Standard', u'1')
-        document.insert_paragraph(paragraph, cell)
         document.insert_cell(cell, row)
         # 1 x "2"
-        cell = odf_create_cell()
-        paragraph = odf_create_paragraph('Standard', u'2')
-        document.insert_paragraph(paragraph, cell)
+        cell = odf_create_cell(u'2')
         document.insert_cell(cell, row)
         # 3 x "3"
-        cell = odf_create_cell()
+        cell = odf_create_cell(u'3')
         cell.set_attribute('table:number-columns-repeated', '3')
-        paragraph = odf_create_paragraph('Standard', u'3')
-        document.insert_paragraph(paragraph, cell)
         document.insert_cell(cell, row)
 
         document.insert_row(row, table)
@@ -797,9 +901,7 @@ class TestGetCell(TestCase):
         # 1 x "1 2 3 4 5 6 7"
         row = odf_create_row()
         for i in xrange(1, 8):
-            cell = odf_create_cell()
-            paragraph = odf_create_paragraph('Standard', unicode(i))
-            document.insert_paragraph(paragraph, cell)
+            cell = odf_create_cell(unicode(i))
             document.insert_cell(cell, row)
         document.insert_row(row, table)
 

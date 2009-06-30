@@ -3,14 +3,15 @@
 
 # Import from the Standard Library
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from decimal import Decimal
 
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
 from utils import _check_arguments, _generate_xpath_query
 from utils import _check_position_or_name, _get_cell_coordinates
-from utils import DateTime, Duration
+from utils import Date, DateTime, Duration, Boolean
 from xmlpart import odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
 
@@ -112,23 +113,84 @@ def odf_create_image(uri):
     return odf_create_element('<draw:image xlink:href="%s"/>' % uri)
 
 
-def odf_create_cell(cell_type='string', currency=None):
-    """Create a cell element of the optinnally given type. If cell_type is
-    "currency", the currency must be given.
+def odf_create_cell(value, representation=None, cell_type=None,
+                    currency=None):
+    """Create a cell element containing the given value. The textual
+    representation is automatically formatted but can be provided. Cell type
+    can be deduced as well, unless the number is a percentage or currency. If
+    cell type is "currency", the currency must be given.
     Arguments:
 
+        value -- bool, int, float, Decimal, date, datetime, str, unicode,
+                 timedelta
+        representation -- unicode
         cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
                      'string' or 'time'
-        currency -- three-letter code
+        currency -- three-letter str
 
     Return: odf_element
     """
-    # FIXME text content?
-    _check_arguments(cell_type=cell_type, currency=currency)
+    if type(value) is bool:
+        if cell_type is None:
+            cell_type = 'boolean'
+        if representation is None:
+            representation = u'true' if value else u'false'
+        value = Boolean.encode(value)
+    elif isinstance(value, (int, float, Decimal)):
+        if cell_type is None:
+            cell_type = 'float'
+        if representation is None:
+            representation = unicode(value)
+        value = str(value)
+    elif type(value) is date:
+        if cell_type is None:
+            cell_type = 'date'
+        if representation is None:
+            representation = unicode(Date.encode(value))
+        value = Date.encode(value)
+    elif type(value) is datetime:
+        if cell_type is None:
+            cell_type = 'date'
+        if representation is None:
+            representation = unicode(DateTime.encode(value))
+        value = DateTime.encode(value)
+    elif type(value) is str:
+        if cell_type is None:
+            cell_type = 'string'
+        if representation is None:
+            representation = unicode(value)
+    elif type(value) is unicode:
+        if cell_type is None:
+            cell_type = 'string'
+        if representation is None:
+            representation = value
+        value = value.encode('utf_8')
+    elif type(value) is timedelta:
+        if cell_type is None:
+            cell_type = 'time'
+        if representation is None:
+            representation = unicode(Duration.encode(value))
+        value = Duration.encode(value)
+    else:
+        raise TypeError, 'type "%s" is unknown to cells' % type(value)
+    _check_arguments(cell_type=cell_type, text=representation,
+                     currency=currency)
     data = '<table:table-cell office:value-type="%s"/>'
     cell = odf_create_element(data % cell_type)
-    if cell_type == 'currency':
+    if cell_type == 'boolean':
+        cell.set_attribute('office:boolean-value', value)
+    elif cell_type == 'currency':
+        cell.set_attribute('office:value', value)
         cell.set_attribute('office:currency', currency)
+    elif cell_type == 'date':
+        cell.set_attribute('office:date-value', value)
+    elif cell_type in ('float', 'percentage'):
+        cell.set_attribute('office:value', value)
+    elif cell_type == 'string':
+        cell.set_attribute('office:string-value', value)
+    elif cell_type == 'time':
+        cell.set_attribute('office:time-value', value)
+    cell.set_text_content(representation)
     return cell
 
 
@@ -143,7 +205,7 @@ def odf_create_row(width=None):
     row = odf_create_element('<table:table-row/>')
     if width is not None:
         for i in xrange(width):
-            cell = odf_create_cell()
+            cell = odf_create_cell(u"")
             row.insert_element(cell, LAST_CHILD)
     return row
 
