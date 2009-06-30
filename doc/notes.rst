@@ -263,7 +263,7 @@ Table
     cell type: office:value-type="{boolean, currency, date, float,
                                    percentage, string, time}"
 
-    boolean: office-boolean-value="{true,false}"
+    boolean: office:boolean-value="{true,false}"
 
     currency: office:currency="EUR"
 
@@ -275,7 +275,7 @@ Table
 
     percentage: office:value="0.5"
 
-    string: office-string-value="toto"
+    string: office:string-value="toto"
 
     time: office:time-value="PT12H33M00S"
 
