@@ -973,6 +973,28 @@ class TestMetadata(TestCase):
         self.assertRaises(TypeError, clone.set_creation_date, date)
 
 
+    def test_get_initial_creator(self):
+        document = self.document
+        creator = document.get_initial_creator()
+        expected = None
+        self.assertEqual(creator, expected)
+
+
+    def test_set_initial_creator(self):
+        document = self.document
+        clone = document.clone()
+        creator = u"Socrates"
+        clone.set_initial_creator(creator)
+        self.assertEqual(clone.get_initial_creator(), creator)
+
+
+    def test_set_bad_initial_creator(self):
+        document = self.document
+        clone = document.clone()
+        creator = "This ain't unicode"
+        self.assertRaises(TypeError, clone.set_initial_creator, creator)
+
+
     def test_get_keyword(self):
         document = self.document
         keyword = document.get_keyword()

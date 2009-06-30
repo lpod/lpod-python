@@ -850,6 +850,40 @@ class odf_document(object):
         element.set_text(date)
 
 
+    def get_initial_creator(self):
+        """Get the first creator of the document.
+        Return: unicode (or None if inexistant)
+
+        Example::
+
+            >>> document.get_initial_creator()
+            >>> u"Unknown"
+        """
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:initial-creator')
+        if element is None:
+            return None
+        creator = element.get_text()
+        return unicode(creator, 'utf_8')
+
+
+    def set_initial_creator(self, creator):
+        """Set the first creator of the document.
+        Arguments:
+
+            creator -- unicode
+
+        Example::
+
+            >>> document.set_initial_creator(u"Plato")
+        """
+        _check_arguments(text=creator)
+        meta = self.__get_xmlpart('meta')
+        element = meta.get_element('//meta:initial-creator')
+        creator = creator.encode('utf_8')
+        element.set_text(creator)
+
+
     def get_keyword(self):
         """Get the keyword(s) of the document.
         Return: unicode (or None if inexistant)
@@ -934,7 +968,8 @@ class odf_document(object):
 
         Example::
 
-
+            >>> document.get_generator()
+            >>> u"KOffice/2.0.0"
         """
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:generator')
@@ -952,7 +987,7 @@ class odf_document(object):
 
         Example::
 
-            document.set_generator(u"lpOD Project")
+            >>> document.set_generator(u"lpOD Project")
         """
         _check_arguments(text=generator)
         meta = self.__get_xmlpart('meta')
