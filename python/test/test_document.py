@@ -395,11 +395,29 @@ class TestTable(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
+    def test_create_cell_bool_repr(self):
+        cell = odf_create_cell(True, representation=u"VRAI")
+        expected = ('<table:table-cell office:value-type="boolean" '
+                      'office:boolean-value="true">'
+                      '<text:p>VRAI</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
     def test_create_cell_int(self):
         cell = odf_create_cell(23)
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="23">'
                       '<text:p>23</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_int_repr(self):
+        cell = odf_create_cell(23, representation=u"00023")
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="23">'
+                      '<text:p>00023</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
 
@@ -413,11 +431,30 @@ class TestTable(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
+    def test_create_cell_float_repr(self):
+        cell = odf_create_cell(3.141592654, representation=u"3,14")
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="3.141592654">'
+                      '<text:p>3,14</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
     def test_create_cell_decimal(self):
         cell = odf_create_cell(Decimal('2.718281828'))
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="2.718281828">'
                       '<text:p>2.718281828</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_decimal_repr(self):
+        cell = odf_create_cell(Decimal('2.718281828'),
+                               representation=u"2,72")
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="2.718281828">'
+                      '<text:p>2,72</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
 
@@ -431,11 +468,31 @@ class TestTable(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
+    def test_create_cell_date_repr(self):
+        cell = odf_create_cell(date(2009, 6, 30),
+                               representation=u"30/6/2009")
+        expected = ('<table:table-cell office:value-type="date" '
+                      'office:date-value="2009-06-30">'
+                      '<text:p>30/6/2009</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
     def test_create_cell_datetime(self):
         cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18))
         expected = ('<table:table-cell office:value-type="date" '
                 'office:date-value="2009-06-30T17:33:18">'
                       '<text:p>2009-06-30T17:33:18</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_datetime_repr(self):
+        cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18),
+                               representation=u"30/6/2009 17:33")
+        expected = ('<table:table-cell office:value-type="date" '
+                'office:date-value="2009-06-30T17:33:18">'
+                      '<text:p>30/6/2009 17:33</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
 
@@ -449,11 +506,29 @@ class TestTable(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
+    def test_create_cell_str_repr(self):
+        cell = odf_create_cell('red', representation=u"Red")
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="red">'
+                      '<text:p>Red</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
     def test_create_cell_unicode(self):
         cell = odf_create_cell(u"Plato")
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="Plato">'
                       '<text:p>Plato</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_unicode_repr(self):
+        cell = odf_create_cell(u"Plato", representation=u"P.")
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="Plato">'
+                      '<text:p>P.</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
 
@@ -467,11 +542,30 @@ class TestTable(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
+    def test_create_cell_timedelta_repr(self):
+        cell = odf_create_cell(timedelta(0, 8), representation=u"00:00:08")
+        expected = ('<table:table-cell office:value-type="time" '
+                      'office:time-value="PT00H00M08S">'
+                      '<text:p>00:00:08</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
     def test_create_cell_percentage(self):
         cell = odf_create_cell(90, cell_type='percentage')
         expected = ('<table:table-cell office:value-type="percentage" '
                       'office:value="90">'
                       '<text:p>90</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_percentage_repr(self):
+        cell = odf_create_cell(90, representation=u"90 %",
+                               cell_type='percentage')
+        expected = ('<table:table-cell office:value-type="percentage" '
+                      'office:value="90">'
+                      '<text:p>90 %</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
 
@@ -485,8 +579,23 @@ class TestTable(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
+    def test_create_cell_currency_repr(self):
+        cell = odf_create_cell(1.54, representation=u"1,54 €",
+                               cell_type='currency', currency='EUR')
+        expected = ('<table:table-cell office:value-type="currency" '
+                      'office:value="1.54" office:currency="EUR">'
+                      '<text:p>1,54 &#8364;</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
     def test_create_cell_bad(self):
         self.assertRaises(TypeError, odf_create_cell, [])
+
+
+    def test_create_cell_bad_repr(self):
+        self.assertRaises(TypeError, odf_create_cell, '',
+                          representation="This ain't unicode")
 
 
     def test_create_row(self):
