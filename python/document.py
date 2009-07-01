@@ -713,6 +713,15 @@ class odf_document(object):
         return annotations
 
 
+    def get_annotation(self, creator=None, start_date=None, end_date=None,
+                       context=None):
+        annotations = self.get_annotation_list(creator=creator,
+                start_date=start_date, end_date=end_date, context=context)
+        if not annotations:
+            return None
+        return annotations[0]
+
+
     def insert_annotation(self, element, context, offset=0):
         """Offset is the position in the paragraph where the annotation is
         inserted.
