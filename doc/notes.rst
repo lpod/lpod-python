@@ -369,7 +369,8 @@ TODO
 ====
 
 named styles, automatic styles
-style families:
+style families
+style objects
 
 manifest?
 
@@ -379,6 +380,10 @@ Make this use case:
     for each file =>
         if image => insert it
         if csv => make a table
+
+Abstract gio (instead of itools)
+
+element attributes API
 
 XPath Requirements
 ==================
