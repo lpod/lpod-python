@@ -175,7 +175,7 @@ class TestParagraph(TestCase):
     def test_get_paragraph_list(self):
         document = self.document
         paragraphs = document.get_paragraph_list()
-        # FIXME the annotation paragraph is counted
+        # The annotation paragraph is counted
         self.assertEqual(len(paragraphs), 7)
         second = paragraphs[1]
         text = second.get_text()

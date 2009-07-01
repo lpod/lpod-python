@@ -53,7 +53,7 @@ class ElementTestCase(TestCase):
 
     def test_get_element_list(self):
         elements = self.content_part.get_element_list('//text:p')
-        # FIXME annotation paragraph is counted
+        # The annotation paragraph is counted
         self.assertEqual(len(elements), 7)
 
 
@@ -219,7 +219,7 @@ class XmlPartTestCase(TestCase):
     def test_get_element_list(self):
         content_part = odf_xmlpart('content', self.container)
         elements = content_part.get_element_list('//text:p')
-        # FIXME annotation paragraph is counted
+        # The annotation paragraph is counted
         self.assertEqual(len(elements), 7)
 
 

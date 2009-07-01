@@ -147,6 +147,9 @@ class odf_element(object):
         return list(self.iteritems())
 
 
+    # TODO get_attributes -> dict
+
+
     def get_attribute(self, name):
         element = self.__element
         uri, name = decode_qname(name)
@@ -252,6 +255,11 @@ class odf_element(object):
             parent.insert(index, element)
 
 
+    def clear(self):
+        element = self.__element
+        element.clear()
+
+
     def copy(self):
         element = self.__element
         return odf_element(deepcopy(element))
@@ -264,11 +272,10 @@ class odf_element(object):
         return ns_stripper.sub('', data)
 
 
-    def delete(self):
-        # FIXME this is generally the parent that destroys a child
+    def delete(self, child):
+        _check_arguments(element=child)
         element = self.__element
-        parent = element.getparent()
-        parent.remove(element)
+        element.remove(child.__element)
 
 
 
@@ -289,6 +296,7 @@ class odf_xmlpart(object):
         if self.__document is None:
             container = self.container
             part = container.get_part(self.part_name)
+            # XXX use "parse"?
             self.__document = fromstring(part)
         return self.__document
 
@@ -309,3 +317,8 @@ class odf_xmlpart(object):
     def serialize(self, pretty=False):
         document = self.__get_document()
         return tostring(document, encoding='UTF-8', pretty_print=pretty)
+
+
+    def delete(self, child):
+        document = self.__get_document()
+        document.remove(child.__element)
