@@ -410,7 +410,8 @@ class odf_document(object):
         return result[0]
 
 
-    def __insert_element(self, element, context, xmlposition):
+    def __insert_element(self, element, context, xmlposition, offset=0):
+        # TODO make it public and remove "insert_*" methods
         _check_arguments(element=element, context=context,
                          xmlposition=xmlposition)
         if context is not None:
