@@ -174,6 +174,8 @@ class DateTime(object):
 
 
 class Duration(object):
+    """ISO 8601 format.
+    """
 
     @staticmethod
     def decode(data):
