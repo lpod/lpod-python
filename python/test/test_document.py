@@ -695,13 +695,13 @@ class TestList(TestCase):
 
 
     def test_create_item(self):
-        item = odf_create_item()
+        item = odf_create_list_item()
         expected = '<text:list-item/>'
         self.assertEqual(item.serialize(), expected)
 
 
     def test_create_list(self):
-        item = odf_create_item()
+        item = odf_create_list_item()
         a_list = odf_create_list('a_style')
         expected = '<text:list text:style-name="a_style"/>'
         self.assertEqual(a_list.serialize(), expected)
@@ -710,9 +710,9 @@ class TestList(TestCase):
     def test_insert_list(self):
         document = self.document
         clone = document.clone()
-        item = odf_create_item()
+        item = odf_create_list_item()
         a_list = odf_create_list('a_style')
-        clone.insert_item(item, a_list)
+        clone.insert_list_item(item, a_list)
         clone.insert_list(a_list)
 
         expected = ('<text:list text:style-name="a_style">'

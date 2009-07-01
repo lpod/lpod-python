@@ -244,12 +244,23 @@ def odf_create_table(name, style, width=None, height=None):
     return table
 
 
-def odf_create_item():
+def odf_create_list_item(text=None):
     """Create a list item element.
+    Arguments:
+
+        text -- unicode
+
     Return: odf_element
+
+    To create a list item with several paragraphs or anything else (except
+    tables), first create an empty list item, insert it in the document, and
+    insert your element using the appropriate function.
     """
-    # FIXME text content?
-    return odf_create_element('<text:list-item/>')
+    element = odf_create_element('<text:list-item/>')
+    if text is not None:
+        _check_arguments(text=text)
+        element.set_text_content(text)
+    return element
 
 
 def odf_create_list(style):
@@ -644,7 +655,7 @@ class odf_document(object):
         self.__insert_element(element, context, xmlposition)
 
 
-    def insert_item(self, element, context, xmlposition=LAST_CHILD):
+    def insert_list_item(self, element, context, xmlposition=LAST_CHILD):
         context.insert_element(element, xmlposition)
 
 
