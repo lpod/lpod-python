@@ -873,7 +873,7 @@ class odf_document(object):
             >>> document.set_language('fr-FR')
         """
         if type(language) is not str:
-            raise TypeError, 'language must be "xx-YY" ISO code'
+            raise TypeError, 'language must be "xx-YY" lang-COUNTRY code (RFC3066)'
         # FIXME test validity?
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:language')
