@@ -102,6 +102,7 @@ def odf_create_frame(name, style, width, height, page=None, x=None, y=None):
     return odf_create_element(data % (name, style, width, height, anchor))
 
 
+
 def odf_create_image(uri):
     """Create an image element showing the image at the given URI.
     Arguments:
@@ -111,6 +112,7 @@ def odf_create_image(uri):
     Return: odf_element
     """
     return odf_create_element('<draw:image xlink:href="%s"/>' % uri)
+
 
 
 def odf_create_cell(value, representation=None, cell_type=None,
@@ -194,6 +196,7 @@ def odf_create_cell(value, representation=None, cell_type=None,
     return cell
 
 
+
 def odf_create_row(width=None):
     """Create a row element, optionally filled with "width" number of cells.
     Arguments:
@@ -210,6 +213,7 @@ def odf_create_row(width=None):
     return row
 
 
+
 def odf_create_column(style):
     """Create a column element of the given style.
     Arguments:
@@ -220,6 +224,7 @@ def odf_create_column(style):
     """
     data = '<table:table-column table:style-name="%s"/>'
     return odf_create_element(data % style)
+
 
 
 def odf_create_table(name, style, width=None, height=None):
@@ -244,6 +249,7 @@ def odf_create_table(name, style, width=None, height=None):
     return table
 
 
+
 def odf_create_list_item(text=None):
     """Create a list item element.
     Arguments:
@@ -263,6 +269,7 @@ def odf_create_list_item(text=None):
     return element
 
 
+
 def odf_create_list(style):
     """Create a list element of the given style.
     Arguments:
@@ -272,6 +279,7 @@ def odf_create_list(style):
     Return: odf_element
     """
     return odf_create_element('<text:list text:style-name="%s"/>' % style)
+
 
 
 def odf_create_style(name, family='paragraph'):
@@ -291,12 +299,14 @@ def odf_create_style(name, family='paragraph'):
     return odf_create_element(data % (name, family))
 
 
+
 def odf_create_style_text_properties():
     """Create a text properties element.
     Return: odf_element
     """
     # TODO should take parameters
     return odf_create_element('<style:text-properties/>')
+
 
 
 def odf_create_note(text, note_class='footnote', id=None):
@@ -322,6 +332,7 @@ def odf_create_note(text, note_class='footnote', id=None):
         note.set_attribute('text:id', id)
 
     return note
+
 
 
 def odf_create_annotation(creator, text, date=None):
