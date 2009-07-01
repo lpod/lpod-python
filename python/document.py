@@ -418,6 +418,7 @@ class odf_document(object):
         else:
             # We insert it in the last office:text
             content = self.__get_xmlpart('content')
+            # FIXME hardcoded odt body element
             office_text = content.get_element_list('//office:text')[-1]
             office_text.insert_element(element, LAST_CHILD)
 
