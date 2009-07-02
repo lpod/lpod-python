@@ -194,13 +194,13 @@ class BooleanTestCase(TestCase):
 
 
     def test_bad_encode(self):
-        self.assertRaises(ValueError, Boolean.encode, 'true')
-        self.assertRaises(ValueError, Boolean.encode, 1)
+        self.assertRaises(TypeError, Boolean.encode, 'true')
+        self.assertRaises(TypeError, Boolean.encode, 1)
 
 
     def test_decode(self):
-        self.assertEqual(Boolean.decode('true', True))
-        self.assertEqual(Boolean.decode('false', False))
+        self.assertEqual(Boolean.decode('true'), True)
+        self.assertEqual(Boolean.decode('false'), False)
 
 
     def test_bad_decode(self):
