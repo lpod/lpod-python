@@ -79,6 +79,14 @@ def uri_to_prefix(uri):
 
 
 
+def get_prefixed_name(tag):
+    # Replace lxml uri with prefix
+    uri, name = tag.split('}', 1)
+    prefix = uri_to_prefix(uri[1:])
+    return '%s:%s' % (prefix, name)
+
+
+
 def odf_create_element(element_data):
     if not isinstance(element_data, str):
         raise TypeError, "element data is not str"
@@ -99,6 +107,10 @@ class odf_element(object):
         if not isinstance(native_element, _Element):
             raise TypeError, "node is not an element node"
         self.__element = native_element
+
+
+    def get_tag(self):
+        return get_prefixed_name(self.__element.tag)
 
 
     def get_element_list(self, xpath_query):
@@ -136,11 +148,7 @@ class odf_element(object):
     def iteritems(self):
         element = self.__element
         for key, value in element.attrib.iteritems():
-            # Replace lxml uri with prefix
-            # XXX probably to factorise with "iterkeys"
-            uri, name = key.split('}', 1)
-            prefix = uri_to_prefix(uri[1:])
-            yield '%s:%s' % (prefix, name), value
+            yield get_prefixed_name(key), value
 
 
     def items(self):
