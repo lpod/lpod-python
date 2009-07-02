@@ -13,7 +13,7 @@ from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
-from lpod.document import odf_create_item, odf_create_list
+from lpod.document import odf_create_list_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_annotation
 from lpod.utils import _get_cell_coordinates, DateTime, Duration
