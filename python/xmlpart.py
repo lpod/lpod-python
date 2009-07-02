@@ -57,6 +57,8 @@ with open(ns_document_path, 'rb') as file:
 
 
 def decode_qname(qname):
+    """Turn a prefixed name to a (uri, name) pair.
+    """
     if ':' in qname:
         prefix, name = qname.split(':')
         try:
@@ -69,6 +71,8 @@ def decode_qname(qname):
 
 
 def uri_to_prefix(uri):
+    """Find the prefix associated to the given URI.
+    """
     for key, value in ODF_NAMESPACES.iteritems():
         if value == uri:
             return key
@@ -77,7 +81,8 @@ def uri_to_prefix(uri):
 
 
 def get_prefixed_name(tag):
-    # Replace lxml uri with prefix
+    """Replace lxml "{uri}name" syntax with "prefix:name" one.
+    """
     uri, name = tag.split('}', 1)
     prefix = uri_to_prefix(uri[1:])
     return '%s:%s' % (prefix, name)
@@ -240,6 +245,7 @@ class odf_element(object):
     def clear(self):
         element = self.__element
         element.clear()
+        element.text = None
 
 
     def copy(self):

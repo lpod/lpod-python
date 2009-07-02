@@ -25,19 +25,21 @@ Constructors
 ~~~~~~~~~~~~~
 
 odf_get_container(uri)
-	Instantiates an odf_container object which is an read-write interface to
+	Instantiates an odf_container object which is a read-write interface to
 	an existing ODF package corresponding to the given URI. The package may
 	be an ODF-compliant zip or an ODF-compliant flat XML file.
 
-odf_new_container({document_class})
+odf_new_container_from_class({document_class})
 	Returns a new odf_container corresponding to the given ODF document class
 	(i.e. presently text, spreadsheet, presentation, or drawing).
 	
 odf_new_container_from_template(uri)
 	Returns a new odf_container instantiated from an existing ODF template
-	package. Same as odf_get_container(), but the template package is read-only.
+    package. Same as odf_get_container(), but the template package is
+    read-only.
 
 Methods
+~~~~~~~
 
 clone()
 	Returns a new odf_container that is a copy of the current instance.
@@ -46,12 +48,10 @@ del_part(part_name)
 	Deletes a part in the container. The target part is selected
 	according to the same rules as with get_part().
 	
-	This part deletion apply to the odf_container object but not
+	This part deletion applies to the odf_container object but not
 	immediately to the physical underlying package. It's made
 	persistent by the next save() call, like any other change
-	regarding an odf_package.
-	
-	Returns true if success, null otherwise.
+	regarding an odf_container.
 
 get_part(part_name)
 	Extracts and returns a part, i.e. either a member file of the package,
@@ -76,13 +76,13 @@ get_part(part_name)
 	existing part.
 
 set_part(part_name, data)
-	Creates or replace a part in the current odf_container using external
+	Creates or replaces a part in the current odf_container using external
 	raw data.
 	
 	The target part_name is selected according to the same rules as with
 	get_part().
 	
-	As with del_part(), the change apply to the odf_container object in
+	As with del_part(), the change applies to the odf_container object in
 	memory but it doesn't affect the corresponding persistent package
 	before the next call of the save() method.
 	
@@ -91,6 +91,10 @@ set_part(part_name, data)
 	is responsible of the XML well-formedness and ODF compliance of this
 	material.
 
+save(uri, packaging)
+    Saves the container to the optionally given URI (or by default the same
+    URI it was loaded from). The container is saved in the same packaging
+    format than when it was open, unless it is given "flat" or "zip".
 
     odf_container container
 
@@ -106,279 +110,128 @@ set_part(part_name, data)
     container.del_part(part_name)
 
 
-TODO
-^^^^
+0.1 XML Parts
+=============
 
-::
+odf_xmlpart
+-----------
 
-    container.save()
-    container.save(packaging)
-    container.save(uri)
-    container.save(uri, packaging)
+The odf_xmlpart object represents one of the XML formats that form the Open
+Document Format: content, styles, meta, settings.
 
-with ``packaging = {flat, zip}``
+Constructors
+~~~~~~~~~~~~
 
+odf_xmlpart(part_name, container)
+    Extracts the part from the container and load it as an XML part.
 
-Level 0.1
----------
-::
+The main interface is sending XPath queries to get odf_element's.
 
-    odf_xmlpart part
+Methods
+~~~~~~~
 
-    part = odf_xmlpart(part_name, container)
+get_element_list(xpath_query)
+    Returns the list of odf_element matching the given XPath query in the
+    whole part. An empty list is returned if no element matches.
 
-    part.events
-    part.container
-    part.serialize()
+get_element(xpath_query)
+    Returns the first odf_element matching the given XPath query in the whole
+    part. Null is returned if no element matches.
 
-    list l_elt = part.get_element_list("//xpath...")
+serialize(pretty)
+    Returns the part as an XML document string. If pretty is true, the XML is
+    pretty printed.
 
-    odf_element elt = l_elt[0]
+delete(child)
+    Deletes a child odf_element from the part.
 
-    elt.get_element_list("//xpath...")
+odf_element
+-----------
 
-    value = elt.get_attribute(name)
-    elt.set_attribute(name, value)
+From the odf_xmlpart, you extract odf_element objects. They are an abstraction
+of the XML library used behind so they offer a basic XML API.
 
-    unicode text = elt.get_text()
-    elt.set_text(text)
+The main interface is sending XPath queries to get odf_element's.
 
-    odf_element e2 = odf_create_element('<element[...]')
-    elt.insert_element(e2, {previous_sibling, next_sibling, first_child,
-                            last_child, <N>})
-    e3 = elt.copy()
+Constructors
+~~~~~~~~~~~~~
 
-    elt.delete()
+odf_create_element(data)
+    Creates an odf_element from a fragment of XML data. XML prefixes common to
+    ODF are allowed.
 
+Methods
+~~~~~~~
 
-Level 1
-=======
-::
+get_name()
+    Get the tag name with its prefix.
 
-    odf_document document
+get_element_list(xpath_query)
+    Get a list of odf_element children matching the given query. An empty list
+    is returned if no element matches.
 
-    document = odf_get_document(uri)
-    document = odf_new_document_from_class(odf_class)
-    document = odf_new_document_from_template(template_uri)
+get_element(xpath_query)
+    Returns the first odf_element child matching the given XPath query in the
+    whole part. Null is returned if no element matches.
 
-    document.get_paragraph_list()
-    document.get_paragraph_list(style)
-    document.get_paragraph_list(context)
-    document.get_paragraph_list(style, context)
+get_attributes()
+    Returns the mapping (dictionary) of attributes carried by the element.
+    An empty mapping is returned if the element has no attribute.
 
-      => '//text:p[@text:style-name="$style"]'
+get_attribute(name)
+    Returns the string value of the attribute having this name. The name must
+    be prefixed.
 
-    document.get_heading_list()
-    document.get_heading_list(style)
-    document.get_heading_list(level)
-    document.get_heading_list(context)
-    document.get_heading_list(style, level)
-    document.get_heading_list(style, level, context)
+set_attribute(name, value)
+    Creates the attribute or updates its string value. The name must be
+    prefixed.
 
-      => assert level >= 1
-      => '//text:h[@text:style-name="%s"]' % style
-      => '//text:h[@text:level="%s"]' % level
+del_attribute(name)
+    Deletes the attribute having this name. The name must be prefixed.
 
-    document.get_paragraph(position)
-    document.get_paragraph(position, context)
+get_text()
+    Returns the text contents of the element in the most appropriate type for
+    text, e.g. unicode. It is not recursive. Null is returned if the element
+    contains no text.
 
-      => assert position >= 1
-      => '//text:p[%s]' % position
+set_text(text, after)
+    Sets the text content of the element. The text is typed in the most
+    appropriate type for text, e.g. unicode. If after is true, the text is set
+    after the closing tag (useful for inserting an element in the middle of
+    text content).
 
-    document.get_heading(position)
-    document.get_heading(position, level)
-    document.get_heading(position, context)
-    document.get_heading(position, level, context)
+get_creator()
+    Shortcut to get the creator value of odf_element's containing a
+    "dc:creator" element. Null is returned if no creator is set.
 
-      => assert position >= 1
-      => assert level >= 1
-      => '//text:h[@text:level="%s"][%s]' % (level, position)
+get_date()
+    Shortcut to get the date value of odf_element's containing a
+    "dc:date" element. Null is returned if no creator is set.
 
-    document.get_style(name)
-
-      => only paragraph styles for now (family=paragraph)
-      => search algorithm:
-        - same part, automatic styles
-        - same part, named styles
-        - styles part, named styles
-        - default style of the same family
-
-    odf_element elt = odf_create_paragraph(style)
-
-      => '<text:p text:style-name="$style"></text:p>'
-
-    odf_element elt = odf_create_paragraph(style, text)
-
-      => '<text:p text:style-name="$style">$text</text:p>'
-
-    odf_element elt = odf_create_heading(style, level)
-
-      => '<text:h text:style-name="$style" text:level="$level"></text:h>'
-
-    odf_element elt = odf_create_heading(style, level, text)
-
-      => '<text:h text:style-name="$style" text:level="$level">$text</text:h>'
-
-    document.insert_paragraph(element)
-    document.insert_paragraph(element, context)
-
-    document.insert_heading(element)
-    document.insert_heading(element, context)
-
-Hint: preload the body, etc. for fast access to default contexts.
-
-
-
-Styles
--------
-
-- style type: font face, default style...
-- style family: font family, text, paragraph, graphics, number...
-- style parent (inheritance)
-- [style class: ... ?]
-
-
-Image
------
-
-::
-
-    odf_element <= odf_create_frame(name, style, width, height,
-                                    page=None, x=None, y=None)
-    if page is None => anchor = paragraph
-
-    document.insert_frame(frame)
-    document.insert_frame(frame, context)
-
-    odf_element <= odf_create_image(link)
-
-    document.insert_image(element, context)
-    (here the context is a frame)
-      or
-    document.insert_image(element)
-    => We create automatically a frame
-
-
-    name must be unique
-    => "draw:frame"
-
-    <draw:frame draw:name="Logo" draw:style-name="Centered Image"
-                draw:z-index="1" svg:height="53mm" svg:width="91mm"
-                text:anchor-page-number="1" text:anchor-type="page">
-        <draw:image xlink:href="Pictures/image.png"/>
-    </draw:frame>
-
-    text:anchor-type = {page|paragraph}
-      if page => text:anchor-page-number="..."
-                 svg:x="..." \
-                               give the position
-                 svg:y="..." /
-
-      if paragraph => nothing
-
-
-
-Table
------
-
-::
-
-  No column in odf, just lines
-  The columns are only used to define the style for a group of cells
-
-      <table:table table:name="..." table:style-name="...">
-        <table:table-column table:style-name="..."/>
-        <table:table-column table:style-name="..."/>
-
-        <table:table-row>
-
-          <table:table-cell office:value-type="String">
-
-          </table:table-cell>
-
-
-        </table:table-row>
-
-      </table:table>
-
-      In a cell, we cannot have a cell or a line. But we can have paragraphs,
-      sections, ...
-
-
-  odt_element <= odf_create_cell()
-  odt_element <= odf_create_row(width=None)
-  odt_element <= odf_create_column()
-
-  odt_element <= odf_create_table(name, style, width=None, height=None)
-
-  document.insert_table(element, context=None, position=None)
-
-  document.insert_row(table, context, position)
-  document.insert_column(table, context, position)
-  document.insert_cell(row, context, position)
-
-
-List
-----
-::
-
-  odt_element <= odt_create_item()
-  odt_element <= odf_create_list(style)
-
-  <text:list text:style-name="Standard">
-    <text:list-item>
-      ...
-    </text:list-item>
-  </text:list>
-
-  document.insert_list(element, context, position)
-  document.insert_item(element, list, position)
-
-
-
-
-
-TODO
-====
-
-named styles, automatic styles
-style families:
-
-manifest?
-
-Make this use case:
-  - Read a directory
-    for each file =>
-        if image => insert it
-        if csv => make a table
-
-
-Element manipulation:
-
-    - Insert a sub-element at a given position: note, annotation, field...
-    - Replace some text of the element by a sub-element: hyperlink, automatic
-      style...
-    - Searching text without couting text:span, text:a, etc. (like a raw
-      search on element.get_content())
-    - Returning the lowest odf_element containing the whole text (if the text
-      is across several span/a, return the p) in the document or the given
-      context, and the offset where the text begins in the content.
-    - Returning the nearest odf_element containing the whole text or the start
-      of the text (if across several span/a) in the odf_element and its
-      sub-elements (the "p" element in the above case), and the offset where
-      the text begins in the content.
-    - Insert a new element at this position, and it may include removing all
-      or part of the text and replacing it in the new element
-
-
-XPath Requirements
-==================
-
-::
-
-    //text:p
-    //text:p[4]
-    //text:section[4]/text:p[5]
-    //text:p[@text:style-name="Note"]
-    //draw:frame[@draw:name="image1"]/draw:image
-    //text:p[@text:style-name="Note"][4]
+get_text_content()
+    Shortcut to get the text of paragraphs inside the element. An empty string
+    is returned by default.
+
+set_text_content(text)
+    Shortcut to set text content inside a paragraph inside the element. The
+    text is typed in the most appropriate type for text, e.g. unicode. Any
+    previous child element is deleted.
+
+insert_element(element, {FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING})
+    Insert the given odf_element at the given position.
+    FIRST_CHILD: the odf_element will be the first child.
+    LAST_CHILD: the odf_element will be the last child.
+    NEXT_SIBLING: the odf_element will be inserted just after.
+    PREV_SIBLING: the odf_element will be inserted just before.
+
+clear()
+    Removes all children and text from the element.
+
+copy()
+    Returns another instance of the element with the same properties.
+
+serialize()
+    Returned an XML fragment string of the element.
+
+delete(child)
+    Removes the odf_element child.
