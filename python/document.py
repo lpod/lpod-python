@@ -1134,7 +1134,7 @@ class odf_document(object):
         if element is None:
             return None
         statistic = {}
-        for key, value in element.iteritems():
+        for key, value in element.get_attributes().iteritems():
             statistic[key] = int(value)
         return statistic
 
@@ -1161,7 +1161,7 @@ class odf_document(object):
             raise TypeError, "statistic must be a dict"
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:document-statistic')
-        for key, value in statistic.iteritems():
+        for key, value in statistic.get_attributes().iteritems():
             if type(key) is not str:
                 raise TypeError, "statistic key must be a str"
             if type(value) is not int:

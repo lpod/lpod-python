@@ -109,8 +109,9 @@ class odf_element(object):
         self.__element = native_element
 
 
-    def get_tag(self):
-        return get_prefixed_name(self.__element.tag)
+    def get_name(self):
+        element = self.__element
+        return get_prefixed_name(element.tag)
 
 
     def get_element_list(self, xpath_query):
@@ -126,36 +127,12 @@ class odf_element(object):
         return result[0]
 
 
-    def iterkeys(self):
-        element = self.__element
-        # TODO replace "{uri}" by prefix, see "iteritems"
-        return element.attrib.iterkeys()
-
-
-    def keys(self):
-        return list(self.iterkeys())
-
-
-    def itervalues(self):
-        element = self.__element
-        return element.attrib.itervalues()
-
-
-    def values(self):
-        return list(self.itervalues())
-
-
-    def iteritems(self):
+    def get_attributes(self):
+        attributes = {}
         element = self.__element
         for key, value in element.attrib.iteritems():
-            yield get_prefixed_name(key), value
-
-
-    def items(self):
-        return list(self.iteritems())
-
-
-    # TODO get_attributes -> dict
+            attributes[get_prefixed_name(key)] = value
+        return attributes
 
 
     def get_attribute(self, name):

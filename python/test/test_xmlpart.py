@@ -52,9 +52,22 @@ class ElementTestCase(TestCase):
 
 
     def test_get_element_list(self):
-        elements = self.content_part.get_element_list('//text:p')
+        content_part = self.content_part
+        elements = content_part.get_element_list('//text:p')
         # The annotation paragraph is counted
         self.assertEqual(len(elements), 7)
+
+
+    def test_get_name(self):
+        element = self.paragraph_element
+        self.assertEqual(element.get_name(), 'text:p')
+
+
+    def test_get_attributes(self):
+        element = self.paragraph_element
+        attributes = element.get_attributes()
+        excepted = {'text:style-name': "Text_20_body"}
+        self.assertEqual(attributes, excepted)
 
 
     def test_get_attribute(self):
@@ -196,7 +209,7 @@ class ElementTestCase(TestCase):
     def test_delete(self):
         element = odf_create_element('<a><b/></a>')
         child = element.get_element('//b')
-        child.delete()
+        element.delete(child)
         self.assertEqual(element.serialize(), '<a/>')
 
 
@@ -223,11 +236,18 @@ class XmlPartTestCase(TestCase):
         self.assertEqual(len(elements), 7)
 
 
-    def serialize(self):
+    def test_serialize(self):
         container = self.container
         content_bytes = container.get_part('content')
         content_part = odf_xmlpart('content', container)
-        self.assertEqual(content_bytes, content_part.serialize())
+        # differences with lxml
+        serialized = ('<?xml version="1.0" encoding="UTF-8"?>\n' +
+                      content_part.serialize().replace("\\'", "'"))
+        self.assertEqual(content_bytes, serialized)
+
+
+    def test_delete(self):
+        raise NotImplementedError
 
 
 
