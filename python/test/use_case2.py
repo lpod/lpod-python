@@ -35,9 +35,9 @@ frame = odf_create_frame('frame1', 'Graphics',
                          str(height / 72.0) + 'in')
 internal_name = 'Pictures/image.png'
 image = odf_create_image(internal_name)
-document.insert_image(image, frame)
-document.insert_frame(frame, paragraph)
-document.insert_paragraph(paragraph)
+document.insert_element(image, frame)
+document.insert_element(frame, paragraph)
+document.insert_element(paragraph)
 
 # And store the data
 container = document.container
@@ -46,8 +46,8 @@ container.set_part(internal_name, image_file.to_str())
 
 # 2- a paragraph
 # --------------
-heading = odf_create_heading('Heading', 1, 'Congratulations !')
-document.insert_heading(heading)
+heading = odf_create_heading('Heading', 1, u'Congratulations !')
+document.insert_element(heading)
 
 # The style
 style = odf_create_style('style1')
@@ -55,79 +55,65 @@ style.set_attribute('style:parent-style-name', 'Standard')
 properties = odf_create_style_text_properties()
 properties.set_attribute('fo:color', '#0000ff')
 properties.set_attribute('fo:background-color', '#ff0000')
-document.insert_style_properties(properties, style)
-document.insert_style(style)
+document.insert_element(properties, style)
+document.insert_element(style)
 
 # The paragraph
-paragraph = odf_create_paragraph('style1', 'A paragraph with a new style.')
-document.insert_paragraph(paragraph)
+paragraph = odf_create_paragraph('style1', u'A paragraph with a new style.')
+document.insert_element(paragraph)
 
 
 # 3- the table
 # ------------
-heading = odf_create_heading('Heading', 1, 'A table')
-document.insert_heading(heading)
+heading = odf_create_heading('Heading', 1, u'A table')
+document.insert_element(heading)
 
 table = odf_create_table('table1', 'Standard')
 
 # A "float"
 row = odf_create_row()
 
-cell = odf_create_cell()
-paragraph = odf_create_paragraph('Standard', 'A float')
-document.insert_paragraph(paragraph, cell)
-document.insert_cell(cell, row)
+cell = odf_create_cell('A float')
+document.insert_element(cell, row)
 
+cell = odf_create_cell(3.14)
+document.insert_element(cell, row)
 
-cell = odf_create_cell('float')
-cell.set_attribute('office:value', '3.14')
-paragraph = odf_create_paragraph('Standard', '3,14')
-document.insert_paragraph(paragraph, cell)
-document.insert_cell(cell, row)
-
-document.insert_row(row, table)
+document.insert_element(row, table)
 
 # A "date"
 row = odf_create_row()
 
-cell = odf_create_cell()
-paragraph = odf_create_paragraph('Standard', 'A date')
-document.insert_paragraph(paragraph, cell)
-document.insert_cell(cell, row)
+cell = odf_create_cell('A date')
+document.insert_element(cell, row)
 
+cell = odf_create_cell(datetime.now())
+document.insert_element(cell, row)
 
-cell = odf_create_cell('date')
-now = datetime.now()
-enc = DateTime.encode(now)
-cell.set_attribute('office:date-value', enc)
-paragraph = odf_create_paragraph('Standard', now.strftime('%c'))
-document.insert_paragraph(paragraph, cell)
-document.insert_cell(cell, row)
-
-document.insert_row(row, table)
+document.insert_element(row, table)
 
 # Columns => Standard
 for i in range(2):
     column = odf_create_column('Standard')
-    document.insert_column(column, table, FIRST_CHILD)
-document.insert_table(table)
+    document.insert_element(column, table, FIRST_CHILD)
+document.insert_element(table)
 
 
 # 4- A footnote
 # -------------
 
-heading = odf_create_heading('Heading', 1, 'A paragraph with a footnote')
-document.insert_heading(heading)
+heading = odf_create_heading('Heading', 1, u'A paragraph with a footnote')
+document.insert_element(heading)
 
-paragraph = odf_create_paragraph('Standard', 'An other paragraph.')
-document.insert_paragraph(paragraph)
+paragraph = odf_create_paragraph('Standard', u'An other paragraph.')
+document.insert_element(paragraph)
 
-note = odf_create_note('1', id='note1')
-body =  odf_create_paragraph('Standard', 'a footnote')
+note = odf_create_note(u'1', id='note1')
+body =  odf_create_paragraph('Standard', u'a footnote')
 document.insert_note_body(body, note)
 
-document.insert_note(note, paragraph)
-document.insert_paragraph(paragraph)
+document.insert_element(note, paragraph, offset=8)
+document.insert_element(paragraph)
 
 
 vfs.make_folder('trash')
