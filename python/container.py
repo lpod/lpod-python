@@ -9,7 +9,9 @@ from cStringIO import StringIO
 # Import from itools
 from itools import vfs
 from itools.vfs import WRITE
-from itools.core import get_abspath
+
+# Import from lpod
+from utils import _get_abspath
 
 
 # Classes and their default template
@@ -289,5 +291,5 @@ def odf_new_container_from_class(odf_class):
     if odf_class not in ODF_CLASSES:
         raise ValueError, 'unknown ODF class "%s"' % odf_class
     template_path = ODF_CLASSES[odf_class]
-    template_uri = get_abspath(template_path)
+    template_uri = _get_abspath(template_path)
     return odf_new_container_from_template(template_uri)

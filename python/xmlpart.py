@@ -5,14 +5,11 @@
 from copy import deepcopy
 from re import compile
 
-# Import from itools
-from itools.core import get_abspath
-
 # Import from lxml
 from lxml.etree import fromstring, tostring, _Element
 
 # Import from lpod
-from utils import _check_arguments, DateTime
+from utils import _check_arguments, DateTime, _get_abspath
 
 
 ODF_NAMESPACES = {
@@ -53,7 +50,7 @@ ns_stripper = compile(' xmlns:\w*="[\w:\-\/\.#]*"')
 
 
 # An empty XML document with all namespaces declared
-ns_document_path = get_abspath('templates/namespaces.xml')
+ns_document_path = _get_abspath('templates/namespaces.xml')
 with open(ns_document_path, 'rb') as file:
     ns_document_data = file.read()
 

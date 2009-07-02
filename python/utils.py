@@ -3,8 +3,9 @@
 
 # Import from the Standard Library
 from datetime import datetime, timedelta
-
-# Import from lpod
+from sys import _getframe, modules
+from os import getcwd
+from os.path import splitdrive, join, sep
 
 
 DATE_FORMAT = '%Y-%m-%d'
@@ -28,6 +29,34 @@ NOTE_CLASSES = ('footnote', 'endnote')
 
 
 
+def _get_abspath(local_path):
+    """Returns the absolute path to the required file.
+    """
+
+    mname = _getframe(1).f_globals.get('__name__')
+
+    if mname == '__main__' or mname == '__init__':
+        mpath = getcwd()
+    else:
+        module = modules[mname]
+        if hasattr(module, '__path__'):
+            mpath = module.__path__[0]
+        elif '.' in mname:
+            mpath = modules[mname[:mname.rfind('.')]].__path__[0]
+        else:
+            mpath = mname
+
+    drive, mpath = splitdrive(mpath)
+    mpath = drive + join(mpath, local_path)
+
+    # Make it working with Windows. Internally we use always the "/".
+    if sep == '\\':
+        mpath = mpath.replace(sep, '/')
+
+    return mpath
+
+
+
 def _generate_xpath_query(element_name, attributes={}, position=None,
                           context=None):
     if context is None:
@@ -46,6 +75,7 @@ def _generate_xpath_query(element_name, attributes={}, position=None,
     if position is not None:
         query.append('[{position}]'.format(position=str(position)))
     return ''.join(query)
+
 
 
 def _get_cell_coordinates(name):
@@ -71,6 +101,7 @@ def _get_cell_coordinates(name):
         raise ValueError, 'cell name "%s" is malformed' % name
 
     return x, y
+
 
 
 def _check_arguments(context=None, element=None, xmlposition=None,
