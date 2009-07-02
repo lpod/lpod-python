@@ -258,9 +258,10 @@ def odf_create_list_item(text=None):
 
     Return: odf_element
 
-    To create a list item with several paragraphs or anything else (except
-    tables), first create an empty list item, insert it in the document, and
-    insert your element using the appropriate function.
+    The "text" argument is just a shortcut for the most common case. To create
+    a list item with several paragraphs or anything else (except tables),
+    first create an empty list item, insert it in the document, and insert
+    your element using the list item as the context.
     """
     element = odf_create_element('<text:list-item/>')
     if text is not None:
