@@ -6,7 +6,6 @@ from datetime import datetime
 
 # Import from itools
 from itools import vfs
-from itools.datatypes import DateTime
 from itools.handlers import get_handler
 
 
