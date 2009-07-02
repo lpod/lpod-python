@@ -214,7 +214,7 @@ class TestParagraph(TestCase):
         clone = document.clone()
         paragraph = odf_create_paragraph('Text_20_body',
                                          u'An inserted test')
-        clone.insert_paragraph(paragraph)
+        clone.insert_element(paragraph)
         last_paragraph = clone.get_paragraph_list()[-1]
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
 
@@ -295,7 +295,7 @@ class TestHeading(TestCase):
         clone = document.clone()
         heading = odf_create_heading('Heading_20_2', 2,
                                      u'An inserted heading')
-        clone.insert_heading(heading)
+        clone.insert_element(heading)
         last_heading = clone.get_heading_list()[-1]
         self.assertEqual(last_heading.get_text(), u'An inserted heading')
 
@@ -331,8 +331,8 @@ class TestFrame(TestCase):
         self.assertEqual(frame2.serialize(), expected)
 
         # Insert OK ?
-        document.insert_frame(frame1)
-        document.insert_frame(frame2)
+        document.insert_element(frame1)
+        document.insert_element(frame2)
 
         # Get OK ?
         get = document.get_frame(name='frame1')
@@ -363,8 +363,8 @@ class TestImage(TestCase):
 
         # Insert OK ?
         frame = odf_create_frame('frame_image', 'Graphics', '0cm', '0cm')
-        document.insert_image(image, frame)
-        document.insert_frame(frame)
+        document.insert_element(image, frame)
+        document.insert_element(frame)
 
         # Get OK ?
         get = document.get_image(name='frame_image')
@@ -657,10 +657,10 @@ class TestTable(TestCase):
         row = odf_create_row()
         cell = odf_create_cell(u"")
 
-        clone.insert_cell(cell, row)
-        clone.insert_column(column, table)
-        clone.insert_row(row, table)
-        clone.insert_table(table)
+        clone.insert_element(cell, row)
+        clone.insert_element(column, table)
+        clone.insert_element(row, table)
+        clone.insert_element(table)
 
         expected = ('<table:table table:name="a_table" '
                       'table:style-name="a_style">'
@@ -712,8 +712,8 @@ class TestList(TestCase):
         clone = document.clone()
         item = odf_create_list_item()
         a_list = odf_create_list('a_style')
-        clone.insert_list_item(item, a_list)
-        clone.insert_list(a_list)
+        clone.insert_element(item, a_list)
+        clone.insert_element(a_list)
 
         expected = ('<text:list text:style-name="a_style">'
                     '<text:list-item/>'
@@ -763,8 +763,8 @@ class TestStyle(TestCase):
         properties = odf_create_style_text_properties()
         properties.set_attribute('fo:color', '#0000ff')
         properties.set_attribute('fo:background-color', '#ff0000')
-        clone.insert_style_properties(properties, style)
-        clone.insert_style(style)
+        clone.insert_element(properties, style)
+        clone.insert_element(style)
 
         expected = ('<style:style style:name="style1" '
                                  'style:family="paragraph">'
@@ -795,8 +795,10 @@ class TestNote(TestCase):
         # TODO stop here and compare to the snippet
 
         # Insert OK ?
+        clone = document.clone()
+        paragraph = clone.get_paragraph(1)
         document.insert_note_body(body, note)
-        document.insert_note(note)
+        document.insert_element(note, paragraph)
 
         # Get OK ?
         expected = ('<text:note text:note-class="footnote" text:id="note1">'
@@ -806,9 +808,10 @@ class TestNote(TestCase):
                           'a footnote'
                         '</text:p>'
                       '</text:note-body>'
-                    '</text:note>')
-        get1 = document.get_note('note1')
-        get2 = document.get_note_list(note_class='footnote')[-1]
+                    '</text:note>'
+                    'This is the first paragraph.')
+        get1 = clone.get_note('note1')
+        get2 = clone.get_note_list(note_class='footnote')[-1]
         self.assertEqual(get1.serialize(), expected)
         self.assertEqual(get2.serialize(), expected)
 
@@ -965,7 +968,7 @@ class TestAnnotation(TestCase):
         text = u"It's like you're in a cave."
         annotation = odf_create_annotation(creator, text)
         context = clone.get_paragraph(1)
-        clone.insert_annotation(annotation, context, offset=27)
+        clone.insert_element(annotation, context, offset=27)
         annotations = clone.get_annotation_list()
         self.assertEqual(len(annotations), 2)
         first_annotation = annotations[0]
@@ -988,7 +991,7 @@ class TestGetCell(TestCase):
         table = odf_create_table('a_table', 'Standard')
         column = odf_create_column('Standard')
         column.set_attribute('table:number-columns-repeated', '7')
-        document.insert_column(column, table)
+        document.insert_element(column, table)
 
         # 3 x "1 1 1 2 3 3 3"
         row = odf_create_row()
@@ -996,25 +999,25 @@ class TestGetCell(TestCase):
         # 3 x "1"
         cell = odf_create_cell(u'1')
         cell.set_attribute('table:number-columns-repeated', '3')
-        document.insert_cell(cell, row)
+        document.insert_element(cell, row)
         # 1 x "2"
         cell = odf_create_cell(u'2')
-        document.insert_cell(cell, row)
+        document.insert_element(cell, row)
         # 3 x "3"
         cell = odf_create_cell(u'3')
         cell.set_attribute('table:number-columns-repeated', '3')
-        document.insert_cell(cell, row)
+        document.insert_element(cell, row)
 
-        document.insert_row(row, table)
+        document.insert_element(row, table)
 
         # 1 x "1 2 3 4 5 6 7"
         row = odf_create_row()
         for i in xrange(1, 8):
             cell = odf_create_cell(unicode(i))
-            document.insert_cell(cell, row)
-        document.insert_row(row, table)
+            document.insert_element(cell, row)
+        document.insert_element(row, table)
 
-        document.insert_table(table)
+        document.insert_element(table)
 
         self.document = document
 

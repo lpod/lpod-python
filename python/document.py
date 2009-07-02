@@ -421,10 +421,9 @@ class odf_document(object):
         return result[0]
 
 
-    def __insert_element(self, element, context, xmlposition, offset=0):
-        # TODO make it public and remove "insert_*" methods
+    def __insert_element(self, element, context, xmlposition, offset):
         _check_arguments(element=element, context=context,
-                         xmlposition=xmlposition)
+                         xmlposition=xmlposition, offset=offset)
         if context is not None:
             context.insert_element(element, xmlposition)
         else:
@@ -433,6 +432,51 @@ class odf_document(object):
             # FIXME hardcoded odt body element
             office_text = content.get_element_list('//office:text')[-1]
             office_text.insert_element(element, LAST_CHILD)
+
+
+    def insert_element(self, element, context=None, xmlposition=LAST_CHILD,
+                       offset=0):
+
+        # Search the good method to insert the element
+        qname = element.get_name()
+
+        # => An image
+        if qname == 'draw:image':
+            self.__insert_image(element, context, xmlposition, offset)
+
+        # => With these elements, the context cannot be None
+        elif qname in ('table:table-column', 'table:table-row',
+                       'table:table-cell', 'text:list-item',
+                       'style:text-properties'):
+            if context is None:
+                raise TypeError, ('insertion of "%s": context cannot be None'
+                                  % qname)
+            self.__insert_element(element, context, xmlposition, offset)
+
+        # => 'In paragraph' elements
+        # Offset is the position in the paragraph where the element is
+        # inserted. Hence the context is mandatory and the XML position makes
+        # no sense.
+        elif qname in ('text:note', 'office:annotation'):
+            if context is None:
+                raise TypeError, ('insertion of "%s": context cannot be None'
+                                  % qname)
+            text = context.get_text()
+            before, after = text[:offset], text[offset:]
+            context.set_text(before)
+            context.insert_element(element, xmlposition=LAST_CHILD)
+            element.set_text(after, after=True)
+
+        # => Styles
+        elif qname == 'style:style':
+            _check_arguments(element=element)
+            styles = self.__get_xmlpart('styles')
+            office_styles = styles.get_element('//office:styles')
+            office_styles.insert_element(element, LAST_CHILD)
+
+        # => Generic insert
+        else:
+            self.__insert_element(element, context, xmlposition, offset)
 
 
     def clone(self):
@@ -485,10 +529,6 @@ class odf_document(object):
         return self.__get_element('text:section', position, context=context)
 
 
-    def insert_section(self, element, context=None, xmlposition=LAST_CHILD):
-        self.__insert_element(element, context, xmlposition)
-
-
     #
     # Paragraphs
     #
@@ -500,11 +540,6 @@ class odf_document(object):
 
     def get_paragraph(self, position, context=None):
         return self.__get_element('text:p', position, context=context)
-
-
-    def insert_paragraph(self, element, context=None,
-                         xmlposition=LAST_CHILD):
-        self.__insert_element(element, context, xmlposition)
 
 
     #
@@ -532,10 +567,6 @@ class odf_document(object):
                                   context=context)
 
 
-    def insert_heading(self, element, context=None, xmlposition=LAST_CHILD):
-        self.__insert_element(element, context, xmlposition)
-
-
     #
     # Frames
     #
@@ -553,21 +584,17 @@ class odf_document(object):
                                   context=context)
 
 
-    def insert_frame(self, element, context=None, position=LAST_CHILD):
-        self.__insert_element(element, context, position)
-
-
     #
     # Images
     #
 
-    def insert_image(self, element, context=None, xmlposition=LAST_CHILD):
+    def __insert_image(self, element, context, xmlposition, offset):
         # XXX If context is None
         #     => auto create a frame with the good dimensions
         if context is None:
             raise NotImplementedError
 
-        self.__insert_element(element, context, xmlposition)
+        self.__insert_element(element, context, xmlposition, offset)
 
 
     def get_image(self, position=None, name=None, context=None):
@@ -592,26 +619,6 @@ class odf_document(object):
                                   attributes=attributes, context=context)
 
 
-    def insert_table(self, element, context=None, xmlposition=LAST_CHILD):
-        self.__insert_element(element, context, xmlposition)
-
-
-    #
-    # Columns
-    #
-
-    def insert_column(self, element, context, xmlposition=LAST_CHILD):
-        context.insert_element(element, xmlposition)
-
-
-    #
-    # Rows
-    #
-
-    def insert_row(self, element, context, xmlposition=LAST_CHILD):
-        context.insert_element(element, xmlposition)
-
-
     def get_row_list(self, style=None, context=None):
         return self.__get_element_list('table:table-row', style=style,
                                        context=context)
@@ -620,10 +627,6 @@ class odf_document(object):
     #
     # Cells
     #
-
-    def insert_cell(self, element, context, xmlposition=LAST_CHILD):
-        context.insert_element(element, xmlposition)
-
 
     def get_cell_list(self, style=None, context=None):
         return self.__get_element_list('table:table-cell', style=style,
@@ -661,18 +664,6 @@ class odf_document(object):
 
 
     #
-    # Lists
-    #
-
-    def insert_list(self, element, context=None, xmlposition=LAST_CHILD):
-        self.__insert_element(element, context, xmlposition)
-
-
-    def insert_list_item(self, element, context, xmlposition=LAST_CHILD):
-        context.insert_element(element, xmlposition)
-
-
-    #
     # Notes
     #
 
@@ -690,10 +681,6 @@ class odf_document(object):
         attributes = {'text:id': id}
         return self.__get_element('text:note', attributes=attributes,
                                   context=context)
-
-
-    def insert_note(self, element, context=None, xmlposition=LAST_CHILD):
-        self.__insert_element(element, context, xmlposition)
 
 
     def insert_note_body(self, element, context):
@@ -734,19 +721,6 @@ class odf_document(object):
         return annotations[0]
 
 
-    def insert_annotation(self, element, context, offset=0):
-        """Offset is the position in the paragraph where the annotation is
-        inserted.
-        Hence the context is mandatory and the XML position makes no sense.
-        """
-        _check_arguments(element=element, context=context, offset=offset)
-        text = context.get_text()
-        before, after = text[:offset], text[offset:]
-        context.set_text(before)
-        context.insert_element(element, xmlposition=LAST_CHILD)
-        element.set_text(after, after=True)
-
-
     #
     # Styles
     #
@@ -765,17 +739,6 @@ class odf_document(object):
         return self.__get_element('style:style', attributes=attributes,
                                   part='styles')
 
-
-    def insert_style(self, element):
-        _check_arguments(element=element)
-        styles = self.__get_xmlpart('styles')
-        office_styles = styles.get_element('//office:styles')
-        office_styles.insert_element(element, LAST_CHILD)
-
-
-    def insert_style_properties(self, element, context):
-        _check_arguments(element=element, context=context)
-        context.insert_element(element, LAST_CHILD)
 
 
     #
@@ -894,7 +857,8 @@ class odf_document(object):
             >>> document.set_language('fr-FR')
         """
         if type(language) is not str:
-            raise TypeError, 'language must be "xx-YY" lang-COUNTRY code (RFC3066)'
+            raise TypeError, ('language must be "xx-YY" lang-COUNTRY code '
+                              '(RFC3066)')
         # FIXME test validity?
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//dc:language')
