@@ -1136,7 +1136,7 @@ class odf_document(object):
             raise TypeError, "statistic must be a dict"
         meta = self.__get_xmlpart('meta')
         element = meta.get_element('//meta:document-statistic')
-        for key, value in statistic.get_attributes().iteritems():
+        for key, value in statistic.iteritems():
             if type(key) is not str:
                 raise TypeError, "statistic key must be a str"
             if type(value) is not int:
