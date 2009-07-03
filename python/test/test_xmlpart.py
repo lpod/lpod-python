@@ -242,7 +242,7 @@ class XmlPartTestCase(TestCase):
         content_part = odf_xmlpart('content', container)
         # differences with lxml
         serialized = ('<?xml version="1.0" encoding="UTF-8"?>\n' +
-                      content_part.serialize().replace("\\'", "'"))
+                      content_part.serialize().replace("'", "&apos;"))
         self.assertEqual(content_bytes, serialized)
 
 
