@@ -283,7 +283,7 @@ def odf_create_list(style):
 
 
 
-def odf_create_style(name, family='paragraph'):
+def odf_create_style(name, family):
     """Create a style element with the given name, related to the given
     family.
     Arguments:
@@ -738,11 +738,10 @@ class odf_document(object):
                                           context=context, part='styles'))
 
 
-    def get_style(self, name, family=None):
+    def get_style(self, name, family):
         _check_arguments(family=family)
-        attributes = {'style:name': name}
-        if family is not None:
-            attributes['style:family'] = family
+        attributes = {'style:name': name,
+                      'style:family': family}
         # 1. content
         element = self.__get_element('style:style', attributes=attributes,
                                      part='content')

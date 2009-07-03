@@ -733,7 +733,7 @@ class TestStyle(TestCase):
 
 
     def test_create_style(self):
-        style = odf_create_style('style1', family='paragraph')
+        style = odf_create_style('style1', 'paragraph')
         expected = ('<style:style style:name="style1" '
                       'style:family="paragraph"/>')
         self.assertEqual(style.serialize(), expected)
@@ -762,13 +762,13 @@ class TestStyle(TestCase):
 
     def test_get_style_automatic(self):
         document = self.document
-        style = document.get_style('P1')
+        style = document.get_style('P1', 'paragraph')
         self.assertNotEqual(style, None)
 
 
     def test_get_style_named(self):
         document = self.document
-        style = document.get_style('Heading_20_1')
+        style = document.get_style('Heading_20_1', 'paragraph')
         self.assertNotEqual(style, None)
 
 
@@ -787,7 +787,7 @@ class TestStyle(TestCase):
                       '<style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>'
                     '</style:style>')
-        get1 = clone.get_style('style1')
+        get1 = clone.get_style('style1', 'paragraph')
         self.assertEqual(get1.serialize(), expected)
 
 
