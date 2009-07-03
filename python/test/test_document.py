@@ -733,7 +733,7 @@ class TestStyle(TestCase):
 
 
     def test_create_style(self):
-        style = odf_create_style('style1', 'paragraph')
+        style = odf_create_style('style1', family='paragraph')
         expected = ('<style:style style:name="style1" '
                       'style:family="paragraph"/>')
         self.assertEqual(style.serialize(), expected)
@@ -749,11 +749,27 @@ class TestStyle(TestCase):
 
 
     def test_get_style_list(self):
-        raise NotImplementedError
+        document = self.document
+        styles = document.get_style_list()
+        self.assertEqual(len(styles), 12)
 
 
-    def test_get_style(self):
-        raise NotImplementedError
+    def test_get_style_list_family(self):
+        document = self.document
+        styles = document.get_style_list(family='paragraph')
+        self.assertEqual(len(styles), 10)
+
+
+    def test_get_style_automatic(self):
+        document = self.document
+        style = document.get_style('P1')
+        self.assertNotEqual(style, None)
+
+
+    def test_get_style_named(self):
+        document = self.document
+        style = document.get_style('Heading_20_1')
+        self.assertNotEqual(style, None)
 
 
     def test_insert_style(self):

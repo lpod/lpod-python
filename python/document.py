@@ -726,20 +726,31 @@ class odf_document(object):
     # Styles
     #
 
-    def get_style_list(self, family='paragraph', context=None):
+    def get_style_list(self, family=None, context=None):
         _check_arguments(family=family, context=context)
-        attributes = {'style:family': family}
-        return self.__get_element_list('style:style', attributes=attributes,
-                                       context=context, part='styles')
+        attributes = {}
+        if family is not None:
+            attributes['style:family'] = family
+        return (self.__get_element_list('style:style', attributes=attributes,
+                                        context=context, part='content')
+                + self.__get_element_list('style:style',
+                                          attributes=attributes,
+                                          context=context, part='styles'))
 
 
-    def get_style(self, name, family='paragraph'):
+    def get_style(self, name, family=None):
         _check_arguments(family=family)
-        attributes = {'style:name': name,
-                      'style:family': family}
+        attributes = {'style:name': name}
+        if family is not None:
+            attributes['style:family'] = family
+        # 1. content
+        element = self.__get_element('style:style', attributes=attributes,
+                                     part='content')
+        if element is not None:
+            return element
+        # 2. styles
         return self.__get_element('style:style', attributes=attributes,
                                   part='styles')
-
 
 
     #
