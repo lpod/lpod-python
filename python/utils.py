@@ -20,7 +20,7 @@ DURATION_FORMAT = 'PT%02dH%02dM%02dS'
 CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
               'time')
 
-STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'tablecolumn',
+STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'table-column',
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'default', 'drawing-page', 'graphic', 'presentation',
                   'control', 'ruby')
