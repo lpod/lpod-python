@@ -1,8 +1,10 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
-# Import from itools
-from itools.core import get_version
+# Import from lpod
+from utils import _get_abspath
 
-
-__version__ = get_version()
+try:
+    __version__ = open(_get_abspath('version.txt')).read().strip()
+except:
+    __version__ = None
