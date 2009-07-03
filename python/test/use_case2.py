@@ -17,7 +17,8 @@ from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_style, odf_create_style_text_properties
-from lpod.document import odf_create_note
+from lpod.document import odf_create_note, odf_create_span
+from lpod.styles import rgb2hex
 
 
 
@@ -52,8 +53,8 @@ document.insert_element(heading)
 style = odf_create_style('style1', 'paragraph')
 style.set_attribute('style:parent-style-name', 'Standard')
 properties = odf_create_style_text_properties()
-properties.set_attribute('fo:color', '#0000ff')
-properties.set_attribute('fo:background-color', '#ff0000')
+properties.set_attribute('fo:color', rgb2hex('blue'))
+properties.set_attribute('fo:background-color', rgb2hex('red'))
 document.insert_element(properties, style)
 document.insert_element(style)
 
@@ -114,6 +115,32 @@ document.insert_note_body(body, note)
 document.insert_element(note, paragraph, offset=8)
 document.insert_element(paragraph)
 
+
+# 5- An other paragraph
+# ---------------------
+
+heading = odf_create_heading('Heading', 1, u'A paragraph with a colored word')
+document.insert_element(heading)
+
+# The style
+style = odf_create_style('style2', 'text')
+style.set_attribute('style:parent-style-name', 'Standard')
+properties = odf_create_style_text_properties()
+properties.set_attribute('fo:background-color', rgb2hex('yellow'))
+document.insert_element(properties, style)
+document.insert_element(style)
+
+# The paragraph
+paragraph = odf_create_paragraph('Standard', u'And an ')
+span = odf_create_span('style2', u'other')
+document.insert_element(span, paragraph)
+span.set_text(u' paragraph.', True)
+document.insert_element(paragraph)
+
+
+
+# Save
+# ----
 
 vfs.make_folder('trash')
 document.save('trash/use_case2.odt', pretty=True)
