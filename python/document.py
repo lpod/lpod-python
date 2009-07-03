@@ -51,6 +51,23 @@ def odf_create_paragraph(style, text=u''):
 
 
 
+def odf_create_span(style, text=u''):
+    """Create a span element of the given style containing the optional
+    given text.
+    Arguments:
+
+        style -- str
+        text -- unicode
+
+    Return: odf_element
+    """
+    _check_arguments(style=style, text=text)
+    data = '<text:span text:style-name="%s">%s</text:span>'
+    text = text.encode('utf_8')
+    return odf_create_element(data % (style, text))
+
+
+
 def odf_create_heading(style, level, text=u''):
     """Create a heading element of the given style and level, containing the
     optional given text.

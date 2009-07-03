@@ -16,6 +16,7 @@ from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_list_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_annotation
+from lpod.document import odf_create_span
 from lpod.utils import _get_cell_coordinates, DateTime, Duration
 
 
@@ -217,6 +218,29 @@ class TestParagraph(TestCase):
         clone.insert_element(paragraph)
         last_paragraph = clone.get_paragraph_list()[-1]
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
+
+
+
+class TestSpan(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def tearDown(self):
+        del self.document
+
+
+    def test_create_span(self):
+        span = odf_create_span('my_style', u'my text')
+        expected = ('<text:span text:style-name="my_style">'
+                      'my text'
+                    '</text:span>')
+        self.assertEqual(span.serialize(), expected)
+
+
+    def test_insert_span(self):
+        raise NotImplementedError
 
 
 
