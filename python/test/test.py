@@ -9,9 +9,11 @@ import test_utils
 import test_container
 import test_xmlpart
 import test_document
+import test_styles
 
 
-test_modules = [test_utils, test_container, test_xmlpart, test_document]
+test_modules = [test_utils, test_container, test_xmlpart, test_document,
+                test_styles]
 
 
 loader = TestLoader()
