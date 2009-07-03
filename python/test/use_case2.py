@@ -49,7 +49,7 @@ heading = odf_create_heading('Heading', 1, u'Congratulations !')
 document.insert_element(heading)
 
 # The style
-style = odf_create_style('style1')
+style = odf_create_style('style1', 'paragraph')
 style.set_attribute('style:parent-style-name', 'Standard')
 properties = odf_create_style_text_properties()
 properties.set_attribute('fo:color', '#0000ff')
