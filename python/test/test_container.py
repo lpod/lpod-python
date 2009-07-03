@@ -4,14 +4,12 @@
 # Import from the Standard Library
 from unittest import TestCase, main
 
-# Import from itools
-from itools import vfs
-
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
-from lpod.container import odf_new_container_from_template
-from lpod.container import odf_new_container_from_class
 from lpod.container import odf_get_container
+from lpod.container import odf_new_container_from_class
+from lpod.container import odf_new_container_from_template
+from lpod.vfs import vfs
 
 
 class NewContainerFromTemplateTestCase(TestCase):

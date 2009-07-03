@@ -2,7 +2,6 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from itools
-from itools import vfs
 from itools.csv import CSVFile
 from itools.handlers import get_handler, Image
 
@@ -13,7 +12,7 @@ from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
-
+from lpod.vfs import vfs
 
 
 document = odf_new_document_from_class('text')

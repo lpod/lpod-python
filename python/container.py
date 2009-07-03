@@ -6,13 +6,9 @@ from copy import deepcopy
 from zipfile import ZipFile
 from cStringIO import StringIO
 
-# Import from itools
-from itools import vfs
-from itools.vfs import WRITE
-
 # Import from lpod
 from utils import _get_abspath
-
+from vfs import vfs, WRITE
 
 # Classes and their default template
 ODF_CLASSES = {
