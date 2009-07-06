@@ -231,7 +231,7 @@ class TestSpan(TestCase):
         del self.document
 
 
-    def test_create_insert_get_span(self):
+    def test_create_span(self):
 
         # Create OK ?
         span = odf_create_span('my_style', u'my text')
@@ -240,7 +240,20 @@ class TestSpan(TestCase):
                     '</text:span>')
         self.assertEqual(span.serialize(), expected)
 
+
+    def test_insert_span(self):
+
+        span = odf_create_span('my_style', u'my text')
+
         # Insert OK?
+        clone = self.document.clone()
+        paragraph = clone.get_paragraph(1)
+        clone.insert_element(span, paragraph)
+
+
+    def test_get_span(self):
+
+        span = odf_create_span('my_style', u'my text')
         clone = self.document.clone()
         paragraph = clone.get_paragraph(1)
         clone.insert_element(span, paragraph)
@@ -250,11 +263,13 @@ class TestSpan(TestCase):
         span2 = clone.get_span_list()[0]
 
         # We have the text with the tag, so, ...
-        expected += 'This is the first paragraph.'
+        expected = ('<text:span text:style-name="my_style">'
+                      'my text'
+                    '</text:span>'
+                    'This is the first paragraph.')
 
         self.assertEqual(span1.serialize(), expected)
         self.assertEqual(span2.serialize(), expected)
-
 
 
 
