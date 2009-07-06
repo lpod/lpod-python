@@ -90,7 +90,8 @@ class odf_styles(odf_xmlpart):
             return self.get_element('//office:automatic-styles')
         elif category == 'master':
             return self.get_element('//office:master-styles')
-        raise ValueError, 'category must be "named", "automatic" or "master"'
+        raise ValueError, ('category must be None, "named", "automatic" '
+                           'or "master"')
 
 
     def get_style_list(self, family=None, category=None):

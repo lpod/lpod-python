@@ -9,7 +9,8 @@ from re import compile
 from lxml.etree import fromstring, tostring, _Element
 
 # Import from lpod
-from utils import _check_arguments, DateTime, _get_abspath
+from utils import _generate_xpath_query, _check_arguments, DateTime
+from utils import _get_abspath
 
 
 ODF_NAMESPACES = {
@@ -109,6 +110,7 @@ class odf_element(object):
         if not isinstance(native_element, _Element):
             raise TypeError, "node is not an element node"
         self.__element = native_element
+        self.__body = None
 
 
     def get_name(self):
@@ -279,6 +281,8 @@ class odf_xmlpart(object):
     """Representation of an XML part.
     Abstraction of the XML library behind.
     """
+    body_xpath = None
+
 
     def __init__(self, part_name, container):
         self.part_name = part_name
@@ -297,6 +301,34 @@ class odf_xmlpart(object):
         return self.__document
 
 
+    def __get_element_list(self, qname, style=None, attributes=None,
+                           frame_style=None, context=None):
+        _check_arguments(style=style, context=context)
+        if attributes is None:
+            attributes = {}
+        if style:
+            attributes['text:style-name'] = style
+        if frame_style:
+            attributes['draw:style-name'] = frame_style
+        query = _generate_xpath_query(qname, attributes=attributes,
+                context=context)
+        if context is None:
+            return self.get_element_list(query)
+        return context.get_element_list(query)
+
+
+    def __get_element(self, qname, position=None, attributes=None,
+                      context=None):
+        _check_arguments(position=position, context=context)
+        if attributes is None:
+            attributes = {}
+        query = _generate_xpath_query(qname, attributes=attributes,
+                                      position=position, context=context)
+        if context is None:
+            return self.get_element(query)
+        return context.get_element(query)
+
+
     def get_element_list(self, xpath_query):
         document = self.__get_document()
         result = document.xpath(xpath_query, namespaces=ODF_NAMESPACES)
@@ -308,6 +340,17 @@ class odf_xmlpart(object):
         if not result:
             return None
         return result[0]
+
+
+    def get_body(self):
+        """Get where the content begins.
+        """
+        body_xpath = self.body_xpath
+        if body_xpath is None:
+            raise NotImplementedError, '"body_xpath" is not defined'
+        if self.__body is None:
+            self.__body = self.get_element(body_xpath)
+        return self.__body
 
 
     def clone(self):
