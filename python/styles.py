@@ -122,3 +122,9 @@ class odf_styles(odf_xmlpart):
             else:
                 return context.get_element(query)
         raise TypeError, "style name or element expected"
+
+
+    def get_parent_style(self, name_or_element, family):
+        style = self.get_style(name_or_element, family)
+        parent_name = style.get_attribute('style:parent-style-name')
+        return self.get_style(parent_name, family)
