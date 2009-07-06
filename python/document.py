@@ -431,12 +431,10 @@ class odf_document(object):
         query = _generate_xpath_query(qname, attributes=attributes,
                                       position=position, context=context)
         if context is None:
-            result = part.get_element_list(query)
+            result = part.get_element(query)
         else:
-            result = context.get_element_list(query)
-        if not result:
-            return None
-        return result[0]
+            result = context.get_element(query)
+        return result
 
 
     def __insert_element(self, element, context, xmlposition, offset):
