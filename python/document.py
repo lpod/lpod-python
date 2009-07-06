@@ -9,6 +9,7 @@ from decimal import Decimal
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
+from styles import odf_styles
 from utils import _check_arguments, _generate_xpath_query
 from utils import _check_position_or_name, _get_cell_coordinates
 from utils import Date, DateTime, Duration, Boolean
@@ -400,7 +401,10 @@ class odf_document(object):
         part = parts.get(part_name)
         if part is None:
             container = self.container
-            part = odf_xmlpart(part_name, container)
+            if part_name == 'styles':
+                part = odf_styles(part_name, container)
+            else:
+                part = odf_xmlpart(part_name, container)
             parts[part_name] = part
         return part
 
@@ -759,25 +763,24 @@ class odf_document(object):
         attributes = {}
         if family is not None:
             attributes['style:family'] = family
-        return (self.__get_element_list('style:style', attributes=attributes,
-                                        context=context, part='content')
+        styles = self.__get_xmlpart('styles')
+        return (styles.get_style_list(family=family, context=context)
                 + self.__get_element_list('style:style',
                                           attributes=attributes,
-                                          context=context, part='styles'))
+                                          context=context))
 
 
     def get_style(self, name, family):
         _check_arguments(family=family)
+        # 1. content
         attributes = {'style:name': name,
                       'style:family': family}
-        # 1. content
-        element = self.__get_element('style:style', attributes=attributes,
-                                     part='content')
+        element = self.__get_element('style:style', attributes=attributes)
         if element is not None:
             return element
         # 2. styles
-        return self.__get_element('style:style', attributes=attributes,
-                                  part='styles')
+        styles = self.__get_xmlpart('styles')
+        return styles.get_style(name, family)
 
 
     #
