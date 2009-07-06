@@ -4,6 +4,8 @@
 # Import from the Standard Library
 
 # Import from lpod
+from lpod.utils import _check_arguments, _generate_xpath_query
+from lpod.xmlpart import odf_element, odf_xmlpart
 
 
 # TODO Read from a shipped file
@@ -66,7 +68,7 @@ def rgb2hex(color):
             raise KeyError, 'color "%s" is unknown' % color
     elif type(color) is tuple:
         if len(color) != 3:
-            raise ValueError, "color is a 3-tuple"
+            raise ValueError, "color must be a 3-tuple"
         code = color
     else:
         raise TypeError, "invalid color"
@@ -74,3 +76,41 @@ def rgb2hex(color):
         if channel < 0 or channel > 255:
             raise ValueError, "color code must be between 0 and 255"
     return '#%02X%02X%02X' % code
+
+
+
+class odf_styles(odf_xmlpart):
+
+    def get_style_list(self, family=None, context=None):
+        _check_arguments(family=family, context=context)
+        attributes = {}
+        if family is not None:
+            attributes['style:family'] = family
+        return self.get_element_list('style:style', attributes=attributes,
+                                     context=context)
+
+
+    def get_style(self, name_or_element, family, category=None):
+        _check_arguments(family=family)
+        if isinstance(name_or_element, odf_element):
+            if not name_or_element.is_style():
+                raise ValueError, "element is not a style element"
+        elif type(name_or_element) is str:
+            qname = 'style:style'
+            attributes = {'style:name': name_or_element,
+                          'style:family': family}
+            query = _generate_xpath_query(qname, attributes=attributes)
+            if category == 'named':
+                context = self.get_element('//office:styles')
+            elif category == 'automatic':
+                context = self.get_element('//office:automatic-styles')
+            elif category == 'master':
+                context = self.get_element('//office:master-styles')
+            else:
+                context = None
+            if context is None:
+                result = self.get_element(query)
+            else:
+                result = context.get_element(query)
+            return result
+        raise TypeError, "style name or element expected"
