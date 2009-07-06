@@ -397,7 +397,7 @@ class odf_document(object):
         self.__xmlparts = {}
 
 
-    def __get_xmlpart(self, part_name):
+    def get_xmlpart(self, part_name):
         parts = self.__xmlparts
         part = parts.get(part_name)
         if part is None:
@@ -415,7 +415,7 @@ class odf_document(object):
     def __get_element_list(self, qname, style=None, attributes=None,
                            frame_style=None, context=None, part='content'):
         _check_arguments(style=style, context=context)
-        part = self.__get_xmlpart(part)
+        part = self.get_xmlpart(part)
         if attributes is None:
             attributes = {}
         if style:
@@ -432,7 +432,7 @@ class odf_document(object):
     def __get_element(self, qname, position=None, attributes=None,
                       context=None, part='content'):
         _check_arguments(position=position, context=context)
-        part = self.__get_xmlpart(part)
+        part = self.get_xmlpart(part)
         if attributes is None:
             attributes = {}
         query = _generate_xpath_query(qname, attributes=attributes,
@@ -451,7 +451,7 @@ class odf_document(object):
             context.insert_element(element, xmlposition)
         else:
             # We insert it in the last office:text
-            content = self.__get_xmlpart('content')
+            content = self.get_xmlpart('content')
             # FIXME hardcoded odt body element
             office_text = content.get_element_list('//office:text')[-1]
             office_text.insert_element(element, LAST_CHILD)
@@ -493,7 +493,7 @@ class odf_document(object):
         # => Styles
         elif qname == 'style:style':
             _check_arguments(element=element)
-            styles = self.__get_xmlpart('styles')
+            styles = self.get_xmlpart('styles')
             office_styles = styles.get_element('//office:styles')
             office_styles.insert_element(element, LAST_CHILD)
 
@@ -512,8 +512,8 @@ class odf_document(object):
                 setattr(clone, name, self.container.clone())
             elif name == '_odf_document__xmlparts':
                 xmlparts = {}
-                for name, value in self.__xmlparts.iteritems():
-                    xmlparts[name] = value.clone()
+                for key, value in self.__xmlparts.iteritems():
+                    xmlparts[key] = value.clone()
                 setattr(clone, name, xmlparts)
             else:
                 value = getattr(self, name)
@@ -763,13 +763,14 @@ class odf_document(object):
     # Styles
     #
 
-    def get_style_list(self, family=None, context=None):
-        _check_arguments(family=family, context=context)
+    def get_style_list(self, family=None, category=None):
+        _check_arguments(family=family)
         attributes = {}
         if family is not None:
             attributes['style:family'] = family
-        styles = self.__get_xmlpart('styles')
-        return (styles.get_style_list(family=family, context=context)
+        styles = self.get_xmlpart('styles')
+        context = styles.get_category_context(category)
+        return (styles.get_style_list(family=family, category=category)
                 + self.__get_element_list('style:style',
                                           attributes=attributes,
                                           context=context))
@@ -784,7 +785,7 @@ class odf_document(object):
         if element is not None:
             return element
         # 2. styles
-        styles = self.__get_xmlpart('styles')
+        styles = self.get_xmlpart('styles')
         return styles.get_style(name, family)
 
 

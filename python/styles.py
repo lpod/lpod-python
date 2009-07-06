@@ -81,7 +81,7 @@ def rgb2hex(color):
 
 class odf_styles(odf_xmlpart):
 
-    def __get_category_context(self, category):
+    def get_category_context(self, category):
         if category is None:
             return None
         elif category == 'named':
@@ -99,7 +99,7 @@ class odf_styles(odf_xmlpart):
         if family is not None:
             attributes['style:family'] = family
         query = _generate_xpath_query('style:style', attributes=attributes)
-        context = self.__get_category_context(category)
+        context = self.get_category_context(category)
         if context is None:
             return self.get_element_list(query)
         else:
@@ -116,7 +116,7 @@ class odf_styles(odf_xmlpart):
                           'style:family': family}
             query = _generate_xpath_query('style:style',
                                           attributes=attributes)
-            context = self.__get_category_context(category)
+            context = self.get_category_context(category)
             if context is None:
                 return self.get_element(query)
             else:

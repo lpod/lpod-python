@@ -14,7 +14,7 @@ class TestMetadata(TestCase):
 
     def setUp(self):
         document = odf_get_document('samples/example.odt')
-        self.meta = document._odf_document__get_xmlpart('meta')
+        self.meta = document.get_xmlpart('meta')
 
 
     def tearDown(self):
