@@ -475,7 +475,7 @@ class odf_document(object):
         # Offset is the position in the paragraph where the element is
         # inserted. Hence the context is mandatory and the XML position makes
         # no sense.
-        elif qname in ('text:note', 'office:annotation'):
+        elif qname in ('text:note', 'office:annotation', 'text:span'):
             if context is None:
                 raise TypeError, ('insertion of "%s": context cannot be None'
                                   % qname)
@@ -558,6 +558,19 @@ class odf_document(object):
 
     def get_paragraph(self, position, context=None):
         return self.__get_element('text:p', position, context=context)
+
+
+    #
+    # Span
+    #
+
+    def get_span_list(self, style=None, context=None):
+        return self.__get_element_list('text:span', style=style,
+                                       context=context)
+
+
+    def get_span(self, position, context=None):
+        return self.__get_element('text:span', position, context=context)
 
 
     #

@@ -231,16 +231,30 @@ class TestSpan(TestCase):
         del self.document
 
 
-    def test_create_span(self):
+    def test_create_insert_get_span(self):
+
+        # Create OK ?
         span = odf_create_span('my_style', u'my text')
         expected = ('<text:span text:style-name="my_style">'
                       'my text'
                     '</text:span>')
         self.assertEqual(span.serialize(), expected)
 
+        # Insert OK?
+        clone = self.document.clone()
+        paragraph = clone.get_paragraph(1)
+        clone.insert_element(span, paragraph)
 
-    def test_insert_span(self):
-        raise NotImplementedError
+        # Get OK ?
+        span1 = clone.get_span(1)
+        span2 = clone.get_span_list()[0]
+
+        # We have the text with the tag, so, ...
+        expected += 'This is the first paragraph.'
+
+        self.assertEqual(span1.serialize(), expected)
+        self.assertEqual(span2.serialize(), expected)
+
 
 
 
