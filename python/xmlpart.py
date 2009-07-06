@@ -248,7 +248,7 @@ class odf_element(object):
         element.text = None
 
 
-    def copy(self):
+    def clone(self):
         element = self.__element
         return odf_element(deepcopy(element))
 
@@ -308,6 +308,20 @@ class odf_xmlpart(object):
         if not result:
             return None
         return result[0]
+
+
+    def clone(self):
+        clone = object.__new__(self.__class__)
+        for name in self.__dict__:
+            if name == 'container':
+                setattr(clone, name, self.container.clone())
+            elif name == '_odf_xmlpart__document':
+                setattr(clone, name, None)
+            else:
+                value = getattr(self, name)
+                value = deepcopy(value)
+                setattr(clone, name, value)
+        return clone
 
 
     def serialize(self, pretty=False):

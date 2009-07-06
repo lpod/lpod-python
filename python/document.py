@@ -511,8 +511,10 @@ class odf_document(object):
             if name == 'container':
                 setattr(clone, name, self.container.clone())
             elif name == '_odf_document__xmlparts':
-                # TODO odf_xmlpart.clone
-                setattr(clone, name, {})
+                xmlparts = {}
+                for name, value in self.__xmlparts.iteritems():
+                    xmlparts[name] = value.clone()
+                setattr(clone, name, xmlparts)
             else:
                 value = getattr(self, name)
                 value = deepcopy(value)

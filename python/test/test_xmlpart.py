@@ -199,9 +199,9 @@ class ElementTestCase(TestCase):
         self.assertRaises(ValueError, element.insert_element, child, 999)
 
 
-    def test_copy(self):
+    def test_clone(self):
         element = self.paragraph_element
-        copy = element.copy()
+        copy = element.clone()
         self.assertNotEqual(id(element), id(copy))
         self.assertEqual(element.get_text(), copy.get_text())
 
