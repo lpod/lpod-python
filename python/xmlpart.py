@@ -266,6 +266,14 @@ class odf_element(object):
         element.remove(child.__element)
 
 
+    def is_style(self):
+        qname = self.get_name()
+        prefix, name = qname.split(':')
+        return (prefix in ('style', 'number')
+                # XXX "and not name.endswith('-properties')" ?
+                and name != 'properties')
+
+
 
 class odf_xmlpart(object):
     """Representation of an XML part.
