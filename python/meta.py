@@ -7,11 +7,20 @@ from utils import DateTime, Duration
 
 # Import from lpod
 from lpod.utils import _check_arguments
-from lpod.xmlpart import odf_xmlpart
+from lpod.xmlpart import LAST_CHILD, odf_create_element, odf_xmlpart
 
 
 
 class odf_meta(odf_xmlpart):
+
+    __root = None
+
+
+    def get_root(self):
+        if self.__root is None:
+            self.__root = self.get_element('office:meta')
+        return self.__root
+
 
     def get_title(self):
         """Get the title of the document.
@@ -37,7 +46,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(text=title)
         element = self.get_element('//dc:title')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<dc:title/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         title = title.encode('utf_8')
         element.set_text(title)
 
@@ -62,7 +72,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(text=description)
         element = self.get_element('//dc:description')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<dc:description/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         description = description.encode('utf_8')
         element.set_text(description)
 
@@ -87,7 +98,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(text=subject)
         element = self.get_element('//dc:subject')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<dc:subject/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         subject = subject.encode('utf_8')
         element.set_text(subject)
 
@@ -123,7 +135,8 @@ class odf_meta(odf_xmlpart):
         # FIXME test validity?
         element = self.get_element('//dc:language')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<dc:language/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         element.set_text(language)
 
 
@@ -147,7 +160,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(date=date)
         element = self.get_element('//dc:date')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<dc:date/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         date = DateTime.encode(date)
         element.set_text(date)
 
@@ -172,7 +186,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(date=date)
         element = self.get_element('//meta:creation-date')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<meta:creation-date/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         date = DateTime.encode(date)
         element.set_text(date)
 
@@ -206,7 +221,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(text=creator)
         element = self.get_element('//meta:initial-creator')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<meta:initial-creator/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         creator = creator.encode('utf_8')
         element.set_text(creator)
 
@@ -231,7 +247,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(text=keyword)
         element = self.get_element('//meta:keyword')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<meta:keyword/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         keyword = keyword.encode('utf_8')
         element.set_text(keyword)
 
@@ -256,7 +273,8 @@ class odf_meta(odf_xmlpart):
             raise TypeError, u"duration must be a timedelta"
         element = self.get_element('//meta:editing-duration')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<meta:editing-duration/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         duration = Duration.encode(duration)
         element.set_text(duration)
 
@@ -285,7 +303,8 @@ class odf_meta(odf_xmlpart):
             raise ValueError, "cycles must be a positive int"
         element = self.get_element('//meta:editing-cycles')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<meta:editing-cycles/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         cycles = str(cycles)
         element.set_text(cycles)
 
@@ -319,7 +338,8 @@ class odf_meta(odf_xmlpart):
         _check_arguments(text=generator)
         element = self.get_element('//meta:generator')
         if element is None:
-            raise NotImplementedError
+            element = odf_create_element('<meta:generator/>')
+            self.get_root().insert_element(element, LAST_CHILD)
         generator = generator.encode('utf_8')
         element.set_text(generator)
 
