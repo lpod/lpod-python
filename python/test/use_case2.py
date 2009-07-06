@@ -131,10 +131,9 @@ document.insert_element(properties, style)
 document.insert_element(style)
 
 # The paragraph
-paragraph = odf_create_paragraph('Standard', u'And an ')
+paragraph = odf_create_paragraph('Standard', u'And an  paragraph.')
 span = odf_create_span('style2', u'other')
-document.insert_element(span, paragraph)
-span.set_text(u' paragraph.', True)
+document.insert_element(span, paragraph, offset=len(u'And an '))
 document.insert_element(paragraph)
 
 
