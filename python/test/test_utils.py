@@ -69,7 +69,8 @@ class CheckArgumentsTestCase(TestCase):
 
 
     def test_bad_context(self):
-        self.assertRaises(TypeError, _check_arguments, context=self.document)
+        document = self.document
+        self.assertRaises(TypeError, _check_arguments, context=document)
 
 
     def test_bad_element(self):
@@ -149,9 +150,10 @@ class CheckArgumentsTestCase(TestCase):
 
     def test_position_name(self):
         document = self.document
-        self.assertRaises(ValueError, document.get_frame, position=1,
+        content = document.get_xmlpart('content')
+        self.assertRaises(ValueError, content.get_frame, position=1,
                           name='foo')
-        self.assertRaises(ValueError, document.get_frame, position=None,
+        self.assertRaises(ValueError, content.get_frame, position=None,
                           name=None)
 
 
