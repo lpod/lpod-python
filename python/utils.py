@@ -57,13 +57,32 @@ def _get_abspath(local_path):
 
 
 
-def _generate_xpath_query(element_name, attributes={}, position=None,
-                          context=None):
+def _make_xpath_query(element_name, style=None, family=None, frame_name=None,
+                      frame_style=None, table_name=None, note_class=None,
+                      text_id=None, level=None, position=None, context=None,
+                      **kw):
     if context is None:
         query = ['//']
     else:
         query = []
     query.append(element_name)
+    attributes = kw
+    if style:
+        attributes['text:style-name'] = style
+    if family:
+        attributes['style:family'] = family
+    if frame_name:
+        attributes['draw:name'] = frame_name
+    if frame_style:
+        attributes['draw:style-name'] = frame_style
+    if table_name:
+        attributes['table:name'] = table_name
+    if note_class:
+        attributes['text:note-class'] = note_class
+    if text_id:
+        attributes['text:id'] = text_id
+    if level:
+        attributes['text:outline-level'] = level
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]
