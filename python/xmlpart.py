@@ -10,6 +10,7 @@ from lxml.etree import fromstring, tostring, _Element
 
 # Import from lpod
 from utils import _check_arguments, _get_abspath, DateTime
+from utils import _make_xpath_query
 
 
 ODF_NAMESPACES = {
@@ -111,34 +112,8 @@ class odf_element(object):
         self.__element = native_element
 
 
-    def _get_element_list(self, element_name, style=None, family=None,
-                          frame_name=None, frame_style=None, table_name=None,
-                          note_class=None, text_id=None, level=None,
-                          position=None, context=None):
-        _check_arguments(style=style, family=family, note_class=note_class,
-                         level=level, position=position, context=context)
-        query = _make_xpath_query(element_name, style=style, family=family,
-                                  frame_name=frame_name,
-                                  frame_style=frame_style,
-                                  table_name=table_name,
-                                  note_class=note_class, text_id=text_id,
-                                  level=level, position=position,
-                                  context=context)
-        if context is None:
-            return self.get_element_list(query)
-        return context.get_element_list(query)
-
-
-    def _get_element(self, element_name, frame_name=None, table_name=None,
-                     text_id=None, position=None, context=None):
-        result = self._get_element_list(element_name, frame_name=frame_name,
-                                        table_name=table_name,
-                                        text_id=text_id, position=position,
-                                        context=context)
-        if result:
-            return result[0]
-        return None
-
+    def __str__(self):
+        return '%s "%s"' % (object.__str__(self), self.get_name())
 
 
     def get_name(self):
@@ -321,6 +296,43 @@ class odf_xmlpart(object):
         # Internal state
         self.__root = None
         self.__body = None
+
+
+    #
+    # Non-public yet useful helpers
+    #
+
+    def _get_element_list(self, element_name, style=None, family=None,
+                          frame_name=None, frame_style=None, table_name=None,
+                          note_class=None, style_name=None, text_id=None,
+                          level=None, position=None, context=None):
+        _check_arguments(style=style, family=family, note_class=note_class,
+                         level=level, position=position, context=context)
+        query = _make_xpath_query(element_name, style=style, family=family,
+                                  frame_name=frame_name,
+                                  frame_style=frame_style,
+                                  table_name=table_name,
+                                  style_name=style_name,
+                                  note_class=note_class, text_id=text_id,
+                                  level=level, position=position,
+                                  context=context)
+        if context is None:
+            return self.get_element_list(query)
+        return context.get_element_list(query)
+
+
+    def _get_element(self, element_name, style=None, family=None,
+                     frame_name=None, table_name=None, style_name=None,
+                     text_id=None, level=None, position=None, context=None):
+        result = self._get_element_list(element_name, style=style,
+                                        family=family, frame_name=frame_name,
+                                        table_name=table_name,
+                                        style_name=style_name,
+                                        text_id=text_id, level=level,
+                                        position=position, context=context)
+        if result:
+            return result[0]
+        return None
 
 
     #
