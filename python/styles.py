@@ -4,7 +4,7 @@
 # Import from the Standard Library
 
 # Import from lpod
-from lpod.utils import _check_arguments, _generate_xpath_query
+from lpod.utils import _check_arguments, _make_xpath_query
 from lpod.xmlpart import odf_element, odf_xmlpart
 
 
@@ -99,7 +99,7 @@ class odf_styles(odf_xmlpart):
         attributes = {}
         if family is not None:
             attributes['style:family'] = family
-        query = _generate_xpath_query('style:style', attributes=attributes)
+        query = _make_xpath_query('style:style', attributes=attributes)
         context = self.get_category_context(category)
         if context is None:
             return self.get_element_list(query)
@@ -115,7 +115,7 @@ class odf_styles(odf_xmlpart):
         elif type(name_or_element) is str:
             attributes = {'style:name': name_or_element,
                           'style:family': family}
-            query = _generate_xpath_query('style:style',
+            query = _make_xpath_query('style:style',
                                           attributes=attributes)
             context = self.get_category_context(category)
             if context is None:

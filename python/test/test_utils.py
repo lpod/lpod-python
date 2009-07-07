@@ -10,7 +10,7 @@ from lxml.etree import Element
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.utils import _generate_xpath_query, _check_arguments
+from lpod.utils import _make_xpath_query, _check_arguments
 from lpod.utils import DateTime, Duration, Boolean
 from lpod.xmlpart import odf_create_element
 
@@ -18,40 +18,40 @@ from lpod.xmlpart import odf_create_element
 class GenerateXPathTestCase(TestCase):
 
     def test_element(self):
-        query = _generate_xpath_query('text:p')
+        query = _make_xpath_query('text:p')
         self.assertEqual(query, '//text:p')
 
 
     def test_attribute(self):
         attributes = {'text:style-name': 'Standard'}
-        query = _generate_xpath_query('text:p', attributes)
+        query = _make_xpath_query('text:p', attributes)
         self.assertEqual(query, '//text:p[@text:style-name="Standard"]')
 
 
     def test_two_attributes(self):
         attributes = {'text:style-name': 'Standard',
                       'text:outline-level': 1}
-        query = _generate_xpath_query('text:h', attributes)
+        query = _make_xpath_query('text:h', attributes)
         expected = ('//text:h[@text:outline-level="1"]'
                     '[@text:style-name="Standard"]')
         self.assertEqual(query, expected)
 
 
     def test_position(self):
-        query = _generate_xpath_query('text:h', position=2)
+        query = _make_xpath_query('text:h', position=2)
         self.assertEqual(query, '//text:h[2]')
 
 
     def test_attribute_position(self):
         attributes = {'text:style-name': 'Standard'}
-        query = _generate_xpath_query('text:p', attributes, position=2)
+        query = _make_xpath_query('text:p', attributes, position=2)
         self.assertEqual(query, '//text:p[@text:style-name="Standard"][2]')
 
 
     def test_two_attributes_position(self):
         attributes = {'text:style-name': 'Standard',
                       'text:outline-level': 1}
-        query = _generate_xpath_query('text:h', attributes, position=2)
+        query = _make_xpath_query('text:h', attributes, position=2)
         expected = ('//text:h[@text:outline-level="1"]'
                     '[@text:style-name="Standard"][2]')
         self.assertEqual(query, expected)
