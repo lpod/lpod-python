@@ -7,13 +7,13 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 # Import from lpod
-from container import odf_get_container, odf_new_container_from_template
+from container import ODF_PARTS, odf_get_container
+from container import odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
 from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
-from utils import _check_arguments, _generate_xpath_query
-from utils import Date, DateTime, Duration, Boolean
+from utils import _check_arguments, Date, DateTime, Duration, Boolean
 from xmlpart import odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
 
@@ -397,56 +397,13 @@ class odf_document(object):
         self.__xmlparts = {}
 
 
-    def __get_element_list(self, qname, style=None, attributes=None,
-                           frame_style=None, context=None, part='content'):
-        _check_arguments(style=style, context=context)
-        part = self.get_xmlpart(part)
-        if attributes is None:
-            attributes = {}
-        if style:
-            attributes['text:style-name'] = style
-        if frame_style:
-            attributes['draw:style-name'] = frame_style
-        query = _generate_xpath_query(qname, attributes=attributes,
-                context=context)
-        if context is None:
-            return part.get_element_list(query)
-        return context.get_element_list(query)
-
-
-    def __get_element(self, qname, position=None, attributes=None,
-                      context=None, part='content'):
-        _check_arguments(position=position, context=context)
-        part = self.get_xmlpart(part)
-        if attributes is None:
-            attributes = {}
-        query = _generate_xpath_query(qname, attributes=attributes,
-                                      position=position, context=context)
-        if context is None:
-            result = part.get_element(query)
-        else:
-            result = context.get_element(query)
-        return result
-
-
-    def __insert_element(self, element, context, xmlposition, offset):
-        _check_arguments(element=element, context=context,
-                         xmlposition=xmlposition, offset=offset)
-        if context is not None:
-            context.insert_element(element, xmlposition)
-        else:
-            # We insert it in the last office:text
-            content = self.get_xmlpart('content')
-            # FIXME hardcoded odt body element
-            office_text = content.get_element_list('//office:text')[-1]
-            office_text.insert_element(element, LAST_CHILD)
-
-
     #
     # Public API
     #
 
     def get_xmlpart(self, part_name):
+        if part_name not in ODF_PARTS:
+            raise ValueError, '"%s" is not an XML part' % part_name
         parts = self.__xmlparts
         part = parts.get(part_name)
         if part is None:
@@ -461,51 +418,6 @@ class odf_document(object):
                 part = odf_xmlpart(part_name, container)
             parts[part_name] = part
         return part
-
-
-    def insert_element(self, element, context=None, xmlposition=LAST_CHILD,
-                       offset=0):
-
-        # Search the good method to insert the element
-        qname = element.get_name()
-
-        # => An image
-        if qname == 'draw:image':
-            self.__insert_image(element, context, xmlposition, offset)
-
-        # => With these elements, the context cannot be None
-        elif qname in ('table:table-column', 'table:table-row',
-                       'table:table-cell', 'text:list-item',
-                       'style:text-properties'):
-            if context is None:
-                raise TypeError, ('insertion of "%s": context cannot be None'
-                                  % qname)
-            self.__insert_element(element, context, xmlposition, offset)
-
-        # => 'In paragraph' elements
-        # Offset is the position in the paragraph where the element is
-        # inserted. Hence the context is mandatory and the XML position makes
-        # no sense.
-        elif qname in ('text:note', 'office:annotation', 'text:span'):
-            if context is None:
-                raise TypeError, ('insertion of "%s": context cannot be None'
-                                  % qname)
-            text = context.get_text()
-            before, after = text[:offset], text[offset:]
-            context.set_text(before)
-            context.insert_element(element, xmlposition=LAST_CHILD)
-            element.set_text(after, after=True)
-
-        # => Styles
-        elif qname == 'style:style':
-            _check_arguments(element=element)
-            styles = self.get_xmlpart('styles')
-            office_styles = styles.get_element('//office:styles')
-            office_styles.insert_element(element, LAST_CHILD)
-
-        # => Generic insert
-        else:
-            self.__insert_element(element, context, xmlposition, offset)
 
 
     def clone(self):
