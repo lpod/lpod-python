@@ -9,8 +9,7 @@ from re import compile
 from lxml.etree import fromstring, tostring, _Element
 
 # Import from lpod
-from utils import _generate_xpath_query, _check_arguments, DateTime
-from utils import _get_abspath
+from utils import _check_arguments, _get_abspath, DateTime
 
 
 ODF_NAMESPACES = {
@@ -112,6 +111,36 @@ class odf_element(object):
         self.__element = native_element
 
 
+    def _get_element_list(self, element_name, style=None, family=None,
+                          frame_name=None, frame_style=None, table_name=None,
+                          note_class=None, text_id=None, level=None,
+                          position=None, context=None):
+        _check_arguments(style=style, family=family, note_class=note_class,
+                         level=level, position=position, context=context)
+        query = _make_xpath_query(element_name, style=style, family=family,
+                                  frame_name=frame_name,
+                                  frame_style=frame_style,
+                                  table_name=table_name,
+                                  note_class=note_class, text_id=text_id,
+                                  level=level, position=position,
+                                  context=context)
+        if context is None:
+            return self.get_element_list(query)
+        return context.get_element_list(query)
+
+
+    def _get_element(self, element_name, frame_name=None, table_name=None,
+                     text_id=None, position=None, context=None):
+        result = self._get_element_list(element_name, frame_name=frame_name,
+                                        table_name=table_name,
+                                        text_id=text_id, position=position,
+                                        context=context)
+        if result:
+            return result[0]
+        return None
+
+
+
     def get_name(self):
         element = self.__element
         return get_prefixed_name(element.tag)
@@ -125,9 +154,9 @@ class odf_element(object):
 
     def get_element(self, xpath_query):
         result = self.get_element_list(xpath_query)
-        if not result:
-            return None
-        return result[0]
+        if result:
+            return result[0]
+        return None
 
 
     def get_attributes(self):
@@ -241,6 +270,8 @@ class odf_element(object):
             parent = current.getparent()
             index = parent.index(current)
             parent.insert(index, element)
+        else:
+            raise ValueError, "xmlposition must be defined"
 
 
     def clear(self):
@@ -288,37 +319,13 @@ class odf_xmlpart(object):
         self.container = container
 
         # Internal state
-        self.__document = None
+        self.__root = None
         self.__body = None
 
 
-    def __get_element_list(self, qname, style=None, attributes=None,
-                           frame_style=None, context=None):
-        _check_arguments(style=style, context=context)
-        if attributes is None:
-            attributes = {}
-        if style:
-            attributes['text:style-name'] = style
-        if frame_style:
-            attributes['draw:style-name'] = frame_style
-        query = _generate_xpath_query(qname, attributes=attributes,
-                context=context)
-        if context is None:
-            return self.get_element_list(query)
-        return context.get_element_list(query)
-
-
-    def __get_element(self, qname, position=None, attributes=None,
-                      context=None):
-        _check_arguments(position=position, context=context)
-        if attributes is None:
-            attributes = {}
-        query = _generate_xpath_query(qname, attributes=attributes,
-                                      position=position, context=context)
-        if context is None:
-            return self.get_element(query)
-        return context.get_element(query)
-
+    #
+    # Public API
+    #
 
     def get_element_list(self, xpath_query):
         root = self.get_root()
@@ -334,12 +341,12 @@ class odf_xmlpart(object):
 
 
     def get_root(self):
-        if self.__document is None:
+        if self.__root is None:
             container = self.container
             part = container.get_part(self.part_name)
             # XXX use "parse"?
-            self.__document = fromstring(part)
-        return self.__document
+            self.__root = fromstring(part)
+        return self.__root
 
 
     def get_body(self):
