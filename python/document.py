@@ -9,6 +9,7 @@ from decimal import Decimal
 # Import from lpod
 from container import odf_get_container, odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
+from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
 from utils import _check_arguments, _generate_xpath_query
@@ -450,7 +451,9 @@ class odf_document(object):
         part = parts.get(part_name)
         if part is None:
             container = self.container
-            if part_name == 'meta':
+            if part_name == 'content':
+                part = odf_content(part_name, container)
+            elif part_name == 'meta':
                 part = odf_meta(part_name, container)
             elif part_name == 'styles':
                 part = odf_styles(part_name, container)
