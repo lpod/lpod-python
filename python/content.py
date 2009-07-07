@@ -4,14 +4,14 @@
 # Import from the Standard Library
 
 # Import from lpod
-from utils import _check_arguments, _make_xpath_query
+from utils import _check_arguments
 from utils import _check_position_or_name, _get_cell_coordinates
 from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
 
 
 class odf_content(odf_xmlpart):
 
-    # Is it? (and won't apply to automatic styles, font declarations...)
+    # FIXME desperately hard-coded
     body_xpath = '//office:text'
 
 
@@ -105,11 +105,12 @@ class odf_content(odf_xmlpart):
     #
 
     def get_heading_list(self, style=None, level=None, context=None):
-        return self._get_element_list('text:h', style=style, context=context)
+        return self._get_element_list('text:h', style=style, level=level,
+                                       context=context)
 
 
     def get_heading(self, position, level=None, context=None):
-        return self._get_element('text:h', position=position,
+        return self._get_element('text:h', position=position, level=level,
                                  context=context)
 
 
@@ -154,7 +155,7 @@ class odf_content(odf_xmlpart):
 
     def get_table(self, name=None, position=None, context=None):
         _check_position_or_name(position, name)
-        return self._get_element('draw:image', table_name=name,
+        return self._get_element('table:table', table_name=name,
                                  position=position, context=context)
 
 
@@ -284,6 +285,7 @@ class odf_content(odf_xmlpart):
             return name_or_element
         elif type(name_or_element) is str:
             context = self.get_category_context('automatic')
-            return self._get_element('style:style', style=name_or_element,
-                                     family=family)
+            return self._get_element('style:style',
+                                     style_name=name_or_element,
+                                     family=family, context=context)
         raise TypeError, "style name or element expected"
