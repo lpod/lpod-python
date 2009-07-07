@@ -246,6 +246,18 @@ class XmlPartTestCase(TestCase):
         self.assertEqual(content_bytes, serialized)
 
 
+    def test_clone(self):
+        # Testing that the clone works on subclasses too
+        from lpod.content import odf_content
+        container = self.container
+        content = odf_content('content', container)
+        clone = content.clone()
+        self.assertEqual(clone.part_name, content.part_name)
+        self.assertNotEqual(id(container), id(clone.container))
+        self.assertEqual(clone._odf_xmlpart__root, None)
+        self.assertEqual(clone._odf_xmlpart__body, None)
+
+
     def test_delete(self):
         raise NotImplementedError
 

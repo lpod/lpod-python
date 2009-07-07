@@ -377,7 +377,7 @@ class odf_xmlpart(object):
         for name in self.__dict__:
             if name == 'container':
                 setattr(clone, name, self.container.clone())
-            elif name == '_odf_xmlpart__document':
+            elif name in ('_odf_xmlpart__root', '_odf_xmlpart__body'):
                 setattr(clone, name, None)
             else:
                 value = getattr(self, name)
