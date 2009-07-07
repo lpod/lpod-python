@@ -96,8 +96,8 @@ def odf_create_element(element_data):
     if not element_data.strip():
         raise ValueError, "element data is empty"
     data = ns_document_data.format(element=element_data)
-    document = fromstring(data)
-    return odf_element(document[0])
+    root = fromstring(data)
+    return odf_element(root[0])
 
 
 
@@ -110,7 +110,6 @@ class odf_element(object):
         if not isinstance(native_element, _Element):
             raise TypeError, "node is not an element node"
         self.__element = native_element
-        self.__body = None
 
 
     def get_name(self):
@@ -290,15 +289,7 @@ class odf_xmlpart(object):
 
         # Internal state
         self.__document = None
-
-
-    def __get_document(self):
-        if self.__document is None:
-            container = self.container
-            part = container.get_part(self.part_name)
-            # XXX use "parse"?
-            self.__document = fromstring(part)
-        return self.__document
+        self.__body = None
 
 
     def __get_element_list(self, qname, style=None, attributes=None,
@@ -330,8 +321,8 @@ class odf_xmlpart(object):
 
 
     def get_element_list(self, xpath_query):
-        document = self.__get_document()
-        result = document.xpath(xpath_query, namespaces=ODF_NAMESPACES)
+        root = self.get_root()
+        result = root.xpath(xpath_query, namespaces=ODF_NAMESPACES)
         return [odf_element(e) for e in result]
 
 
@@ -340,6 +331,15 @@ class odf_xmlpart(object):
         if not result:
             return None
         return result[0]
+
+
+    def get_root(self):
+        if self.__document is None:
+            container = self.container
+            part = container.get_part(self.part_name)
+            # XXX use "parse"?
+            self.__document = fromstring(part)
+        return self.__document
 
 
     def get_body(self):
@@ -368,10 +368,10 @@ class odf_xmlpart(object):
 
 
     def serialize(self, pretty=False):
-        document = self.__get_document()
-        return tostring(document, encoding='UTF-8', pretty_print=pretty)
+        root = self.get_root()
+        return tostring(root, encoding='UTF-8', pretty_print=pretty)
 
 
     def delete(self, child):
-        document = self.__get_document()
-        document.remove(child.__element)
+        root = self.get_root()
+        root.remove(child.__element)
