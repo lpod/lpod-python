@@ -237,6 +237,15 @@ class odf_content(odf_xmlpart):
     # Styles
     #
 
+    def get_category_context(self, category):
+        if category is None:
+            return None
+        elif category == 'automatic':
+            return self.get_element('//office:automatic-styles')
+        raise ValueError, ('category must be None, "named", "automatic" '
+                           'or "master"')
+
+
     def get_style_list(self, family=None, category=None):
         _check_arguments(family=family)
         attributes = {}
@@ -246,8 +255,7 @@ class odf_content(odf_xmlpart):
         context = self.get_category_context(category)
         if context is None:
             return self.get_element_list(query)
-        else:
-            return context.get_element_list(query)
+        return context.get_element_list(query)
 
 
     def get_style(self, name_or_element, family):
