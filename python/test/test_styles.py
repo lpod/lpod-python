@@ -5,6 +5,8 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.document import odf_get_document, odf_create_style
+from lpod.document import odf_create_style_text_properties
 from lpod.styles import hex2rgb, rgb2hex
 
 
@@ -82,6 +84,82 @@ class Rgb2HexTestCase(TestCase):
     def test_color_bad_value(self):
         color = {}
         self.assertRaises(TypeError, rgb2hex, color)
+
+
+
+class TestStyle(TestCase):
+
+    def setUp(self):
+        self.document = document = odf_get_document('samples/example.odt')
+        self.styles = document.get_xmlpart('styles')
+
+
+    def tearDown(self):
+        del self.styles
+        del self.document
+
+
+    def test_create_style(self):
+        style = odf_create_style('style1', 'paragraph')
+        expected = ('<style:style style:name="style1" '
+                      'style:family="paragraph"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_properties(self):
+        properties = odf_create_style_text_properties()
+        properties.set_attribute('fo:color', '#0000ff')
+        properties.set_attribute('fo:background-color', '#ff0000')
+        expected = ('<style:text-properties fo:color="#0000ff" '
+                      'fo:background-color="#ff0000"/>')
+        self.assertEqual(properties.serialize(), expected)
+
+
+    def test_get_style_list(self):
+        styles = self.styles
+        style_list = styles.get_style_list()
+        # XXX default style, outline style, page layout and master page are
+        # not counted
+        self.assertEqual(len(style_list), 9)
+
+
+    def test_get_style_list_family(self):
+        styles = self.styles
+        style_list = styles.get_style_list(family='paragraph')
+        # XXX default style is not counted
+        self.assertEqual(len(style_list), 9)
+
+
+    def test_get_style_automatic(self):
+        styles = self.styles
+        style = styles.get_style('Mpm1', 'page-layout')
+        # XXX page layout is not found
+        self.assertNotEqual(style, None)
+
+
+    def test_get_style_named(self):
+        styles = self.styles
+        style = styles.get_style('Heading_20_1', 'paragraph')
+        self.assertNotEqual(style, None)
+
+
+    def test_insert_style(self):
+        styles = self.styles
+        clone = styles.clone()
+        style = odf_create_style('style1', 'paragraph')
+        properties = odf_create_style_text_properties()
+        properties.set_attribute('fo:color', '#0000ff')
+        properties.set_attribute('fo:background-color', '#ff0000')
+        clone.insert_element(properties, style)
+        clone.insert_element(style)
+
+        expected = ('<style:style style:name="style1" '
+                                 'style:family="paragraph">'
+                      '<style:text-properties fo:color="#0000ff" '
+                                             'fo:background-color="#ff0000"/>'
+                    '</style:style>')
+        get1 = clone.get_style('style1', 'paragraph')
+        self.assertEqual(get1.serialize(), expected)
 
 
 
