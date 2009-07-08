@@ -658,8 +658,7 @@ class TestTable(TestCase):
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
 
-        body = content.get_element('//office:text')
-        clone.insert_element(cell, body)
+        body = clone.get_element('//office:text')
         clone.insert_element(table, body)
 
         # Get OK ?
