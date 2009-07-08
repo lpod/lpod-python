@@ -140,8 +140,9 @@ class odf_content(odf_xmlpart):
 
     def get_image(self, name=None, position=None, context=None):
         _check_position_or_name(position, name)
-        return self._get_element('draw:image', frame_name=name,
-                                 position=position, context=context)
+        # The frame is holding the name
+        frame = self.get_frame(name=name, position=position, context=context)
+        return frame.get_element('draw:image')
 
 
     #
