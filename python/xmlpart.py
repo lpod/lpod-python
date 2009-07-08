@@ -282,16 +282,12 @@ class odf_xmlpart(object):
     """Representation of an XML part.
     Abstraction of the XML library behind.
     """
-    body_xpath = None
-
-
     def __init__(self, part_name, container):
         self.part_name = part_name
         self.container = container
 
         # Internal state
         self.__root = None
-        self.__body = None
 
 
     #
@@ -357,23 +353,12 @@ class odf_xmlpart(object):
         return self.__root
 
 
-    def get_body(self):
-        """Get where the content begins.
-        """
-        body_xpath = self.body_xpath
-        if body_xpath is None:
-            raise NotImplementedError, '"body_xpath" is not defined'
-        if self.__body is None:
-            self.__body = self.get_element(body_xpath)
-        return self.__body
-
-
     def clone(self):
         clone = object.__new__(self.__class__)
         for name in self.__dict__:
             if name == 'container':
                 setattr(clone, name, self.container.clone())
-            elif name in ('_odf_xmlpart__root', '_odf_xmlpart__body'):
+            elif name in ('_odf_xmlpart__root',):
                 setattr(clone, name, None)
             else:
                 value = getattr(self, name)

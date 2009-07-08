@@ -125,6 +125,7 @@ def _traverse(g_file):
 ######################################################################
 # Public API
 ######################################################################
+# TODO find a more generic name (Channel?)
 class Folder(object):
 
     def __init__(self, obj=None):

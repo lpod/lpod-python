@@ -374,16 +374,18 @@ style objects
 
 manifest?
 
+Add length along with offset to move text inside a text:span or text:a
+element.
 
-Make this use case:
-  - Read a directory
-    for each file =>
-        if image => insert it
-        if csv => make a table
+At a higher level, a method to apply a style on patterns of text, e.g.
+highlight the given pattern with a yellow background style.
 
-Abstract gio (instead of itools)
+variables fields and user (constant) fields
 
-element attributes API
+    - insert value and find its preceding "set" to adjust its representation
+      afterwards
+    - modify value (insert a "set" or insert/update a "get/set")
+
 
 XPath Requirements
 ==================

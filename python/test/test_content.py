@@ -136,7 +136,7 @@ class TestParagraph(TestCase):
         clone = content.clone()
         paragraph = odf_create_paragraph('Text_20_body',
                                          u'An inserted test')
-        clone.insert_element(paragraph, clone.get_body())
+        clone.insert_element(paragraph, clone.get_text_body())
         last_paragraph = clone.get_paragraph_list()[-1]
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
 
@@ -273,7 +273,7 @@ class TestHeading(TestCase):
         clone = content.clone()
         heading = odf_create_heading('Heading_20_2', 2,
                                      u'An inserted heading')
-        clone.insert_element(heading, clone.get_body())
+        clone.insert_element(heading, clone.get_text_body())
         last_heading = clone.get_heading_list()[-1]
         self.assertEqual(last_heading.get_text(), u'An inserted heading')
 
@@ -311,8 +311,8 @@ class TestFrame(TestCase):
         self.assertEqual(frame2.serialize(), expected)
 
         # Insert OK ?
-        content.insert_element(frame1, content.get_body())
-        content.insert_element(frame2, content.get_body())
+        content.insert_element(frame1, content.get_text_body())
+        content.insert_element(frame2, content.get_text_body())
 
         # Get OK ?
         get = content.get_frame(name='frame1')
@@ -346,7 +346,7 @@ class TestImage(TestCase):
         frame = odf_create_frame('frame_image', 'Graphics', '0cm', '0cm')
         image = odf_create_image('path')
         content.insert_element(image, frame)
-        content.insert_element(frame, content.get_body())
+        content.insert_element(frame, content.get_text_body())
 
         # XXX cannot test "insert" and "get" until the test document embeds
         # an image
@@ -658,8 +658,7 @@ class TestTable(TestCase):
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
 
-        body = clone.get_element('//office:text')
-        clone.insert_element(table, body)
+        clone.insert_element(table, clone.get_text_body())
 
         # Get OK ?
         table = clone.get_table(name='a_table')
@@ -701,7 +700,7 @@ class TestList(TestCase):
         item = odf_create_list_item()
         a_list = odf_create_list('a_style')
         clone.insert_element(item, a_list)
-        clone.insert_element(a_list, clone.get_body())
+        clone.insert_element(a_list, clone.get_text_body())
 
         expected = ('<text:list text:style-name="a_style">'
                     '<text:list-item/>'
@@ -1022,7 +1021,7 @@ class TestGetCell(TestCase):
             content.insert_element(cell, row)
         content.insert_element(row, table)
 
-        content.insert_element(table, content.get_body())
+        content.insert_element(table, content.get_text_body())
 
 
     def tearDown(self):

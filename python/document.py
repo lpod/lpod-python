@@ -477,16 +477,17 @@ class odf_document(object):
         return styles.get_style_list(family=family, category=category)
 
 
-    def get_style(self, name, family):
+    def get_style(self, name, family, retrieve_by='name'):
         _check_arguments(family=family)
         # 1. content
+        # TODO except retrieve_by is "display-name"
         content = self.get_xmlpart('content')
         element = content.get_style(name, family)
         if element is not None:
             return element
         # 2. styles
         styles = self.get_xmlpart('styles')
-        return styles.get_style(name, family)
+        return styles.get_style(name, family, retrieve_by=retrieve_by)
 
 
 

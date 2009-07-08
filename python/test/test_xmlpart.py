@@ -255,10 +255,10 @@ class XmlPartTestCase(TestCase):
         self.assertEqual(clone.part_name, content.part_name)
         self.assertNotEqual(id(container), id(clone.container))
         self.assertEqual(clone._odf_xmlpart__root, None)
-        self.assertEqual(clone._odf_xmlpart__body, None)
 
 
     def test_delete(self):
+        # TODO...
         raise NotImplementedError
 
 

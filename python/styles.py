@@ -107,7 +107,9 @@ class odf_styles(odf_xmlpart):
             return context.get_element_list(query)
 
 
-    def get_style(self, name_or_element, family, category=None):
+    def get_style(self, name_or_element, family, category=None,
+                  retrieve_by='name'):
+        # TODO search the display name as a last resort
         _check_arguments(family=family)
         if isinstance(name_or_element, odf_element):
             if not name_or_element.is_style():
@@ -129,3 +131,10 @@ class odf_styles(odf_xmlpart):
         style = self.get_style(name_or_element, family)
         parent_name = style.get_attribute('style:parent-style-name')
         return self.get_style(parent_name, family)
+
+
+    styles.delete(style)
+
+
+    # TODO get/set_properties(name_or_element, style, family=None)
+    # same family than the style by default, or "text", "paragraph", etc.

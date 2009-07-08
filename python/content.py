@@ -11,27 +11,38 @@ from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
 
 class odf_content(odf_xmlpart):
 
-    # FIXME desperately hard-coded
-    body_xpath = '//office:text'
+    def get_text_body(self):
+        raise NotImplementedError
+
+
+    def get_spreadsheet_body(self):
+        raise NotImplementedError
+
+
+    def get_presentation_body(self):
+        raise NotImplementedError
 
 
     def insert_element(self, element, context, xmlposition=LAST_CHILD,
-                       offset=0):
+                       offset=0, length=None):
+        # TODO Do not check validity of insertions
         _check_arguments(element=element, context=context,
                          xmlposition=xmlposition, offset=offset)
         qname = element.get_name()
         if qname in ('text:section', 'text:p', 'text:h', 'draw:frame',
                      'table:table', 'text:list'):
-            # TODO check validity of the context
             context.insert_element(element, xmlposition)
         elif qname in ('text:note', 'office:annotation', 'text:span'):
-            if context.get_name() != 'text:p':
+            if context.get_name() not in ('text:p', 'text:h'):
+                # XXX Image captions, footnote on a footnote...
                 raise ValueError, "context must be a paragraph"
             text = context.get_text()
             before, after = text[:offset], text[offset:]
             context.set_text(before)
             element.set_text(after, after=True)
             context.insert_element(element, xmlposition=LAST_CHILD)
+        # TODO span, xlink, etc. use offset and length to match the sentence
+        # to put into the tag.
         elif qname == 'text:list-item':
             if context.get_name() != 'text:list':
                 raise ValueError, "context must be a list"
@@ -290,3 +301,7 @@ class odf_content(odf_xmlpart):
                                      style_name=name_or_element,
                                      family=family, context=context)
         raise TypeError, "style name or element expected"
+
+
+    # TODO get_parent_style that also searches in styles part if not found
+    # in content
