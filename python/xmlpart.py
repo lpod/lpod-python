@@ -274,11 +274,7 @@ class odf_element(object):
 
 
     def is_style(self):
-        qname = self.get_name()
-        prefix, name = qname.split(':')
-        return (prefix in ('style', 'number')
-                # XXX "and not name.endswith('-properties')" ?
-                and name != 'properties')
+        return self.get_attribute('style:name') is not None
 
 
 
