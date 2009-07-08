@@ -5,8 +5,9 @@
 from copy import deepcopy
 
 # Import from lpod
-from xmlpart import odf_create_element, LAST_CHILD
 from document import odf_create_cell, odf_create_column, odf_create_row
+from utils import _get_cell_coordinates
+from xmlpart import odf_create_element, LAST_CHILD
 
 
 
@@ -109,7 +110,7 @@ class odf_table:
             # Delete the table:number-rows-repeated
             row_repeat = row.get_attribute('table:number-rows-repeated')
             if row_repeat is not None:
-                row_repeat = int(repeat)
+                row_repeat = int(row_repeat)
                 row.del_attribute('table:number-rows-repeated')
             else:
                 row_repeat = 1
@@ -169,3 +170,7 @@ class odf_table:
 
         return table
 
+
+    def get_cell(self, coordinates):
+        x, y = _get_cell_coordinates(coordinates)
+        return self.__rows[y - 1]['cells'][x - 1]
