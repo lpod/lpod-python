@@ -25,7 +25,7 @@ class odf_content(odf_xmlpart):
 
     def insert_element(self, element, context, xmlposition=LAST_CHILD,
                        offset=0, length=None):
-        # TODO Do not check validity of insertions
+        # TODO Do not check validity of insertions anymore
         _check_arguments(element=element, context=context,
                          xmlposition=xmlposition, offset=offset)
         qname = element.get_name()
@@ -52,7 +52,6 @@ class odf_content(odf_xmlpart):
                 raise ValueError, "context must be a frame"
             context.insert_element(element, xmlposition)
         elif qname == 'style:style':
-            # XXX we'll probably have add_style/remove_style/...
             if context.get_name() != 'office:automatic-styles':
                 raise ValueError, "context must be the styles container"
             context.insert_element(element, xmlposition)
@@ -60,12 +59,10 @@ class odf_content(odf_xmlpart):
         elif qname in ('table:table-cell', 'table:table-row',
                        'table:table-column'):
             context.insert_element(element, xmlposition)
-            # TODO raise ValueError, "use the odf_table API"
         elif qname.startswith('style:') and qname.endswith('-properties'):
             if context.get_name() != 'style:style':
                 raise ValueError, "context must be a style"
             context.insert_element(element, xmlposition)
-            # TODO raise ValueError, "use the style API"
         else:
             raise ValueError, 'element "%s" is not (yet) supported' % qname
 
