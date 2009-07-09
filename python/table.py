@@ -1,9 +1,6 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
-# Import from the Standard Library
-from copy import deepcopy
-
 # Import from lpod
 from document import odf_create_cell, odf_create_column, odf_create_row
 from utils import _get_cell_coordinates
@@ -132,7 +129,7 @@ class odf_table:
                 column.del_attribute('table:number-columns-repeated')
                 repeat = int(repeat)
                 for i in range(repeat):
-                    columns.append(deepcopy(column))
+                    columns.append(column.clone())
             else:
                 columns.append(column)
 
@@ -156,14 +153,19 @@ class odf_table:
                     cell.del_attribute('table:number-columns-repeated')
                     repeat = int(repeat)
                     for i in range(repeat):
-                        cells.append(deepcopy(cell))
+                        cells.append(cell.clone())
                 else:
                     cells.append(cell)
 
             # Append the rows
-            for i in range(row_repeat):
+            if row_repeat > 1:
+                for i in range(row_repeat):
+                    rows.append({'attributes': row.get_attributes(),
+                                 'cells': [ cell.clone() for cell in cells ]})
+            else:
                 rows.append({'attributes': row.get_attributes(),
-                             'cells': deepcopy(cells)})
+                             'cells': cells})
+
 
 
     def __get_odf_row(self, row):
@@ -239,3 +241,10 @@ class odf_table:
     def get_cell(self, coordinates):
         x, y = _get_cell_coordinates(coordinates)
         return self.__rows[y - 1]['cells'][x - 1]
+
+
+    def set_cell(self, coordinates, odf_cell):
+        # XXX auto-adjust the table size ?
+        x, y = _get_cell_coordinates(coordinates)
+        self.__rows[y - 1]['cells'][x - 1] = odf_cell
+

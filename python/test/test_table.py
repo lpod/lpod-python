@@ -8,6 +8,7 @@ from datetime import datetime
 # Import from lpod
 from lpod.table import odf_table
 from lpod.xmlpart import odf_create_element
+from lpod.document import odf_create_cell
 
 
 
@@ -139,6 +140,52 @@ class odf_table_TestCase(TestCase):
 
         table_serialized = table.get_odf_element().serialize()
         self.assertEqual(table_serialized, data)
+
+
+    def test_change_table(self):
+        data1 = ((1, 1, 1, 1),
+                 (1, 1, 1, 1),
+                 (2, 2, 2, 2))
+        # Force repeat
+        table1 = odf_table(name='table', style='Standard', data=data1)
+        table1 = odf_table(odf_element=table1.get_odf_element())
+
+        # Change the value of C2 to 3, not with a new cell, but with the same
+        cell = table1.get_cell('C2')
+        cell.set_attribute('office:value', u'3')
+        paragraph = cell.get_element('text:p')
+        paragraph.set_text(u'3')
+
+        # Expected
+        data2 = ((1, 1, 1, 1),
+                 (1, 1, 3, 1),
+                 (2, 2, 2, 2))
+        table2 = odf_table(name='table', style='Standard', data=data2)
+
+        self.assertEqual(table1.get_odf_element().serialize(),
+                         table2.get_odf_element().serialize())
+
+
+    def test_set_cell_table(self):
+        data1 = ((1, 1, 1, 1),
+                 (1, 1, 1, 1),
+                 (2, 2, 2, 2))
+        # Force repeat
+        table1 = odf_table(name='table', style='Standard', data=data1)
+        table1 = odf_table(odf_element=table1.get_odf_element())
+
+        # Change the value of C2 to 3 with a new cell
+        cell = odf_create_cell(3)
+        table1.set_cell('C2', cell)
+
+        # Expected
+        data2 = ((1, 1, 1, 1),
+                 (1, 1, 3, 1),
+                 (2, 2, 2, 2))
+        table2 = odf_table(name='table', style='Standard', data=data2)
+
+        self.assertEqual(table1.get_odf_element().serialize(),
+                         table2.get_odf_element().serialize())
 
 
 if __name__ == '__main__':
