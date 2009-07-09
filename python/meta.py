@@ -14,7 +14,7 @@ from lpod.xmlpart import LAST_CHILD, odf_create_element, odf_xmlpart
 class odf_meta(odf_xmlpart):
 
     def get_meta_body(self):
-        raise NotImplementedError
+        return self.get_element('//office:meta')
 
 
     def get_title(self):

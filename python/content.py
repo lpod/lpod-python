@@ -12,15 +12,15 @@ from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
 class odf_content(odf_xmlpart):
 
     def get_text_body(self):
-        raise NotImplementedError
+        return self.get_element('//office:text')
 
 
     def get_spreadsheet_body(self):
-        raise NotImplementedError
+        return self.get_element('//office:spreadsheet')
 
 
     def get_presentation_body(self):
-        raise NotImplementedError
+        return self.get_element('//office:presentation')
 
 
     def insert_element(self, element, context, xmlposition=LAST_CHILD,
