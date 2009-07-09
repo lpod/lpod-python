@@ -142,6 +142,19 @@ class ElementTestCase(TestCase):
         element.set_text(old_text)
 
 
+    def test_get_parent(self):
+        paragraph = self.paragraph_element
+        parent = paragraph.get_parent()
+        self.assertEqual(parent.get_name(), 'text:section')
+
+
+    def test_get_parent_root(self):
+        content = self.content_part
+        root = content.get_root()
+        parent = root.get_parent()
+        self.assertEqual(parent, None)
+
+
     def test_get_text_content(self):
         element = self.annotation_element
         text = element.get_text_content()
@@ -258,8 +271,13 @@ class XmlPartTestCase(TestCase):
 
 
     def test_delete(self):
-        # TODO...
-        raise NotImplementedError
+        container = self.container
+        content = odf_xmlpart('content', container)
+        paragraphs = content.get_element_list('//text:p')
+        for paragraph in paragraphs:
+            content.delete(paragraph)
+        serialized = content.serialize()
+        self.assertEqual(serialized.count('<text:p'), 0)
 
 
 

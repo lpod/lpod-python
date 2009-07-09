@@ -190,6 +190,15 @@ class odf_element(object):
             element.text = text
 
 
+    def get_parent(self):
+        element = self.__element
+        parent = element.getparent()
+        if parent is None:
+            # Already at root
+            return None
+        return self.__class__(parent)
+
+
     def get_creator(self):
         dc_creator = self.get_element('//dc:creator')
         if dc_creator is None:
@@ -249,6 +258,12 @@ class odf_element(object):
             raise ValueError, "xmlposition must be defined"
 
 
+    def xpath(self, xpath_query):
+        element = self.__element
+        result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
+        return [self.__class__(e) for e in result]
+
+
     def clear(self):
         element = self.__element
         element.clear()
@@ -287,6 +302,7 @@ class odf_xmlpart(object):
         self.container = container
 
         # Internal state
+        # TODO should be "__tree", the lxml tree object
         self.__root = None
 
 
@@ -333,8 +349,7 @@ class odf_xmlpart(object):
 
     def get_element_list(self, xpath_query):
         root = self.get_root()
-        result = root.xpath(xpath_query, namespaces=ODF_NAMESPACES)
-        return [odf_element(e) for e in result]
+        return root.xpath(xpath_query)
 
 
     def get_element(self, xpath_query):
@@ -349,7 +364,7 @@ class odf_xmlpart(object):
             container = self.container
             part = container.get_part(self.part_name)
             # XXX use "parse"?
-            self.__root = fromstring(part)
+            self.__root = odf_element(fromstring(part))
         return self.__root
 
 
@@ -369,9 +384,10 @@ class odf_xmlpart(object):
 
     def serialize(self, pretty=False):
         root = self.get_root()
-        return tostring(root, encoding='UTF-8', pretty_print=pretty)
+        # FIXME this returns a fragment, not a document
+        return root.serialize()
 
 
     def delete(self, child):
-        root = self.get_root()
-        root.remove(child.__element)
+        parent = child.get_parent()
+        parent.delete(child)
