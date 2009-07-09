@@ -16,12 +16,14 @@ from lpod.vfs import vfs
 
 
 document = odf_new_document_from_class('text')
+content = document.get_xmlpart('content')
+body = content.get_text_body()
 
 samples = vfs.open('samples')
 for numero, filename in enumerate(samples.get_names()):
     # Heading
     heading = odf_create_heading('Standard', 2, unicode(filename, 'utf-8'))
-    document.insert_element(heading)
+    content.insert_element(heading, body)
 
     uri = samples.get_uri(filename)
     handler = get_handler(uri)
@@ -35,9 +37,9 @@ for numero, filename in enumerate(samples.get_names()):
                                  str(width / 72.0) + 'in',
                                  str(height / 72.0) + 'in')
         image = odf_create_image(internal_name)
-        document.insert_element(image, frame)
-        document.insert_element(frame, paragraph)
-        document.insert_element(paragraph)
+        content.insert_element(image, frame)
+        content.insert_element(frame, paragraph)
+        content.insert_element(paragraph, body)
 
         # And store the data
         container = document.container
@@ -50,15 +52,15 @@ for numero, filename in enumerate(samples.get_names()):
             row = odf_create_row()
             for value in csv_row:
                 cell = odf_create_cell(value)
-                document.insert_element(cell, row)
-            document.insert_element(row, table)
+                content.insert_element(cell, row)
+            content.insert_element(row, table)
         for i in xrange(size):
             column = odf_create_column('Standard')
-            document.insert_element(column, table, FIRST_CHILD)
-        document.insert_element(table)
+            content.insert_element(column, table, FIRST_CHILD)
+        content.insert_element(table, body)
     else:
         paragraph = odf_create_paragraph('Standard', u'Not image / csv')
-        document.insert_element(paragraph)
+        content.insert_element(paragraph, body)
 
 vfs.make_folder('trash')
 document.save('trash/use_case1.odt', pretty=True)

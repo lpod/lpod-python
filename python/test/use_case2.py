@@ -24,6 +24,13 @@ from lpod.styles import rgb2hex
 
 document = odf_new_document_from_class('text')
 
+content = document.get_xmlpart('content')
+body = content.get_text_body()
+
+styles = document.get_xmlpart('styles')
+named_styles = styles.get_category_context('named')
+
+
 # 1- the image
 # ------------
 image_file = get_handler('samples/image.png')
@@ -35,9 +42,9 @@ frame = odf_create_frame('frame1', 'Graphics',
                          str(height / 72.0) + 'in')
 internal_name = 'Pictures/image.png'
 image = odf_create_image(internal_name)
-document.insert_element(image, frame)
-document.insert_element(frame, paragraph)
-document.insert_element(paragraph)
+content.insert_element(image, frame)
+content.insert_element(frame, paragraph)
+content.insert_element(paragraph, body)
 
 # And store the data
 container = document.container
@@ -47,7 +54,7 @@ container.set_part(internal_name, image_file.to_str())
 # 2- a paragraph
 # --------------
 heading = odf_create_heading('Heading', 1, u'Congratulations !')
-document.insert_element(heading)
+content.insert_element(heading, body)
 
 # The style
 style = odf_create_style('style1', 'paragraph')
@@ -55,18 +62,19 @@ style.set_attribute('style:parent-style-name', 'Standard')
 properties = odf_create_style_text_properties()
 properties.set_attribute('fo:color', rgb2hex('blue'))
 properties.set_attribute('fo:background-color', rgb2hex('red'))
-document.insert_element(properties, style)
-document.insert_element(style)
+
+styles.insert_element(properties, style)
+styles.insert_element(style, named_styles)
 
 # The paragraph
 paragraph = odf_create_paragraph('style1', u'A paragraph with a new style.')
-document.insert_element(paragraph)
+content.insert_element(paragraph, body)
 
 
 # 3- the table
 # ------------
 heading = odf_create_heading('Heading', 1, u'A table')
-document.insert_element(heading)
+content.insert_element(heading, body)
 
 table = odf_create_table('table1', 'Standard')
 
@@ -74,67 +82,68 @@ table = odf_create_table('table1', 'Standard')
 row = odf_create_row()
 
 cell = odf_create_cell('A float')
-document.insert_element(cell, row)
+content.insert_element(cell, row)
 
 cell = odf_create_cell(3.14)
-document.insert_element(cell, row)
+content.insert_element(cell, row)
 
-document.insert_element(row, table)
+content.insert_element(row, table)
 
 # A "date"
 row = odf_create_row()
 
 cell = odf_create_cell('A date')
-document.insert_element(cell, row)
+content.insert_element(cell, row)
 
 cell = odf_create_cell(datetime.now())
-document.insert_element(cell, row)
+content.insert_element(cell, row)
 
-document.insert_element(row, table)
+content.insert_element(row, table)
 
 # Columns => Standard
 for i in range(2):
     column = odf_create_column('Standard')
-    document.insert_element(column, table, FIRST_CHILD)
-document.insert_element(table)
+    content.insert_element(column, table, FIRST_CHILD)
+content.insert_element(table, body)
 
 
 # 4- A footnote
 # -------------
 
 heading = odf_create_heading('Heading', 1, u'A paragraph with a footnote')
-document.insert_element(heading)
+content.insert_element(heading, body)
 
 paragraph = odf_create_paragraph('Standard', u'An other paragraph.')
-document.insert_element(paragraph)
+content.insert_element(paragraph, body)
 
 note = odf_create_note(u'1', id='note1')
 body =  odf_create_paragraph('Standard', u'a footnote')
-document.insert_note_body(body, note)
+content.insert_note_body(body, note)
 
-document.insert_element(note, paragraph, offset=8)
-document.insert_element(paragraph)
+content.insert_element(note, paragraph, offset=8)
+content.insert_element(paragraph, body)
 
 
 # 5- An other paragraph
 # ---------------------
 
 heading = odf_create_heading('Heading', 1, u'A paragraph with a colored word')
-document.insert_element(heading)
+content.insert_element(heading, body)
 
 # The style
 style = odf_create_style('style2', 'text')
 style.set_attribute('style:parent-style-name', 'Standard')
 properties = odf_create_style_text_properties()
 properties.set_attribute('fo:background-color', rgb2hex('yellow'))
-document.insert_element(properties, style)
-document.insert_element(style)
+styles.insert_element(properties, style)
+styles.insert_element(style, named_styles)
 
 # The paragraph
+# XXX Use "length"
 paragraph = odf_create_paragraph('Standard', u'And an  paragraph.')
 span = odf_create_span('style2', u'other')
-document.insert_element(span, paragraph, offset=len(u'And an '))
-document.insert_element(paragraph)
+content.insert_element(span, paragraph, offset=len(u'And an '))
+content.insert_element(paragraph, body)
 
 
 
