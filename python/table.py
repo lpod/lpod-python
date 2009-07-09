@@ -11,6 +11,39 @@ from xmlpart import odf_create_element, LAST_CHILD
 
 
 
+def _insert_elements(elements, target):
+    # No elements => nothing to do
+    if not elements:
+        return
+
+    # At least a element
+    current_element = elements[0]
+    current_element_serialized = current_element.serialize()
+    repeat = 1
+    for element in elements[1:]:
+        element_serialized = element.serialize()
+        if element_serialized == current_element_serialized:
+            repeat += 1
+        else:
+            # Insert the current_element
+            if repeat > 1:
+                current_element.set_attribute('table:number-columns-repeated',
+                                              str(repeat))
+            target.insert_element(current_element, xmlposition=LAST_CHILD)
+
+            # Current element is now this element
+            current_element = element
+            current_element_serialized = element_serialized
+            repeat = 1
+
+    # Insert the last elements
+    if repeat > 1:
+        current_element.set_attribute('table:number-columns-repeated',
+                                     str(repeat))
+    target.insert_element(current_element, xmlposition=LAST_CHILD)
+
+
+
 class odf_table:
 
     def __init__(self, name=None, style=None, data=None, odf_element=None):
@@ -133,6 +166,56 @@ class odf_table:
                              'cells': deepcopy(cells)})
 
 
+    def __get_odf_row(self, row):
+        attributes = row['attributes']
+        cells = row['cells']
+
+        # Create the node
+        odf_row = odf_create_row()
+        for key, value in attributes:
+            odf_row.set_attribute(key, value)
+
+        # Add the cells
+        _insert_elements(cells, odf_row)
+
+        return odf_row
+
+
+    def __insert_rows(self, table):
+        rows = self.__rows
+
+        # No rows => nothing to do
+        if not rows:
+            return
+
+        # At least a row
+        current_row = self.__get_odf_row(rows[0])
+        current_row_serialized = current_row.serialize()
+        repeat = 1
+        for row in rows[1:]:
+            row = self.__get_odf_row(row)
+            row_serialized = row.serialize()
+            if row_serialized == current_row_serialized:
+                repeat += 1
+            else:
+                # Insert the current_row
+                if repeat > 1:
+                    current_row.set_attribute('table:number-rows-repeated',
+                                              str(repeat))
+                table.insert_element(current_row, xmlposition=LAST_CHILD)
+
+                # Current row is now this row
+                current_row = row
+                current_row_serialized = row_serialized
+                repeat = 1
+
+        # Insert the last rows
+        if repeat > 1:
+            current_row.set_attribute('table:number-rows-repeated',
+                                      str(repeat))
+        table.insert_element(current_row, xmlposition=LAST_CHILD)
+
+
     #
     # Public API
     #
@@ -145,28 +228,10 @@ class odf_table:
             table.set_attribute(key, value)
 
         # 2) Add the columns
-        # XXX use repeat!
-        for column in self.__columns:
-            table.insert_element(column, xmlposition=LAST_CHILD)
+        _insert_elements(self.__columns, table)
 
         # 3) The rows
-        # XXX use repeat!
-        for row in self.__rows:
-
-            attributes = row['attributes']
-            cells = row['cells']
-
-            # Create the node
-            odf_row = odf_create_row()
-            for key, value in attributes:
-                odf_row.set_attribute(key, value)
-
-            # Add the cell
-            # XXX use repeat!
-            for cell in cells:
-                odf_row.insert_element(cell, xmlposition=LAST_CHILD)
-
-            table.insert_element(odf_row, xmlposition=LAST_CHILD)
+        self.__insert_rows(table)
 
         return table
 

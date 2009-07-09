@@ -11,14 +11,57 @@ from lpod.xmlpart import odf_create_element
 
 
 
+def get_example():
+    # Encode this table
+    #   A B C D E F G
+    # 1 1 1 1 2 3 3 3
+    # 2 1 1 1 2 3 3 3
+    # 3 1 1 1 2 3 3 3
+    # 4 1 2 3 4 5 6 7
+
+    # Header
+    data = ['<table:table table:name="a_table" '
+              'table:style-name="Standard">'
+              '<table:table-column table:style-name="Standard" '
+                'table:number-columns-repeated="7"/>']
+
+    # 3x "1 1 1 2 3 3 3"
+    data.append('<table:table-row table:number-rows-repeated="3">')
+    for i in range(1, 4):
+        data.append(('<table:table-cell office:value-type="string" '
+                      'office:string-value="%d"'
+                      '%s>'
+                      '<text:p>%d</text:p>'
+                     '</table:table-cell>') %
+                  (i,
+                   ' table:number-columns-repeated="3"' if i != 2 else '',
+                   i))
+    data.append('</table:table-row>')
+
+    # 1x "1 2 3 4 5 6 7"
+    data.append('<table:table-row>')
+    for i in range(1, 8):
+        data.append(('<table:table-cell office:value-type="string" '
+                        'office:string-value="%d">'
+                        '<text:p>%d</text:p>'
+                     '</table:table-cell>') % (i, i))
+    data.append('</table:table-row>')
+
+    # Footer
+    data.append('</table:table>')
+
+    return ''.join(data)
+
+
+
 class odf_table_TestCase(TestCase):
 
     def test_create_table(self):
 
         expected = ('<table:table table:name="table1" '
                       'table:style-name="Standard">'
-                      '<table:table-column table:style-name="Standard"/>'
-                      '<table:table-column table:style-name="Standard"/>'
+                      '<table:table-column table:style-name="Standard" '
+                      'table:number-columns-repeated="2"/>'
                       '<table:table-row>'
                         '<table:table-cell office:value-type="string" '
                           'office:string-value="A float">'
@@ -59,46 +102,7 @@ class odf_table_TestCase(TestCase):
 
 
     def test_create_with_repeat(self):
-        # Encode this table
-        #   A B C D E F G
-        # 1 1 1 1 2 3 3 3
-        # 2 1 1 1 2 3 3 3
-        # 3 1 1 1 2 3 3 3
-        # 4 1 2 3 4 5 6 7
-
-        # Header
-        data = ['<table:table table:name="a_table" '
-                  'table:style-name="Standard">'
-                  '<table:table-column table:style-name="Standard" '
-                    'table:number-columns-repeated="7"/>']
-
-        # 3x "1 1 1 2 3 3 3"
-        data.append('<table:table-row table:number-rows-repeated="3">')
-        for i in range(1, 4):
-            data.append(('<table:table-cell office:value-type="string" '
-                          'office:string-value="%d"'
-                          '%s>'
-                          '<text:p>%d</text:p>'
-                         '</table:table-cell>') %
-                      (i,
-                       ' table:number-columns-repeated="3"' if i != 2 else '',
-                       i))
-        data.append('</table:table-row>')
-
-        # 1x "1 2 3 4 5 6 7"
-        data.append('<table:table-row>')
-        for i in range(1, 8):
-            data.append(('<table:table-cell office:value-type="string" '
-                            'office:string-value="%d">'
-                            '<text:p>%d</text:p>'
-                         '</table:table-cell>') % (i, i))
-        data.append('</table:table-row>')
-
-        # Footer
-        data.append('</table:table>')
-
-        # Make the table
-        data = ''.join(data)
+        data = get_example()
         odf_element = odf_create_element(data)
         table = odf_table(odf_element=odf_element)
 
@@ -111,7 +115,6 @@ class odf_table_TestCase(TestCase):
         self.assertEqual(get_value('B4'), 2)
 
         self.assertRaises(IndexError, get_value, 'A5')
-
 
 
     def test_get_cell(self):
@@ -128,6 +131,14 @@ class odf_table_TestCase(TestCase):
                     '</table:table-cell>')
         self.assertEqual(cell_A2.serialize(), expected)
 
+
+    def test_get_odf_element(self):
+        data = get_example()
+        odf_element = odf_create_element(data)
+        table = odf_table(odf_element=odf_element)
+
+        table_serialized = table.get_odf_element().serialize()
+        self.assertEqual(table_serialized, data)
 
 
 if __name__ == '__main__':
