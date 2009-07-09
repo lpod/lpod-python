@@ -133,8 +133,5 @@ class odf_styles(odf_xmlpart):
         return self.get_style(parent_name, family)
 
 
-    styles.delete(style)
-
-
     # TODO get/set_properties(name_or_element, style, family=None)
     # same family than the style by default, or "text", "paragraph", etc.
