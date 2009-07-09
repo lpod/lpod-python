@@ -3,10 +3,11 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from cStringIO import StringIO
 from re import compile
 
 # Import from lxml
-from lxml.etree import fromstring, tostring, _Element
+from lxml.etree import parse, fromstring, tostring, _Element
 
 # Import from lpod
 from utils import _check_arguments, _get_abspath, DateTime
@@ -302,8 +303,16 @@ class odf_xmlpart(object):
         self.container = container
 
         # Internal state
-        # TODO should be "__tree", the lxml tree object
+        self.__tree = None
         self.__root = None
+
+
+    def __get_tree(self):
+        if self.__tree is None:
+            container = self.container
+            part = container.get_part(self.part_name)
+            self.__tree = parse(StringIO(part))
+        return self.__tree
 
 
     #
@@ -361,10 +370,8 @@ class odf_xmlpart(object):
 
     def get_root(self):
         if self.__root is None:
-            container = self.container
-            part = container.get_part(self.part_name)
-            # XXX use "parse"?
-            self.__root = odf_element(fromstring(part))
+            tree = self.__get_tree()
+            self.__root = odf_element(tree.getroot())
         return self.__root
 
 
@@ -373,7 +380,7 @@ class odf_xmlpart(object):
         for name in self.__dict__:
             if name == 'container':
                 setattr(clone, name, self.container.clone())
-            elif name in ('_odf_xmlpart__root',):
+            elif name in ('_odf_xmlpart__tree',):
                 setattr(clone, name, None)
             else:
                 value = getattr(self, name)
@@ -383,9 +390,10 @@ class odf_xmlpart(object):
 
 
     def serialize(self, pretty=False):
-        root = self.get_root()
-        # FIXME this returns a fragment, not a document
-        return root.serialize()
+        tree = self.__get_tree()
+        # lxml declaration is too exotic too me
+        return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+                + tostring(tree, encoding='UTF-8', pretty_print=pretty))
 
 
     def delete(self, child):

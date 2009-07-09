@@ -254,8 +254,7 @@ class XmlPartTestCase(TestCase):
         content_bytes = container.get_part('content')
         content_part = odf_xmlpart('content', container)
         # differences with lxml
-        serialized = ('<?xml version="1.0" encoding="UTF-8"?>\n' +
-                      content_part.serialize().replace("'", "&apos;"))
+        serialized = content_part.serialize().replace("'", "&apos;")
         self.assertEqual(content_bytes, serialized)
 
 
@@ -267,7 +266,7 @@ class XmlPartTestCase(TestCase):
         clone = content.clone()
         self.assertEqual(clone.part_name, content.part_name)
         self.assertNotEqual(id(container), id(clone.container))
-        self.assertEqual(clone._odf_xmlpart__root, None)
+        self.assertEqual(clone._odf_xmlpart__tree, None)
 
 
     def test_delete(self):
