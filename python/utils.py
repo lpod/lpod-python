@@ -23,7 +23,7 @@ CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
 STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'table-column',
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'default', 'drawing-page', 'graphic', 'presentation',
-                  'control', 'ruby')
+                  'control', 'ruby', 'page-layout')
 
 NOTE_CLASSES = ('footnote', 'endnote')
 

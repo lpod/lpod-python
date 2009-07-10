@@ -111,9 +111,12 @@ class odf_styles(odf_xmlpart):
             if not name_or_element.is_style():
                 raise ValueError, "element is not a style element"
         elif type(name_or_element) is str:
-            query = _make_xpath_query('style:style',
-                                      style_name=name_or_element,
-                                      family=family)
+            if family == 'page-layout':
+                query = _make_xpath_query('style:page-layout',
+                                          style_name=name_or_element)
+            else:
+                query = _make_xpath_query('style:style',
+                                          style_name=name_or_element)
             context = self.get_category_context(category)
             if context is None:
                 return self.get_element(query)
