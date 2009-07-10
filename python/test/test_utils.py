@@ -23,15 +23,12 @@ class GenerateXPathTestCase(TestCase):
 
 
     def test_attribute(self):
-        attributes = {'text:style-name': 'Standard'}
-        query = _make_xpath_query('text:p', attributes)
+        query = _make_xpath_query('text:p', style='Standard')
         self.assertEqual(query, '//text:p[@text:style-name="Standard"]')
 
 
     def test_two_attributes(self):
-        attributes = {'text:style-name': 'Standard',
-                      'text:outline-level': 1}
-        query = _make_xpath_query('text:h', attributes)
+        query = _make_xpath_query('text:h', style='Standard', level=1)
         expected = ('//text:h[@text:outline-level="1"]'
                     '[@text:style-name="Standard"]')
         self.assertEqual(query, expected)
@@ -43,15 +40,13 @@ class GenerateXPathTestCase(TestCase):
 
 
     def test_attribute_position(self):
-        attributes = {'text:style-name': 'Standard'}
-        query = _make_xpath_query('text:p', attributes, position=2)
+        query = _make_xpath_query('text:p', style='Standard', position=2)
         self.assertEqual(query, '//text:p[@text:style-name="Standard"][2]')
 
 
     def test_two_attributes_position(self):
-        attributes = {'text:style-name': 'Standard',
-                      'text:outline-level': 1}
-        query = _make_xpath_query('text:h', attributes, position=2)
+        query = _make_xpath_query('text:h', style='Standard', level=1,
+                                  position=2)
         expected = ('//text:h[@text:outline-level="1"]'
                     '[@text:style-name="Standard"][2]')
         self.assertEqual(query, expected)
