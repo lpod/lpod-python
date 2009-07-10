@@ -788,28 +788,6 @@ class TestNote(TestCase):
     def setUp(self):
         self.document = document = odf_get_document('samples/example.odt')
         self.content = document.get_xmlpart('content')
-
-
-    def tearDown(self):
-        del self.content
-        del self.document
-
-
-    def test_create_note(self):
-        content = self.content
-
-        # Create OK ?
-        note = odf_create_note(u'1', id='note1')
-        note_body = odf_create_paragraph('Standard', u'a footnote')
-        # TODO stop here and compare to the snippet
-
-        # Insert OK ?
-        clone = content.clone()
-        paragraph = clone.get_paragraph(1)
-        note.insert_element(note_body, LAST_CHILD)
-        paragraph.insert_element(note, LAST_CHILD)
-
-        # Get OK ?
         expected = ('<text:note text:note-class="footnote" text:id="note1">'
                       '<text:note-citation>1</text:note-citation>'
                       '<text:note-body>'
@@ -817,26 +795,60 @@ class TestNote(TestCase):
                           'a footnote'
                         '</text:p>'
                       '</text:note-body>'
-                    '</text:note>'
-                    'This is the first paragraph.')
-        get1 = clone.get_note('note1')
-        get2 = clone.get_note_list(note_class='footnote')[-1]
-        self.assertEqual(get1.serialize(), expected)
-        self.assertEqual(get2.serialize(), expected)
+                    '</text:note>')
+        self.expected = expected
+
+
+    def test_create_note(self):
+        note = odf_create_note(u'1', id='note1')
+        note_body = odf_create_paragraph('Standard', u'a footnote')
+        note.get_element('text:note-body').insert_element(note_body,
+                                                          LAST_CHILD)
+
+        self.assertEqual(note.serialize(), self.expected)
 
 
     def test_get_note(self):
-        raise NotImplementedError
+        clone = self.content.clone()
+
+        note = odf_create_note(u'1', id='note1')
+        note_body = odf_create_paragraph('Standard', u'a footnote')
+        note.get_element('text:note-body').insert_element(note_body,
+                                                          LAST_CHILD)
+
+        paragraph = clone.get_paragraph(1)
+        paragraph.insert_element(note, LAST_CHILD)
+
+        get = clone.get_note('note1')
+        self.assertEqual(get.serialize(), self.expected)
 
 
     def test_get_note_list(self):
-        raise NotImplementedError
+        clone = self.content.clone()
+
+        note = odf_create_note(u'1', id='note1')
+        note_body = odf_create_paragraph('Standard', u'a footnote')
+        note.get_element('text:note-body').insert_element(note_body,
+                                                          LAST_CHILD)
+
+        paragraph = clone.get_paragraph(1)
+        paragraph.insert_element(note, LAST_CHILD)
+
+        get = clone.get_note_list()
+        self.assertEqual(len(get), 1)
+        self.assertEqual(get[0].serialize(), self.expected)
 
 
     def test_insert_note(self):
-        content = self.content
-        clone = content.clone()
-        raise NotImplementedError
+        clone = self.content.clone()
+
+        note = odf_create_note(u'1', id='note1')
+        note_body = odf_create_paragraph('Standard', u'a footnote')
+        note.get_element('text:note-body').insert_element(note_body,
+                                                          LAST_CHILD)
+
+        paragraph = clone.get_paragraph(1)
+        paragraph.insert_element(note, LAST_CHILD)
 
 
 
