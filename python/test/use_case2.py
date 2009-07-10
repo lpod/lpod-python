@@ -116,7 +116,7 @@ body.insert_element(heading, LAST_CHILD)
 
 note = odf_create_note(u'1', id='note1')
 note_body = odf_create_paragraph('Standard', u'a footnote')
-note.insert_element(note_body, LAST_CHILD)
+note.get_element('text:note-body').insert_element(note_body, LAST_CHILD)
 
 paragraph = odf_create_paragraph('Standard', u'Another paragraph.')
 offset = len(u'Another')
@@ -142,8 +142,8 @@ named_styles.insert_element(style, LAST_CHILD)
 text = u'And another paragraph.'
 paragraph = odf_create_paragraph('Standard', text)
 span = odf_create_span('style2')
-offset = text.index(u'other')
-length = len(u'other')
+offset = text.index(u'another')
+length = len(u'another')
 paragraph.wrap_text(span, offset=offset, length=length)
 body.insert_element(paragraph, LAST_CHILD)
 
