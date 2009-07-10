@@ -134,7 +134,7 @@ def odf_create_image(uri):
 
 
 
-def odf_create_cell(value, representation=None, cell_type=None,
+def odf_create_cell(value=None, representation=None, cell_type=None,
                     currency=None):
     """Create a cell element containing the given value. The textual
     representation is automatically formatted but can be provided. Cell type
@@ -192,12 +192,18 @@ def odf_create_cell(value, representation=None, cell_type=None,
         if representation is None:
             representation = unicode(Duration.encode(value))
         value = Duration.encode(value)
-    else:
+    elif value is not None:
         raise TypeError, 'type "%s" is unknown to cells' % type(value)
     _check_arguments(cell_type=cell_type, text=representation,
                      currency=currency)
-    data = '<table:table-cell office:value-type="%s"/>'
-    cell = odf_create_element(data % cell_type)
+
+    if cell_type is None:
+        data = '<table:table-cell/>'
+        cell = odf_create_element(data)
+    else:
+        data = '<table:table-cell office:value-type="%s"/>'
+        cell = odf_create_element(data % cell_type)
+
     if cell_type == 'boolean':
         cell.set_attribute('office:boolean-value', value)
     elif cell_type == 'currency':
@@ -211,7 +217,10 @@ def odf_create_cell(value, representation=None, cell_type=None,
         cell.set_attribute('office:string-value', value)
     elif cell_type == 'time':
         cell.set_attribute('office:time-value', value)
-    cell.set_text_content(representation)
+
+    if representation is not None:
+        cell.set_text_content(representation)
+
     return cell
 
 
