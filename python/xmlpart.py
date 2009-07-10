@@ -182,7 +182,7 @@ class odf_element(object):
     def set_text(self, text, after=False):
         """If "after" is true, sets the text at the end of the element, not
         inside.
-        FIXME maybe too specific to lxml
+        FIXME maybe too specific to lxml, see at the end if disposable
         """
         element = self.__element
         if after:
@@ -239,7 +239,7 @@ class odf_element(object):
         element.text = text
 
 
-    def insert_element(self, element, xmlposition=LAST_CHILD):
+    def insert_element(self, element, xmlposition):
         _check_arguments(element=element, xmlposition=xmlposition)
         current = self.__element
         element = element.__element
@@ -257,6 +257,22 @@ class odf_element(object):
             parent.insert(index, element)
         else:
             raise ValueError, "xmlposition must be defined"
+
+
+    def wrap_text(self, element, offset=0, length=0):
+        """Wrap text beginning at "offset" and for "length" characters, into
+        the given element. If "length" is not defined, just insert the
+        element inside the text.
+        """
+        _check_arguments(element=element, offset=offset, length=length)
+        text = self.get_text()
+        before, after = text[:offset], text[offset + length:]
+        self.set_text(before)
+        element.set_text(after, after=True)
+        self.insert_element(element, LAST_CHILD)
+        cutted = text[offset:offset + length]
+        if cutted:
+            element.set_text(cutted)
 
 
     def xpath(self, xpath_query):
