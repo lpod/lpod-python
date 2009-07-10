@@ -4,6 +4,9 @@
 # Import from the Standard Library
 from unittest import TestCase, main
 
+# Import from the XML Library
+from lxml.etree import _ElementTree
+
 # Import from lpod
 from lpod.container import odf_get_container
 from lpod.xmlpart import odf_create_element, odf_element, odf_xmlpart
@@ -247,6 +250,22 @@ class XmlPartTestCase(TestCase):
         elements = content_part.get_element_list('//text:p')
         # The annotation paragraph is counted
         self.assertEqual(len(elements), 7)
+
+
+    def test_tree(self):
+        # Testing a private but important method
+        content = odf_xmlpart('content', self.container)
+        tree = content._odf_xmlpart__get_tree()
+        self.assert_(isinstance(tree, _ElementTree))
+        self.assertNotEqual(content._odf_xmlpart__tree, None)
+
+
+    def test_root(self):
+        content = odf_xmlpart('content', self.container)
+        root = content.get_root()
+        self.assert_(isinstance(root, odf_element))
+        self.assertEqual(root.get_name(), "office:document-content")
+        self.assertNotEqual(content._odf_xmlpart__root, None)
 
 
     def test_serialize(self):

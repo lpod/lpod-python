@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from unittest import TestCase, main
 
 # Import from the XML Library
-from lxml.etree import Element
+from lxml.etree import _Element
 
 # Import from lpod
 from lpod.document import odf_get_document
@@ -69,7 +69,7 @@ class CheckArgumentsTestCase(TestCase):
 
 
     def test_bad_element(self):
-        self.assertRaises(TypeError, _check_arguments, element=Element)
+        self.assertRaises(TypeError, _check_arguments, element=_Element)
 
 
     def test_str_xmlposition(self):

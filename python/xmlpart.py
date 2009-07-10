@@ -239,7 +239,7 @@ class odf_element(object):
         element.text = text
 
 
-    def insert_element(self, element, xmlposition):
+    def insert_element(self, element, xmlposition=LAST_CHILD):
         _check_arguments(element=element, xmlposition=xmlposition)
         current = self.__element
         element = element.__element
@@ -356,6 +356,13 @@ class odf_xmlpart(object):
     # Public API
     #
 
+    def get_root(self):
+        if self.__root is None:
+            tree = self.__get_tree()
+            self.__root = odf_element(tree.getroot())
+        return self.__root
+
+
     def get_element_list(self, xpath_query):
         root = self.get_root()
         return root.xpath(xpath_query)
@@ -366,13 +373,6 @@ class odf_xmlpart(object):
         if not result:
             return None
         return result[0]
-
-
-    def get_root(self):
-        if self.__root is None:
-            tree = self.__get_tree()
-            self.__root = odf_element(tree.getroot())
-        return self.__root
 
 
     def clone(self):
