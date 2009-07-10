@@ -186,11 +186,6 @@ class odf_content(odf_xmlpart):
                                  context=context)
 
 
-    def insert_note_body(self, element, context):
-        body = context.get_element_list('//text:note-body')[-1]
-        body.insert_element(element, LAST_CHILD)
-
-
     #
     # Annotations
     #

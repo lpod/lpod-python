@@ -800,13 +800,13 @@ class TestNote(TestCase):
 
         # Create OK ?
         note = odf_create_note(u'1', id='note1')
-        body = odf_create_paragraph('Standard', u'a footnote')
+        note_body = odf_create_paragraph('Standard', u'a footnote')
         # TODO stop here and compare to the snippet
 
         # Insert OK ?
         clone = content.clone()
         paragraph = clone.get_paragraph(1)
-        clone.insert_note_body(body, note)
+        note.insert_element(note_body, LAST_CHILD)
         paragraph.insert_element(note, LAST_CHILD)
 
         # Get OK ?
