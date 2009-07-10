@@ -198,6 +198,20 @@ class odf_table_TestCase(TestCase):
         self.assertEqual(table.get_size(), (1024, 9))
 
 
+    def test_add_row(self):
+        data = ((1, 1, 1, 1),
+                 (1, 1, 1, 1),
+                 (2, 2, 2, 2))
+        table = odf_table(name='table', style='Standard', data=data)
+
+        table.add_row()
+        self.assertEqual(table.get_size(), (4, 4))
+
+        table.add_row(number=2, position=1)
+        self.assertEqual(table.get_size(), (4, 6))
+
+        # XXX test the table
+        raise NotImplementedError
 
 if __name__ == '__main__':
     main()
