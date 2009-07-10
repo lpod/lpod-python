@@ -94,7 +94,9 @@ row = odf_create_row()
 cell = odf_create_cell('A date')
 row.insert_element(cell, LAST_CHILD)
 
-cell = odf_create_cell(datetime.now())
+now = datetime.now()
+representation = unicode(now.strftime('%c'))
+cell = odf_create_cell(now, representation=representation)
 row.insert_element(cell, LAST_CHILD)
 
 table.insert_element(row, LAST_CHILD)
