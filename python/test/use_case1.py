@@ -13,6 +13,7 @@ from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.vfs import vfs
+from lpod.xmlpart import LAST_CHILD
 
 
 document = odf_new_document_from_class('text')
@@ -23,7 +24,7 @@ samples = vfs.open('samples')
 for numero, filename in enumerate(samples.get_names()):
     # Heading
     heading = odf_create_heading('Standard', 2, unicode(filename, 'utf-8'))
-    content.insert_element(heading, body)
+    body.insert_element(heading, LAST_CHILD)
 
     uri = samples.get_uri(filename)
     handler = get_handler(uri)
@@ -37,9 +38,9 @@ for numero, filename in enumerate(samples.get_names()):
                                  str(width / 72.0) + 'in',
                                  str(height / 72.0) + 'in')
         image = odf_create_image(internal_name)
-        content.insert_element(image, frame)
-        content.insert_element(frame, paragraph)
-        content.insert_element(paragraph, body)
+        frame.insert_element(image, LAST_CHILD)
+        paragraph.insert_element(frame, LAST_CHILD)
+        body.insert_element(paragraph, LAST_CHILD)
 
         # And store the data
         container = document.container
@@ -52,15 +53,15 @@ for numero, filename in enumerate(samples.get_names()):
             row = odf_create_row()
             for value in csv_row:
                 cell = odf_create_cell(value)
-                content.insert_element(cell, row)
-            content.insert_element(row, table)
+                row.insert_element(cell, LAST_CHILD)
+            table.insert_element(row, LAST_CHILD)
         for i in xrange(size):
             column = odf_create_column('Standard')
-            content.insert_element(column, table, FIRST_CHILD)
-        content.insert_element(table, body)
+            table.insert_element(column, FIRST_CHILD)
+        body.insert_element(table, LAST_CHILD)
     else:
         paragraph = odf_create_paragraph('Standard', u'Not image / csv')
-        content.insert_element(paragraph, body)
+        body.insert_element(paragraph, LAST_CHILD)
 
 vfs.make_folder('trash')
 document.save('trash/use_case1.odt', pretty=True)
