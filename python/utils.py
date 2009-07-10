@@ -129,7 +129,8 @@ def _check_arguments(context=None, element=None, xmlposition=None,
                      position=None, level=None, text=None, style=None,
                      family=None, cell_type=None, currency=None,
                      note_class=None, creator=None, date=None,
-                     start_date=None, end_date=None, offset=None):
+                     start_date=None, end_date=None, offset=None,
+                     retrieve_by=None):
     if context is not None:
         # FIXME cyclic import
         from xmlpart import odf_element
@@ -190,6 +191,11 @@ def _check_arguments(context=None, element=None, xmlposition=None,
     if offset is not None:
         if type(offset) is not int:
             raise TypeError, "offset must be an integer"
+    if retrieve_by is not None:
+        if retrieve_by not in ('name', 'display-name'):
+            raise ValueError, ('retrieve_by must be "name" '
+                               'or "display-name"')
+
 
 
 

@@ -96,10 +96,7 @@ class odf_styles(odf_xmlpart):
 
     def get_style_list(self, family=None, category=None):
         _check_arguments(family=family)
-        attributes = {}
-        if family is not None:
-            attributes['style:family'] = family
-        query = _make_xpath_query('style:style', attributes=attributes)
+        query = _make_xpath_query('style:style', family=family)
         context = self.get_category_context(category)
         if context is None:
             return self.get_element_list(query)
@@ -109,16 +106,14 @@ class odf_styles(odf_xmlpart):
 
     def get_style(self, name_or_element, family, category=None,
                   retrieve_by='name'):
-        # TODO search the display name as a last resort
-        _check_arguments(family=family)
+        _check_arguments(family=family, retrieve_by=retrieve_by)
         if isinstance(name_or_element, odf_element):
             if not name_or_element.is_style():
                 raise ValueError, "element is not a style element"
         elif type(name_or_element) is str:
-            attributes = {'style:name': name_or_element,
-                          'style:family': family}
             query = _make_xpath_query('style:style',
-                                          attributes=attributes)
+                                      style_name=name_or_element,
+                                      family=family)
             context = self.get_category_context(category)
             if context is None:
                 return self.get_element(query)
