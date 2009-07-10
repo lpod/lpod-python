@@ -8,7 +8,7 @@ from datetime import datetime
 # Import from lpod
 from lpod.table import odf_table
 from lpod.xmlpart import odf_create_element
-from lpod.document import odf_create_cell
+from lpod.document import odf_create_cell, odf_get_document
 
 
 
@@ -186,6 +186,17 @@ class odf_table_TestCase(TestCase):
 
         self.assertEqual(table1.get_odf_element().serialize(),
                          table2.get_odf_element().serialize())
+
+
+    def test_bug_openoffice(self):
+        document = odf_get_document('samples/table-example.ods')
+        content = document.get_xmlpart('content')
+
+        table = content.get_table('Feuille1')
+        table = odf_table(odf_element=table)
+
+        self.assertEqual(table.get_size(), (1024, 9))
+
 
 
 if __name__ == '__main__':

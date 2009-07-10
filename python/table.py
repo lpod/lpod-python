@@ -41,6 +41,59 @@ def _insert_elements(elements, target):
 
 
 
+def _is_odf_row_empty(odf_row):
+    # XXX For the moment, a row is said empty when:
+    # 1- It has only a cell
+    # 2- This cell has no child
+    cells = odf_row.get_element_list(
+            'table:table-cell|table:covered-table-cell')
+    if len(cells) == 0:
+        return True
+    elif len(cells) > 1:
+        return False
+
+    # If here we have only a cell
+    cell = cells[0]
+    if len(cell.get_element_list('*')) > 0:
+        return False
+
+    return True
+
+
+
+def _append_odf_row(odf_row, rows):
+    # Delete the table:number-rows-repeated
+    row_repeat = odf_row.get_attribute('table:number-rows-repeated')
+    if row_repeat is not None:
+        row_repeat = int(row_repeat)
+        odf_row.del_attribute('table:number-rows-repeated')
+    else:
+        row_repeat = 1
+
+    # The cells
+    cells = []
+    for cell in odf_row.get_element_list(
+                    'table:table-cell|table:covered-table-cell'):
+        repeat = cell.get_attribute('table:number-columns-repeated')
+        if repeat is not None:
+            cell.del_attribute('table:number-columns-repeated')
+            repeat = int(repeat)
+            for i in range(repeat):
+                cells.append(cell.clone())
+        else:
+            cells.append(cell)
+
+    # Append the rows
+    if row_repeat > 1:
+        for i in range(row_repeat):
+            rows.append({'attributes': odf_row.get_attributes(),
+                         'cells': [ cell.clone() for cell in cells ]})
+    else:
+        rows.append({'attributes': odf_row.get_attributes(),
+                     'cells': cells})
+
+
+
 class odf_table:
 
     def __init__(self, name=None, style=None, data=None, odf_element=None):
@@ -135,37 +188,21 @@ class odf_table:
 
         # 3) The rows
         rows = self.__rows = []
+        empty_rows = []
         for row  in odf_element.get_element_list('table:table-row'):
 
-            # Delete the table:number-rows-repeated
-            row_repeat = row.get_attribute('table:number-rows-repeated')
-            if row_repeat is not None:
-                row_repeat = int(row_repeat)
-                row.del_attribute('table:number-rows-repeated')
-            else:
-                row_repeat = 1
+            # An empty row ?
+            if _is_odf_row_empty(row):
+                empty_rows.append(row)
+                continue
 
-            # The cells
-            cells = []
-            for cell in row.get_element_list('table:table-cell'):
-                repeat = cell.get_attribute('table:number-columns-repeated')
-                if repeat is not None:
-                    cell.del_attribute('table:number-columns-repeated')
-                    repeat = int(repeat)
-                    for i in range(repeat):
-                        cells.append(cell.clone())
-                else:
-                    cells.append(cell)
+            # We must append the last empty rows
+            for empty_row in empty_rows:
+                _append_odf_row(empty_row, rows)
+                empty_rows = []
 
-            # Append the rows
-            if row_repeat > 1:
-                for i in range(row_repeat):
-                    rows.append({'attributes': row.get_attributes(),
-                                 'cells': [ cell.clone() for cell in cells ]})
-            else:
-                rows.append({'attributes': row.get_attributes(),
-                             'cells': cells})
-
+            # And we append this new row
+            _append_odf_row(row, rows)
 
 
     def __get_odf_row(self, row):
@@ -174,7 +211,7 @@ class odf_table:
 
         # Create the node
         odf_row = odf_create_row()
-        for key, value in attributes:
+        for key, value in attributes.iteritems():
             odf_row.set_attribute(key, value)
 
         # Add the cells
@@ -247,4 +284,9 @@ class odf_table:
         # XXX auto-adjust the table size ?
         x, y = _get_cell_coordinates(coordinates)
         self.__rows[y - 1]['cells'][x - 1] = odf_cell
+
+
+    def get_size(self):
+        return len(self.__columns), len(self.__rows)
+
 
