@@ -8,6 +8,7 @@ from unittest import TestCase, main
 from lpod.document import odf_get_document, odf_create_style
 from lpod.document import odf_create_style_text_properties
 from lpod.styles import hex2rgb, rgb2hex
+from lpod.xmlpart import LAST_CHILD
 
 
 class Hex2RgbTestCase(TestCase):
@@ -150,9 +151,9 @@ class TestStyle(TestCase):
         properties = odf_create_style_text_properties()
         properties.set_attribute('fo:color', '#0000ff')
         properties.set_attribute('fo:background-color', '#ff0000')
-        style.insert_element(properties)
+        style.insert_element(properties, LAST_CHILD)
         context = clone.get_category_context('named')
-        context.insert_element(style)
+        context.insert_element(style, LAST_CHILD)
 
         expected = ('<style:style style:name="style1" '
                                  'style:family="paragraph">'
