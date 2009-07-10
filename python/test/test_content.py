@@ -17,6 +17,7 @@ from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_annotation
 from lpod.document import odf_create_span
 from lpod.utils import _get_cell_coordinates
+from lpod.xmlpart import LAST_CHILD
 
 
 class GetElementTestCase(TestCase):
@@ -136,7 +137,8 @@ class TestParagraph(TestCase):
         clone = content.clone()
         paragraph = odf_create_paragraph('Text_20_body',
                                          u'An inserted test')
-        clone.insert_element(paragraph, clone.get_text_body())
+        body = clone.get_text_body()
+        body.insert_element(paragraph, LAST_CHILD)
         last_paragraph = clone.get_paragraph_list()[-1]
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
 
@@ -155,7 +157,6 @@ class TestSpan(TestCase):
 
 
     def test_create_span(self):
-
         # Create OK ?
         span = odf_create_span('my_style', u'my text')
         expected = ('<text:span text:style-name="my_style">'
@@ -165,25 +166,26 @@ class TestSpan(TestCase):
 
 
     def test_insert_span(self):
-
         span = odf_create_span('my_style', u'my text')
 
         # Insert OK?
         clone = self.content.clone()
         paragraph = clone.get_paragraph(1)
-        clone.insert_element(span, paragraph)
+        paragraph.insert_element(span, LAST_CHILD)
 
 
     def test_get_span(self):
-
         span = odf_create_span('my_style', u'my text')
         clone = self.content.clone()
         paragraph = clone.get_paragraph(1)
-        clone.insert_element(span, paragraph)
+        print "paragraph", paragraph
+        paragraph.wrap_text(span, offset=0)
 
         # Get OK ?
         span1 = clone.get_span(1)
+        print "span1", span1
         span2 = clone.get_span_list()[0]
+        print "span2", span2
 
         # We have the text with the tag, so, ...
         expected = ('<text:span text:style-name="my_style">'
@@ -273,7 +275,8 @@ class TestHeading(TestCase):
         clone = content.clone()
         heading = odf_create_heading('Heading_20_2', 2,
                                      u'An inserted heading')
-        clone.insert_element(heading, clone.get_text_body())
+        body = clone.get_text_body()
+        body.insert_element(heading, LAST_CHILD)
         last_heading = clone.get_heading_list()[-1]
         self.assertEqual(last_heading.get_text(), u'An inserted heading')
 
@@ -311,8 +314,9 @@ class TestFrame(TestCase):
         self.assertEqual(frame2.serialize(), expected)
 
         # Insert OK ?
-        content.insert_element(frame1, content.get_text_body())
-        content.insert_element(frame2, content.get_text_body())
+        body = content.get_text_body()
+        body.insert_element(frame1, LAST_CHILD)
+        body.insert_element(frame2, LAST_CHILD)
 
         # Get OK ?
         get = content.get_frame(name='frame1')
@@ -345,8 +349,9 @@ class TestImage(TestCase):
         content = self.content
         frame = odf_create_frame('frame_image', 'Graphics', '0cm', '0cm')
         image = odf_create_image('path')
-        content.insert_element(image, frame)
-        content.insert_element(frame, content.get_text_body())
+        frame.insert_element(image, LAST_CHILD)
+        body = content.get_text_body()
+        body.insert_element(frame, LAST_CHILD)
 
         # XXX cannot test "insert" and "get" until the test document embeds
         # an image
@@ -642,9 +647,9 @@ class TestTable(TestCase):
         row = odf_create_row()
         cell = odf_create_cell(u"")
 
-        clone.insert_element(column, table)
-        clone.insert_element(cell, row)
-        clone.insert_element(row, table)
+        table.insert_element(column, LAST_CHILD)
+        row.insert_element(cell, LAST_CHILD)
+        table.insert_element(row, LAST_CHILD)
         expected = ('<table:table table:name="a_table" '
                       'table:style-name="a_style">'
                       '<table:table-column '
@@ -658,7 +663,8 @@ class TestTable(TestCase):
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
 
-        clone.insert_element(table, clone.get_text_body())
+        body = clone.get_text_body()
+        body.insert_element(table, LAST_CHILD)
 
         # Get OK ?
         table = clone.get_table(name='a_table')
@@ -699,8 +705,9 @@ class TestList(TestCase):
         clone = content.clone()
         item = odf_create_list_item()
         a_list = odf_create_list('a_style')
-        clone.insert_element(item, a_list)
-        clone.insert_element(a_list, clone.get_text_body())
+        a_list.insert_element(item, LAST_CHILD)
+        body = clone.get_text_body()
+        body.insert_element(a_list, LAST_CHILD)
 
         expected = ('<text:list text:style-name="a_style">'
                     '<text:list-item/>'
@@ -762,8 +769,9 @@ class TestStyle(TestCase):
         properties = odf_create_style_text_properties()
         properties.set_attribute('fo:color', '#0000ff')
         properties.set_attribute('fo:background-color', '#ff0000')
-        clone.insert_element(properties, style)
-        clone.insert_element(style, clone.get_category_context('automatic'))
+        style.insert_element(properties, LAST_CHILD)
+        auto_styles = clone.get_category_context('automatic')
+        auto_styles.insert_element(style, LAST_CHILD)
 
         expected = ('<style:style style:name="style1" '
                                  'style:family="paragraph">'
@@ -798,8 +806,8 @@ class TestNote(TestCase):
         # Insert OK ?
         clone = content.clone()
         paragraph = clone.get_paragraph(1)
-        content.insert_note_body(body, note)
-        content.insert_element(note, paragraph)
+        clone.insert_note_body(body, note)
+        paragraph.insert_element(note, LAST_CHILD)
 
         # Get OK ?
         expected = ('<text:note text:note-class="footnote" text:id="note1">'
@@ -971,7 +979,7 @@ class TestAnnotation(TestCase):
         text = u"It's like you're in a cave."
         annotation = odf_create_annotation(creator, text)
         context = clone.get_paragraph(1)
-        clone.insert_element(annotation, context, offset=27)
+        context.wrap_text(annotation, offset=27)
         annotations = clone.get_annotation_list()
         self.assertEqual(len(annotations), 2)
         first_annotation = annotations[0]
@@ -995,7 +1003,7 @@ class TestGetCell(TestCase):
         table = odf_create_table('a_table', 'Standard')
         column = odf_create_column('Standard')
         column.set_attribute('table:number-columns-repeated', '7')
-        content.insert_element(column, table)
+        table.insert_element(column, LAST_CHILD)
 
         # 3 x "1 1 1 2 3 3 3"
         row = odf_create_row()
@@ -1003,25 +1011,26 @@ class TestGetCell(TestCase):
         # 3 x "1"
         cell = odf_create_cell(u'1')
         cell.set_attribute('table:number-columns-repeated', '3')
-        content.insert_element(cell, row)
+        row.insert_element(cell, LAST_CHILD)
         # 1 x "2"
         cell = odf_create_cell(u'2')
-        content.insert_element(cell, row)
+        row.insert_element(cell, LAST_CHILD)
         # 3 x "3"
         cell = odf_create_cell(u'3')
         cell.set_attribute('table:number-columns-repeated', '3')
-        content.insert_element(cell, row)
+        row.insert_element(cell, LAST_CHILD)
 
-        content.insert_element(row, table)
+        table.insert_element(row, LAST_CHILD)
 
         # 1 x "1 2 3 4 5 6 7"
         row = odf_create_row()
         for i in xrange(1, 8):
             cell = odf_create_cell(unicode(i))
-            content.insert_element(cell, row)
-        content.insert_element(row, table)
+            row.insert_element(cell, LAST_CHILD)
+        table.insert_element(row, LAST_CHILD)
 
-        content.insert_element(table, content.get_text_body())
+        body = content.get_text_body()
+        body.insert_element(table, LAST_CHILD)
 
 
     def tearDown(self):

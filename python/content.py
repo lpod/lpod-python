@@ -23,50 +23,6 @@ class odf_content(odf_xmlpart):
         return self.get_element('//office:presentation')
 
 
-    def insert_element(self, element, context, xmlposition=LAST_CHILD,
-                       offset=0, length=None):
-        # TODO Do not check validity of insertions anymore
-        _check_arguments(element=element, context=context,
-                         xmlposition=xmlposition, offset=offset)
-        qname = element.get_name()
-        if qname in ('text:section', 'text:p', 'text:h', 'draw:frame',
-                     'table:table', 'text:list'):
-            context.insert_element(element, xmlposition)
-        elif qname in ('text:note', 'office:annotation', 'text:span'):
-            if context.get_name() not in ('text:p', 'text:h'):
-                # XXX Image captions, footnote on a footnote...
-                raise ValueError, "context must be a paragraph"
-            text = context.get_text()
-            before, after = text[:offset], text[offset:]
-            context.set_text(before)
-            element.set_text(after, after=True)
-            context.insert_element(element, xmlposition=LAST_CHILD)
-        # TODO span, xlink, etc. use offset and length to match the sentence
-        # to put into the tag.
-        elif qname == 'text:list-item':
-            if context.get_name() != 'text:list':
-                raise ValueError, "context must be a list"
-            context.insert_element(element, xmlposition)
-        elif qname == 'draw:image':
-            if context.get_name() != 'draw:frame':
-                raise ValueError, "context must be a frame"
-            context.insert_element(element, xmlposition)
-        elif qname == 'style:style':
-            if context.get_name() != 'office:automatic-styles':
-                raise ValueError, "context must be the styles container"
-            context.insert_element(element, xmlposition)
-        # From now on report explicit errors
-        elif qname in ('table:table-cell', 'table:table-row',
-                       'table:table-column'):
-            context.insert_element(element, xmlposition)
-        elif qname.startswith('style:') and qname.endswith('-properties'):
-            if context.get_name() != 'style:style':
-                raise ValueError, "context must be a style"
-            context.insert_element(element, xmlposition)
-        else:
-            raise ValueError, 'element "%s" is not (yet) supported' % qname
-
-
     #
     # Sections
     #
