@@ -222,6 +222,27 @@ class odf_table_TestCase(TestCase):
                          table2.get_odf_element().serialize())
 
 
+    def test_add_column(self):
+        data1 = ((1, 1, 1, 1),
+                 (1, 1, 1, 1),
+                 (2, 2, 2, 2))
+        table1 = odf_table(name='table', style='Standard', data=data1)
+
+        table1.add_column()
+        self.assertEqual(table1.get_size(), (5, 3))
+
+        table1.add_column(number=2, position=2)
+        self.assertEqual(table1.get_size(), (7, 3))
+
+        # Test the table
+        data2 = ((1, None, None, 1, 1, 1, None),
+                 (1, None, None, 1, 1, 1, None),
+                 (2, None, None, 2, 2, 2, None))
+        table2 = odf_table(name='table', style='Standard', data=data2)
+        self.assertEqual(table1.get_odf_element().serialize(),
+                         table2.get_odf_element().serialize())
+
+
 
 if __name__ == '__main__':
     main()

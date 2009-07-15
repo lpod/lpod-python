@@ -309,3 +309,39 @@ class odf_table:
                              'cells': [ odf_create_cell()
                                         for i in range(row_size) ]})
 
+
+    # XXX Add a cells argument ??
+    def add_column(self, number=1, position=None):
+        """Insert number columns before the column 'position' (append if None)
+        """
+        columns = self.__columns
+        rows = self.__rows
+
+        if position is not None:
+            position -= 1
+            for i in range(number):
+
+                # Append an empty column info
+                # XXX Style = ?
+                columns.insert(position, odf_create_column('Standard'))
+
+                # And now, insert empty cells
+                for row in rows:
+                    cells = row['cells']
+                    cells.insert(position, odf_create_cell())
+        else:
+            for i in range(number):
+
+                # Append an empty column info
+                # XXX Style = ?
+                columns.append(odf_create_column('Standard'))
+
+                # And now, insert empty cells
+                for row in rows:
+                    cells = row['cells']
+                    cells.append(odf_create_cell())
+
+
+
+
+
