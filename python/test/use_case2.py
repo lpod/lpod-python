@@ -114,9 +114,8 @@ body.insert_element(table, LAST_CHILD)
 heading = odf_create_heading('Heading', 1, u'A paragraph with a footnote')
 body.insert_element(heading, LAST_CHILD)
 
-note = odf_create_note(u'1', id='note1')
 note_body = odf_create_paragraph('Standard', u'a footnote')
-note.get_element('text:note-body').insert_element(note_body, LAST_CHILD)
+note = odf_create_note(u'1', id='note1', body=note_body)
 
 paragraph = odf_create_paragraph('Standard', u'Another paragraph.')
 offset = len(u'Another')

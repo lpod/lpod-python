@@ -800,10 +800,8 @@ class TestNote(TestCase):
 
 
     def test_create_note(self):
-        note = odf_create_note(u'1', id='note1')
         note_body = odf_create_paragraph('Standard', u'a footnote')
-        note.get_element('text:note-body').insert_element(note_body,
-                                                          LAST_CHILD)
+        note = odf_create_note(u'1', id='note1', body=note_body)
 
         self.assertEqual(note.serialize(), self.expected)
 
@@ -811,10 +809,8 @@ class TestNote(TestCase):
     def test_get_note(self):
         clone = self.content.clone()
 
-        note = odf_create_note(u'1', id='note1')
         note_body = odf_create_paragraph('Standard', u'a footnote')
-        note.get_element('text:note-body').insert_element(note_body,
-                                                          LAST_CHILD)
+        note = odf_create_note(u'1', id='note1', body=note_body)
 
         paragraph = clone.get_paragraph(1)
         paragraph.insert_element(note, LAST_CHILD)
@@ -826,10 +822,8 @@ class TestNote(TestCase):
     def test_get_note_list(self):
         clone = self.content.clone()
 
-        note = odf_create_note(u'1', id='note1')
         note_body = odf_create_paragraph('Standard', u'a footnote')
-        note.get_element('text:note-body').insert_element(note_body,
-                                                          LAST_CHILD)
+        note = odf_create_note(u'1', id='note1', body=note_body)
 
         paragraph = clone.get_paragraph(1)
         paragraph.insert_element(note, LAST_CHILD)
@@ -842,10 +836,8 @@ class TestNote(TestCase):
     def test_insert_note(self):
         clone = self.content.clone()
 
-        note = odf_create_note(u'1', id='note1')
         note_body = odf_create_paragraph('Standard', u'a footnote')
-        note.get_element('text:note-body').insert_element(note_body,
-                                                          LAST_CHILD)
+        note = odf_create_note(u'1', id='note1', body=note_body)
 
         paragraph = clone.get_paragraph(1)
         paragraph.insert_element(note, LAST_CHILD)

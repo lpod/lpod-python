@@ -338,7 +338,7 @@ def odf_create_style_text_properties():
 
 
 
-def odf_create_note(text, note_class='footnote', id=None):
+def odf_create_note(text, note_class='footnote', id=None, body=None):
     """Create either a footnote or a endnote element with the given text,
     optionally referencing it using the given id.
     Arguments:
@@ -346,6 +346,7 @@ def odf_create_note(text, note_class='footnote', id=None):
         text -- unicode
         note_class -- 'footnote' or 'endnote'
         id -- str
+        body -- an odf_element
 
     Return: odf_element
     """
@@ -359,6 +360,9 @@ def odf_create_note(text, note_class='footnote', id=None):
 
     if id is not None:
         note.set_attribute('text:id', id)
+
+    if body is not None:
+        note.get_element('text:note-body').insert_element(body, LAST_CHILD)
 
     return note
 
