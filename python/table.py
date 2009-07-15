@@ -297,8 +297,8 @@ class odf_table:
         row_size = len(self.__columns)
 
         if position is not None:
+            position -= 1
             for i in range(number):
-                position -= 1
                 rows.insert(position,
                             {'attributes': {},
                              'cells': [ odf_create_cell()

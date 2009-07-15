@@ -199,19 +199,29 @@ class odf_table_TestCase(TestCase):
 
 
     def test_add_row(self):
-        data = ((1, 1, 1, 1),
+        data1 = ((1, 1, 1, 1),
                  (1, 1, 1, 1),
                  (2, 2, 2, 2))
-        table = odf_table(name='table', style='Standard', data=data)
+        table1 = odf_table(name='table', style='Standard', data=data1)
 
-        table.add_row()
-        self.assertEqual(table.get_size(), (4, 4))
+        table1.add_row()
+        self.assertEqual(table1.get_size(), (4, 4))
 
-        table.add_row(number=2, position=1)
-        self.assertEqual(table.get_size(), (4, 6))
+        table1.add_row(number=2, position=2)
+        self.assertEqual(table1.get_size(), (4, 6))
 
-        # XXX test the table
-        raise NotImplementedError
+        # Test the table
+        data2 = ((1, 1, 1, 1),
+                 (None, None, None, None),
+                 (None, None, None, None),
+                 (1, 1, 1, 1),
+                 (2, 2, 2, 2),
+                 (None, None, None, None))
+        table2 = odf_table(name='table', style='Standard', data=data2)
+        self.assertEqual(table1.get_odf_element().serialize(),
+                         table2.get_odf_element().serialize())
+
+
 
 if __name__ == '__main__':
     main()
