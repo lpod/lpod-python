@@ -3,8 +3,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
-from datetime import date, datetime, timedelta
-from decimal import Decimal
+from datetime import datetime
 
 # Import from lpod
 from container import ODF_PARTS, odf_get_container
@@ -13,7 +12,7 @@ from container import odf_new_container_from_class, odf_container
 from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
-from utils import _check_arguments, Date, DateTime, Duration, Boolean
+from utils import _check_arguments, DateTime, _set_value_and_type
 from xmlpart import odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element
 
@@ -151,72 +150,13 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
 
     Return: odf_element
     """
-    if type(value) is bool:
-        if cell_type is None:
-            cell_type = 'boolean'
-        if representation is None:
-            representation = u'true' if value else u'false'
-        value = Boolean.encode(value)
-    elif isinstance(value, (int, float, Decimal)):
-        if cell_type is None:
-            cell_type = 'float'
-        if representation is None:
-            representation = unicode(value)
-        value = str(value)
-    elif type(value) is date:
-        if cell_type is None:
-            cell_type = 'date'
-        if representation is None:
-            representation = unicode(Date.encode(value))
-        value = Date.encode(value)
-    elif type(value) is datetime:
-        if cell_type is None:
-            cell_type = 'date'
-        if representation is None:
-            representation = unicode(DateTime.encode(value))
-        value = DateTime.encode(value)
-    elif type(value) is str:
-        if cell_type is None:
-            cell_type = 'string'
-        if representation is None:
-            representation = unicode(value)
-    elif type(value) is unicode:
-        if cell_type is None:
-            cell_type = 'string'
-        if representation is None:
-            representation = value
-        value = value.encode('utf_8')
-    elif type(value) is timedelta:
-        if cell_type is None:
-            cell_type = 'time'
-        if representation is None:
-            representation = unicode(Duration.encode(value))
-        value = Duration.encode(value)
-    elif value is not None:
-        raise TypeError, 'type "%s" is unknown to cells' % type(value)
-    _check_arguments(cell_type=cell_type, text=representation,
-                     currency=currency)
 
-    if cell_type is None:
-        data = '<table:table-cell/>'
-        cell = odf_create_element(data)
-    else:
-        data = '<table:table-cell office:value-type="%s"/>'
-        cell = odf_create_element(data % cell_type)
+    cell = odf_create_element('<table:table-cell/>')
 
-    if cell_type == 'boolean':
-        cell.set_attribute('office:boolean-value', value)
-    elif cell_type == 'currency':
-        cell.set_attribute('office:value', value)
-        cell.set_attribute('office:currency', currency)
-    elif cell_type == 'date':
-        cell.set_attribute('office:date-value', value)
-    elif cell_type in ('float', 'percentage'):
-        cell.set_attribute('office:value', value)
-    elif cell_type == 'string':
-        cell.set_attribute('office:string-value', value)
-    elif cell_type == 'time':
-        cell.set_attribute('office:time-value', value)
+    representation = _set_value_and_type(cell, value=value,
+                                         representation=representation,
+                                         value_type=cell_type,
+                                         currency=currency)
 
     if representation is not None:
         cell.set_text_content(representation)
@@ -392,6 +332,59 @@ def odf_create_annotation(creator, text, date=None):
     date = DateTime.encode(date)
     text = text.encode('utf_8')
     return odf_create_element(data % (creator, date, text))
+
+
+
+def odf_create_variable_decls():
+    return odf_create_element('<text:variable-decls />')
+
+
+
+def odf_create_variable_decl(name, type):
+    data = '<text:variable-decl office:value-type="%s" text:name="%s"/>'
+    return odf_create_element(data % (type, name))
+
+
+
+def odf_create_variable_set(name, value, value_type=None, display=False,
+                            representation=None, style=None):
+
+    data = '<text:variable-set text:name="%s" />'
+    variable_set = odf_create_element(data % name)
+
+    representation = _set_value_and_type(variable_set, value=value,
+                                         value_type=value_type,
+                                         representation=representation)
+
+    if not display:
+        variable_set.set_attribute('text:display', 'none')
+    else:
+        variable_set.set_text(representation)
+
+    if style is not None:
+        variable_set.set_attribute('style:data-style-name', style)
+
+    return variable_set
+
+
+
+def odf_create_variable_get(name, value, value_type=None, representation=None,
+                            style=None):
+
+    data = '<text:variable-get text:name="%s" />'
+    variable_get = odf_create_element(data % name)
+
+    representation = _set_value_and_type(variable_get, value=value,
+                                         value_type=value_type,
+                                         representation=representation)
+
+    variable_get.set_text(representation)
+
+    if style is not None:
+        variable_get.set_attribute('style:data-style-name', style)
+
+    return variable_get
+
 
 
 #

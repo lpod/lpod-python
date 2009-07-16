@@ -17,6 +17,8 @@ from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_span
+from lpod.document import odf_create_variable_decl, odf_create_variable_decls
+from lpod.document import odf_create_variable_set, odf_create_variable_get
 from lpod.styles import rgb2hex
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
 
@@ -145,6 +147,39 @@ offset = text.index(u'another')
 length = len(u'another')
 paragraph.wrap_text(span, offset=offset, length=length)
 body.insert_element(paragraph, LAST_CHILD)
+
+
+# 6- Some variables
+# -----------------
+
+# A variable "foo" with the value 42
+variable_set = odf_create_variable_set('foo', value=42)
+value_type = variable_set.get_attribute('office:value-type')
+
+variable_decl = odf_create_variable_decl('foo', value_type)
+variable_get = odf_create_variable_get('foo', 42)
+
+# Insert
+heading = odf_create_heading('Heading', 1, u'A variable')
+body.insert_element(heading, LAST_CHILD)
+
+decl = body.get_element('text:variable-decls')
+if decl is None:
+    body.insert_element(odf_create_variable_decls(), FIRST_CHILD)
+    decl = body.get_element('text:variable-decls')
+decl.insert_element(variable_decl, LAST_CHILD)
+
+
+text = u'Set of foo.'
+paragraph = odf_create_paragraph('Standard', text)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(variable_set, offset=len(text))
+
+text = u'The value of foo is: '
+paragraph = odf_create_paragraph('Standard', text)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(variable_get, offset=len(text))
+
 
 
 

@@ -2,10 +2,12 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import datetime, timedelta
-from sys import _getframe, modules
+from datetime import date, datetime, timedelta
+from decimal import Decimal
 from os import getcwd
 from os.path import splitdrive, join, sep
+from sys import _getframe, modules
+
 
 
 DATE_FORMAT = '%Y-%m-%d'
@@ -127,7 +129,7 @@ def _get_cell_coordinates(name):
 
 def _check_arguments(context=None, element=None, xmlposition=None,
                      position=None, level=None, text=None, style=None,
-                     family=None, cell_type=None, currency=None,
+                     family=None, value_type=None, currency=None,
                      note_class=None, creator=None, date=None,
                      start_date=None, end_date=None, offset=None,
                      length=None, retrieve_by=None):
@@ -165,10 +167,10 @@ def _check_arguments(context=None, element=None, xmlposition=None,
     if family is not None:
         if not family in STYLE_FAMILIES:
             raise ValueError, '"%s" is not a valid style family' % family
-    if cell_type is not None:
-        if not cell_type in CELL_TYPES:
-            raise ValueError, '"%s" is not a valid cell type' % cell_type
-        if cell_type == 'currency':
+    if value_type is not None:
+        if not value_type in CELL_TYPES:
+            raise ValueError, '"%s" is not a valid cell type' % value_type
+        if value_type == 'currency':
             if currency is None:
                 raise ValueError, 'currency is mandatory in monetary cells'
             if type(currency) is not str:
@@ -297,3 +299,74 @@ class Boolean(object):
         elif value is False:
             return 'false'
         raise TypeError, '"%s" is not a boolean' % value
+
+
+def _set_value_and_type(element, value=None, value_type=None,
+                        representation=None, currency=None):
+
+    if type(value) is bool:
+        if value_type is None:
+            value_type = 'boolean'
+        if representation is None:
+            representation = u'true' if value else u'false'
+        value = Boolean.encode(value)
+    elif isinstance(value, (int, float, Decimal)):
+        if value_type is None:
+            value_type = 'float'
+        if representation is None:
+            representation = unicode(value)
+        value = str(value)
+    elif type(value) is date:
+        if value_type is None:
+            value_type = 'date'
+        if representation is None:
+            representation = unicode(Date.encode(value))
+        value = Date.encode(value)
+    elif type(value) is datetime:
+        if value_type is None:
+            value_type = 'date'
+        if representation is None:
+            representation = unicode(DateTime.encode(value))
+        value = DateTime.encode(value)
+    elif type(value) is str:
+        if value_type is None:
+            value_type = 'string'
+        if representation is None:
+            representation = unicode(value)
+    elif type(value) is unicode:
+        if value_type is None:
+            value_type = 'string'
+        if representation is None:
+            representation = value
+        value = value.encode('utf_8')
+    elif type(value) is timedelta:
+        if value_type is None:
+            value_type = 'time'
+        if representation is None:
+            representation = unicode(Duration.encode(value))
+        value = Duration.encode(value)
+    elif value is not None:
+        raise TypeError, 'type "%s" is unknown to cells' % type(value)
+    _check_arguments(value_type=value_type, text=representation,
+                     currency=currency)
+
+    if value_type is not None:
+        element.set_attribute('office:value-type', value_type)
+
+    if value_type == 'boolean':
+        element.set_attribute('office:boolean-value', value)
+    elif value_type == 'currency':
+        element.set_attribute('office:value', value)
+        element.set_attribute('office:currency', currency)
+    elif value_type == 'date':
+        element.set_attribute('office:date-value', value)
+    elif value_type in ('float', 'percentage'):
+        element.set_attribute('office:value', value)
+    elif value_type == 'string':
+        element.set_attribute('office:string-value', value)
+    elif value_type == 'time':
+        element.set_attribute('office:time-value', value)
+
+    return representation
+
+
