@@ -16,6 +16,7 @@ from lpod.document import odf_create_list_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_annotation
 from lpod.document import odf_create_span
+from lpod.document import odf_create_variable_set
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -178,14 +179,11 @@ class TestSpan(TestCase):
         span = odf_create_span('my_style', u'my text')
         clone = self.content.clone()
         paragraph = clone.get_paragraph(1)
-        print "paragraph", paragraph
         paragraph.wrap_text(span, offset=0)
 
         # Get OK ?
         span1 = clone.get_span(1)
-        print "span1", span1
         span2 = clone.get_span_list()[0]
-        print "span2", span2
 
         # We have the text with the tag, so, ...
         expected = ('<text:span text:style-name="my_style">'
@@ -993,6 +991,19 @@ class TestAnnotation(TestCase):
         first_annotation = annotations[0]
         self.assertEqual(first_annotation.get_text_content(), text)
         del clone
+
+
+
+class TestVariables(TestCase):
+
+    def test_create_variable(self):
+        variable_set = odf_create_variable_set('foo', value=42)
+
+        expected = ('<text:variable-set text:name="foo" '
+                      'office:value-type="float" office:value="42" '
+                      'text:display="none"/>')
+
+        self.assertEqual(variable_set.serialize(), expected)
 
 
 
