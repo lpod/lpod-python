@@ -113,11 +113,11 @@ class CheckArgumentsTestCase(TestCase):
 
 
     def test_bad_cell_type(self):
-        self.assertRaises(ValueError, _check_arguments, cell_type='integer')
+        self.assertRaises(ValueError, _check_arguments, value_type='integer')
 
 
     def test_missing_currency(self):
-        self.assertRaises(ValueError, _check_arguments, cell_type='currency')
+        self.assertRaises(ValueError, _check_arguments, value_type='currency')
 
 
     def test_bad_author(self):
