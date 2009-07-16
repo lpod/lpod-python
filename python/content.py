@@ -6,7 +6,7 @@
 # Import from lpod
 from utils import _check_arguments
 from utils import _check_position_or_name, _get_cell_coordinates
-from xmlpart import odf_element, odf_xmlpart, LAST_CHILD
+from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD, LAST_CHILD
 
 
 class odf_content(odf_xmlpart):
@@ -253,3 +253,23 @@ class odf_content(odf_xmlpart):
 
     # TODO get_parent_style that also searches in styles part if not found
     # in content
+
+
+    #
+    # Variables
+    #
+
+    # XXX This is a good place for this function ???
+    def get_variable_decls(self):
+        variable_decls = self.get_element('//text:variable-decls')
+        if variable_decls is None:
+            from document import odf_create_variable_decls
+
+            # Variable only in a "text" document ?
+            body = self.get_text_body()
+            body.insert_element(odf_create_variable_decls(), FIRST_CHILD)
+            variable_decls = body.get_element('//text:variable-decls')
+
+        return variable_decls
+
+

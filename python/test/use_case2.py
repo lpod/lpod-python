@@ -17,7 +17,7 @@ from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_span
-from lpod.document import odf_create_variable_decl, odf_create_variable_decls
+from lpod.document import odf_create_variable_decl
 from lpod.document import odf_create_variable_set, odf_create_variable_get
 from lpod.styles import rgb2hex
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
@@ -163,12 +163,8 @@ variable_get = odf_create_variable_get('foo', 42)
 heading = odf_create_heading('Heading', 1, u'A variable')
 body.insert_element(heading, LAST_CHILD)
 
-decl = body.get_element('text:variable-decls')
-if decl is None:
-    body.insert_element(odf_create_variable_decls(), FIRST_CHILD)
-    decl = body.get_element('text:variable-decls')
+decl = content.get_variable_decls()
 decl.insert_element(variable_decl, LAST_CHILD)
-
 
 text = u'Set of foo.'
 paragraph = odf_create_paragraph('Standard', text)
