@@ -5,7 +5,7 @@
 
 # Import from lpod
 from utils import _check_arguments
-from utils import _check_position_or_name, _get_cell_coordinates
+from utils import _check_position_or_name, _get_cell_coordinates, _get_value
 from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD, LAST_CHILD
 
 
@@ -271,5 +271,37 @@ class odf_content(odf_xmlpart):
             variable_decls = body.get_element('//text:variable-decls')
 
         return variable_decls
+
+
+    def get_variable_list(self, context=None):
+        return self._get_element_list('text:variable-decl', context=context)
+
+
+    def get_variable_decl(self, name, context=None):
+        return self._get_element('text:variable-decl', text_name=name,
+                                 context=context)
+
+
+    def get_variable_sets(self, name, context=None):
+        return self._get_element_list('text:variable-set', text_name=name,
+                                      context=context)
+
+
+    def get_variable_value(self, name, context=None):
+        variable_sets = self.get_variable_sets(name, context)
+
+        # Nothing ?
+        if not variable_sets:
+            return None
+
+        # Get the last
+        return _get_value(variable_sets[-1])
+
+
+
+
+
+
+
 
 

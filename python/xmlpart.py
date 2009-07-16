@@ -338,7 +338,8 @@ class odf_xmlpart(object):
     def _get_element_list(self, element_name, style=None, family=None,
                           frame_name=None, frame_style=None, table_name=None,
                           note_class=None, style_name=None, text_id=None,
-                          level=None, position=None, context=None):
+                          text_name=None, level=None, position=None,
+                          context=None):
         _check_arguments(style=style, family=family, note_class=note_class,
                          level=level, position=position, context=context)
         query = _make_xpath_query(element_name, style=style, family=family,
@@ -347,8 +348,8 @@ class odf_xmlpart(object):
                                   table_name=table_name,
                                   style_name=style_name,
                                   note_class=note_class, text_id=text_id,
-                                  level=level, position=position,
-                                  context=context)
+                                  text_name=text_name, level=level,
+                                  position=position, context=context)
         if context is None:
             return self.get_element_list(query)
         return context.get_element_list(query)
@@ -356,13 +357,15 @@ class odf_xmlpart(object):
 
     def _get_element(self, element_name, style=None, family=None,
                      frame_name=None, table_name=None, style_name=None,
-                     text_id=None, level=None, position=None, context=None):
+                     text_id=None, text_name=None, level=None, position=None,
+                     context=None):
         result = self._get_element_list(element_name, style=style,
                                         family=family, frame_name=frame_name,
                                         table_name=table_name,
                                         style_name=style_name,
-                                        text_id=text_id, level=level,
-                                        position=position, context=context)
+                                        text_id=text_id, text_name=text_name,
+                                        level=level, position=position,
+                                        context=context)
         if result:
             return result[0]
         return None

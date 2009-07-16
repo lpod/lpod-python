@@ -157,7 +157,6 @@ variable_set = odf_create_variable_set('foo', value=42)
 value_type = variable_set.get_attribute('office:value-type')
 
 variable_decl = odf_create_variable_decl('foo', value_type)
-variable_get = odf_create_variable_get('foo', 42)
 
 # Insert
 heading = odf_create_heading('Heading', 1, u'A variable')
@@ -172,10 +171,11 @@ body.insert_element(paragraph, LAST_CHILD)
 paragraph.wrap_text(variable_set, offset=len(text))
 
 text = u'The value of foo is: '
+value = content.get_variable_value('foo')
+variable_get = odf_create_variable_get('foo', value)
 paragraph = odf_create_paragraph('Standard', text)
 body.insert_element(paragraph, LAST_CHILD)
 paragraph.wrap_text(variable_get, offset=len(text))
-
 
 
 

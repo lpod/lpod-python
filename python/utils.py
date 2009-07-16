@@ -61,8 +61,8 @@ def _get_abspath(local_path):
 
 def _make_xpath_query(element_name, style=None, family=None, frame_name=None,
                       frame_style=None, table_name=None, style_name=None,
-                      note_class=None, text_id=None, level=None,
-                      position=None, context=None, **kw):
+                      note_class=None, text_id=None, text_name=None,
+                      level=None, position=None, context=None, **kw):
     if context is None:
         query = ['//']
     else:
@@ -85,6 +85,8 @@ def _make_xpath_query(element_name, style=None, family=None, frame_name=None,
         attributes['text:note-class'] = note_class
     if text_id:
         attributes['text:id'] = text_id
+    if text_name:
+        attributes['text:name'] = text_name
     if level:
         attributes['text:outline-level'] = level
     # Sort attributes for reproducible test cases
@@ -369,4 +371,24 @@ def _set_value_and_type(element, value=None, value_type=None,
 
     return representation
 
+
+# XXX value_type must be an argument!
+def _get_value(element):
+    value_type = element.get_attribute('office:value-type')
+
+    if value_type == 'boolean':
+        value = element.get_attribute('office:boolean-value')
+        return Boolean.decode(value)
+    elif value_type in  ('float', 'percentage', 'currency'):
+        value = element.get_attribute('office:value')
+        return float(value)
+    elif value_type == 'date':
+        value = element.get_attribute('office:date-value')
+        return Date.decode(value)
+    elif value_type == 'string':
+        value = element.get_attribute('office:string-value')
+        return unicode(value)
+    elif value_type == 'time':
+        value = element.get_attribute('office:time-value')
+        return Duration.decode(value)
 
