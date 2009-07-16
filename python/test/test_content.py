@@ -791,7 +791,7 @@ class TestNote(TestCase):
         expected = ('<text:note text:note-class="footnote" text:id="note1">'
                       '<text:note-citation>1</text:note-citation>'
                       '<text:note-body>'
-                        '<text:p text:style-name="Standard">'
+                        '<text:p>'
                           'a footnote'
                         '</text:p>'
                       '</text:note-body>'
@@ -800,17 +800,23 @@ class TestNote(TestCase):
 
 
     def test_create_note(self):
+
+        # With an odf_element
         note_body = odf_create_paragraph('Standard', u'a footnote')
         note = odf_create_note(u'1', id='note1', body=note_body)
+        expected = self.expected.replace('<text:p>',
+                                         '<text:p text:style-name="Standard">')
+        self.assertEqual(note.serialize(), expected)
 
+        # With an unicode object
+        note = odf_create_note(u'1', id='note1', body=u'a footnote')
         self.assertEqual(note.serialize(), self.expected)
 
 
     def test_get_note(self):
         clone = self.content.clone()
 
-        note_body = odf_create_paragraph('Standard', u'a footnote')
-        note = odf_create_note(u'1', id='note1', body=note_body)
+        note = odf_create_note(u'1', id='note1', body=u'a footnote')
 
         paragraph = clone.get_paragraph(1)
         paragraph.insert_element(note, LAST_CHILD)
@@ -822,8 +828,7 @@ class TestNote(TestCase):
     def test_get_note_list(self):
         clone = self.content.clone()
 
-        note_body = odf_create_paragraph('Standard', u'a footnote')
-        note = odf_create_note(u'1', id='note1', body=note_body)
+        note = odf_create_note(u'1', id='note1', body=u'a footnote')
 
         paragraph = clone.get_paragraph(1)
         paragraph.insert_element(note, LAST_CHILD)
@@ -836,8 +841,7 @@ class TestNote(TestCase):
     def test_insert_note(self):
         clone = self.content.clone()
 
-        note_body = odf_create_paragraph('Standard', u'a footnote')
-        note = odf_create_note(u'1', id='note1', body=note_body)
+        note = odf_create_note(u'1', id='note1', body=u'a footnote')
 
         paragraph = clone.get_paragraph(1)
         paragraph.insert_element(note, LAST_CHILD)

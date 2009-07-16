@@ -14,7 +14,7 @@ from meta import odf_meta
 from styles import odf_styles
 from utils import _check_arguments, DateTime, _set_value_and_type
 from xmlpart import odf_xmlpart, LAST_CHILD
-from xmlpart import odf_create_element
+from xmlpart import odf_create_element, odf_element
 
 
 #
@@ -286,7 +286,7 @@ def odf_create_note(text, note_class='footnote', id=None, body=None):
         text -- unicode
         note_class -- 'footnote' or 'endnote'
         id -- str
-        body -- an odf_element
+        body -- an odf_element or an unicode object
 
     Return: odf_element
     """
@@ -302,7 +302,15 @@ def odf_create_note(text, note_class='footnote', id=None, body=None):
         note.set_attribute('text:id', id)
 
     if body is not None:
-        note.get_element('text:note-body').insert_element(body, LAST_CHILD)
+        note_body = note.get_element('text:note-body')
+
+        # Autocreate a paragraph if body = unicode
+        if isinstance(body, unicode):
+            note_body.set_text_content(body)
+        elif isinstance(body, odf_element):
+            note_body.insert_element(body, LAST_CHILD)
+        else:
+            raise ValueError, 'unexpected type for body: "%s"' % type(body)
 
     return note
 
