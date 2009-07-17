@@ -19,6 +19,7 @@ from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_span
 from lpod.document import odf_create_variable_decl
 from lpod.document import odf_create_variable_set, odf_create_variable_get
+from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.styles import rgb2hex
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
 
@@ -149,8 +150,8 @@ paragraph.wrap_text(span, offset=offset, length=length)
 body.insert_element(paragraph, LAST_CHILD)
 
 
-# 6- Some variables
-# -----------------
+# 6- A variable
+# -------------
 
 # A variable "foo" with the value 42
 variable_set = odf_create_variable_set('foo', value=42)
@@ -176,6 +177,27 @@ variable_get = odf_create_variable_get('foo', value)
 paragraph = odf_create_paragraph('Standard', text)
 body.insert_element(paragraph, LAST_CHILD)
 paragraph.wrap_text(variable_get, offset=len(text))
+
+
+# 7- An user field
+# ----------------
+
+# An user field "pi5" with the value 3.14159
+user_field_decl = odf_create_user_field_decl('pi5', value=3.14159)
+
+# Insert
+heading = odf_create_heading('Heading', 1, u'An user field')
+body.insert_element(heading, LAST_CHILD)
+
+decl = content.get_user_field_decls()
+decl.insert_element(user_field_decl, LAST_CHILD)
+
+text = u'The value of pi5 is: '
+value = content.get_user_field_value('pi5')
+user_field_get = odf_create_user_field_get('pi5', value)
+paragraph = odf_create_paragraph('Standard', text)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(user_field_get, offset=len(text))
 
 
 
