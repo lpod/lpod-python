@@ -18,6 +18,7 @@ from lpod.document import odf_create_note, odf_create_annotation
 from lpod.document import odf_create_span
 from lpod.document import odf_create_variable_decl, odf_create_variable_set
 from lpod.document import odf_create_variable_get
+from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1076,6 +1077,58 @@ class TestVariables(TestCase):
         # ---------
 
         value = content.get_variable_value('foo')
+        self.assertEqual(value, 42)
+
+
+
+class TestUserFields(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def test_create_user_field(self):
+
+        # decl
+        # ----
+
+        user_field_decl = odf_create_user_field_decl('foo', 42)
+        expected = ('<text:user-field-decl text:name="foo" '
+                      'office:value-type="float" office:value="42"/>')
+        self.assertEqual(user_field_decl.serialize(), expected)
+
+
+        # get
+        # ---
+
+        user_field_get = odf_create_user_field_get('foo', value=42)
+        expected = ('<text:user-field-get text:name="foo" '
+                      'office:value-type="float" office:value="42">'
+                      '42'
+                    '</text:user-field-get>')
+        self.assertEqual(user_field_get.serialize(), expected)
+
+
+    def test_get_user_field(self):
+        clone = self.document.clone()
+        content = clone.get_xmlpart('content')
+
+        # decl
+        # ----
+
+        decls = content.get_user_field_decls()
+        user_field_decl = odf_create_user_field_decl('foo', 42)
+        decls.insert_element(user_field_decl, LAST_CHILD)
+
+        user_field_decl = content.get_user_field_decl('foo')
+        expected = ('<text:user-field-decl text:name="foo" '
+                      'office:value-type="float" office:value="42"/>')
+        self.assertEqual(user_field_decl.serialize(), expected)
+
+        # get value
+        # ---------
+
+        value = content.get_user_field_value('foo')
         self.assertEqual(value, 42)
 
 
