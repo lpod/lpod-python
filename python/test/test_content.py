@@ -16,7 +16,8 @@ from lpod.document import odf_create_list_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_annotation
 from lpod.document import odf_create_span
-from lpod.document import odf_create_variable_set
+from lpod.document import odf_create_variable_decl, odf_create_variable_set
+from lpod.document import odf_create_variable_get
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -996,14 +997,86 @@ class TestAnnotation(TestCase):
 
 class TestVariables(TestCase):
 
-    def test_create_variable(self):
-        variable_set = odf_create_variable_set('foo', value=42)
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
 
+
+    def test_create_variable(self):
+
+        # decl
+        # ----
+
+        variable_decl = odf_create_variable_decl('foo', 'float')
+        expected = ('<text:variable-decl office:value-type="float" '
+                      'text:name="foo"/>')
+        self.assertEqual(variable_decl.serialize(), expected)
+
+        # set
+        # ---
+
+        # A float ?
+        variable_set = odf_create_variable_set('foo', value=42)
         expected = ('<text:variable-set text:name="foo" '
                       'office:value-type="float" office:value="42" '
                       'text:display="none"/>')
-
         self.assertEqual(variable_set.serialize(), expected)
+
+        # A datetime ?
+        date = datetime(2009, 5, 17, 23, 23, 00)
+        variable_set = odf_create_variable_set('foo', value=date, display=True)
+        expected = ('<text:variable-set text:name="foo" '
+                      'office:value-type="date" '
+                      'office:date-value="2009-05-17T23:23:00">'
+                      '2009-05-17T23:23:00'
+                    '</text:variable-set>')
+        self.assertEqual(variable_set.serialize(), expected)
+
+        # get
+        # ---
+
+        variable_get = odf_create_variable_get('foo', value=42)
+        expected = ('<text:variable-get text:name="foo" '
+                      'office:value-type="float" office:value="42">'
+                      '42'
+                    '</text:variable-get>')
+        self.assertEqual(variable_get.serialize(), expected)
+
+
+    def test_get_variable(self):
+        clone = self.document.clone()
+        content = clone.get_xmlpart('content')
+
+        # decl
+        # ----
+
+        decls = content.get_variable_decls()
+        variable_decl = odf_create_variable_decl('foo', 'float')
+        decls.insert_element(variable_decl, LAST_CHILD)
+
+        variable_decl = content.get_variable_decl('foo')
+        expected = ('<text:variable-decl office:value-type="float" '
+                      'text:name="foo"/>')
+        self.assertEqual(variable_decl.serialize(), expected)
+
+        # set
+        # ---
+
+        variable_set = odf_create_variable_set('foo', value=42)
+        body = content.get_text_body()
+        body.insert_element(variable_set, LAST_CHILD)
+
+        variable_sets = content.get_variable_sets('foo')
+        self.assertEqual(len(variable_sets), 1)
+        expected = ('<text:variable-set text:name="foo" '
+                      'office:value-type="float" office:value="42" '
+                      'text:display="none"/>')
+        self.assertEqual(variable_sets[0].serialize(), expected)
+
+        # get value
+        # ---------
+
+        value = content.get_variable_value('foo')
+        self.assertEqual(value, 42)
 
 
 
