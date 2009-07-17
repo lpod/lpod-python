@@ -287,15 +287,15 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_variable_value(self, name, context=None):
+    def get_variable_value(self, name, value_type=None, context=None):
         variable_sets = self.get_variable_sets(name, context)
 
         # Nothing ?
         if not variable_sets:
             return None
 
-        # Get the last
-        return _get_value(variable_sets[-1])
+        # Get the last value
+        return _get_value(variable_sets[-1], value_type)
 
 
 

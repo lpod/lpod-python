@@ -372,9 +372,11 @@ def _set_value_and_type(element, value=None, value_type=None,
     return representation
 
 
-# XXX value_type must be an argument!
-def _get_value(element):
-    value_type = element.get_attribute('office:value-type')
+
+def _get_value(element, value_type=None):
+
+    if value_type is None:
+        value_type = element.get_attribute('office:value-type')
 
     if value_type == 'boolean':
         value = element.get_attribute('office:boolean-value')
@@ -384,11 +386,16 @@ def _get_value(element):
         return float(value)
     elif value_type == 'date':
         value = element.get_attribute('office:date-value')
-        return Date.decode(value)
+        if 'T' in value:
+            return DateTime.decode(value)
+        else:
+            return Date.decode(value)
     elif value_type == 'string':
         value = element.get_attribute('office:string-value')
         return unicode(value)
     elif value_type == 'time':
         value = element.get_attribute('office:time-value')
         return Duration.decode(value)
+
+    raise ValueError, 'unexpected value type "%s"' % value_type
 

@@ -154,8 +154,8 @@ body.insert_element(paragraph, LAST_CHILD)
 
 # A variable "foo" with the value 42
 variable_set = odf_create_variable_set('foo', value=42)
-value_type = variable_set.get_attribute('office:value-type')
 
+value_type = variable_set.get_attribute('office:value-type')
 variable_decl = odf_create_variable_decl('foo', value_type)
 
 # Insert
