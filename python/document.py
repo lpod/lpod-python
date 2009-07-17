@@ -348,9 +348,9 @@ def odf_create_variable_decls():
 
 
 
-def odf_create_variable_decl(name, type):
+def odf_create_variable_decl(name, value_type):
     data = '<text:variable-decl office:value-type="%s" text:name="%s"/>'
-    return odf_create_element(data % (type, name))
+    return odf_create_element(data % (value_type, name))
 
 
 
@@ -392,6 +392,41 @@ def odf_create_variable_get(name, value, value_type=None, representation=None,
         variable_get.set_attribute('style:data-style-name', style)
 
     return variable_get
+
+
+
+def odf_create_user_field_decls():
+    return odf_create_element('<text:user-field-decls />')
+
+
+
+def odf_create_user_field_decl(name, value, value_type=None):
+
+    data = '<text:user-field-decl text:name="%s"/>'
+    user_field_set = odf_create_element(data % name)
+
+    _set_value_and_type(user_field_set, value=value, value_type=value_type)
+
+    return user_field_set
+
+
+
+def odf_create_user_field_get(name, value, value_type=None,
+                              representation=None, style=None):
+
+    data = '<text:user-field-get text:name="%s" />'
+    user_field_get = odf_create_element(data % name)
+
+    representation = _set_value_and_type(user_field_get, value=value,
+                                         value_type=value_type,
+                                         representation=representation)
+
+    user_field_get.set_text(representation)
+
+    if style is not None:
+        user_field_get.set_attribute('style:data-style-name', style)
+
+    return user_field_get
 
 
 

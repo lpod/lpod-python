@@ -298,10 +298,41 @@ class odf_content(odf_xmlpart):
         return _get_value(variable_sets[-1], value_type)
 
 
+    #
+    # User fields
+    #
+
+    # XXX This is a good place for this function ???
+    def get_user_field_decls(self):
+        user_field_decls = self.get_element('//text:user-field-decls')
+        if user_field_decls is None:
+            from document import odf_create_user_field_decls
+
+            # User fields only in a "text" document ?
+            body = self.get_text_body()
+            body.insert_element(odf_create_user_field_decls(), FIRST_CHILD)
+            user_field_decls = body.get_element('//text:user-field-decls')
+
+        return user_field_decls
 
 
+    def get_user_field_list(self, context=None):
+        return self._get_element_list('text:user-field-decl', context=context)
 
 
+    def get_user_field_decl(self, name, context=None):
+        return self._get_element('text:user-field-decl', text_name=name,
+                                 context=context)
+
+
+    def get_user_field_value(self, name, value_type=None, context=None):
+        user_field_decl = self.get_user_field_decl(name, context)
+
+        # Nothing ?
+        if user_field_decl is None:
+            return None
+
+        return _get_value(user_field_decl, value_type)
 
 
 
