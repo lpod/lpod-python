@@ -430,6 +430,26 @@ def odf_create_user_field_get(name, value, value_type=None,
 
 
 
+def odf_create_page_number(select_page=None, page_adjust=None):
+    """page_adjust is an integer to add (or subtract) to the page number
+
+    select_page -- string in ('previous', 'current', 'next')
+    page_adjust -- int
+    """
+
+    page_number = odf_create_element('<text:page-number/>')
+
+    if select_page is None:
+        select_page = 'current'
+    page_number.set_attribute('text:select-page', select_page)
+
+    if page_adjust is not None:
+        page_number.set_attribute('text:page-adjust', str(page_adjust))
+
+    return page_number
+
+
+
 #
 # The odf_document object
 #
