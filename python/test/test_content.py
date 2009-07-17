@@ -19,6 +19,7 @@ from lpod.document import odf_create_span
 from lpod.document import odf_create_variable_decl, odf_create_variable_set
 from lpod.document import odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
+from lpod.document import odf_create_page_number
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1130,6 +1131,27 @@ class TestUserFields(TestCase):
 
         value = content.get_user_field_value('foo')
         self.assertEqual(value, 42)
+
+
+
+class TestPageNumber(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/example.odt')
+
+
+    def test_create_page_number(self):
+
+        # Simple
+        page_number = odf_create_page_number()
+        expected = '<text:page-number text:select-page="current"/>'
+        self.assertEqual(page_number.serialize(), expected)
+
+        # With arguments
+        page_number = odf_create_page_number(select_page='next', page_adjust=1)
+        expected = ('<text:page-number text:select-page="next" '
+                    'text:page-adjust="1"/>')
+        self.assertEqual(page_number.serialize(), expected)
 
 
 
