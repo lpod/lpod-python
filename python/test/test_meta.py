@@ -112,7 +112,7 @@ class TestMetadata(TestCase):
     def test_get_modification_date(self):
         meta = self.meta
         date = meta.get_modification_date()
-        expected = DateTime.decode('2009-06-29T14:33:21')
+        expected = DateTime.decode('2009-07-20T12:44:32')
         self.assertEqual(date, expected)
 
 
@@ -200,7 +200,7 @@ class TestMetadata(TestCase):
     def test_get_editing_duration(self):
         meta = self.meta
         duration = meta.get_editing_duration()
-        expected = Duration.decode('PT00H06M53S')
+        expected = Duration.decode('PT00H08M20S')
         self.assertEqual(duration, expected)
 
 
@@ -222,7 +222,7 @@ class TestMetadata(TestCase):
     def test_get_editing_cycles(self):
         meta = self.meta
         cycles = meta.get_editing_cycles()
-        expected = 8
+        expected = 9
         self.assertEqual(cycles, expected)
 
 
@@ -244,7 +244,7 @@ class TestMetadata(TestCase):
     def test_get_generator(self):
         meta = self.meta
         generator = meta.get_generator()
-        expected = (u"OpenOffice.org/3.1$Unix "
+        expected = (u"OpenOffice.org/3.1$Linux "
                     u"OpenOffice.org_project/310m11$Build-9399")
         self.assertEqual(generator, expected)
 
@@ -296,6 +296,38 @@ class TestMetadata(TestCase):
         clone = meta.clone()
         generator = "This ain't unicode"
         self.assertRaises(TypeError, clone.set_generator, generator)
+
+
+    def test_get_user_defined_metadata(self):
+        meta = self.meta
+
+        metadata = meta.get_user_defined_metadata()
+        expected = {'Prop1': u'a text',
+                    'Prop2': datetime(2009, 7, 20, 0, 0),
+                    'Prop3': 42.0,
+                    'Prop4': True}
+
+        self.assertEqual(metadata, expected)
+
+
+    def test_set_user_defined_metadata(self):
+        meta = self.meta
+        clone = meta.clone()
+
+        # A new value
+        meta.set_user_defined_metadata('Prop5', 1)
+
+        # Change a value
+        meta.set_user_defined_metadata('Prop2', False)
+
+        expected = {'Prop1': u'a text',
+                    'Prop2': False,
+                    'Prop3': 42.0,
+                    'Prop4': True,
+                    'Prop5': 1.0}
+
+        metadata = meta.get_user_defined_metadata()
+        self.assertEqual(metadata, expected)
 
 
 
