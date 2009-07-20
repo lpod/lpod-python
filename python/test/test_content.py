@@ -19,7 +19,7 @@ from lpod.document import odf_create_span
 from lpod.document import odf_create_variable_decl, odf_create_variable_set
 from lpod.document import odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
-from lpod.document import odf_create_page_number
+from lpod.document import odf_create_page_number, odf_create_page_count
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1152,6 +1152,16 @@ class TestPageNumber(TestCase):
         expected = ('<text:page-number text:select-page="next" '
                     'text:page-adjust="1"/>')
         self.assertEqual(page_number.serialize(), expected)
+
+
+
+class TestPageCount(TestCase):
+
+    def test_create_page_number(self):
+
+        page_count = odf_create_page_count()
+        expected = '<text:page-count/>'
+        self.assertEqual(page_count.serialize(), expected)
 
 
 
