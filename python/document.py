@@ -12,7 +12,7 @@ from container import odf_new_container_from_class, odf_container
 from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
-from utils import _check_arguments, DateTime, _set_value_and_type
+from utils import _check_arguments, Date, DateTime, _set_value_and_type
 from xmlpart import odf_xmlpart, LAST_CHILD
 from xmlpart import odf_create_element, odf_element
 
@@ -453,6 +453,23 @@ def odf_create_page_number(select_page=None, page_adjust=None):
 def odf_create_page_count():
     return odf_create_element('<text:page-count />')
 
+
+
+def odf_create_date(date, fixed=False, data_style=None, representation=None):
+    data = '<text:date text:date-value="%s"/>'
+    date_elt = odf_create_element(data % DateTime.encode(date))
+
+    if fixed:
+        date_elt.set_attribute('text:fixed', 'true')
+
+    if data_style is not None:
+        date_elt.set_attribute('style:data-style-name', data_style)
+
+    if representation is None:
+        representation = Date.encode(date)
+    date_elt.set_text(representation)
+
+    return date_elt
 
 
 #
