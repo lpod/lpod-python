@@ -2,8 +2,9 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import timedelta
-from utils import DateTime, Duration
+from datetime import timedelta, date, datetime
+from decimal import Decimal
+from utils import DateTime, Duration, Boolean, Date
 
 # Import from lpod
 from lpod.utils import _check_arguments
@@ -390,3 +391,78 @@ class odf_meta(odf_xmlpart):
             if type(value) is not int:
                 raise TypeError, "statistic value must be a int"
             element.set_attribute(key, str(value))
+
+
+    def get_user_defined_metadata(self):
+        """Return a dict key / value.
+
+        Value can be a: float, date, time, boolean or string.
+        """
+
+        result = {}
+        for meta in self.get_element_list('//meta:user-defined'):
+
+            # Read the values
+            name = meta.get_attribute('meta:name')
+            value_type = meta.get_attribute('meta:value-type')
+            if value_type is None:
+                value_type = 'string'
+            value = meta.get_text()
+
+            # Interpretation
+            if value_type == 'boolean':
+                result[name] = Boolean.decode(value)
+            elif value_type in  ('float', 'percentage', 'currency'):
+                result[name] = float(value)
+            elif value_type == 'date':
+                if 'T' in value:
+                    result[name] = DateTime.decode(value)
+                else:
+                    result[name] = Date.decode(value)
+            elif value_type == 'string':
+                result[name] = unicode(value)
+            elif value_type == 'time':
+                result[name] = Duration.decode(value)
+
+        return result
+
+
+    def set_user_defined_metadata(self, name, value):
+
+        if type(value) is bool:
+            value_type = 'boolean'
+            value = u'true' if value else u'false'
+        elif isinstance(value, (int, float, Decimal)):
+            value_type = 'float'
+            value = unicode(value)
+        elif type(value) is date:
+            value_type = 'date'
+            value = unicode(Date.encode(value))
+        elif type(value) is datetime:
+            value_type = 'date'
+            value = unicode(DateTime.encode(value))
+        elif type(value) is str:
+            value_type = 'string'
+            value = unicode(value)
+        elif type(value) is unicode:
+            value_type = 'string'
+        elif type(value) is timedelta:
+            value_type = 'time'
+            value = unicode(Duration.encode(value))
+        else:
+            raise TypeError, 'unexpected type "%s" for value' % type(value)
+
+        # Already the same element ?
+        for metadata in self.get_element_list('//meta:user-defined'):
+            if metadata.get_attribute('meta:name') == name:
+                break
+        else:
+            data = '<meta:user-defined meta:name="%s"/>'
+            metadata = odf_create_element(data % name)
+
+        metadata.set_attribute('meta:value-type', value_type)
+        metadata.set_text(value)
+
+        self.get_meta_body().insert_element(metadata, LAST_CHILD)
+
+

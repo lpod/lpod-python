@@ -348,7 +348,7 @@ def _set_value_and_type(element, value=None, value_type=None,
             representation = unicode(Duration.encode(value))
         value = Duration.encode(value)
     elif value is not None:
-        raise TypeError, 'type "%s" is unknown to cells' % type(value)
+        raise TypeError, 'type "%s" is unknown' % type(value)
     _check_arguments(value_type=value_type, text=representation,
                      currency=currency)
 
