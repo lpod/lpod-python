@@ -450,6 +450,11 @@ def odf_create_page_number(select_page=None, page_adjust=None):
 
 
 
+def odf_create_page_count():
+    return odf_create_element('<text:page-count />')
+
+
+
 #
 # The odf_document object
 #
