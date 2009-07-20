@@ -20,7 +20,7 @@ from lpod.document import odf_create_note, odf_create_span
 from lpod.document import odf_create_variable_decl
 from lpod.document import odf_create_variable_set, odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
-from lpod.document import odf_create_page_number
+from lpod.document import odf_create_page_number, odf_create_page_count
 from lpod.styles import rgb2hex
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
 
@@ -210,6 +210,7 @@ body.insert_element(heading, LAST_CHILD)
 text1 = u'The current page is: '
 text2 = u'The previous page is: '
 text3 = u'The next page is: '
+text4 = u'The total page number is: '
 
 paragraph = odf_create_paragraph('Standard', text1)
 body.insert_element(paragraph, LAST_CHILD)
@@ -224,6 +225,11 @@ paragraph = odf_create_paragraph('Standard', text3)
 body.insert_element(paragraph, LAST_CHILD)
 paragraph.wrap_text(odf_create_page_number(select_page='next'),
                     offset=len(text3))
+
+paragraph = odf_create_paragraph('Standard', text4)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(odf_create_page_count(), offset=len(text4))
+
 
 # Save
 # ----
