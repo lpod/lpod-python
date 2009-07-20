@@ -20,6 +20,7 @@ from lpod.document import odf_create_variable_decl, odf_create_variable_set
 from lpod.document import odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
+from lpod.document import odf_create_date
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1162,6 +1163,35 @@ class TestPageCount(TestCase):
         page_count = odf_create_page_count()
         expected = '<text:page-count/>'
         self.assertEqual(page_count.serialize(), expected)
+
+
+
+class TestDate(TestCase):
+
+    def test_create_date(self):
+
+        # Simple
+        date_elt = odf_create_date(datetime(2009, 7, 20))
+        expected = ('<text:date text:date-value="2009-07-20T00:00:00">'
+                      '2009-07-20'
+                    '</text:date>')
+        self.assertEqual(date_elt.serialize(), expected)
+
+        # Fixed
+        date_elt = odf_create_date(datetime(2009, 7, 20), fixed=True)
+        expected = ('<text:date text:date-value="2009-07-20T00:00:00" '
+                      'text:fixed="true">'
+                      '2009-07-20'
+                    '</text:date>')
+        self.assertEqual(date_elt.serialize(), expected)
+
+        # Change the representation
+        date_elt =  odf_create_date(datetime(2009, 7, 20),
+                                    representation=u'20 juil. 09')
+        expected = ('<text:date text:date-value="2009-07-20T00:00:00">'
+                      '20 juil. 09'
+                    '</text:date>')
+        self.assertEqual(date_elt.serialize(), expected)
 
 
 
