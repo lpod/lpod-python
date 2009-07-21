@@ -502,6 +502,20 @@ def odf_create_time(time, fixed=False, data_style=None, representation=None,
 
 
 
+def odf_create_chapter(display='name', outline_level=None):
+    """display can be: 'number', 'name', 'number-and-name', 'plain-number' or
+                       'plain-number-and-name'
+    """
+    data = '<text:chapter text:display="%s"/>'
+    chapter = odf_create_element(data % display)
+
+    if outline_level is not None:
+        chapter.set_attribute('text:outline-level', str(outline_level))
+
+    return chapter
+
+
+
 #
 # The odf_document object
 #
