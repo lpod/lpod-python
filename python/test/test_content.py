@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 from decimal import Decimal
 from unittest import TestCase, main
 
@@ -20,7 +20,7 @@ from lpod.document import odf_create_variable_decl, odf_create_variable_set
 from lpod.document import odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
-from lpod.document import odf_create_date
+from lpod.document import odf_create_date, odf_create_time
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1192,6 +1192,35 @@ class TestDate(TestCase):
                       '20 juil. 09'
                     '</text:date>')
         self.assertEqual(date_elt.serialize(), expected)
+
+
+
+class TestTime(TestCase):
+
+    def test_create_time(self):
+
+        # Simple
+        time_elt = odf_create_time(time(19,30))
+        expected = ('<text:time text:time-value="1900-01-01T19:30:00">'
+                      '19:30:00'
+                    '</text:time>')
+        self.assertEqual(time_elt.serialize(), expected)
+
+        # Fixed
+        time_elt = odf_create_time(time(19, 30), fixed=True)
+        expected = ('<text:time text:time-value="1900-01-01T19:30:00" '
+                      'text:fixed="true">'
+                      '19:30:00'
+                    '</text:time>')
+        self.assertEqual(time_elt.serialize(), expected)
+
+        # Change the representation
+        time_elt =  odf_create_time(time(19, 30),
+                                    representation=u'19h30')
+        expected = ('<text:time text:time-value="1900-01-01T19:30:00">'
+                      '19h30'
+                    '</text:time>')
+        self.assertEqual(time_elt.serialize(), expected)
 
 
 
