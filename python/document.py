@@ -478,6 +478,30 @@ def odf_create_date(date, fixed=False, data_style=None, representation=None,
     return date_elt
 
 
+
+def odf_create_time(time, fixed=False, data_style=None, representation=None,
+                    time_adjust=None):
+    data = '<text:time text:time-value="%s"/>'
+    time_elt = odf_create_element(data % DateTime.encode(time))
+
+    if fixed:
+        time_elt.set_attribute('text:fixed', 'true')
+
+    if data_style is not None:
+        time_elt.set_attribute('style:data-style-name', data_style)
+
+    if representation is None:
+        representation = time.strftime('%H:%M:%S')
+    time_elt.set_text(representation)
+
+    if time_adjust is not None:
+        time_elt.set_attribute('text:time-adjust',
+                               Duration.encode(time_adjust))
+
+    return time_elt
+
+
+
 #
 # The odf_document object
 #
