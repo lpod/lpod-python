@@ -248,38 +248,62 @@ class Duration(object):
 
     @staticmethod
     def decode(data):
-        if not data.startswith('PT'):
+        if data.startswith('PT'):
+            sign = 1
+        elif data.startswith('-PT'):
+            sign = -1
+        else:
             raise ValueError, "duration is not '%s" % DURATION_FORMAT
-        hours = ''
-        minutes = ''
-        seconds = ''
-        bufffer = ''
+
+        hours = 0
+        minutes = 0
+        seconds = 0
+
+        buffer = ''
         for c in data:
             if c.isdigit():
-                bufffer += c
+                buffer += c
             elif c == 'H':
-                hours = int(bufffer)
-                bufffer = ''
+                hours = int(buffer)
+                buffer = ''
             elif c == 'M':
-                minutes = int(bufffer)
-                bufffer = ''
+                minutes = int(buffer)
+                buffer = ''
             elif c == 'S':
-                seconds = int(bufffer)
+                seconds = int(buffer)
                 break
         else:
             raise ValueError, "duration is not '%s" % DURATION_FORMAT
-        return timedelta(0, seconds, 0, 0, minutes, hours, 0)
+
+        return timedelta(hours=sign*hours,
+                         minutes=sign*minutes,
+                         seconds=sign*seconds)
 
 
     @staticmethod
     def encode(value):
         if type(value) is not timedelta:
             raise TypeError, "duration must be a timedelta"
+
         days = value.days
-        hours = days * 24
-        minutes = value.seconds / 60
-        seconds = value.seconds % 60
-        return DURATION_FORMAT % (hours, minutes, seconds)
+        if days < 0:
+            microseconds = -((days * 24 * 60 *60 + value.seconds) * 1000000 +
+                             value.microseconds)
+            sign = '-'
+        else:
+            microseconds = ((days * 24 * 60 *60 + value.seconds) * 1000000 +
+                             value.microseconds)
+            sign = ''
+
+        hours = microseconds / ( 60 * 60 * 1000000)
+        microseconds %= 60 * 60 * 1000000
+
+        minutes = microseconds / ( 60 * 1000000)
+        microseconds %= 60 * 1000000
+
+        seconds = microseconds / 1000000
+
+        return sign + DURATION_FORMAT % (hours, minutes, seconds)
 
 
 
