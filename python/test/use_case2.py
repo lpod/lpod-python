@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import datetime, date
+from datetime import datetime, date, time, timedelta
 
 # Import from itools
 from itools import vfs
@@ -21,7 +21,7 @@ from lpod.document import odf_create_variable_decl
 from lpod.document import odf_create_variable_set, odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
-from lpod.document import odf_create_date
+from lpod.document import odf_create_date, odf_create_time
 from lpod.styles import rgb2hex
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
 
@@ -249,6 +249,34 @@ paragraph.wrap_text(odf_create_date(date(2009, 7, 20), fixed=True),
 paragraph = odf_create_paragraph('Standard', text2)
 body.insert_element(paragraph, LAST_CHILD)
 paragraph.wrap_text(odf_create_date(date(2009, 7, 20)), offset=len(text2))
+
+
+# 10- Time
+# --------
+
+heading = odf_create_heading('Heading', 1, u'Time insertion')
+body.insert_element(heading, LAST_CHILD)
+
+text1 = u'A fixed time: '
+text2 = u'Now: '
+text3 = u'In 1 hour: '
+
+paragraph = odf_create_paragraph('Standard', text1)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(odf_create_time(time(19, 30), fixed=True),
+                    offset=len(text1))
+
+paragraph = odf_create_paragraph('Standard', text2)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(odf_create_time(time(19, 30)), offset=len(text2))
+
+paragraph = odf_create_paragraph('Standard', text3)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(odf_create_time(time(19, 30),
+                                    time_adjust=timedelta(hours=1)),
+                    offset=len(text3))
+
+
 
 
 
