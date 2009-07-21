@@ -7,14 +7,15 @@ from datetime import datetime
 
 # Import from lpod
 from container import ODF_PARTS, odf_get_container
-from container import odf_new_container_from_template
 from container import odf_new_container_from_class, odf_container
+from container import odf_new_container_from_template
 from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
 from utils import _check_arguments, Date, DateTime, _set_value_and_type
-from xmlpart import odf_xmlpart, LAST_CHILD
+from utils import Duration
 from xmlpart import odf_create_element, odf_element
+from xmlpart import odf_xmlpart, LAST_CHILD
 
 
 #
@@ -455,7 +456,8 @@ def odf_create_page_count():
 
 
 
-def odf_create_date(date, fixed=False, data_style=None, representation=None):
+def odf_create_date(date, fixed=False, data_style=None, representation=None,
+                    date_adjust=None):
     data = '<text:date text:date-value="%s"/>'
     date_elt = odf_create_element(data % DateTime.encode(date))
 
@@ -468,6 +470,10 @@ def odf_create_date(date, fixed=False, data_style=None, representation=None):
     if representation is None:
         representation = Date.encode(date)
     date_elt.set_text(representation)
+
+    if date_adjust is not None:
+        date_elt.set_attribute('text:date-adjust',
+                               Duration.encode(date_adjust))
 
     return date_elt
 
