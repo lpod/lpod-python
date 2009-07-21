@@ -20,7 +20,7 @@ from lpod.document import odf_create_variable_decl, odf_create_variable_set
 from lpod.document import odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
-from lpod.document import odf_create_date, odf_create_time
+from lpod.document import odf_create_date, odf_create_time, odf_create_chapter
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1221,6 +1221,24 @@ class TestTime(TestCase):
                       '19h30'
                     '</text:time>')
         self.assertEqual(time_elt.serialize(), expected)
+
+
+
+class TestChapter(TestCase):
+
+    def test_create_chapter(self):
+
+        # Simple
+        chapter = odf_create_chapter()
+        expected = '<text:chapter text:display="name"/>'
+        self.assertEqual(chapter.serialize(), expected)
+
+        # Complex
+        chapter = odf_create_chapter(display='number-and-name',
+                                     outline_level=1)
+        expected = ('<text:chapter text:display="number-and-name" '
+                      'text:outline-level="1"/>')
+        self.assertEqual(chapter.serialize(), expected)
 
 
 
