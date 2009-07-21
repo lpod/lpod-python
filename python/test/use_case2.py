@@ -22,6 +22,7 @@ from lpod.document import odf_create_variable_set, odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
 from lpod.document import odf_create_date, odf_create_time
+from lpod.document import odf_create_chapter
 from lpod.styles import rgb2hex
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
 
@@ -276,6 +277,19 @@ paragraph.wrap_text(odf_create_time(time(19, 30),
                                     time_adjust=timedelta(hours=1)),
                     offset=len(text3))
 
+
+# 11- Chapter
+# -----------
+
+heading = odf_create_heading('Heading', 1, u'Chapter')
+body.insert_element(heading, LAST_CHILD)
+
+text = u'The current chapter is: '
+
+paragraph = odf_create_paragraph('Standard', text)
+body.insert_element(paragraph, LAST_CHILD)
+paragraph.wrap_text(odf_create_chapter(display='number-and-name'),
+                    offset=len(text))
 
 
 
