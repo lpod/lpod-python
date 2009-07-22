@@ -63,7 +63,7 @@ for numero, filename in enumerate(samples.get_names()):
         paragraph = odf_create_paragraph('Standard', u'Not image / csv')
         body.insert_element(paragraph, LAST_CHILD)
 
-vfs.make_folder('trash')
-document.save('trash/use_case1.odt', pretty=True)
+vfs.make_folder('test_output')
+document.save('test_output/use_case1.odt', pretty=True)
 
 

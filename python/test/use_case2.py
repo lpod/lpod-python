@@ -25,7 +25,15 @@ from lpod.document import odf_create_date, odf_create_time
 from lpod.document import odf_create_chapter, odf_create_filename
 from lpod.styles import rgb2hex
 from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
+from lpod import __version__, __installation_path__
 
+
+# Hello messages
+print 'lpod installation test'
+print ' Version           : %s' %  __version__
+print ' Installation path : %s' % __installation_path__
+print
+print 'Generating test_output/use_case2.odt ...'
 
 
 document = odf_new_document_from_class('text')
@@ -55,6 +63,7 @@ body.insert_element(paragraph, LAST_CHILD)
 # And store the data
 container = document.container
 container.set_part(internal_name, image_file.to_str())
+
 
 # 2- a paragraph
 # --------------
@@ -310,7 +319,7 @@ paragraph.wrap_text(odf_create_filename(), offset=len(text))
 # Save
 # ----
 
-vfs.make_folder('trash')
-document.save('trash/use_case2.odt', pretty=True)
+vfs.make_folder('test_output')
+document.save('test_output/use_case2.odt', pretty=True)
 
 

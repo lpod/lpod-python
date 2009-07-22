@@ -8,3 +8,5 @@ try:
     __version__ = open(_get_abspath('version.txt')).read().strip()
 except:
     __version__ = None
+
+__installation_path__ = _get_abspath('')
