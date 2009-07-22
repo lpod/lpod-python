@@ -1,6 +1,6 @@
-#####################################
-Level 1 coverage
-#####################################
+##########################################
+Level 1 coverage - Proposal for 2009-09-30
+##########################################
 
 Basic text containers
 =====================
@@ -13,6 +13,7 @@ Text marks and indices
 ======================
 
 - Bookmarks
+- Links
 - Tables of content
 - Indices
 - Annotations
@@ -55,5 +56,8 @@ Metadata
 
 - Pre-defined
 - User defined
+
+Application settings
+====================
 
 
