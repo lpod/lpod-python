@@ -21,6 +21,7 @@ from lpod.document import odf_create_variable_get
 from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
 from lpod.document import odf_create_date, odf_create_time, odf_create_chapter
+from lpod.document import odf_create_filename
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1239,6 +1240,22 @@ class TestChapter(TestCase):
         expected = ('<text:chapter text:display="number-and-name" '
                       'text:outline-level="1"/>')
         self.assertEqual(chapter.serialize(), expected)
+
+
+
+class TestFilename(TestCase):
+
+    def test_create_filename(self):
+
+        # Simple
+        filename = odf_create_filename()
+        expected = '<text:file-name text:display="full"/>'
+        self.assertEqual(filename.serialize(), expected)
+
+        # Fixed
+        filename = odf_create_filename(fixed=True)
+        expected = '<text:file-name text:display="full" text:fixed="true"/>'
+        self.assertEqual(filename.serialize(), expected)
 
 
 
