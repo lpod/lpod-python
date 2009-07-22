@@ -12,6 +12,7 @@ Contents:
 
    notes.rst
    level0.rst
+   autodocs.rst
 
 
 Indices and tables
