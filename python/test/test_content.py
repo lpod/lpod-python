@@ -22,6 +22,14 @@ from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
 from lpod.document import odf_create_date, odf_create_time, odf_create_chapter
 from lpod.document import odf_create_filename
+from lpod.document import odf_create_initial_creator
+from lpod.document import odf_create_document_creation_date
+from lpod.document import odf_create_document_creation_time
+from lpod.document import odf_create_description
+from lpod.document import odf_create_title, odf_create_keywords
+from lpod.document import odf_create_subject
+
+
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -1256,6 +1264,40 @@ class TestFilename(TestCase):
         filename = odf_create_filename(fixed=True)
         expected = '<text:file-name text:display="full" text:fixed="true"/>'
         self.assertEqual(filename.serialize(), expected)
+
+
+
+class TestSomeMetaInformations(TestCase):
+
+    def test_create_elements(self):
+
+        elt = odf_create_initial_creator()
+        expected = '<text:initial-creator/>'
+        self.assertEqual(elt.serialize(), expected)
+
+        elt = odf_create_document_creation_date()
+        expected = '<text:creation-date/>'
+        self.assertEqual(elt.serialize(), expected)
+
+        elt = odf_create_document_creation_time()
+        expected = '<text:creation-time/>'
+        self.assertEqual(elt.serialize(), expected)
+
+        elt = odf_create_description()
+        expected = '<text:description/>'
+        self.assertEqual(elt.serialize(), expected)
+
+        elt = odf_create_title()
+        expected = '<text:title/>'
+        self.assertEqual(elt.serialize(), expected)
+
+        elt = odf_create_subject()
+        expected = '<text:subject/>'
+        self.assertEqual(elt.serialize(), expected)
+
+        elt = odf_create_keywords()
+        expected = '<text:keywords/>'
+        self.assertEqual(elt.serialize(), expected)
 
 
 
