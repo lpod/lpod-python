@@ -186,8 +186,8 @@ events()
 odf_xmlpart
 -----------
 
-The odf_xmlpart object represents one of the XML formats that form the Open
-Document Format: content, styles, meta, settings.
+The odf_xmlpart object represents one of the XML components of an ODF document,
+i.e. content, styles, meta, settings.
 
 Constructors
 ~~~~~~~~~~~~
@@ -195,18 +195,19 @@ Constructors
 odf_xmlpart(part_name, container)
     Extracts the part from the container and load it as an XML part.
 
-The main interface is sending XPath queries to get odf_element's.
+The main interface allows the application to retrieve odf_element lists or
+individual instances according to given XPath expressions.
 
 Methods
 ~~~~~~~
 
-get_element_list(xpath_query)
-    Returns the list of odf_element matching the given XPath query in the
+get_element_list(xpath_expr)
+    Returns the list of odf_element matching the given XPath expression in the
     whole part. An empty list is returned if no element matches.
 
-get_element(xpath_query)
-    Returns the first odf_element matching the given XPath query in the whole
-    part. Null is returned if no element matches.
+get_element(xpath_expr)
+    Returns the first odf_element matching the given XPath expression in the
+	whole part. Null is returned if no element matches.
 
 serialize(pretty)
     Returns the part as an XML document string. If pretty is true, the XML is
