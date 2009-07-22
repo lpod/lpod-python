@@ -1,5 +1,10 @@
-# Makefile for Sphinx documentation
-#
+#####################################
+# Makefile for Sphinx documentation #
+#####################################
+
+
+# General options
+# ---------------
 
 # Git repository
 GIT_VERSION = $(shell ../python/release.py)
@@ -14,7 +19,7 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d .build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html latex pdf changes linkcheck release
+.PHONY: help clean html latex pdf pdf-figures png-figures changes linkcheck release
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -28,14 +33,15 @@ help:
 clean:
 	-rm -rf .build
 	-rm -rf lpod-docs-*.tgz
+	-rm -rf figures
 
-html:
+html: png-figures
 	mkdir -p .build/html .build/doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) .build/html
 	@echo
 	@echo "Build finished. The HTML pages are in .build/html."
 
-latex:
+latex: pdf-figures
 	mkdir -p .build/latex .build/doctrees
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) .build/latex
 	@echo
@@ -69,4 +75,60 @@ release: html pdf
 	@echo "pdf doc is available ./lpod-docs-pdf-$(GIT_VERSION).tgz"
 
 
+# Figures conversion
+# ------------------
+
+SRC_NAMES=$(wildcard figures-src/*)
+SRC_BASE_NAMES=$(basename $(SRC_NAMES))
+TARGET_BASE_NAMES=$(patsubst  figures-src/%, figures/%, $(SRC_BASE_NAMES))
+
+PDF_NAMES=$(addsuffix .pdf, $(TARGET_BASE_NAMES))
+PNG_NAMES=$(addsuffix .png, $(TARGET_BASE_NAMES))
+
+pdf-figures: figures $(PDF_NAMES)
+
+png-figures: figures $(PNG_NAMES)
+
+figures:
+	mkdir -p figures
+
+# To PDF rules
+
+figures/%.eps: figures-src/%.png
+	convert $< -compress jpeg eps2:$@
+
+figures/%.eps: figures-src/%.jpg
+	convert -units PixelsPerInch -density 72 $< eps2:$@
+
+figures/%.eps: figures-src/%.svg
+	inkscape -z $< -E $@
+
+figures/%.eps: figures-src/%.fig
+	fig2dev -L eps $< $@
+
+figures/%.eps: figures-src/%.dot
+	dot -Tps $< -o $@
+
+figures/%.eps: figures-src/%.dia
+	dia $< -e $@
+
+%.pdf: %.eps
+	epstopdf $<
+
+# To PNG rules
+
+figures/%.png: figures-src/%.png
+	cp $< $@
+
+figures/%.png: figures-src/%.jpg
+	convert  $< $@
+
+figures/%.png: figures-src/%.svg
+	inkscape -z $< -e $@
+
+figures/%.png: figures-src/%.dot
+	dot -Tpng $< -o $@
+
+figures/%.png: figures-src/%.dia
+	dia $< -e $@ -t cairo-png
 
