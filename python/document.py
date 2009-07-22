@@ -516,6 +516,19 @@ def odf_create_chapter(display='name', outline_level=None):
 
 
 
+def odf_create_filename(display='full', fixed=False):
+    """display can be: 'full', 'path', 'name' or 'name-and-extension'
+    """
+    data = '<text:file-name text:display="%s"/>'
+    filename = odf_create_element(data % display)
+
+    if fixed:
+        filename.set_attribute('text:fixed', 'true')
+
+    return filename
+
+
+
 #
 # The odf_document object
 #
