@@ -529,6 +529,87 @@ def odf_create_filename(display='full', fixed=False):
 
 
 
+def odf_create_initial_creator(fixed=False):
+    creator = odf_create_element('<text:initial-creator/>')
+
+    if fixed:
+        creator.set_attribute('text:fixed', 'true')
+
+    return creator
+
+
+
+def odf_create_document_creation_date(fixed=False, data_style=None):
+    creation_date = odf_create_element('<text:creation-date/>')
+
+    if fixed:
+        creation_date.set_attribute('text:fixed', 'true')
+
+    if data_style is not None:
+        creation_date.set_attribute('style:data-style-name', data_style)
+
+    return creation_date
+
+
+
+def odf_create_document_creation_time(fixed=False, data_style=None):
+
+    creation_time = odf_create_element('<text:creation-time/>')
+
+    if fixed:
+        creation_time.set_attribute('text:fixed', 'true')
+
+    if data_style is not None:
+        creation_time.set_attribute('style:data-style-name', data_style)
+
+    return creation_time
+
+
+
+def odf_create_description(fixed=False):
+
+    description = odf_create_element('<text:description/>')
+
+    if fixed:
+        description.set_attribute('text:fixed', 'true')
+
+    return description
+
+
+
+def odf_create_title(fixed=False):
+
+    title = odf_create_element('<text:title/>')
+
+    if fixed:
+        title.set_attribute('text:fixed', 'true')
+
+    return title
+
+
+
+def odf_create_subject(fixed=False):
+
+    subject = odf_create_element('<text:subject/>')
+
+    if fixed:
+        subject.set_attribute('text:fixed', 'true')
+
+    return subject
+
+
+
+def odf_create_keywords(fixed=False):
+
+    keywords = odf_create_element('<text:keywords/>')
+
+    if fixed:
+        keywords.set_attribute('text:fixed', 'true')
+
+    return keywords
+
+
+
 #
 # The odf_document object
 #
