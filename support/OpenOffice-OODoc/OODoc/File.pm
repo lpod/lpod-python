@@ -1,15 +1,15 @@
 #-----------------------------------------------------------------------------
 #
-#	$Id : File.pm 2.117 2008-10-23 JMG$
+#	$Id : File.pm 2.118 2009-01-30 JMG$
 #
 #	Created and maintained by Jean-Marie Gouarne
-#	Copyright 2008 by Genicorp, S.A. (www.genicorp.com)
+#	Copyright 2009 by Genicorp, S.A. (www.genicorp.com)
 #
 #-----------------------------------------------------------------------------
 
 package	OpenOffice::OODoc::File;
 use	5.008_000;
-our	$VERSION	= 2.117;
+our	$VERSION	= 2.118;
 use	Archive::Zip	1.14	qw ( :DEFAULT :CONSTANTS :ERROR_CODES );
 use	File::Temp;
 
@@ -96,7 +96,14 @@ sub	store_member
 		}
 	elsif	($opt{'file'})
 		{
-		$m = $zipfile->addFileOrDirectory($opt{'file'}, $opt{'member'});
+		my $f = $opt{'file'};
+		unless (-r $f && (-f $f || -d $f ))
+			{
+			warn	"[" . __PACKAGE__ . "::store_member] "	.
+				"Resource $f not available\n";
+			return undef;
+			}
+		$m = $zipfile->addFileOrDirectory($f, $opt{'member'});
 		}
 	else
 		{

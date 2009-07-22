@@ -236,10 +236,10 @@ not necessarily in OpenOffice.org format.
         available at that very moment. A raw_import method can be called
         before the imported file is available (no check of availability is
         made). An error will be caused if the file is absent at the time of
-        the save call. If several raw_import statements are run against the
+        the save() call. If several raw_import statements are run against the
         same filename, there will actually be a corresponding number of
         copies of the file in its final state which are imported at the
-        moment of the save, even if it had perhaps been modified in the
+        moment of the save() call, even if it had perhaps been modified in the
         meantime (probably not a very useful outcome).
 
 =head3	save([<filename>])
@@ -248,25 +248,31 @@ not necessarily in OpenOffice.org format.
         some or all of the XML members with data supplied by the linked
         OODoc::XPath object(s). Each updated member must be indicated in the
         form of a hash element whose key corresponds to a standard XML
-        member of an OpenOffice.org file, in the same way as for an extract
+        member of an OpenDocument file, in the same way as for an extract
         call with the value being the new XML content to be saved.
+
+	In addition, the external, non-XML resources (i.e. image files) that
+	have previously been targeted by import methods, if any, are
+	physically imported when save() is called (and not before). If these
+	resources are not available at this time, they are ignored and a
+	warning is issued for each missing file. 
 
         Example:
 
         	$archive->save("target.odt");
 
-        Please note that File does not check the content, and the save
+        Please note that File does not check the content, and the save()
         method can be used to force through any data which may produce a
-        file unusable by StarOffice/OpenOffice.org. Normally, supplied data
-        should have been produced by an XPath object or other application
-        producing OpenOffice.org XML.
+        file not compliant with the ODF packaging specification.
 
         The filename argument is optional. If it is omitted, the source file
         previously supplied by the constructor call is used. In fact in this
 	case a more complex (but hidden) operation is carried out: firstly
 	it writes to a temporary file and if no error occurs, the source file
-	is deleted and its name given to the temporary file. OODoc::File never
-	writes directly to the source file.
+	is deleted and replaced by the temporary file. If something goes wrong
+	during the process, the temporary file remains available in the
+	working directory (whose path depends on the installation parameters).
+	OODoc::File never writes directly to the source file.
 
         Even though the life of an OODoc::File object does not necessarily
         end with a save, it is recommended that you avoid repeated

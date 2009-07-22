@@ -1,18 +1,18 @@
 #-----------------------------------------------------------------------------
 #
-#	$Id : Image.pm 2.018 2008-09-16 JMG$
+#	$Id : Image.pm 2.019 2009-02-18 JMG$
 #
 #	Created and maintained by Jean-Marie Gouarne
-#	Copyright 2008 by Genicorp, S.A. (www.genicorp.com)
+#	Copyright 2009 by Genicorp, S.A. (www.genicorp.com)
 #
 #-----------------------------------------------------------------------------
 
 package	OpenOffice::OODoc::Image;
 use	5.008_000;
-use	OpenOffice::OODoc::XPath	2.226;
+use	OpenOffice::OODoc::XPath	2.229;
 use	File::Basename;
 our	@ISA		= qw ( OpenOffice::OODoc::XPath );
-our	$VERSION	= 2.018;
+our	$VERSION	= 2.019;
 
 #-----------------------------------------------------------------------------
 # default attributes for image style
@@ -639,14 +639,22 @@ sub	importImage
 	my $element	= $self->getImageElement(shift);
 	return undef	unless $element;
 	my $filename	= shift;
+	my $tmpl	= $self->{'image_fpath'};
 	unless ($filename)
 		{
-		warn	"[" . __PACKAGE__ . "::importImage] No filename\n";
-		return undef;
+		my $source = $self->imageLink($element);
+		unless ($source)
+			{
+			warn	"[" . __PACKAGE__ . "::importImage] "	.
+				"Missing source path\n";
+			return undef;
+			}
+		$source =~ s/%(..)/{ chr(hex($1)) }/eg;
+		$source =~ s/^\.\.[\\\/]/\.\//;
+		$filename = $source;
 		}
 	my ($base, $path, $suffix) =
-		File::Basename::fileparse($filename, '\..*');
-	my $tmpl	= $self->{'image_fpath'};
+		File::Basename::fileparse($filename, '\..*');	
 	my $link	= shift;
 	if ($link)
 		{

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                OpenOffice-OODoc
-version:             2.107
+version:             2.108
 abstract:            The Perl Open OpenDocument Connector
 license:             LGPL
 author:              

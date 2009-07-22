@@ -1,17 +1,17 @@
 #----------------------------------------------------------------------------
 #
-#	$Id : Text.pm 2.235 2008-12-07 JMG$
+#	$Id : Text.pm 2.236 2009-02-18 JMG$
 #
 #	Created and maintained by Jean-Marie Gouarne
-#	Copyright 2008 by Genicorp, S.A. (www.genicorp.com)
+#	Copyright 2009 by Genicorp, S.A. (www.genicorp.com)
 #
 #-----------------------------------------------------------------------------
 
 package OpenOffice::OODoc::Text;
 use	5.008_000;
-use	OpenOffice::OODoc::XPath	2.228;
+use	OpenOffice::OODoc::XPath	2.229;
 our	@ISA		= qw ( OpenOffice::OODoc::XPath );
-our	$VERSION	= 2.235;
+our	$VERSION	= 2.236;
 
 #-----------------------------------------------------------------------------
 # synonyms
@@ -67,6 +67,8 @@ BEGIN	{
 	*cellType			= *fieldType;
 	*cellValueAttributeName		= *fieldValueAttributeName;
 	*cellCurrency			= *fieldCurrency;
+	*getStyle			= *textStyle;
+	*setStyle			= *textStyle;
 	}
 
 #-----------------------------------------------------------------------------
@@ -2477,6 +2479,7 @@ sub	getTableSize
 
 #-----------------------------------------------------------------------------
 # increases the size of an existing table
+# improved by Barry Slaymaker [rt.cpan.org #41975]
 
 sub	expandTable
 	{
@@ -2496,13 +2499,27 @@ sub	expandTable
 		}
 	my $last_col	= $self->getTableColumn($table, -1);
 	my $last_row	= $self->getRow($table, -1);
-	my $last_cell	= $self->getCell($last_row, -1);
 	my $i		= 0;
-	for ($i = $old_width; $i < $width; $i++)
+	my $j		= 0;
+
+	# expand column declarations
+	for ($i = $old_width ; $i < $width ; $i++)
 		{
-		$last_col	= $last_col->replicateNode;
-		$last_cell	= $last_cell->replicateNode;
+		$last_col = $last_col->replicateNode;
 		}
+
+	# expand existing rows
+	for ($i = 0 ; $i < $old_length ; $i++)
+		{
+		my $row		= $self->getTableRow($table,  $i);
+		my $last_cell	= $self->getTableCell($row, -1);
+		for ($j = $old_width ; $j < $width ; $j++)
+			{
+			$last_cell = $last_cell->replicateNode;
+			}
+		}
+
+	# append new rows
 	for ($i = $old_length; $i < $length; $i++)
 		{
 		$last_row = $last_row->replicateNode;
@@ -3127,17 +3144,21 @@ sub	getTable
 			return undef;
 			}
 		}
-	elsif (($table =~ /^\d*$/) || ($table =~ /^[\d+-]\d+$/))
+	else	# retrieve table by number or name
 		{
-		$t = $self->getElement('//table:table', $table, $context);
-		}
-	else
-		{
-		my $n = $self->inputTextConversion($table);
-		$t = $self->getNodeByXPath
+		if (($table =~ /^\d*$/) || ($table =~ /^[\d+-]\d+$/))
+			{
+			$t = $self->getElement
+				('//table:table', $table, $context);
+			}
+		unless ($t)
+			{
+			my $n = $self->inputTextConversion($table);
+			$t = $self->getNodeByXPath
 				(
 				"//table:table[\@table:name=\"$n\"]"
 				);
+			}
 		}
 	return undef	unless $t;
 	if	(
@@ -3955,24 +3976,6 @@ sub	textStyle
 				($element, 'text:style-name' => $newstyle) :
 			$self->getAttribute($element, 'text:style-name');
 		}
-	}
-
-#-----------------------------------------------------------------------------
-# deprecated methods, maintained for compatibility reasons only
-
-sub	getStyle
-	{
-	my $self	= shift;
-	my $path	= shift;
-	my $pos		= (ref $path) ? undef : shift;
-	my $element	= $self->getElement($path, $pos) or return undef;
-	return	$self->textStyle($element);
-	}
-
-sub	setStyle
-	{
-	my $self	= shift;
-	return	$self->textStyle(@_);
 	}
 
 #-----------------------------------------------------------------------------

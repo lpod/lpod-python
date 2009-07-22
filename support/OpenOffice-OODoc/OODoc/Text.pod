@@ -1368,8 +1368,13 @@ presentation which is one of the foundations of the OpenDocument format.
 	a document. But the retrieval by name works with two restrictions:
 
 	- if a table name is made of digits only, or if if represents a
-	numeric expression, it's automatically regarded as a table number;
-	use getTableByName() to avoid this behaviour;
+	numeric expression, it's automatically regarded as a table number and
+	the table is selected according to its sequential (zero-based)
+	position in the document; if (and only if) the given number is greater
+	than the position of the last table, the given argument is regarded as
+	a name (for example, if the document contains 3 tables, getTable(365)
+	will attempt to retrieve a table whose name is "365"); in order to
+	avoid any retrieval by number, use getTableByName();
 
 	- getTable() can't retrieve a table by name if the name contains
 	one or more "$", "{" or "}" characters; these characters are allowed
@@ -1411,10 +1416,10 @@ presentation which is one of the foundations of the OpenDocument format.
 =head3	getTableByName(name [, length, width])
 
 	Retrieves a table according to its name (if it exists). This methods
-	allows the retrieval of a table whose name is made of digits and
-	which, as a consequence, can't be properly selected with getTable().
+	allows the retrieval of a table whose name is made of digits without
+	possible confusion between names and numeric positions.
 
-	The behaviour and the optional arguments are the same as getTable().
+	The optional arguments and the limits are the same as for getTable().
 
 =head3	getTableCell(table, row, column)
 
@@ -2768,18 +2773,20 @@ presentation which is one of the foundations of the OpenDocument format.
 
 =head3	textStyle(element [, style])
 
-        Reads a text element's style or, if a 'style' argument is given,
-        changes it. The text element may be a section, paragraph, a header,
-	or a span included in a paragraph or a header.
+        Reads the name of a text element's style or, if a 'style' argument is
+	given, changes it. The text element may be a section, paragraph, a
+	heading, or a text span included in a paragraph or a heading.
 
         The element can be indicated by the pair [path, position] or by
         reference.
 
-        Note: the returned value is a literal style identifier or the value
-        of the element's 'text:style-name' attribute.
+        The returned value is a literal style identifier, i.e. the value
+        of the element's 'text:style-name' attribute. This identifier could
+	be used to retrieve the style element itself, through another method
+	such as getStyleElement() (see OpenOffice::OODoc::Styles).
 
         Note: this method allows you to attribute a non-existent style to a
-        paragraph or header. Such a style can be created later (e.g. using
+        paragraph or heading. Such a style can be created later (e.g. using
         createStyle) or not at all. The actual existence of the style is
         only relevant to the needs of the application. Obviously,
 	opening a document which contains references to non-existent styles

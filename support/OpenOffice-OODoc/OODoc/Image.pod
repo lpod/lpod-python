@@ -208,7 +208,7 @@ documents. But it can't process the images themselves.
         should be imported from an external file and, implicitly, that the
         image link (which it is useless to give here) points to the image
         imported into the OpenOffice.org file. The import will only be made
-        when all the updates are validated by a save(). See importImage
+        when all the updates are validated by a save(). See importImage()
         about importing images. An imported image is *not* embedded in the
 	XML image element; it's always referred to through a link, and stored
 	in a separate, non-XML member of the ODF archive. However, with the
@@ -490,11 +490,18 @@ documents. But it can't process the images themselves.
 
         Allows you to read or modify the display size of an image. Returns
         the height and width as a pair of values. If height and width
-        arguments are provided, they replace the image's old size. Caution:
-        it is up to the application to maintain the proportions of an image
-        if needed.
+        arguments are provided, they replace the image's old size.
 
-        See imagePosition about measure formats.
+	Note that this method deals with the display size only, and ignores
+	the original size of the image; in other words, it doesn't change
+	anything in the graphic object itself.
+
+	Caution: it is up to the application to maintain the aspect ratio of
+	the image if needed.
+
+	See the "size" option about the createImageElement() method.
+
+        See imagePosition() about measure formats.
 
 =head3	imageStyle(image [, style])
 
@@ -511,21 +518,30 @@ documents. But it can't process the images themselves.
 
         	$doc->importImage("Image1", "C:\Images\Portrait.jpg");
 
-        This import cancels and replaces any previous image content.
+        This import cancels and replaces any previous image content, if any.
 
         The first argument is either the image's name (as the user would see
         it) or the image's corresponding element reference. In any case, the
-        image must already exist, created if necessary using
-        insertImageElement. Obviously, the imported file should preferably
-        be in a graphics format supported by OpenOffice.org, but this method
-        actually allows you to import anything, including data which could
-        not be displayed in an OpenOffice.org document.
+        image element must already exist, created if necessary using
+        insertImageElement().
+
+	The second argument is the full path of the image file to be
+	imported and associated to the ODF image object. If this argument is
+	omitted, importImage() assumes that the full path of the needed
+	resource file is indicated by an external link already associated
+	with the image object in the document (see imageLink).
+
+	Obviously, the imported file should preferably be in a graphic format
+	supported by most office software products, but this method actually
+	allows you to import anything, including data which could not be
+	displayed.
 
         Caution: this method does not carry out the import immediately and
         does not check for the presence of the file to be imported. It only
         sends the request to the associated OODoc::File object (via its
-        raw_import method) which performs the operation at the next save
-        call.
+        raw_import method) which performs the operation at the next save()
+        call. As a consequence, the image file is needed later, but its
+	availability is not required by the importImage() method itself.
 
 =head3	insertImageElement(name [, options])
 
@@ -548,7 +564,9 @@ documents. But it can't process the images themselves.
 =head3	selectImageElementByDescription(expression)
 
         Returns the first (or only) image (if found) which has an image
-        description and which matches the regular expression.
+        description matching the provided regular expression.
+
+	See also selectImageElementsByDescription().
 
 =head3	selectImageElementByLink(link)
 
@@ -568,8 +586,10 @@ documents. But it can't process the images themselves.
 
         Note: if an application needs to get a list of individual or
         multiple images which share the same target, the easiest way is to
-        loop through the list returned by getImageElementList and perform an
-        imageLink on each element.
+        loop through the list returned by getImageElementList() and perform an
+        imageLink() on each element.
+
+	See also selectImageElementsByLink().
 
 =head3	selectImageElementsByDescription(expression)
 
@@ -589,8 +609,9 @@ documents. But it can't process the images themselves.
 
         	my @webimages = $doc->selectImageElementsByLink("^http:");
 
-        allows you to get a list of images which will not be visible if the
-        user's machine is not connected to the internet.
+        allows you to get a list of images referred to through an HTTP URL
+	(i.e. which will not be visible if the user's machine is not connected
+	to the internet).
 
 =head3	selectImageElementsByName(expression)
 
@@ -620,7 +641,7 @@ Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
 
 Contact: jmgdoc@cpan.org
 
-Copyright 2004-2006 by Genicorp, S.A. L<http://www.genicorp.com>
+Copyright 2004-2009 by Genicorp, S.A. L<http://www.genicorp.com>
 
 Initial English version of the reference manual by Graeme A. Hunter
 (graeme.hunter@zen.co.uk).

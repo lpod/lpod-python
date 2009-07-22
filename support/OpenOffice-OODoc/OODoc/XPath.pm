@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
 #
-#	$Id : XPath.pm 2.228 2008-11-07 JMG$
+#	$Id : XPath.pm 2.229 2009-02-18 JMG$
 #
 #	Created and maintained by Jean-Marie Gouarne
 #	Copyright 2008 by Genicorp, S.A. (www.genicorp.com)
@@ -9,7 +9,7 @@
 
 package	OpenOffice::OODoc::XPath;
 use	5.008_000;
-our	$VERSION	= 2.228;
+our	$VERSION	= 2.229;
 use	XML::Twig	3.32;
 use	Encode;
 
@@ -2506,7 +2506,7 @@ sub	insertTextChild
 sub	getAttributes
 	{
 	my $node	= shift;
-	return %{$node->atts(@_)};
+	return %{$node->atts(@_) || {}};
 	}
 
 sub	setAttribute

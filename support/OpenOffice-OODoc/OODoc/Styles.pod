@@ -763,12 +763,19 @@ at least a blank of each required style.
         Remember that this structure can be used directly by an application
         to create or update another style.
 
-=head3	getStyleElement(style [, options])
+=head3	getStyleElement(style_name [, options])
 
-        Returns a style element's reference using its name.
+        Returns a style element's reference using its name, or undef if
+	no style owns the given name in the current context. Remember that
+	a style can be used in the 'content' context while its descriptor
+	(i.e. the style element) is defined in either the 'styles' context
+	or the 'content' one. If the application doesn't know where the
+	needed style is defined, it must call getStyleElement() in both.
 
         If the first argument is already an element reference, it returns
-        the argument if it is indeed a style element, and undef if not.
+        the argument if it is indeed a style element, and undef if not, so
+	this method could be used in order to check if a given element is
+	a style element or not.
 
         By default, the style name is sought amongst "style" type elements
         in the "style" namespace. If an application is looking for a special
@@ -1450,7 +1457,7 @@ Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
 
 Contact: jmgdoc@cpan.org
 
-Copyright 2004-2008 by Genicorp, S.A. L<http://www.genicorp.com>
+Copyright 2004-2009 by Genicorp, S.A. L<http://www.genicorp.com>
 
 Initial English version of the reference manual by Graeme A. Hunter
 (graeme.hunter@zen.co.uk).

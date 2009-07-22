@@ -1,3 +1,9 @@
+2.108	2009-02-18
+	XPath.pm: avoided a useless warning in getAttributes() [#42038]
+	Text.pm: improved expandTable() according to [#41975] (thanks to
+	Barry Slaymaker), changed getTable(), some code cleaning
+	Image.pm: importImage() now can automatically import externally linked images
+	File.pm: save() now checks the source files availability
 2.107	2008-12-07
 	Text.pm: added getCellPosition(), adapted from a proposal by dhoworth
 	Makefile.PL: updated the XML::Twig version requirement
