@@ -14,8 +14,18 @@ from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.vfs import vfs
 from lpod.xmlpart import LAST_CHILD
+from lpod import __version__, __installation_path__
 
 
+# Hello messages
+print 'lpod installation test'
+print ' Version           : %s' %  __version__
+print ' Installation path : %s' % __installation_path__
+print
+print 'Generating test_output/use_case1.odt ...'
+
+
+# Go
 document = odf_new_document_from_class('text')
 content = document.get_xmlpart('content')
 body = content.get_text_body()
