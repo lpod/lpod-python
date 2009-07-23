@@ -9,6 +9,10 @@ This level provides the odf_container class only; this class encapsulates
 the required logic for read & write operations regarding the ODF documents
 and associated resources across a virtual file system.				
 
+.. figure:: figures/lpod_level0.*
+       :align: center
+
+
 class: odf_container
 --------------------
 	
