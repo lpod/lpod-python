@@ -148,19 +148,24 @@ Hint: preload the body, etc. for fast access to default contexts.
 TODO
 ----
 
-    - Move implementation to specific classes: odf_content, odf_meta,
-      odf_styles, odf_settings
-    - Define API in odf_document, but then call the implementation in the
-      part instance.
-
+- Move implementation to specific classes: 
+  
+  - odf_content **DONE**
+  - odf_meta **DONE**
+  - odf_styles  ?
+  - odf_settings ? 
 
 Styles
 -------
 
-- style type: font face, default style...
-- style family: font family, text, paragraph, graphics, number...
-- style parent (inheritance)
-- [style class: ... ?]
+Basic style framework **DONE**
+
+But more high level API for: 
+
+  - style type: font face, default style...
+  - style family: font family, text, paragraph, graphics, number...
+  - style parent (inheritance)
+  - [style class: ... ?]
 
 
 Image
