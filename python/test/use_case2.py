@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
-from datetime import datetime, date, time, timedelta
+from datetime import date, time, timedelta
 from sys import version_info
 
 # Import from itools
@@ -14,8 +14,6 @@ from itools.handlers import get_handler
 from lpod.document import odf_new_document_from_class
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
-from lpod.document import odf_create_cell, odf_create_row
-from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_style, odf_create_style_text_properties
 from lpod.document import odf_create_note, odf_create_span
 from lpod.document import odf_create_variable_decl
@@ -26,7 +24,7 @@ from lpod.document import odf_create_date, odf_create_time
 from lpod.document import odf_create_chapter, odf_create_filename
 from lpod.table import odf_table
 from lpod.styles import rgb2hex
-from lpod.xmlpart import FIRST_CHILD, LAST_CHILD
+from lpod.xmlpart import LAST_CHILD
 from lpod import __version__, __installation_path__
 
 
