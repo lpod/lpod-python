@@ -1,5 +1,6 @@
 MANIFEST
 version.txt
+python_path.txt
 build
 dist
 test/trash

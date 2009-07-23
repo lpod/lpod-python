@@ -3,6 +3,7 @@
 
 # Import from the Standard Library
 from distutils import core
+from sys import executable
 
 # Import from lpod
 from release import get_release, get_git_files
@@ -20,6 +21,9 @@ filenames.extend(['MANIFEST', 'version.txt'])
 filenames = [ name for name in filenames if not name.startswith('test') ]
 open('MANIFEST', 'w').write('\n'.join(filenames))
 data_files = [ name for name in filenames if not name.endswith('.py') ]
+
+# Make the python_path.txt file
+open('python_path.txt', 'w').write(executable)
 
 # And call core.setup ....
 core.setup(description = 'lpOD Library',

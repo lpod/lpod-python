@@ -1,3 +1,5 @@
 *.swp
 doc/.build
 doc/lpod-docs-*.tgz
+doc/autodocs
+doc/figures

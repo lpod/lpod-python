@@ -9,9 +9,12 @@
 # Git repository
 GIT_VERSION = $(shell ../python/release.py)
 
+# Python path
+PYTHON = $(shell cat ../python/python_path.txt)
+
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = $(PYTHON) sphinx-link.py
 PAPER         =
 
 # Internal variables.
