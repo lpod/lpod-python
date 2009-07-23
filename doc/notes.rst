@@ -1,7 +1,6 @@
 Notes
 #####
 
-
 Level 0
 =======
 
@@ -21,7 +20,6 @@ Level 0.0
     str data = container.get_part(part_name)
     container.set_part(part_name, data)
     container.del_part(part_name)
-
 
 TODO
 ^^^^
@@ -70,7 +68,7 @@ Level 0.1
 
 Level 1
 =======
-::
+For you DV::
 
     odf_document document
 
@@ -155,30 +153,43 @@ TODO
   - odf_styles  ?
   - odf_settings ? 
 
-Styles
--------
-
-Basic style framework **DONE**
-
-But more high level API for: 
-
-  - style type: font face, default style...
-  - style family: font family, text, paragraph, graphics, number...
-  - style parent (inheritance)
-  - [style class: ... ?]
-
 
 Image
 -----
 
-::
+Info::
+
+  name must be unique
+  => "draw:frame"
+  
+  <draw:frame draw:name="Logo" draw:style-name="Centered Image"
+              draw:z-index="1" svg:height="53mm" svg:width="91mm"
+              text:anchor-page-number="1" text:anchor-type="page">
+      <draw:image xlink:href="Pictures/image.png"/>
+  </draw:frame>
+  
+  text:anchor-type = {page|paragraph}
+    if page => text:anchor-page-number="..."
+               svg:x="..." \
+                             give the position
+               svg:y="..." /
+  
+    if paragraph => nothing
+
+    get_image_list
+    get_image_by_position
+    get_image_by_name
+
+Done::
 
     odf_element <= odf_create_frame(name, style, width, height,
                                     page=None, x=None, y=None)
     if page is None => anchor = paragraph
 
-    document.insert_frame(frame)
     document.insert_frame(frame, context)
+
+
+Not yet::
 
     odf_element <= odf_create_image(link)
 
@@ -189,45 +200,20 @@ Image
     => We create automatically a frame
 
 
-    name must be unique
-    => "draw:frame"
-
-    <draw:frame draw:name="Logo" draw:style-name="Centered Image"
-                draw:z-index="1" svg:height="53mm" svg:width="91mm"
-                text:anchor-page-number="1" text:anchor-type="page">
-        <draw:image xlink:href="Pictures/image.png"/>
-    </draw:frame>
-
-    text:anchor-type = {page|paragraph}
-      if page => text:anchor-page-number="..."
-                 svg:x="..." \
-                               give the position
-                 svg:y="..." /
-
-      if paragraph => nothing
-
-
-
-    get_image_list
-    get_image_by_position
-    get_image_by_name
-
-
-
 Frame
 -----
-::
+
+Done::
 
     get_frame_list
     get_frame_by_position
     get_frame_by_name
 
 
-
 Table
 -----
 
-::
+Info::
 
     No column in odf, just lines
     The columns are only used to define the style for a group of cells
@@ -250,6 +236,7 @@ Table
         In a cell, we cannot have a cell or a line. But we can have
         paragraphs, sections, ...
 
+Done::
 
     odt_element <= odf_create_cell()
     odt_element <= odf_create_row(width=None)
@@ -284,25 +271,25 @@ Table
 
     time: office:time-value="PT12H33M00S"
 
-    formula: table:formula="of:AVERAGE([.D4:.E5])"
-
     cell style: table:style-name="ce1"
 
     repetition: table:number-columns-repeated="..."
 
     cell representation: <text:p>...</text:p>
 
-    possibly an annotation
-
     /!\ expanding cells to easily address and modify them
+
+Not Yet::
+
+    formula: table:formula="of:AVERAGE([.D4:.E5])"
+
+    possibly an annotation
 
 
 List
 ----
-::
 
-    odt_element <= odt_create_item()
-    odt_element <= odf_create_list(style)
+Info::
 
     <text:list text:style-name="Standard">
       <text:list-item>
@@ -310,20 +297,26 @@ List
       </text:list-item>
     </text:list>
 
+Done::
+
+    odt_element <= odt_create_item()
+    odt_element <= odf_create_list(style)
+
     document.insert_list(element, context, xmlposition)
     document.insert_item(element, list, xmlposition)
 
-
-
 Sections
 --------
-::
 
-    odf_document.get_section_by_position(position)
-    odf_document.get_section_by_position(position, context)
+Not Yet::
 
     odf_document.get_section_by_name(name)
     odf_document.get_section_by_name(name, context)
+
+Done::
+
+    odf_document.get_section_by_position(position)
+    odf_document.get_section_by_position(position, context)
 
     odf_document.get_section_external_resource(name)
     odf_document.get_section_external_resource(name, context)
@@ -331,66 +324,78 @@ Sections
 
 Footnotes and Endnotes
 ----------------------
-::
+
+Done::
 
     get_note_list(class, context)
-
     get_note(id, context)
-
     The citation is not reliable
 
 
 Annotations
 -----------
-::
+Info::
 
     No name or id
     Search by creator
     Search by date or date range
 
+Done::
 
     get_annotation_list(author, start_date, end_date...)
-
-
     insert_annotation(author, date, offset, text, style)
-
 
 Meta
 ----
 
-    - Easy
-    - Regroup keywords in a list
-    - User-defined metadata (type: boolean, date, float, string and time)
+Done::
 
+  - Regroup keywords in a list ``get_statistique``
+  - User-defined metadata (type: boolean, date, float, string and time)
+
+Not Yet::
+
+  - User-defined metadata (type: grandma author nickname) 
 
 Common
 ------
-::
+
+Not Yet::
 
     odf_document.get_external_uri(name, context)
 
+Styles
+-------
 
-TODO
-====
+Done::
+ 
+  Basic style framework **DONE**
+  Add length along with offset to move text inside a text:span or text:a element.
 
-named styles, automatic styles
-style families
-style objects
+  variables fields and user (constant) fields
+  
+     - insert value and find its preceding "set" to adjust its representation
+       afterwards
+     - modify value (insert a "set" or insert/update a "get/set")
 
-manifest?
+Not Yet::
 
-Add length along with offset to move text inside a text:span or text:a
-element.
+  More high level API for: 
 
-At a higher level, a method to apply a style on patterns of text, e.g.
-highlight the given pattern with a yellow background style.
+  - style type: font face, default style...
+  - style family: font family, text, paragraph, graphics, number...
+  - style parent (inheritance)
+  - [style class: ... ?]
 
-variables fields and user (constant) fields
+  named styles, automatic styles
 
-    - insert value and find its preceding "set" to adjust its representation
-      afterwards
-    - modify value (insert a "set" or insert/update a "get/set")
-
+  - style families
+  - style objects
+  
+  Manifest
+  
+  At a higher level, a method to apply a style on patterns of text, e.g. highlight the given pattern with a yellow background style.
+  
 
 XPath Requirements
 ==================
