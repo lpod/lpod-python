@@ -289,6 +289,11 @@ class odf_table:
     def get_size(self):
         return len(self.__columns), len(self.__rows)
 
+
+    def get_name(self):
+        return self.__table_attributes['table:name']
+
+
     # XXX Add a cells argument ??
     def add_row(self, number=1, position=None):
         """Insert number rows before the row 'position' (append if None)
