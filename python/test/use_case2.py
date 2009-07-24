@@ -49,6 +49,7 @@ named_styles = styles.get_category_context('named')
 # ------------
 image_file = get_handler('samples/image.png')
 width, height = image_file.get_size()
+print 33,  width, height
 paragraph = odf_create_paragraph('Standard')
 # 72 ppp
 frame = odf_create_frame('frame1', 'Graphics',
