@@ -649,6 +649,24 @@ class odf_document(object):
         return part
 
 
+    def get_type(self):
+        """ The type can be::
+
+                chart, database, formula, graphics, graphics-template, image,
+                presentation, presentation-template, spreadsheet,
+                spreadsheet-template, text, text-master, text-template,
+                text-web
+        """
+
+        mimetype = self.container.get_part('mimetype').strip()
+
+        # The mimetype must be with the form:
+        # application/vnd.oasis.opendocument.text
+
+        # Isolate and return the last part
+        return mimetype.split('.')[-1]
+
+
     def clone(self):
         """Return an exact copy of the document.
         Return: odf_document
