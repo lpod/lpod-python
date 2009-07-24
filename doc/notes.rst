@@ -68,7 +68,9 @@ Level 0.1
 
 Level 1
 =======
-For you DV::
+
+
+Done::
 
     odf_document document
 
@@ -76,47 +78,15 @@ For you DV::
     document = odf_new_document_from_class(odf_class)
     document = odf_new_document_from_template(template_uri)
 
-    document.get_paragraph_list()
-    document.get_paragraph_list(style)
-    document.get_paragraph_list(context)
-    document.get_paragraph_list(style, context)
+    content = document.get_xmlpart('content')
+      => odf_content
 
-      => '//text:p[@text:style-name="$style"]'
+    meta = document.get_xmlpart('meta')
+      => odf_meta
 
-    document.get_heading_list()
-    document.get_heading_list(style)
-    document.get_heading_list(level)
-    document.get_heading_list(context)
-    document.get_heading_list(style, level)
-    document.get_heading_list(style, level, context)
+    styles = document.get_xmlpart('styles')
+      => odf_styles
 
-      => assert level >= 1
-      => '//text:h[@text:style-name="%s"]' % style
-      => '//text:h[@text:level="%s"]' % level
-
-    document.get_paragraph(position)
-    document.get_paragraph(position, context)
-
-      => assert position >= 1
-      => '//text:p[%s]' % position
-
-    document.get_heading(position)
-    document.get_heading(position, level)
-    document.get_heading(position, context)
-    document.get_heading(position, level, context)
-
-      => assert position >= 1
-      => assert level >= 1
-      => '//text:h[@text:level="%s"][%s]' % (level, position)
-
-    document.get_style(name)
-
-      => only paragraph styles for now (family=paragraph)
-      => search algorithm:
-        - same part, automatic styles
-        - same part, named styles
-        - styles part, named styles
-        - default style of the same family
 
     odf_element elt = odf_create_paragraph(style)
 
@@ -134,24 +104,83 @@ For you DV::
 
       => '<text:h text:style-name="$style" text:level="$level">$text</text:h>'
 
-    document.insert_paragraph(element)
-    document.insert_paragraph(element, context)
 
-    document.insert_heading(element)
-    document.insert_heading(element, context)
+    odf_content content
 
-Hint: preload the body, etc. for fast access to default contexts.
+    content.get_paragraph_list()
+    content.get_paragraph_list(style)
+    content.get_paragraph_list(context)
+    content.get_paragraph_list(style, context)
 
+      => '//text:p[@text:style-name="$style"]'
+
+    content.get_paragraph(position)
+    content.get_paragraph(position, context)
+
+      => assert position >= 1
+      => '//text:p[%s]' % position
+
+    content.get_heading_list()
+    content.get_heading_list(style)
+    content.get_heading_list(level)
+    content.get_heading_list(context)
+    content.get_heading_list(style, level)
+    content.get_heading_list(style, level, context)
+
+      => assert level >= 1
+      => '//text:h[@text:style-name="%s"]' % style
+      => '//text:h[@text:level="%s"]' % level
+
+    content.get_heading(position)
+    content.get_heading(position, level)
+    content.get_heading(position, context)
+    content.get_heading(position, level, context)
+
+      => assert position >= 1
+      => assert level >= 1
+      => '//text:h[@text:level="%s"][%s]' % (level, position)
+
+
+    body = content.get_text_body()
+      body => odf_element
+
+    body.insert_paragraph(element)
+    body.insert_paragraph(element, context)
+
+    body.insert_heading(element)
+    body.insert_heading(element, context)
+
+
+    odf_styles styles
+
+    styles.get_style(name)
+
+
+Not yet::
+
+  Styles:
+
+      => only paragraph styles for now (family=paragraph)
+      => search algorithm:
+        - same part, automatic styles
+        - same part, named styles
+        - styles part, named styles
+        - default style of the same family
+
+
+Info::
+
+  Hint: preload the body, etc. for fast access to default contexts.
 
 TODO
 ----
 
-- Move implementation to specific classes: 
-  
+- Move implementation to specific classes:
+
   - odf_content **DONE**
   - odf_meta **DONE**
   - odf_styles  ?
-  - odf_settings ? 
+  - odf_settings ?
 
 
 Image
@@ -161,19 +190,19 @@ Info::
 
   name must be unique
   => "draw:frame"
-  
+
   <draw:frame draw:name="Logo" draw:style-name="Centered Image"
               draw:z-index="1" svg:height="53mm" svg:width="91mm"
               text:anchor-page-number="1" text:anchor-type="page">
       <draw:image xlink:href="Pictures/image.png"/>
   </draw:frame>
-  
+
   text:anchor-type = {page|paragraph}
     if page => text:anchor-page-number="..."
                svg:x="..." \
                              give the position
                svg:y="..." /
-  
+
     if paragraph => nothing
 
     get_image_list
@@ -355,7 +384,7 @@ Done::
 
 Not Yet::
 
-  - User-defined metadata (type: grandma author nickname) 
+  - User-defined metadata (type: grandma author nickname)
 
 Common
 ------
@@ -368,19 +397,20 @@ Styles
 -------
 
 Done::
- 
+
   Basic style framework **DONE**
-  Add length along with offset to move text inside a text:span or text:a element.
+  Add length along with offset to move text inside a text:span or text:a
+  element.
 
   variables fields and user (constant) fields
-  
+
      - insert value and find its preceding "set" to adjust its representation
        afterwards
      - modify value (insert a "set" or insert/update a "get/set")
 
 Not Yet::
 
-  More high level API for: 
+  More high level API for:
 
   - style type: font face, default style...
   - style family: font family, text, paragraph, graphics, number...
@@ -391,11 +421,12 @@ Not Yet::
 
   - style families
   - style objects
-  
+
   Manifest
-  
-  At a higher level, a method to apply a style on patterns of text, e.g. highlight the given pattern with a yellow background style.
-  
+
+  At a higher level, a method to apply a style on patterns of text, e.g.
+  highlight the given pattern with a yellow background style.
+
 
 XPath Requirements
 ==================
