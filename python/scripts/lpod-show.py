@@ -4,21 +4,22 @@
 
 # Import from the standard library
 from optparse import OptionParser
+from os.path import basename
 from sys import exit, stdout, stdin
 from urlparse import urlparse
-from os.path import basename
 
 # Import from lpod
 from lpod import __version__
+from lpod.document import odf_get_document
 from lpod.vfs import vfs
 
 
-def get_target_directory(dirname, container):
+def _get_target_directory(dirname, container_url):
 
     # Compute a name if not gived
     if dirname is None:
         # Find the filename
-        path = urlparse(container).path
+        path = urlparse(container_url).path
         dirname = basename(path)
 
         # The last . => '_'
@@ -44,6 +45,36 @@ def get_target_directory(dirname, container):
 
 
 
+def _get_text(document):
+    content = document.get_xmlpart('content')
+    body = content.get_text_body()
+
+    result = []
+    for element in body.get_element_list('//*'):
+        tag = element.get_name()
+
+        text = [ text for text in element.xpath('text:span/text()|text()') ]
+        text = u''.join(text)
+
+        if text == '':
+            continue
+
+        if tag == 'text:h':
+            if result:
+                result.append(u'\n')
+
+            result.append(text)
+            result.append(u'\n')
+            result.append(u'=' * len(text))
+            result.append(u'\n')
+        elif tag == 'text:p':
+            result.append(text)
+            result.append(u'\n')
+
+    return u''.join(result)
+
+
+
 if  __name__ == '__main__':
 
     # Options initialisation
@@ -66,11 +97,13 @@ if  __name__ == '__main__':
     if len(args) != 1:
         parser.print_help()
         exit(1)
-    container = args[0]
+    container_url = args[0]
 
-    target_directory = get_target_directory(opts.dirname, container)
+    target = _get_target_directory(opts.dirname, container_url)
+    document = odf_get_document(container_url)
 
-
-
+    text = _get_text(document)
+    text_file = target.open('text.txt', 'w')
+    text_file.write(text)
 
 
