@@ -103,8 +103,17 @@ def _make_xpath_query(element_name, style=None, family=None, frame_name=None,
 
 
 
-def _get_cell_coordinates(name):
-    lower = name.lower()
+def _get_cell_coordinates(obj):
+    # By values ?
+    if isinstance(obj, (list, tuple)):
+        return tuple(obj)
+
+    # Or by 'B3' notation ?
+    if not isinstance(obj, (str, unicode)):
+        raise ValueError, ('_get_cell_coordinates called with a bad argument '
+                'type: "%s"' % type(obj))
+
+    lower = obj.lower()
 
     # First "x"
     x = 0
@@ -115,15 +124,15 @@ def _get_cell_coordinates(name):
         v = ord(c) - ord('a') + 1
         x = x * 26 + v
     if x == 0:
-        raise ValueError, 'cell name "%s" is malformed' % name
+        raise ValueError, 'cell name "%s" is malformed' % obj
 
     # And "y"
     try:
         y = int(lower[p:])
     except ValueError:
-        raise ValueError, 'cell name "%s" is malformed' % name
+        raise ValueError, 'cell name "%s" is malformed' % obj
     if y <= 0:
-        raise ValueError, 'cell name "%s" is malformed' % name
+        raise ValueError, 'cell name "%s" is malformed' % obj
 
     return x, y
 
@@ -416,10 +425,15 @@ def _get_value(element, value_type=None):
             return Date.decode(value)
     elif value_type == 'string':
         value = element.get_attribute('office:string-value')
-        return unicode(value)
+        if value is not None:
+            return unicode(value)
+        else:
+            return None
     elif value_type == 'time':
         value = element.get_attribute('office:time-value')
         return Duration.decode(value)
+    elif value_type is None:
+        return None
 
     raise ValueError, 'unexpected value type "%s"' % value_type
 
