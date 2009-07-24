@@ -14,7 +14,7 @@ Slides Draft
 .. toctree::
    :maxdepth: 1
 
-   level1_coverage.rst
+   slide_draft.rst
 
 lpOD Cookbook
 =============
