@@ -12,6 +12,9 @@ from urlparse import urlparse
 from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.vfs import vfs
+from lpod.table import odf_table
+from lpod.utils import _get_value
+
 
 
 def _get_target_directory(dirname, container_url):
@@ -75,6 +78,56 @@ def _get_text(document):
 
 
 
+def _clean_filename(filename):
+    filename = filename.encode('utf-8')
+
+    allowed_characters = set([u'.', u'-', u'_', u'@'])
+    result = []
+    for c in filename:
+        if c not in allowed_characters and not c.isalnum():
+            result.append('_')
+        else:
+            result.append(c)
+    return ''.join(result)
+
+
+
+def _sheet_to_csv(document, target):
+    content = document.get_xmlpart('content')
+
+    for table in content.get_table_list():
+        table = odf_table(odf_element=table)
+
+        name = table.get_name()
+        filename = _clean_filename(name) + '.csv'
+
+        columns_nb, rows_nb = table.get_size()
+
+        csv = target.open(filename, 'w')
+        for r in range(1, rows_nb + 1):
+            row = []
+            for c in range(1, columns_nb + 1):
+                cell = table.get_cell( (c, r) )
+
+                # 1- Try with _get_value
+                value = _get_value(cell)
+
+                # 2- Try to find text with a brutal xpath query
+                if value is None:
+                    text = [ text for text in cell.xpath(
+                             'text:p/text()|text:span/text()|text()') ]
+                    text = u''.join(text).strip()
+                    if text != '':
+                        value = text.encode('utf-8')
+
+                value = '' if value is None else str(value)
+                value.replace('"', "'")
+                row.append('"%s"' % value)
+            csv.write(';'.join(row))
+            csv.write('\n')
+
+
+
 if  __name__ == '__main__':
 
     # Options initialisation
@@ -102,8 +155,14 @@ if  __name__ == '__main__':
     target = _get_target_directory(opts.dirname, container_url)
     document = odf_get_document(container_url)
 
-    text = _get_text(document)
-    text_file = target.open('text.txt', 'w')
-    text_file.write(text)
+    doc_type = document.get_type()
+    # text
+    if doc_type == 'text':
+        text = _get_text(document)
+        text_file = target.open('text.txt', 'w')
+        text_file.write(text)
+    elif doc_type == 'spreadsheet':
+        _sheet_to_csv(document, target)
+
 
 
