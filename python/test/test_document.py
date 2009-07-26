@@ -73,12 +73,12 @@ class GetDocumentTestCase(TestCase):
 
 
     def test_http(self):
-        uri = 'http://test.lpod-project.org/example.odt'
+        uri = 'http://ftp.lpod-project.org/example.odt'
         self.assert_(odf_get_document(uri))
 
 
     def test_ftp(self):
-        uri = 'ftp://test.lpod-project.org/example.odt'
+        uri = 'ftp://ftp.lpod-project.org/example.odt'
         self.assert_(odf_get_document(uri))
 
 

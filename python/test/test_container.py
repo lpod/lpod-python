@@ -81,7 +81,7 @@ class GetContainerTestCase(TestCase):
 
 
     def test_ftp(self):
-        uri = 'ftp://test.lpod-project.org/example.odt'
+        uri = 'ftp://ftp.lpod-project.org/example.odt'
         self.assert_(odf_get_container(uri))
 
 
