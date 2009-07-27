@@ -19,6 +19,9 @@ from gio import FILE_ATTRIBUTE_ACCESS_CAN_READ
 from gio import FILE_ATTRIBUTE_ACCESS_CAN_WRITE
 from gio import FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE
 
+from gio import MountOperation, MOUNT_OPERATION_HANDLED
+from gio import ASK_PASSWORD_ANONYMOUS_SUPPORTED
+from glib import MainLoop
 
 
 ######################################################################
@@ -146,21 +149,30 @@ class Folder(object):
         if type(uri) is not str:
             raise TypeError, 'unexpected "%s"' % repr(uri)
 
+        # Resolve or not ?
+
         # Your folder is None => new File
         if self._folder is None:
-            return File(uri)
+            g_file = File(uri)
+        else:
+            # Split the uri
+            scheme, authority, path, query, fragment = urlsplit(uri)
 
-        # Your folder is not None, we must resolve the uri
-        scheme, authority, path, query, fragment = urlsplit(uri)
+            # A scheme or an authority => new File
+            # XXX This is not truly exact:
+            #     we can have a scheme and a relative path.
+            if scheme or authority:
+                g_file = File(uri)
+            else:
+                # Else we resolve the path
+                g_file = self._folder.resolve_relative_path(uri)
 
-        # A scheme or an authority => new File
-        # XXX This is not truly exact:
-        #     we can have a scheme and a relative path.
-        if scheme or authority:
-            return File(uri)
+        # Automount a ftp server ?
+        if g_file.get_uri_scheme () == 'ftp':
+            # Mount the server
+            AnonymousConnection(g_file)
 
-        # Else we resolve the path
-        return self._folder.resolve_relative_path(uri)
+        return g_file
 
 
     def _get_xtime(self, uri, attribut):
@@ -312,6 +324,70 @@ class Folder(object):
         if self._folder is None:
             return g_file.get_path()
         return self._folder.get_relative_path(g_file)
+
+
+
+######################################################################
+# Encapsulate an anonymous connection
+######################################################################
+class AnonymousConnection(object):
+
+    def __init__(self, g_file):
+        self._g_file = None
+        self._loop = MainLoop()
+
+        # Already mounted ?
+        if g_file.query_exists():
+            self._g_file = g_file
+        else:
+            mount_operation = MountOperation()
+            mount_operation.connect('ask-password', self._ask_password)
+            g_file.mount_enclosing_volume(mount_operation, self._mount_end)
+
+            # Wait
+            self._loop.run()
+
+
+#    def __del__(self):
+#        # Umount the archive
+#        self.unmount()
+
+
+    ############################
+    # Private API
+    ############################
+    def _ask_password(self, op, message, default_user, default_domain, flags):
+        if not flags & ASK_PASSWORD_ANONYMOUS_SUPPORTED:
+            raise IOError, 'This server doest not support anonymous connection'
+
+        op.set_anonymous(True)
+        op.reply(MOUNT_OPERATION_HANDLED)
+
+
+    def _mount_end(self, g_file, result):
+        if g_file.mount_enclosing_volume_finish(result):
+            self._g_file = g_file
+        self._loop.quit()
+
+
+    def _unmount_end(self, g_mount, result):
+        g_mount.unmount_finish(result)
+        self._g_file = None
+        self._loop.quit()
+
+
+    ############################
+    # Public API
+    ############################
+    def unmount(self):
+        # Unmount the archive
+        if self._g_file is not None:
+            g_mount = self._g_file.find_enclosing_mount()
+            g_mount.unmount(self._unmount_end)
+
+        # Wait
+        self._loop.run()
+
 
 
 ######################################################################
