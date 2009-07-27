@@ -1,0 +1,9 @@
+Install dependencies:
+  - lxml >= 2.0
+  - pygobject >= 2.16.1
+
+Test dependencies:
+  - itools = 0.60
+
+Installation:
+  $ python setup.py install
