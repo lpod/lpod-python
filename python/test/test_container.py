@@ -76,7 +76,7 @@ class GetContainerTestCase(TestCase):
 
 
     def test_http(self):
-        uri = 'http://test.lpod-project.org/example.odt'
+        uri = 'http://ftp.lpod-project.org/example.odt'
         self.assert_(odf_get_container(uri))
 
 
