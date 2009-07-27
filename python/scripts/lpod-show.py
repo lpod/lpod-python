@@ -160,7 +160,7 @@ if  __name__ == '__main__':
     if doc_type == 'text':
         text = _get_text(document)
         text_file = target.open('text.txt', 'w')
-        text_file.write(text)
+        text_file.write(text.encode('utf-8'))
     elif doc_type == 'spreadsheet':
         _sheet_to_csv(document, target)
 

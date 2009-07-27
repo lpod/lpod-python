@@ -8,7 +8,7 @@ from re import compile
 
 # Import from lxml
 from lxml.etree import parse, fromstring, tostring, _Element
-from lxml.etree import _ElementStringResult
+from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
 from utils import _check_arguments, _get_abspath, DateTime
@@ -285,6 +285,8 @@ class odf_element(object):
             # The results of a xpath query can be a str
             if type(obj) is _ElementStringResult:
                 result.append(str(obj))
+            elif type(obj) is _ElementUnicodeResult:
+                result.append(unicode(obj))
             else:
                 result.append(self.__class__(obj))
         return result
