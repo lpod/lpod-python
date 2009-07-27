@@ -59,8 +59,6 @@ class odf_container(object):
     def __init__(self, uri):
         if not vfs.exists(uri):
             raise ValueError, 'URI "%s" is not found' % uri
-        if not vfs.can_read(uri):
-            raise ValueError, 'URI "%s" is not readable' % uri
         if vfs.is_folder(uri):
             raise NotImplementedError, ("reading uncompressed ODF "
                                         "is not supported")
