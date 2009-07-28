@@ -237,7 +237,7 @@ def odf_create_list_item(text=None):
     The "text" argument is just a shortcut for the most common case. To create
     a list item with several paragraphs or anything else (except tables),
     first create an empty list item, insert it in the document, and insert
-    your element using the list item as the context.
+    your element using the list item append_element function.
     """
     element = odf_create_element('<text:list-item/>')
     if text is not None:
@@ -247,15 +247,29 @@ def odf_create_list_item(text=None):
 
 
 
-def odf_create_list(style):
-    """Create a list element of the given style.
+def odf_create_list(text=[], style=None):
+    """Create a list element.
     Arguments:
 
+        text -- a list of unicode
         style -- str
+
+    The "text" argument is just a shortcut for the most common case.
+    cf. odf_create_list_item.
 
     Return: odf_element
     """
-    return odf_create_element('<text:list text:style-name="%s"/>' % style)
+    element = odf_create_element('<text:list/>')
+
+    # Auto insert "text" items
+    for value in text:
+        element.append_element(odf_create_list_item(text=value))
+
+    #  A style ?
+    if style is not None:
+        element.set_attribute('text:style-name', style)
+
+    return element
 
 
 
