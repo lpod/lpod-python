@@ -13,7 +13,6 @@ from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.vfs import vfs
-from lpod.xmlpart import LAST_CHILD
 from lpod import __version__, __installation_path__
 
 
@@ -27,14 +26,13 @@ print 'Generating test_output/use_case1.odt ...'
 
 # Go
 document = odf_new_document_from_type('text')
-content = document.get_xmlpart('content')
-body = content.get_text_body()
+body = document.get_body()
 
 samples = vfs.open('samples')
 for numero, filename in enumerate(samples.get_names()):
     # Heading
-    heading = odf_create_heading('Standard', 2, unicode(filename, 'utf-8'))
-    body.insert_element(heading, LAST_CHILD)
+    heading = odf_create_heading(2, text=unicode(filename, 'utf-8'))
+    body.append_element(heading)
 
     uri = samples.get_uri(filename)
     handler = get_handler(uri)
@@ -48,9 +46,9 @@ for numero, filename in enumerate(samples.get_names()):
                                  str(width / 72.0) + 'in',
                                  str(height / 72.0) + 'in')
         image = odf_create_image(internal_name)
-        frame.insert_element(image, LAST_CHILD)
-        paragraph.insert_element(frame, LAST_CHILD)
-        body.insert_element(paragraph, LAST_CHILD)
+        frame.append_element(image)
+        paragraph.append_element(frame)
+        body.append_element(paragraph)
 
         # And store the data
         container = document.container
@@ -63,15 +61,15 @@ for numero, filename in enumerate(samples.get_names()):
             row = odf_create_row()
             for value in csv_row:
                 cell = odf_create_cell(value)
-                row.insert_element(cell, LAST_CHILD)
-            table.insert_element(row, LAST_CHILD)
+                row.append_element(cell)
+            table.append_element(row)
         for i in xrange(size):
             column = odf_create_column('Standard')
             table.insert_element(column, FIRST_CHILD)
-        body.insert_element(table, LAST_CHILD)
+        body.append_element(table)
     else:
         paragraph = odf_create_paragraph('Standard', u'Not image / csv')
-        body.insert_element(paragraph, LAST_CHILD)
+        body.append_element(paragraph)
 
 vfs.make_folder('test_output')
 document.save('test_output/use_case1.odt', pretty=True)

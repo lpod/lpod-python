@@ -49,7 +49,6 @@ named_styles = styles.get_category_context('named')
 # ------------
 image_file = get_handler('samples/image.png')
 width, height = image_file.get_size()
-print 33,  width, height
 paragraph = odf_create_paragraph('Standard')
 # 72 ppp
 frame = odf_create_frame('frame1', 'Graphics',
@@ -68,7 +67,7 @@ container.set_part(internal_name, image_file.to_str())
 
 # 2- Congratulations (=> style on paragraph)
 # ------------------------------------------
-heading = odf_create_heading('Heading', 1, u'Congratulations !')
+heading = odf_create_heading(1, text=u'Congratulations !')
 body.insert_element(heading, LAST_CHILD)
 
 # The style
@@ -89,7 +88,7 @@ body.insert_element(paragraph, LAST_CHILD)
 
 # 3- Your environment (=> a table)
 # --------------------------------
-heading = odf_create_heading('Heading', 1, u'Your environment')
+heading = odf_create_heading(1, text=u'Your environment')
 body.insert_element(heading, LAST_CHILD)
 
 data = []
@@ -109,7 +108,7 @@ body.insert_element(table, LAST_CHILD)
 # 4- Description (=> footnote & => highlight)
 # -------------------------------------------
 
-heading = odf_create_heading('Heading', 1, u'Description')
+heading = odf_create_heading(1, text=u'Description')
 body.insert_element(heading, LAST_CHILD)
 
 # A paragraph with a note
@@ -152,7 +151,7 @@ value_type = variable_set.get_attribute('office:value-type')
 variable_decl = odf_create_variable_decl('foo', value_type)
 
 # Insert
-heading = odf_create_heading('Heading', 1, u'A variable')
+heading = odf_create_heading(1, text=u'A variable')
 body.insert_element(heading, LAST_CHILD)
 
 decl = content.get_variable_decls()
@@ -178,7 +177,7 @@ paragraph.wrap_text(variable_get, offset=len(text))
 user_field_decl = odf_create_user_field_decl('pi5', value=3.14159)
 
 # Insert
-heading = odf_create_heading('Heading', 1, u'An user field')
+heading = odf_create_heading(1, text=u'An user field')
 body.insert_element(heading, LAST_CHILD)
 
 decl = content.get_user_field_decls()
@@ -195,7 +194,7 @@ paragraph.wrap_text(user_field_get, offset=len(text))
 # 8- Page number
 # --------------
 
-heading = odf_create_heading('Heading', 1, u'Page number')
+heading = odf_create_heading(1, text=u'Page number')
 body.insert_element(heading, LAST_CHILD)
 
 text1 = u'The current page is: '
@@ -225,7 +224,7 @@ paragraph.wrap_text(odf_create_page_count(), offset=len(text4))
 # 9- Date
 # -------
 
-heading = odf_create_heading('Heading', 1, u'Date insertion')
+heading = odf_create_heading(1, text=u'Date insertion')
 body.insert_element(heading, LAST_CHILD)
 
 text1 = u'A fixed date: '
@@ -244,7 +243,7 @@ paragraph.wrap_text(odf_create_date(date(2009, 7, 20)), offset=len(text2))
 # 10- Time
 # --------
 
-heading = odf_create_heading('Heading', 1, u'Time insertion')
+heading = odf_create_heading(1, text=u'Time insertion')
 body.insert_element(heading, LAST_CHILD)
 
 text1 = u'A fixed time: '
@@ -270,7 +269,7 @@ paragraph.wrap_text(odf_create_time(time(19, 30),
 # 11- Chapter
 # -----------
 
-heading = odf_create_heading('Heading', 1, u'Chapter')
+heading = odf_create_heading(1, text=u'Chapter')
 body.insert_element(heading, LAST_CHILD)
 
 text = u'The current chapter is: '
@@ -284,7 +283,7 @@ paragraph.wrap_text(odf_create_chapter(display='number-and-name'),
 # 11- Filename
 # ------------
 
-heading = odf_create_heading('Heading', 1, u'Filename')
+heading = odf_create_heading(1, text=u'Filename')
 body.insert_element(heading, LAST_CHILD)
 
 text = u'The current file name is: '
