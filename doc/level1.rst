@@ -6,17 +6,17 @@ Basic text containers
 =====================
 
 - Paragraphs
-	- sdsdsd
-		bla bla qsdf qsdkfjqhs fksqfdsqdfsq 
-		dfsdqf qsd q qufh q
-		sddsdsdsd
-	- suite 
-	    qsdlkfj lqsdf lsqdkf jsqdlfk jsdfl ksdjf
-		qmsldkfj qsdl sqdfkjsq dfsqdjkf::
-		
-		  class prout(self):
-		    """ doc """
-			return "coucou"
+  - sdsdsd
+    bla bla qsdf qsdkfjqhs fksqfdsqdfsq 
+    dfsdqf qsd q qufh q
+    sddsdsdsd
+  - suite 
+      qsdlkfj lqsdf lsqdkf jsqdlfk jsdfl ksdjf
+    qmsldkfj qsdl sqdfkjsq dfsqdjkf::
+    
+      class prout(self):
+        """ doc """
+        return "coucou"
 
 - Headings
 - Text spans
@@ -40,6 +40,10 @@ Structured containers
 - Sections
 - Draw pages TODO
 
+  .. figure:: figures/lpod_drawpage.*
+     :align: center
+
+
 Fields and forms
 ================
 
@@ -61,6 +65,10 @@ Styles
 - Text styles
 - Graphic styles TODO
 - Page styles TODO
+
+  .. figure:: figures/lpod_page_style.*
+     :align: center
+
 - Data formatting styles
 
 Metadata
