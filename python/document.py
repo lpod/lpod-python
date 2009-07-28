@@ -252,7 +252,7 @@ def odf_create_list(style):
 
 
 
-def odf_create_style(name, family):
+def odf_create_style(name, family, area=None, **kw):
     """Create a style element with the given name, related to the given
     family.
     Arguments:
@@ -262,10 +262,15 @@ def odf_create_style(name, family):
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'default', 'drawing-page', 'graphic', 'presentation',
                   'control' or 'ruby'
+        area -- the "<area>-properties" where to store properties
+                identical to the family by default
+        kw -- properties to create on the fly
     Return: odf_element
     """
     _check_arguments(family=family)
     data = '<style:style style:name="%s" style:family="%s"/>'
+    if kw:
+        raise NotImplementedError
     return odf_create_element(data % (name, family))
 
 
@@ -273,8 +278,8 @@ def odf_create_style(name, family):
 def odf_create_style_text_properties():
     """Create a text properties element.
     Return: odf_element
+    XXX probably obsolete given the new odf_create_style signature
     """
-    # TODO should take parameters
     return odf_create_element('<style:text-properties/>')
 
 

@@ -316,8 +316,30 @@ class odf_element(object):
         element.remove(child.__element)
 
 
+    #
+    # Style-specific API without subclassing yet
+    #
+
     def is_style(self):
         return self.get_attribute('style:name') is not None
+
+
+    def get_style_properties(self, area=None):
+        if not self.is_style():
+            return None
+        # TODO get the family, get the "<family>-properties" element, return
+        # a dictionary of its attributes
+        # The area can be forced for text properties inside paragraph style
+        raise NotImplementedError
+
+
+    def set_style_properties(self, properties, area=None, **kw):
+        if not self.is_style():
+            raise TypeError, "this element is not a style"
+        # TODO create "<family>-properties" if necessary, and apply
+        # dictionary to attributes
+        # The area can be forced for text properties inside paragraph style
+        raise NotImplementedError
 
 
 

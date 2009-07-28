@@ -427,6 +427,8 @@ Not Yet::
   At a higher level, a method to apply a style on patterns of text, e.g.
   highlight the given pattern with a yellow background style.
 
+  Get/set style properties, given the family of the style
+
 
 XPath Requirements
 ==================
