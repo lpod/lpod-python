@@ -8,8 +8,57 @@ from lpod.document import odf_create_list, odf_create_list_item
 from lpod.document import odf_create_note, odf_create_annotation
 
 # Creation of the document
-document = odf_new_document_from_type('text')
+document = odf_new_document_from_type('presentation')
 body = document.get_body()
+
+# DrawPage 1
+page = odf_create_drawpage('page1')
+
+
+# Add a frame with a draw_text-box 
+heading = odf_create_heading(1, text=u'Headings, Paragraph, Liste and Notes')
+body.append_element(heading)
+text-element = odf_create_paragraph(text = u'First SlideShow')
+
+draw_text-box1 = odf_create_text-box(text-elment, height, width=, x=, y=, image_style=)
+
+draw_text-box1 = odf_create_text-box(text-elment, frame=frame)
+
+draw_text-box1 = odf_create_text-box(text-elment, 
+                                     frame_size=('5cm', '100mm'), 
+                                     frame_position=('1cm', '0cm'),
+                                     image_style=xxx)
+
+
+page.append_element(draw_text-box)
+
+# fill draw_text-box with a paragraph
+text-element = odf_create_list([u'thé', u'café'])
+text-frame = odf_create_text_frame(text-elment, height, width=, x=, y=)
+page.append_element(text-frame)
+
+
+#existe en mémoir n'a pas été sérialisé
+image = odf_create_image(image_uri="toto.jpg", image_style=xxx, link=yes)
+
+draw_image = odf_create_image_frame(image_uri="toto.jpg", 
+                                    frame_size=('5cm', '100mm'), 
+                                    frame_position=('1cm', '0cm'),
+                                    image_style=xxx,
+                                    link=yes)
+
+
+
+
+
+draw_image = odf_create_image(uri, height, width=, x=, y=, image_style=)
+page.append(draw_image)
+
+# introspection
+page.get_frames()
+
+# DrawPage 2
+page = body.()
 
 # Add Heading
 heading = odf_create_heading(level=1, u'Headings, Paragraph, Liste and Notes')
@@ -24,18 +73,5 @@ my_list = odf_create_list([u'thé', u'café'])
 item = odf_create_list_item(u'chocolat')
 my_list.append_element(item)
 
-# Footnote, endnote, annotations
-footnote = odf_create_note(u'1', id='note1', body=u'A footnote')
-paragraph = odf_create_paragraph(u'A paragraph with a footnote.')
-
-##offset = len(u'A paragraph')
-##paragraph.wrap_text(footnote, offset=offset)
-##body.append_element(paragraph)
-
-paragraph.add_footnote(footnote, place="xxx")
-paragraph.add_endnote(footnote, place=34)
-paragraph.add_annotation(footnote, place='')
-paragraph.add_note(footnote, type="footnote", place="")
-
 # Save
-document.save('basic-text.odt', pretty=True)
+document.save('presentation.odp', pretty=True)
