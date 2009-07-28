@@ -93,6 +93,12 @@ class DocumentTestCase(TestCase):
         del self.document
 
 
+    def test_get_body(self):
+        document = self.document
+        body = document.get_body()
+        self.assertEqual(body.get_name(), 'office:text')
+
+
     def test_clone(self):
         document = self.document
         document.get_xmlpart('content')

@@ -637,6 +637,9 @@ class odf_document(object):
         # Cache of XML parts
         self.__xmlparts = {}
 
+        # Cache of the body
+        self.__body = None
+
 
     #
     # Public API
@@ -677,6 +680,21 @@ class odf_document(object):
 
         # Isolate and return the last part
         return mimetype.split('.')[-1]
+
+
+    def get_body(self):
+        if self.__body is None:
+            content = self.get_xmlpart('content')
+            type = self.get_type()
+            if type == 'text':
+                self.__body = content.get_text_body()
+            elif type == 'spreadsheet':
+                self.__body = content.get_spreadsheet_body()
+            elif type == 'presentation':
+                self.__body = content.get_presentation_body()
+            else:
+                raise NotImplementedError
+        return self.__body
 
 
     def clone(self):
