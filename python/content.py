@@ -6,7 +6,7 @@
 # Import from lpod
 from utils import _check_arguments
 from utils import _check_position_or_name, _get_cell_coordinates, _get_value
-from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD, LAST_CHILD
+from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD
 
 
 class odf_content(odf_xmlpart):
