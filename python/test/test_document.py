@@ -6,7 +6,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_new_document_from_template
-from lpod.document import odf_new_document_from_class, odf_get_document
+from lpod.document import odf_new_document_from_type, odf_get_document
 
 
 class NewDocumentFromTemplateTestCase(TestCase):
@@ -36,27 +36,27 @@ class NewDocumentFromTemplateTestCase(TestCase):
 
 
 
-class NewdocumentFromClassTestCase(TestCase):
+class NewdocumentFromTypeTestCase(TestCase):
 
-    def test_bad_class(self):
-        self.assertRaises(ValueError, odf_new_document_from_class,
+    def test_bad_type(self):
+        self.assertRaises(ValueError, odf_new_document_from_type,
                           'foobar')
 
 
-    def test_text_class(self):
-        self.assert_(odf_new_document_from_class('text'))
+    def test_text_type(self):
+        self.assert_(odf_new_document_from_type('text'))
 
 
-    def test_spreadsheet_class(self):
-        self.assert_(odf_new_document_from_class('spreadsheet'))
+    def test_spreadsheet_type(self):
+        self.assert_(odf_new_document_from_type('spreadsheet'))
 
 
-    def test_presentation_class(self):
-        self.assert_(odf_new_document_from_class('presentation'))
+    def test_presentation_type(self):
+        self.assert_(odf_new_document_from_type('presentation'))
 
 
-    def test_drawing_class(self):
-        self.assert_(odf_new_document_from_class('drawing'))
+    def test_drawing_type(self):
+        self.assert_(odf_new_document_from_type('drawing'))
 
 
 

@@ -11,7 +11,7 @@ from itools.handlers import get_handler
 
 
 # Import from lpod
-from lpod.document import odf_new_document_from_class
+from lpod.document import odf_new_document_from_type
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_style, odf_create_style_text_properties
@@ -36,7 +36,7 @@ print
 print 'Generating test_output/use_case2.odt ...'
 
 # Go
-document = odf_new_document_from_class('text')
+document = odf_new_document_from_type('text')
 
 content = document.get_xmlpart('content')
 body = content.get_text_body()

@@ -7,7 +7,7 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
 from lpod.container import odf_get_container
-from lpod.container import odf_new_container_from_class
+from lpod.container import odf_new_container_from_type
 from lpod.container import odf_new_container_from_template
 from lpod.vfs import vfs
 
@@ -39,27 +39,27 @@ class NewContainerFromTemplateTestCase(TestCase):
 
 
 
-class NewContainerFromClassTestCase(TestCase):
+class NewContainerFromTypeTestCase(TestCase):
 
-    def test_bad_class(self):
-        self.assertRaises(ValueError, odf_new_container_from_class,
+    def test_bad_type(self):
+        self.assertRaises(ValueError, odf_new_container_from_type,
                           'foobar')
 
 
-    def test_text_class(self):
-        self.assert_(odf_new_container_from_class('text'))
+    def test_text_type(self):
+        self.assert_(odf_new_container_from_type('text'))
 
 
-    def test_spreadsheet_class(self):
-        self.assert_(odf_new_container_from_class('spreadsheet'))
+    def test_spreadsheet_type(self):
+        self.assert_(odf_new_container_from_type('spreadsheet'))
 
 
-    def test_presentation_class(self):
-        self.assert_(odf_new_container_from_class('presentation'))
+    def test_presentation_type(self):
+        self.assert_(odf_new_container_from_type('presentation'))
 
 
-    def test_drawing_class(self):
-        self.assert_(odf_new_container_from_class('drawing'))
+    def test_drawing_type(self):
+        self.assert_(odf_new_container_from_type('drawing'))
 
 
 
@@ -89,7 +89,7 @@ class GetContainerTestCase(TestCase):
 class ContainerTestCase(TestCase):
 
     def test_clone(self):
-        container = odf_new_container_from_class('text')
+        container = odf_new_container_from_type('text')
         clone = container.clone()
         self.assertEqual(clone.uri, None)
         self.assertNotEqual(clone._odf_container__data, None)

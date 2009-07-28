@@ -7,7 +7,7 @@ from datetime import datetime
 
 # Import from lpod
 from container import ODF_PARTS, odf_get_container
-from container import odf_new_container_from_class, odf_container
+from container import odf_new_container_from_type, odf_container
 from container import odf_new_container_from_template
 from content import odf_content
 from meta import odf_meta
@@ -649,8 +649,8 @@ class odf_document(object):
         return part
 
 
-    def get_class(self):
-        """The class can be::
+    def get_type(self):
+        """The type can be::
 
                chart, database, formula, graphics, graphics-template, image,
                presentation, presentation-template, spreadsheet,
@@ -769,15 +769,15 @@ def odf_new_document_from_template(template_uri):
 
 
 
-def odf_new_document_from_class(odf_class):
-    """Return an "odf_document" instance of the given class.
+def odf_new_document_from_type(odf_type):
+    """Return an "odf_document" instance of the given type.
     Arguments:
 
-        odf_class -- 'text', 'spreadsheet', 'presentation' or 'drawing'
+        odf_type -- 'text', 'spreadsheet', 'presentation' or 'drawing'
 
     Example::
 
-        >>> document = odf_new_document_from_class('spreadsheet')
+        >>> document = odf_new_document_from_type('spreadsheet')
     """
-    container = odf_new_container_from_class(odf_class)
+    container = odf_new_container_from_type(odf_type)
     return odf_document(container)

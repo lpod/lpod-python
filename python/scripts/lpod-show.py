@@ -155,7 +155,7 @@ if  __name__ == '__main__':
     target = _get_target_directory(opts.dirname, container_url)
     document = odf_get_document(container_url)
 
-    doc_type = document.get_class()
+    doc_type = document.get_type()
     # text
     if doc_type == 'text':
         text = _get_text(document)

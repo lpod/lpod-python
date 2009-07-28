@@ -10,8 +10,8 @@ from cStringIO import StringIO
 from utils import _get_abspath
 from vfs import vfs, WRITE
 
-# Classes and their default template
-ODF_CLASSES = {
+# Types and their default template
+ODF_TYPES = {
         'text': 'templates/text.ott',
         'spreadsheet': 'templates/spreadsheet.ots',
         'presentation': 'templates/presentation.otp',
@@ -279,11 +279,11 @@ def odf_new_container_from_template(template_uri):
 
 
 
-def odf_new_container_from_class(odf_class):
-    """Return an "odf_container" instance of the given class.
+def odf_new_container_from_type(odf_type):
+    """Return an "odf_container" instance of the given type.
     """
-    if odf_class not in ODF_CLASSES:
-        raise ValueError, 'unknown ODF class "%s"' % odf_class
-    template_path = ODF_CLASSES[odf_class]
+    if odf_type not in ODF_TYPES:
+        raise ValueError, 'unknown ODF type "%s"' % odf_type
+    template_path = ODF_TYPES[odf_type]
     template_uri = _get_abspath(template_path)
     return odf_new_container_from_template(template_uri)

@@ -7,7 +7,7 @@ from decimal import Decimal
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.document import odf_new_document_from_class, odf_get_document
+from lpod.document import odf_new_document_from_type, odf_get_document
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
@@ -1304,7 +1304,7 @@ class TestSomeMetaInformations(TestCase):
 class TestGetCell(TestCase):
 
     def setUp(self):
-        self.document = document = odf_new_document_from_class('text')
+        self.document = document = odf_new_document_from_type('text')
         self.content = content = document.get_xmlpart('content')
 
         # Encode this table
