@@ -22,7 +22,8 @@ from xmlpart import odf_xmlpart, LAST_CHILD
 # odf creation functions
 #
 
-def odf_create_section(style):
+def odf_create_section(style=None):
+    # TODO add tests without style
     """Create a section element of the given style.
     Arguments:
 
@@ -36,7 +37,7 @@ def odf_create_section(style):
 
 
 
-def odf_create_paragraph(style, text=u''):
+def odf_create_paragraph(style=None, text=u''):
     """Create a paragraph element of the given style containing the optional
     given text.
     Arguments:
@@ -47,13 +48,15 @@ def odf_create_paragraph(style, text=u''):
     Return: odf_element
     """
     _check_arguments(style=style, text=text)
-    data = '<text:p text:style-name="%s">%s</text:p>'
-    text = text.encode('utf_8')
-    return odf_create_element(data % (style, text))
+    data = '<text:p>%s</text:p>' % text.encode('utf_8')
+    element = odf_create_element(data)
+    if style:
+        element.set_attribute('text:style-name', style)
+    return element
 
 
 
-def odf_create_span(style, text=u''):
+def odf_create_span(style=None, text=u''):
     """Create a span element of the given style containing the optional
     given text.
     Arguments:
@@ -64,19 +67,21 @@ def odf_create_span(style, text=u''):
     Return: odf_element
     """
     _check_arguments(style=style, text=text)
-    data = '<text:span text:style-name="%s">%s</text:span>'
-    text = text.encode('utf_8')
-    return odf_create_element(data % (style, text))
+    data = '<text:span>%s</text:span>' % text.encode('utf_8')
+    element = odf_create_element(data)
+    if style:
+        element.set_attribute('text:style-name', style)
+    return element
 
 
 
-def odf_create_heading(style, level, text=u''):
+def odf_create_heading(level, style=None, text=u''):
     """Create a heading element of the given style and level, containing the
     optional given text.
     Arguments:
 
-        style -- str
         level -- int
+        style -- str
         text -- unicode
 
     Return: odf_element
@@ -84,9 +89,11 @@ def odf_create_heading(style, level, text=u''):
     Level count begins at 1.
     """
     _check_arguments(style=style, level=level, text=text)
-    data = '<text:h text:style-name="%s" text:outline-level="%d">%s</text:h>'
-    text = text.encode('utf_8')
-    return odf_create_element(data % (style, level, text))
+    data = '<text:h text:outline-level="%d">%s</text:h>'
+    element = odf_create_element(data % (level, text.encode('utf_8')))
+    if style:
+        element.set_attribute('text:style-name', style)
+    return element
 
 
 

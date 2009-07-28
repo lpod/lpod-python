@@ -284,7 +284,7 @@ class TestHeading(TestCase):
     def test_insert_heading(self):
         content = self.content
         clone = content.clone()
-        heading = odf_create_heading('Heading_20_2', 2,
+        heading = odf_create_heading(2, 'Heading_20_2',
                                      u'An inserted heading')
         body = clone.get_text_body()
         body.insert_element(heading, LAST_CHILD)
