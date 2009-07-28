@@ -12,21 +12,22 @@ document = odf_new_document_from_type('text')
 body = document.get_body()
 
 # Add Heading
-heading = odf_create_heading(level=1, u'Headings, Paragraph, Liste and Notes')
+heading = odf_create_heading(1, text=u'Headings, Paragraph, Liste and Notes')
 body.append_element(heading)
 
-# Add Paragraph 
-paragraph = odf_create_paragraph(text = u'lpOD generated Document')
+# Add Paragraph
+paragraph = odf_create_paragraph(text=u'lpOD generated Document')
 body.append_element(paragraph)
 
 # A list
 my_list = odf_create_list([u'thé', u'café'])
 item = odf_create_list_item(u'chocolat')
 my_list.append_element(item)
+body.append_element(my_list)
 
 # Footnote, endnote, annotations
 footnote = odf_create_note(u'1', id='note1', body=u'A footnote')
-paragraph = odf_create_paragraph(u'A paragraph with a footnote.')
+paragraph = odf_create_paragraph(text=u'A paragraph with a footnote.')
 
 ##offset = len(u'A paragraph')
 ##paragraph.wrap_text(footnote, offset=offset)
