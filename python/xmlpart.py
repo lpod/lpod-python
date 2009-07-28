@@ -261,6 +261,10 @@ class odf_element(object):
             raise ValueError, "xmlposition must be defined"
 
 
+    def append_element(self, element):
+        self.insert_element(element, xmlposition=LAST_CHILD)
+
+
     def wrap_text(self, element, offset=0, length=0):
         """Wrap text beginning at "offset" and for "length" characters, into
         the given element. If "length" is not defined, just insert the
