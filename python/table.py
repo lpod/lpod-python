@@ -94,7 +94,7 @@ def _append_odf_row(odf_row, rows):
 
 
 
-class odf_table:
+class odf_table(object):
 
     def __init__(self, name=None, style=None, data=None, odf_element=None):
         """Create an odf_table object.
