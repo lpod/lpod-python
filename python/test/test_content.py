@@ -113,7 +113,7 @@ class TestParagraph(TestCase):
         content = self.content
         paragraphs = content.get_paragraph_list()
         # The annotation paragraph is counted
-        self.assertEqual(len(paragraphs), 7)
+        self.assertEqual(len(paragraphs), 8)
         second = paragraphs[1]
         text = second.get_text()
         self.assertEqual(text, 'This is the second paragraph.')
@@ -895,7 +895,7 @@ class TestAnnotation(TestCase):
         date = annotation.get_date()
         self.assertEqual(date, datetime(2009, 6, 22, 17, 18, 42))
         text = annotation.get_text_content()
-        self.assertEqual(text, u"This is an annotation")
+        self.assertEqual(text, u"This is an annotation.")
 
 
     def test_get_annotation_list_author(self):

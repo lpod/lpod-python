@@ -112,7 +112,7 @@ class TestMetadata(TestCase):
     def test_get_modification_date(self):
         meta = self.meta
         date = meta.get_modification_date()
-        expected = DateTime.decode('2009-07-20T18:24:54')
+        expected = DateTime.decode('2009-07-28T11:08:00')
         self.assertEqual(date, expected)
 
 
@@ -200,7 +200,7 @@ class TestMetadata(TestCase):
     def test_get_editing_duration(self):
         meta = self.meta
         duration = meta.get_editing_duration()
-        expected = Duration.decode('PT00H08M40S')
+        expected = Duration.decode('PT00H28M24S')
         self.assertEqual(duration, expected)
 
 
@@ -222,7 +222,7 @@ class TestMetadata(TestCase):
     def test_get_editing_cycles(self):
         meta = self.meta
         cycles = meta.get_editing_cycles()
-        expected = 10
+        expected = 12
         self.assertEqual(cycles, expected)
 
 
@@ -272,8 +272,8 @@ class TestMetadata(TestCase):
                     'meta:object-count': 0,
                     'meta:page-count': 1,
                     'meta:paragraph-count': 9,
-                    'meta:word-count': 51,
-                    'meta:character-count': 279}
+                    'meta:word-count': 55,
+                    'meta:character-count': 305}
         self.assertEqual(statistic, expected)
 
 

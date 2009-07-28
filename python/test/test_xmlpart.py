@@ -58,7 +58,7 @@ class ElementTestCase(TestCase):
         content_part = self.content_part
         elements = content_part.get_element_list('//text:p')
         # The annotation paragraph is counted
-        self.assertEqual(len(elements), 7)
+        self.assertEqual(len(elements), 8)
 
 
     def test_get_name(self):
@@ -161,7 +161,7 @@ class ElementTestCase(TestCase):
     def test_get_text_content(self):
         element = self.annotation_element
         text = element.get_text_content()
-        self.assertEqual(text, u"This is an annotation")
+        self.assertEqual(text, u"This is an annotation.")
 
 
     def test_set_text_content(self):
@@ -273,7 +273,7 @@ class XmlPartTestCase(TestCase):
         content_part = odf_xmlpart('content', self.container)
         elements = content_part.get_element_list('//text:p')
         # The annotation paragraph is counted
-        self.assertEqual(len(elements), 7)
+        self.assertEqual(len(elements), 8)
 
 
     def test_tree(self):
