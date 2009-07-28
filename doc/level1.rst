@@ -12,21 +12,21 @@ Basic text containers
 Text marks and indices
 ======================
 
-- Bookmarks
-- Links
-- Tables of content
-- Indices
+- Bookmarks TODO
+- Links TODO
+- Tables of content TODO
+- Indices TODO
 - Annotations
-- Change tracking
+- Change tracking TODO
 
 Structured containers
 =====================
 
 - Tables
 - Lists
-- Data pilot (pivot) tables
+- Data pilot (pivot) tables TODO
 - Sections
-- Draw pages
+- Draw pages TODO
 
 Fields and forms
 ================
@@ -38,17 +38,17 @@ Graphic content
 ===============
 
 - Frames
-- Shapes
+- Shapes TODO
 - Images
-- Animations
-- Charts
+- Animations TODO
+- Charts TODO
 
 Styles
 ======
 
 - Text styles
-- Graphic styles
-- Page styles
+- Graphic styles TODO
+- Page styles TODO
 - Data formatting styles
 
 Metadata
@@ -60,4 +60,4 @@ Metadata
 Application settings
 ====================
 
-
+TODO
