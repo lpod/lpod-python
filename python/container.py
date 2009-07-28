@@ -53,9 +53,8 @@ ODF_PARTS = ['content', 'meta', 'mimetype', 'settings', 'styles']
 
 
 class odf_container(object):
-    """Representation of the ODF document.
+    """Representation of the ODF file.
     """
-
     def __init__(self, uri):
         if not vfs.exists(uri):
             raise ValueError, 'URI "%s" is not found' % uri

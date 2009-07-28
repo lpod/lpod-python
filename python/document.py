@@ -620,7 +620,7 @@ def odf_create_keywords(fixed=False):
 #
 
 class odf_document(object):
-    """An abstraction of the Open Document file.
+    """Abstraction of the ODF document.
     """
     def __init__(self, container):
         if not isinstance(container, odf_container):
