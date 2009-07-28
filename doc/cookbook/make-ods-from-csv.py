@@ -8,7 +8,6 @@ from csv import reader
 # Import from lpod
 from lpod.document import odf_new_document_from_type
 from lpod.table import odf_table
-from lpod.xmlpart import LAST_CHILD
 
 
 
@@ -36,8 +35,7 @@ def get_python_value(data):
 
 # Get elements
 document = odf_new_document_from_type('spreadsheet')
-content = document.get_xmlpart('content')
-body = content.get_spreadsheet_body()
+body = document.get_body()
 
 # Delete the 3 default sheets
 body.clear()
@@ -51,7 +49,7 @@ for csv_name in csv_filenames:
     data = [ [ get_python_value(value) for value in line ]
              for line in csv_file ]
     table = odf_table(name=csv_name[:-4], style='Standard', data=data)
-    body.insert_element(table.get_odf_element(), LAST_CHILD)
+    body.append_element(table.get_odf_element())
 
 
 

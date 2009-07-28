@@ -14,8 +14,7 @@ from lpod.styles import rgb2hex
 document = odf_new_document_from_type('text')
 
 # Get the elements
-content = document.get_xmlpart('content')
-body = content.get_text_body()
+body = document.get_body()
 styles = document.get_xmlpart('styles')
 named_styles = styles.get_category_context('named')
 
