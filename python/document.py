@@ -649,13 +649,13 @@ class odf_document(object):
         return part
 
 
-    def get_type(self):
-        """ The type can be::
+    def get_class(self):
+        """The class can be::
 
-                chart, database, formula, graphics, graphics-template, image,
-                presentation, presentation-template, spreadsheet,
-                spreadsheet-template, text, text-master, text-template,
-                text-web
+               chart, database, formula, graphics, graphics-template, image,
+               presentation, presentation-template, spreadsheet,
+               spreadsheet-template, text, text-master, text-template,
+               text-web
         """
 
         mimetype = self.container.get_part('mimetype').strip()
