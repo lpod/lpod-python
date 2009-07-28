@@ -706,8 +706,12 @@ class TestList(TestCase):
 
     def test_create_list(self):
         item = odf_create_list_item()
-        a_list = odf_create_list('a_style')
-        expected = '<text:list text:style-name="a_style"/>'
+        a_list = odf_create_list([u'foo'])
+        expected = ('<text:list>'
+                      '<text:list-item>'
+                        '<text:p>foo</text:p>'
+                      '</text:list-item>'
+                    '</text:list>')
         self.assertEqual(a_list.serialize(), expected)
 
 
@@ -715,7 +719,7 @@ class TestList(TestCase):
         content = self.content
         clone = content.clone()
         item = odf_create_list_item()
-        a_list = odf_create_list('a_style')
+        a_list = odf_create_list(style='a_style')
         a_list.insert_element(item, LAST_CHILD)
         body = clone.get_text_body()
         body.insert_element(a_list, LAST_CHILD)
