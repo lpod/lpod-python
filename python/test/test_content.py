@@ -8,6 +8,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.document import odf_create_section
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
@@ -66,6 +67,12 @@ class TestSection(TestCase):
     def tearDown(self):
         del self.content
         del self.document
+
+
+    def test_create_section(self):
+        element = odf_create_section(style='Standard')
+        excepted = '<text:section text:style-name="Standard"/>'
+        self.assertEqual(element.serialize(), excepted)
 
 
     def test_get_section_list(self):
