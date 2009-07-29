@@ -579,6 +579,35 @@ def odf_create_keywords_variable(fixed=False):
 
 
 
+def odf_create_draw_page(name, style=None, master_page=None,
+                         page_layout=None, id=None):
+    """This element is a container for content in a drawing or presentation
+    document.
+    Arguments:
+
+        name -- unicode
+        style -- str
+        master_page -- str
+        page_layout -- str
+        id -- str
+    Return: odf_element
+    """
+    _check_arguments(text=name, style=style)
+    element = odf_create_element('<draw:page/>')
+    element.set_attribute('draw:name', name.encode('utf_8'))
+    if style:
+        element.set_attribute('draw:style-name', style)
+    if master_page:
+        element.set_attribute('draw:master-page-name', master_page)
+    if page_layout:
+        element.set_attribute('presentation:presentation-page-layout-name',
+                              page_layout)
+    if id:
+        element.set_attribute('draw:id', id)
+    return element
+
+
+
 #
 # The odf_document object
 #
