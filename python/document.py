@@ -231,6 +231,8 @@ def odf_create_table(name, width=None, height=None, style=None):
 
     Arguments:
 
+        name -- unicode
+        style -- str
         width -- int
 
         height -- int

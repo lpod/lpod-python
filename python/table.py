@@ -104,7 +104,7 @@ class odf_table(object):
            be  a matrix (a list of list) of python objects.
         2) With odf_element
 
-        name -- string
+        name -- unicode
         style -- string
         data -- list / tuple of list / tuple
         odf_element -- odf_element
@@ -135,7 +135,7 @@ class odf_table(object):
     def __load_state_from_list(self, name, style, data):
 
         # 1) table attributes
-        self.__table_attributes['table:name'] = name
+        self.__table_attributes['table:name'] = name.encode('utf-8')
         self.__table_attributes['table:style-name'] = style
 
         # Nothing ??
