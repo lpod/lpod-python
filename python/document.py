@@ -383,41 +383,31 @@ def odf_create_variable_decl(name, value_type):
 
 def odf_create_variable_set(name, value, value_type=None, display=False,
                             representation=None, style=None):
-
     data = '<text:variable-set text:name="%s" />'
     variable_set = odf_create_element(data % name)
-
     representation = _set_value_and_type(variable_set, value=value,
                                          value_type=value_type,
                                          representation=representation)
-
     if not display:
         variable_set.set_attribute('text:display', 'none')
     else:
         variable_set.set_text(representation)
-
     if style is not None:
         variable_set.set_attribute('style:data-style-name', style)
-
     return variable_set
 
 
 
-def odf_create_variable_get(name, value, value_type=None, representation=None,
-                            style=None):
-
+def odf_create_variable_get(name, value, value_type=None,
+                            representation=None, style=None):
     data = '<text:variable-get text:name="%s" />'
     variable_get = odf_create_element(data % name)
-
     representation = _set_value_and_type(variable_get, value=value,
                                          value_type=value_type,
                                          representation=representation)
-
     variable_get.set_text(representation)
-
     if style is not None:
         variable_get.set_attribute('style:data-style-name', style)
-
     return variable_get
 
 
@@ -428,210 +418,163 @@ def odf_create_user_field_decls():
 
 
 def odf_create_user_field_decl(name, value, value_type=None):
-
     data = '<text:user-field-decl text:name="%s"/>'
     user_field_set = odf_create_element(data % name)
-
     _set_value_and_type(user_field_set, value=value, value_type=value_type)
-
     return user_field_set
 
 
 
 def odf_create_user_field_get(name, value, value_type=None,
                               representation=None, style=None):
-
     data = '<text:user-field-get text:name="%s" />'
     user_field_get = odf_create_element(data % name)
-
     representation = _set_value_and_type(user_field_get, value=value,
                                          value_type=value_type,
                                          representation=representation)
-
     user_field_get.set_text(representation)
-
     if style is not None:
         user_field_get.set_attribute('style:data-style-name', style)
-
     return user_field_get
 
 
 
-def odf_create_page_number(select_page=None, page_adjust=None):
+def odf_create_page_number_variable(select_page=None, page_adjust=None):
     """page_adjust is an integer to add (or subtract) to the page number
 
     select_page -- string in ('previous', 'current', 'next')
     page_adjust -- int
     """
-
     page_number = odf_create_element('<text:page-number/>')
-
     if select_page is None:
         select_page = 'current'
     page_number.set_attribute('text:select-page', select_page)
-
     if page_adjust is not None:
         page_number.set_attribute('text:page-adjust', str(page_adjust))
-
     return page_number
 
 
 
-def odf_create_page_count():
+def odf_create_page_count_variable():
     return odf_create_element('<text:page-count />')
 
 
 
-def odf_create_date(date, fixed=False, data_style=None, representation=None,
-                    date_adjust=None):
+def odf_create_date_variable(date, fixed=False, data_style=None,
+                             representation=None, date_adjust=None):
     data = '<text:date text:date-value="%s"/>'
     date_elt = odf_create_element(data % DateTime.encode(date))
-
     if fixed:
         date_elt.set_attribute('text:fixed', 'true')
-
     if data_style is not None:
         date_elt.set_attribute('style:data-style-name', data_style)
-
     if representation is None:
         representation = Date.encode(date)
     date_elt.set_text(representation)
-
     if date_adjust is not None:
         date_elt.set_attribute('text:date-adjust',
                                Duration.encode(date_adjust))
-
     return date_elt
 
 
 
-def odf_create_time(time, fixed=False, data_style=None, representation=None,
-                    time_adjust=None):
+def odf_create_time_variable(time, fixed=False, data_style=None,
+                             representation=None, time_adjust=None):
     data = '<text:time text:time-value="%s"/>'
     time_elt = odf_create_element(data % DateTime.encode(time))
-
     if fixed:
         time_elt.set_attribute('text:fixed', 'true')
-
     if data_style is not None:
         time_elt.set_attribute('style:data-style-name', data_style)
-
     if representation is None:
         representation = time.strftime('%H:%M:%S')
     time_elt.set_text(representation)
-
     if time_adjust is not None:
         time_elt.set_attribute('text:time-adjust',
                                Duration.encode(time_adjust))
-
     return time_elt
 
 
 
-def odf_create_chapter(display='name', outline_level=None):
+def odf_create_chapter_variable(display='name', outline_level=None):
     """display can be: 'number', 'name', 'number-and-name', 'plain-number' or
                        'plain-number-and-name'
     """
     data = '<text:chapter text:display="%s"/>'
     chapter = odf_create_element(data % display)
-
     if outline_level is not None:
         chapter.set_attribute('text:outline-level', str(outline_level))
-
     return chapter
 
 
 
-def odf_create_filename(display='full', fixed=False):
+def odf_create_filename_variable(display='full', fixed=False):
     """display can be: 'full', 'path', 'name' or 'name-and-extension'
     """
     data = '<text:file-name text:display="%s"/>'
     filename = odf_create_element(data % display)
-
     if fixed:
         filename.set_attribute('text:fixed', 'true')
-
     return filename
 
 
 
-def odf_create_initial_creator(fixed=False):
+def odf_create_initial_creator_variable(fixed=False):
     creator = odf_create_element('<text:initial-creator/>')
-
     if fixed:
         creator.set_attribute('text:fixed', 'true')
-
     return creator
 
 
 
-def odf_create_document_creation_date(fixed=False, data_style=None):
+def odf_create_creation_date_variable(fixed=False, data_style=None):
     creation_date = odf_create_element('<text:creation-date/>')
-
     if fixed:
         creation_date.set_attribute('text:fixed', 'true')
-
     if data_style is not None:
         creation_date.set_attribute('style:data-style-name', data_style)
-
     return creation_date
 
 
 
-def odf_create_document_creation_time(fixed=False, data_style=None):
-
+def odf_create_creation_time_variable(fixed=False, data_style=None):
     creation_time = odf_create_element('<text:creation-time/>')
-
     if fixed:
         creation_time.set_attribute('text:fixed', 'true')
-
     if data_style is not None:
         creation_time.set_attribute('style:data-style-name', data_style)
-
     return creation_time
 
 
 
-def odf_create_description(fixed=False):
-
+def odf_create_description_variable(fixed=False):
     description = odf_create_element('<text:description/>')
-
     if fixed:
         description.set_attribute('text:fixed', 'true')
-
     return description
 
 
 
-def odf_create_title(fixed=False):
-
+def odf_create_title_variable(fixed=False):
     title = odf_create_element('<text:title/>')
-
     if fixed:
         title.set_attribute('text:fixed', 'true')
-
     return title
 
 
 
-def odf_create_subject(fixed=False):
-
+def odf_create_subject_variable(fixed=False):
     subject = odf_create_element('<text:subject/>')
-
     if fixed:
         subject.set_attribute('text:fixed', 'true')
-
     return subject
 
 
 
-def odf_create_keywords(fixed=False):
-
+def odf_create_keywords_variable(fixed=False):
     keywords = odf_create_element('<text:keywords/>')
-
     if fixed:
         keywords.set_attribute('text:fixed', 'true')
-
     return keywords
 
 
