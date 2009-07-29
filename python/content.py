@@ -4,7 +4,6 @@
 # Import from the Standard Library
 
 # Import from lpod
-from utils import _check_arguments
 from utils import _check_position_or_name, _get_cell_coordinates, _get_value
 from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD
 
@@ -194,8 +193,6 @@ class odf_content(odf_xmlpart):
                             end_date=None, context=None):
         """XXX end date is not included (as expected in Python).
         """
-        _check_arguments(creator=creator, start_date=start_date,
-                         end_date=end_date)
         annotations = []
         for annotation in self._get_element_list('office:annotation',
                                                  context=context):

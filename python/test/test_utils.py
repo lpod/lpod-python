@@ -10,7 +10,7 @@ from lxml.etree import _Element
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.utils import _make_xpath_query, _check_arguments
+from lpod.utils import _make_xpath_query
 from lpod.utils import DateTime, Duration, Boolean
 from lpod.xmlpart import odf_create_element
 
@@ -53,7 +53,7 @@ class GenerateXPathTestCase(TestCase):
 
 
 
-class CheckArgumentsTestCase(TestCase):
+class CheckPositionNameTestCase(TestCase):
 
     def setUp(self):
         self.document = odf_get_document('samples/example.odt')
@@ -61,86 +61,6 @@ class CheckArgumentsTestCase(TestCase):
 
     def tearDown(self):
         del self.document
-
-
-    def test_bad_context(self):
-        document = self.document
-        self.assertRaises(TypeError, _check_arguments, context=document)
-
-
-    def test_bad_element(self):
-        self.assertRaises(TypeError, _check_arguments, element=_Element)
-
-
-    def test_str_xmlposition(self):
-        self.assertRaises(ValueError, _check_arguments, xmlposition='after')
-
-
-    def test_big_xmlposition(self):
-        self.assertRaises(ValueError, _check_arguments, xmlposition=999)
-
-
-    def test_str_position(self):
-        self.assertRaises(TypeError, _check_arguments, position='1')
-
-
-    def test_position_zero(self):
-        self.assertRaises(ValueError, _check_arguments, position=0)
-
-
-    def test_str_level(self):
-        self.assertRaises(TypeError, _check_arguments, level='1')
-
-
-    def test_level_zero(self):
-        self.assertRaises(ValueError, _check_arguments, level=0)
-
-
-    def test_bad_text(self):
-        self.assertRaises(TypeError, _check_arguments, text='Hello')
-
-
-    def test_bad_style(self):
-        data = ('<style:master-page '
-                'style:name="Standard" '
-                'style:page-layout-name="Mpm1"/>')
-        element = odf_create_element(data)
-        self.assertRaises(TypeError, _check_arguments, style=element)
-
-
-    def test_bad_family(self):
-        self.assertRaises(ValueError, _check_arguments, family='heading')
-
-
-    def test_bad_cell_type(self):
-        self.assertRaises(ValueError, _check_arguments, value_type='integer')
-
-
-    def test_missing_currency(self):
-        self.assertRaises(ValueError, _check_arguments, value_type='currency')
-
-
-    def test_bad_author(self):
-        self.assertRaises(TypeError, _check_arguments, author='Plato')
-
-
-    def test_bad_date(self):
-        self.assertRaises(TypeError, _check_arguments,
-                          date='2009-06-22T17:18:42')
-
-
-    def test_bad_start_date(self):
-        self.assertRaises(TypeError, _check_arguments,
-                          start_date='2009-06-22T17:18:42')
-
-
-    def test_bad_end_date(self):
-        self.assertRaises(TypeError, _check_arguments,
-                          end_date='2009-06-22T17:18:42')
-
-
-    def test_bad_offset(self):
-        self.assertRaises(TypeError, _check_arguments, offset='a word')
 
 
     def test_position_name(self):

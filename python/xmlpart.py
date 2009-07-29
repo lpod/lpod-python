@@ -11,7 +11,7 @@ from lxml.etree import parse, fromstring, tostring, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
-from utils import _check_arguments, _get_abspath, DateTime
+from utils import _get_abspath, DateTime
 from utils import _make_xpath_query
 
 
@@ -278,7 +278,6 @@ class odf_element(object):
         """Like "set_text" but applied to the embedded paragraph:
         annotations, cells...
         """
-        _check_arguments(text=text)
         paragraph = self.get_element('text:p')
         if paragraph is None:
             paragraph = odf_create_element('<text:p/>')
@@ -289,7 +288,6 @@ class odf_element(object):
 
 
     def insert_element(self, element, xmlposition):
-        _check_arguments(element=element, xmlposition=xmlposition)
         current = self.__element
         element = element.__element
         if xmlposition is FIRST_CHILD:
@@ -348,7 +346,6 @@ class odf_element(object):
 
 
     def delete(self, child):
-        _check_arguments(element=child)
         element = self.__element
         element.remove(child.__element)
 
@@ -471,8 +468,6 @@ class odf_xmlpart(object):
                           note_class=None, style_name=None, text_id=None,
                           text_name=None, level=None, position=None,
                           context=None):
-        _check_arguments(style=style, family=family, note_class=note_class,
-                         level=level, position=position, context=context)
         query = _make_xpath_query(element_name, style=style, family=family,
                                   frame_name=frame_name,
                                   frame_style=frame_style,

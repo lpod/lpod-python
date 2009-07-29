@@ -7,7 +7,6 @@ from decimal import Decimal
 from utils import DateTime, Duration, Boolean, Date
 
 # Import from lpod
-from lpod.utils import _check_arguments
 from lpod.xmlpart import LAST_CHILD, odf_create_element, odf_xmlpart
 
 
@@ -39,7 +38,6 @@ class odf_meta(odf_xmlpart):
 
         This is not the first heading but the title metadata.
         """
-        _check_arguments(text=title)
         element = self.get_element('//dc:title')
         if element is None:
             element = odf_create_element('<dc:title/>')
@@ -65,7 +63,6 @@ class odf_meta(odf_xmlpart):
 
             description -- unicode
         """
-        _check_arguments(text=description)
         element = self.get_element('//dc:description')
         if element is None:
             element = odf_create_element('<dc:description/>')
@@ -91,7 +88,6 @@ class odf_meta(odf_xmlpart):
 
             subject -- unicode
         """
-        _check_arguments(text=subject)
         element = self.get_element('//dc:subject')
         if element is None:
             element = odf_create_element('<dc:subject/>')
@@ -153,7 +149,6 @@ class odf_meta(odf_xmlpart):
 
             date -- datetime
         """
-        _check_arguments(date=date)
         element = self.get_element('//dc:date')
         if element is None:
             element = odf_create_element('<dc:date/>')
@@ -179,7 +174,6 @@ class odf_meta(odf_xmlpart):
 
             date -- datetime
         """
-        _check_arguments(date=date)
         element = self.get_element('//meta:creation-date')
         if element is None:
             element = odf_create_element('<meta:creation-date/>')
@@ -214,7 +208,6 @@ class odf_meta(odf_xmlpart):
 
             >>> document.set_initial_creator(u"Plato")
         """
-        _check_arguments(text=creator)
         element = self.get_element('//meta:initial-creator')
         if element is None:
             element = odf_create_element('<meta:initial-creator/>')
@@ -240,7 +233,6 @@ class odf_meta(odf_xmlpart):
 
             keyword -- unicode
         """
-        _check_arguments(text=keyword)
         element = self.get_element('//meta:keyword')
         if element is None:
             element = odf_create_element('<meta:keyword/>')
@@ -331,7 +323,6 @@ class odf_meta(odf_xmlpart):
 
             >>> document.set_generator(u"lpOD Project")
         """
-        _check_arguments(text=generator)
         element = self.get_element('//meta:generator')
         if element is None:
             element = odf_create_element('<meta:generator/>')

@@ -138,87 +138,6 @@ def _get_cell_coordinates(obj):
 
 
 
-def _check_arguments(context=None, element=None, xmlposition=None,
-                     position=None, level=None, text=None, style=None,
-                     family=None, value_type=None, currency=None,
-                     note_class=None, creator=None, date=None,
-                     start_date=None, end_date=None, offset=None,
-                     length=None, retrieve_by=None):
-    if context is not None:
-        # FIXME cyclic import
-        from xmlpart import odf_element
-        if not isinstance(context, odf_element):
-            raise TypeError, "context must be an odf element"
-    if element is not None:
-        # FIXME cyclic import
-        from xmlpart import odf_element
-        if not isinstance(element, odf_element):
-            raise TypeError, "element must be an odf element"
-    if xmlposition is not None:
-        # FIXME cyclic import
-        from xmlpart import STOPMARKER
-        if type(xmlposition) is not int or xmlposition >= STOPMARKER:
-            raise ValueError, "invalid XML position"
-    if position is not None:
-        if type(position) is not int:
-            raise TypeError, "an integer position is expected"
-        if position < 1:
-            raise ValueError, "position count begin at 1"
-    if level is not None:
-        if not isinstance(level, int):
-            raise TypeError, "an integer level is expected"
-        if level < 1:
-            raise ValueError, "level count begin at 1"
-    if text is not None:
-        if type(text) is not unicode:
-            raise TypeError, "text must be an unicode string"
-    if style is not None:
-        if type(style) is not str:
-            raise TypeError, "a style name is expected"
-    if family is not None:
-        if not family in STYLE_FAMILIES:
-            raise ValueError, '"%s" is not a valid style family' % family
-    if value_type is not None:
-        if not value_type in CELL_TYPES:
-            raise ValueError, '"%s" is not a valid cell type' % value_type
-        if value_type == 'currency':
-            if currency is None:
-                raise ValueError, 'currency is mandatory in monetary cells'
-            if type(currency) is not str:
-                raise TypeError, 'currency must be a three-letter code'
-    if note_class is not None:
-        if not note_class in NOTE_CLASSES:
-            raise ValueError, '"%s" is not a valid note class' % note_class
-    if creator is not None:
-        if type(creator) is not unicode:
-            raise TypeError, "creator must be an unicode string"
-    if date is not None:
-        if type(date) is not datetime:
-            raise TypeError, "date must be a datetime object"
-    if start_date is not None:
-        if type(start_date) is not datetime:
-            raise TypeError, "start date must be a datetime object"
-    if end_date is not None:
-        if type(end_date) is not datetime:
-            raise TypeError, "end date must be a datetime object"
-    if offset is not None:
-        if type(offset) is not int:
-            raise TypeError, "offset must be an integer"
-        if offset < 0:
-            raise ValueError, "offset must be zero or positive"
-    if length is not None:
-        if type(length) is not int:
-            raise TypeError, "length must be an integer"
-        if length < 0:
-            raise ValueError, "length must be zero or positive"
-    if retrieve_by is not None:
-        if retrieve_by not in ('name', 'display-name'):
-            raise ValueError, ('retrieve_by must be "name" '
-                               'or "display-name"')
-
-
-
-
 def _check_position_or_name(position, name):
     if not ((position is None) ^ (name is None)):
         raise ValueError, 'You must choose either position or name'
@@ -338,7 +257,6 @@ class Boolean(object):
 
 def _set_value_and_type(element, value=None, value_type=None,
                         representation=None, currency=None):
-
     if type(value) is bool:
         if value_type is None:
             value_type = 'boolean'
@@ -382,8 +300,6 @@ def _set_value_and_type(element, value=None, value_type=None,
         value = Duration.encode(value)
     elif value is not None:
         raise TypeError, 'type "%s" is unknown' % type(value)
-    _check_arguments(value_type=value_type, text=representation,
-                     currency=currency)
 
     if value_type is not None:
         element.set_attribute('office:value-type', value_type)

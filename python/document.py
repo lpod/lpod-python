@@ -771,6 +771,19 @@ class odf_document(object):
 
 
     def get_style(self, name, family, retrieve_by='name'):
+        """Get the automatic or named style identified by its name+family.
+        Styles can be searched by name or display name.
+
+        Arguments:
+
+            name -- str (name) or unicode (display name)
+
+            family -- str
+
+            retrieve_by -- 'name' or 'display-name'
+
+        Returns: odf_element
+        """
         # 1. content
         # TODO except retrieve_by is "display-name"
         content = self.get_xmlpart('content')
