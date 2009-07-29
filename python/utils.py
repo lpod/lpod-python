@@ -30,6 +30,9 @@ STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'table-column',
 NOTE_CLASSES = ('footnote', 'endnote')
 
 
+######################################################################
+# Private API
+######################################################################
 
 def _get_abspath(local_path):
     """Returns the absolute path to the required file.
@@ -352,4 +355,28 @@ def _get_value(element, value_type=None):
         return None
 
     raise ValueError, 'unexpected value type "%s"' % value_type
+
+
+
+######################################################################
+# Public API
+######################################################################
+
+def get_value(element):
+    tag = element.get_name()
+
+    value = None
+
+    # 1- Try with _get_value
+    if tag in ('table:cell', 'text:variable-set', 'text:user-field-decl'):
+        value = _get_value(element)
+
+    # 2- Try to find text with get_text
+    if value is None:
+        text = element.get_text()
+        if text:
+            value = text
+
+    # 3- Else => None
+    return value
 
