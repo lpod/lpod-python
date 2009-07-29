@@ -214,7 +214,7 @@ class odf_element(object):
 
     def get_text(self):
         result = []
-        for obj in self.xpath('text:p|text:span|text()'):
+        for obj in self.xpath('text:p|text:span|text:a|text()'):
             if isinstance(obj, odf_element):
                 result.append(obj.get_text())
             else:
