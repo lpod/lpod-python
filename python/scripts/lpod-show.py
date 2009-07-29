@@ -48,31 +48,28 @@ def _get_target_directory(dirname, container_url):
 
 
 
-def _get_text(document):
-    content = document.get_xmlpart('content')
-    body = content.get_text_body()
-
+def _extract_structured_text(odf_element):
     result = []
-    for element in body.get_element_list('//*'):
+    for element in odf_element.get_children():
         tag = element.get_name()
-
-        text = [ text for text in element.xpath('text:span/text()|text()') ]
-        text = u''.join(text)
+        text = element.get_text()
 
         if text == '':
             continue
 
         if tag == 'text:h':
-            if result:
-                result.append(u'\n')
-
+            result.append(u'\n')
             result.append(text)
             result.append(u'\n')
             result.append(u'=' * len(text))
             result.append(u'\n')
+
         elif tag == 'text:p':
             result.append(text)
             result.append(u'\n')
+
+        else:
+            result.append(_extract_structured_text(element))
 
     return u''.join(result)
 
@@ -112,13 +109,11 @@ def _sheet_to_csv(document, target):
                 # 1- Try with _get_value
                 value = _get_value(cell)
 
-                # 2- Try to find text with a brutal xpath query
+                # 2- Try to find text with get_text
                 if value is None:
-                    text = [ text for text in cell.xpath(
-                             'text:p/text()|text:span/text()|text()') ]
-                    text = u''.join(text).strip()
-                    if text != '':
-                        value = text.encode('utf-8')
+                    text = cell.get_text()
+                    if text:
+                        value = text.strip().encode('utf-8')
 
                 value = '' if value is None else str(value)
                 value.replace('"', "'")
@@ -158,7 +153,8 @@ if  __name__ == '__main__':
     doc_type = document.get_type()
     # text
     if doc_type == 'text':
-        text = _get_text(document)
+        body = document.get_body()
+        text = _extract_structured_text(body)
         text_file = target.open('text.txt', 'w')
         text_file.write(text.encode('utf-8'))
     elif doc_type == 'spreadsheet':
