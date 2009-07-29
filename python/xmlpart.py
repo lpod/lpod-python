@@ -213,13 +213,13 @@ class odf_element(object):
 
 
     def get_text(self):
-        element = self.__element
-        text = element.text
-        if len(element):
-            last_child = element[-1]
-            if last_child.tail is not None:
-                text += last_child.tail
-        return text
+        result = []
+        for obj in self.xpath('text:p|text:span|text()'):
+            if isinstance(obj, odf_element):
+                result.append(obj.get_text())
+            else:
+                result.append(obj)
+        return u''.join(result)
 
 
     def set_text(self, text, after=False):
