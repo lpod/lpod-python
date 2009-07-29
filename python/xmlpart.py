@@ -119,6 +119,46 @@ class odf_element(object):
         return '%s "%s"' % (object.__str__(self), self.get_name())
 
 
+    # wrap_text must a private function
+    def wrap_text(self, odf_element, offset=0, length=0):
+        current = self.__element
+        element = odf_element.__element
+
+        total = 0
+        for text in current.xpath('text()'):
+            total += len(text)
+            if offset < total:
+                left = text[:-(total - offset)]
+                right = text[-(total - offset):]
+                center, right = right[:length], right[length:]
+
+                element.tail = right
+                if center:
+                    element.text = center
+
+                if text.is_tail:
+                    owner = text.getparent()
+
+                    # Set text
+                    owner.tail = left
+
+                    # Insert element
+                    index = current.index(owner)
+                    current.insert(index + 1, element)
+                    return
+                else:
+                    # Set text
+                    current.text = left
+
+                    # Insert element
+                    current.insert(0, element)
+                    return
+        else:
+            # offset is too big => insert at the end
+            current.append(element)
+            return
+
+
     def get_name(self):
         element = self.__element
         return get_prefixed_name(element.tag)
@@ -272,22 +312,6 @@ class odf_element(object):
         """Shortcut to insert at the end.
         """
         self.insert_element(element, LAST_CHILD)
-
-
-    def wrap_text(self, element, offset=0, length=0):
-        """Wrap text beginning at "offset" and for "length" characters, into
-        the given element. If "length" is not defined, just insert the
-        element inside the text.
-        """
-        _check_arguments(element=element, offset=offset, length=length)
-        text = self.get_text()
-        before, after = text[:offset], text[offset + length:]
-        self.set_text(before)
-        element.set_text(after, after=True)
-        self.insert_element(element, LAST_CHILD)
-        cutted = text[offset:offset + length]
-        if cutted:
-            element.set_text(cutted)
 
 
     def xpath(self, xpath_query):
