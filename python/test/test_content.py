@@ -618,13 +618,13 @@ class TestTable(TestCase):
 
     def test_create_table(self):
         # Test 1
-        table = odf_create_table('a_table', style='a_style')
+        table = odf_create_table(u'a_table', style='a_style')
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style"/>')
         self.assertEqual(table.serialize(), expected)
 
         # Test 2
-        table = odf_create_table('a_table', width=1, height=2,
+        table = odf_create_table(u'a_table', width=1, height=2,
                                  style='a_style')
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style">'
@@ -647,7 +647,7 @@ class TestTable(TestCase):
     def test_insert_table(self):
         content = self.content
         clone = content.clone()
-        table = odf_create_table('a_table', style='a_style')
+        table = odf_create_table(u'a_table', style='a_style')
         column = odf_create_column(style='a_column_style')
         row = odf_create_row()
         cell = odf_create_cell(u"")
@@ -1302,7 +1302,7 @@ class TestGetCell(TestCase):
         # 2 1 1 1 2 3 3 3
         # 3 1 1 1 2 3 3 3
         # 4 1 2 3 4 5 6 7
-        table = odf_create_table('a_table', style='Standard')
+        table = odf_create_table(u'a_table', style='Standard')
         column = odf_create_column('Standard')
         column.set_attribute('table:number-columns-repeated', '7')
         table.insert_element(column, LAST_CHILD)

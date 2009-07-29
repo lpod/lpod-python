@@ -147,7 +147,7 @@ class odf_table_TestCase(TestCase):
                  (1, 1, 1, 1),
                  (2, 2, 2, 2))
         # Force repeat
-        table1 = odf_table(name='table', style='Standard', data=data1)
+        table1 = odf_table(name=u'table', style='Standard', data=data1)
         table1 = odf_table(odf_element=table1.get_odf_element())
 
         # Change the value of C2 to 3, not with a new cell, but with the same
@@ -160,7 +160,7 @@ class odf_table_TestCase(TestCase):
         data2 = ((1, 1, 1, 1),
                  (1, 1, 3, 1),
                  (2, 2, 2, 2))
-        table2 = odf_table(name='table', style='Standard', data=data2)
+        table2 = odf_table(name=u'table', style='Standard', data=data2)
 
         self.assertEqual(table1.get_odf_element().serialize(),
                          table2.get_odf_element().serialize())
@@ -171,7 +171,7 @@ class odf_table_TestCase(TestCase):
                  (1, 1, 1, 1),
                  (2, 2, 2, 2))
         # Force repeat
-        table1 = odf_table(name='table', style='Standard', data=data1)
+        table1 = odf_table(name=u'table', style='Standard', data=data1)
         table1 = odf_table(odf_element=table1.get_odf_element())
 
         # Change the value of C2 to 3 with a new cell
@@ -182,7 +182,7 @@ class odf_table_TestCase(TestCase):
         data2 = ((1, 1, 1, 1),
                  (1, 1, 3, 1),
                  (2, 2, 2, 2))
-        table2 = odf_table(name='table', style='Standard', data=data2)
+        table2 = odf_table(name=u'table', style='Standard', data=data2)
 
         self.assertEqual(table1.get_odf_element().serialize(),
                          table2.get_odf_element().serialize())
@@ -202,7 +202,7 @@ class odf_table_TestCase(TestCase):
         data1 = ((1, 1, 1, 1),
                  (1, 1, 1, 1),
                  (2, 2, 2, 2))
-        table1 = odf_table(name='table', style='Standard', data=data1)
+        table1 = odf_table(name=u'table', style='Standard', data=data1)
 
         table1.add_row()
         self.assertEqual(table1.get_size(), (4, 4))
@@ -217,7 +217,7 @@ class odf_table_TestCase(TestCase):
                  (1, 1, 1, 1),
                  (2, 2, 2, 2),
                  (None, None, None, None))
-        table2 = odf_table(name='table', style='Standard', data=data2)
+        table2 = odf_table(name=u'table', style='Standard', data=data2)
         self.assertEqual(table1.get_odf_element().serialize(),
                          table2.get_odf_element().serialize())
 
@@ -226,7 +226,7 @@ class odf_table_TestCase(TestCase):
         data1 = ((1, 1, 1, 1),
                  (1, 1, 1, 1),
                  (2, 2, 2, 2))
-        table1 = odf_table(name='table', style='Standard', data=data1)
+        table1 = odf_table(name=u'table', style='Standard', data=data1)
 
         table1.add_column()
         self.assertEqual(table1.get_size(), (5, 3))
@@ -238,7 +238,7 @@ class odf_table_TestCase(TestCase):
         data2 = ((1, None, None, 1, 1, 1, None),
                  (1, None, None, 1, 1, 1, None),
                  (2, None, None, 2, 2, 2, None))
-        table2 = odf_table(name='table', style='Standard', data=data2)
+        table2 = odf_table(name=u'table', style='Standard', data=data2)
         self.assertEqual(table1.get_odf_element().serialize(),
                          table2.get_odf_element().serialize())
 
