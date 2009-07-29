@@ -254,7 +254,7 @@ class odf_element(object):
         if dc_creator is None:
             return None
         creator = dc_creator.get_text()
-        return unicode(dc_creator.get_text(), 'utf_8')
+        return dc_creator.get_text()
 
 
     def get_date(self):

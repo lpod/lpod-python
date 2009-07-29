@@ -28,7 +28,7 @@ class odf_meta(odf_xmlpart):
         if element is None:
             return None
         title = element.get_text()
-        return unicode(title, 'utf_8')
+        return title
 
 
     def set_title(self, title):
@@ -56,7 +56,7 @@ class odf_meta(odf_xmlpart):
         if element is None:
             return None
         description = element.get_text()
-        return unicode(description, 'utf_8')
+        return description
 
 
     def set_description(self, description):
@@ -82,7 +82,7 @@ class odf_meta(odf_xmlpart):
         if element is None:
             return None
         subject = element.get_text()
-        return unicode(subject, 'utf_8')
+        return subject
 
 
     def set_subject(self, subject):
@@ -201,7 +201,7 @@ class odf_meta(odf_xmlpart):
         if element is None:
             return None
         creator = element.get_text()
-        return unicode(creator, 'utf_8')
+        return creator
 
 
     def set_initial_creator(self, creator):
@@ -231,7 +231,7 @@ class odf_meta(odf_xmlpart):
         if element is None:
             return None
         keyword = element.get_text()
-        return unicode(keyword, 'utf_8')
+        return keyword
 
 
     def set_keyword(self, keyword):
@@ -318,7 +318,7 @@ class odf_meta(odf_xmlpart):
         if element is None:
             return None
         generator = element.get_text()
-        return unicode(generator, 'utf_8')
+        return generator
 
 
     def set_generator(self, generator):
@@ -420,7 +420,7 @@ class odf_meta(odf_xmlpart):
                 else:
                     result[name] = Date.decode(value)
             elif value_type == 'string':
-                result[name] = unicode(value)
+                result[name] = value
             elif value_type == 'time':
                 result[name] = Duration.decode(value)
 
