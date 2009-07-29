@@ -293,26 +293,20 @@ class TestHeading(TestCase):
 class TestFrame(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        document = odf_get_document('samples/example.odt').clone()
         self.content = document.get_xmlpart('content')
+        self.body = document.get_body()
 
 
-    def tearDown(self):
-        del self.content
-        del self.document
-
-
-    def test_create_frame(self):
-        content = self.content
-
-        # Test 1
+    def test_create_frame1(self):
         frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
         expected = ('<draw:frame draw:name="frame1" svg:width="10cm" '
                     'svg:height="10cm" text:anchor-type="paragraph" '
                     'draw:style-name="Graphics"/>')
         self.assertEqual(frame1.serialize(), expected)
 
-        # Test 2
+
+    def test_create_frame2(self):
         frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
                                   y='10mm', style='Graphics')
         expected = ('<draw:frame draw:name="frame2" svg:width="10cm" '
@@ -321,16 +315,43 @@ class TestFrame(TestCase):
                       'svg:y="10mm" draw:style-name="Graphics"/>')
         self.assertEqual(frame2.serialize(), expected)
 
-        # Insert OK ?
-        body = content.get_text_body()
-        body.insert_element(frame1, LAST_CHILD)
-        body.insert_element(frame2, LAST_CHILD)
 
-        # Get OK ?
-        get = content.get_frame(name='frame1')
+    def test_insert_frame(self):
+        body = self.body
+
+        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
+        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
+                                  y='10mm', style='Graphics')
+
+        body.append_element(frame1)
+        body.append_element(frame2)
+
+
+    def test_get_frame_by_name(self):
+        body = self.body
+
+        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
+        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
+                                  y='10mm', style='Graphics')
+
+        body.append_element(frame1)
+        body.append_element(frame2)
+
+        get = self.content.get_frame(name='frame1')
         self.assertEqual(get.get_attribute('draw:name'), 'frame1')
 
-        get = content.get_frame(position=2)
+
+    def test_get_frame_by_position(self):
+        body = self.body
+
+        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
+        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
+                                  y='10mm', style='Graphics')
+
+        body.append_element(frame1)
+        body.append_element(frame2)
+
+        get = self.content.get_frame(position=2)
         self.assertEqual(get.get_attribute('draw:name'), 'frame2')
 
 
