@@ -106,7 +106,8 @@ def odf_create_heading(level, text=None, style=None):
 
 
 
-def odf_create_frame(name, width, height, page=None, x=None, y=None, style=None):
+def odf_create_frame(name, width, height, page=None, x=None, y=None,
+                     style=None):
     """Create a frame element of the given style, width and height,
     optionally positionned at the given x and y coordinates in the given
     page number.
@@ -232,7 +233,9 @@ def odf_create_table(name, width=None, height=None, style=None):
     Arguments:
 
         name -- unicode
+
         style -- str
+
         width -- int
 
         height -- int
