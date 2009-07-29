@@ -13,7 +13,7 @@ from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.vfs import vfs
 from lpod.table import odf_table
-from lpod.utils import _get_value
+from lpod.utils import get_value
 
 
 
@@ -106,18 +106,16 @@ def _sheet_to_csv(document, target):
             for c in range(1, columns_nb + 1):
                 cell = table.get_cell( (c, r) )
 
-                # 1- Try with _get_value
-                value = _get_value(cell)
-
-                # 2- Try to find text with get_text
-                if value is None:
-                    text = cell.get_text()
-                    if text:
-                        value = text.strip().encode('utf-8')
-
+                value = get_value(cell)
+                if type(value) is unicode:
+                    value = value.encode('utf-8')
+                if type(value) is str:
+                    value = value.strip()
                 value = '' if value is None else str(value)
                 value.replace('"', "'")
+
                 row.append('"%s"' % value)
+
             csv.write(';'.join(row))
             csv.write('\n')
 
