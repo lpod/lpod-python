@@ -608,8 +608,8 @@ def odf_create_keywords_variable(fixed=False):
 
 
 
-def odf_create_draw_page(name, style=None, master_page=None,
-                         page_layout=None, id=None):
+def odf_create_draw_page(name, master_page=None, page_layout=None, id=None,
+                         style=None):
     """This element is a container for content in a drawing or presentation
     document.
 
@@ -617,13 +617,13 @@ def odf_create_draw_page(name, style=None, master_page=None,
 
         name -- unicode
 
-        style -- str
-
         master_page -- str
 
         page_layout -- str
 
         id -- str
+
+        style -- str
 
     Return: odf_element
     """

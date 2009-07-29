@@ -32,8 +32,7 @@ from lpod.document import odf_create_description_variable
 from lpod.document import odf_create_title_variable
 from lpod.document import odf_create_keywords_variable
 from lpod.document import odf_create_subject_variable
-
-
+from lpod.document import odf_create_draw_page
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD
 
@@ -69,7 +68,21 @@ class TestSection(TestCase):
         del self.document
 
 
-    def test_create_section(self):
+    def test_create_simple_section(self):
+        """The idea is to test only with the mandatory arguments (none
+        in this case), not to test odf_create_element which is done in
+        test_xmlpart.
+        """
+        element = odf_create_section()
+        excepted = '<text:section/>'
+        self.assertEqual(element.serialize(), excepted)
+
+
+    def test_create_complex_section(self):
+        """The idea is to test with all possible arguments. If some arguments
+        are contradictory or trigger different behaviours, test all those
+        combinations separately.
+        """
         element = odf_create_section(style='Standard')
         excepted = '<text:section text:style-name="Standard"/>'
         self.assertEqual(element.serialize(), excepted)
@@ -1388,6 +1401,38 @@ class TestGetCell(TestCase):
         cell = content.get_cell('D4', table)
         paragraph = content.get_paragraph(1, context=cell)
         self.assertEqual(paragraph.get_text(), '4')
+
+
+
+class TestDrawPage(TestCase):
+
+    def setUp(self):
+        self.document = document = odf_get_document('samples/example.odp')
+        self.content = document.get_xmlpart('content')
+
+
+    def tearDown(self):
+        del self.content
+        del self.document
+
+
+    def test_create_simple_page(self):
+        element = odf_create_draw_page(u"Page de titre")
+        expected = '<draw:page draw:name="Page de titre"/>'
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_create_complex_page(self):
+        element = odf_create_draw_page(u"Introduction",
+                                       master_page='prs-novelty',
+                                       page_layout='AL1T0', id='id1',
+                                       style='dp1')
+        expected = ('<draw:page draw:name="Introduction" '
+                    'draw:style-name="dp1" '
+                    'draw:master-page-name="prs-novelty" '
+                    'presentation:presentation-page-layout-name="AL1T0" '
+                    'draw:id="id1"/>')
+        self.assertEqual(element.serialize(), expected)
 
 
 
