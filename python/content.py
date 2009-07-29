@@ -330,6 +330,3 @@ class odf_content(odf_xmlpart):
             return None
 
         return _get_value(user_field_decl, value_type)
-
-
-

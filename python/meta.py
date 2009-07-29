@@ -19,24 +19,25 @@ class odf_meta(odf_xmlpart):
 
     def get_title(self):
         """Get the title of the document.
-        Return: unicode (or None if inexistant)
 
         This is not the first heading but the title metadata.
+
+        Return: unicode (or None if inexistant)
         """
         element = self.get_element('//dc:title')
         if element is None:
             return None
-        title = element.get_text()
-        return title
+        return element.get_text()
 
 
     def set_title(self, title):
         """Set the title of the document.
+
+        This is not the first heading but the title metadata.
+
         Arguments:
 
             title -- unicode
-
-        This is not the first heading but the title metadata.
         """
         element = self.get_element('//dc:title')
         if element is None:
@@ -48,17 +49,18 @@ class odf_meta(odf_xmlpart):
 
     def get_description(self):
         """Get the description of the document.
+
         Return: unicode (or None if inexistant)
         """
         element = self.get_element('//dc:description')
         if element is None:
             return None
-        description = element.get_text()
-        return description
+        return element.get_text()
 
 
     def set_description(self, description):
         """Set the title of the document.
+
         Arguments:
 
             description -- unicode
@@ -78,12 +80,12 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:subject')
         if element is None:
             return None
-        subject = element.get_text()
-        return subject
+        return element.get_text()
 
 
     def set_subject(self, subject):
         """Set the subject of the document.
+
         Arguments:
 
             subject -- unicode
@@ -98,6 +100,7 @@ class odf_meta(odf_xmlpart):
 
     def get_language(self):
         """Get the language code of the document.
+
         Return: str (or None if inexistant)
 
         Example::
@@ -113,6 +116,7 @@ class odf_meta(odf_xmlpart):
 
     def set_language(self, language):
         """Set the language code of the document.
+
         Arguments:
 
             language -- str
@@ -139,8 +143,8 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:date')
         if element is None:
             return None
-        date = element.get_text()
-        return DateTime.decode(date)
+        modification_date = element.get_text()
+        return DateTime.decode(modification_date)
 
 
     def set_modification_date(self, date):
@@ -153,8 +157,8 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<dc:date/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        date = DateTime.encode(date)
-        element.set_text(date)
+        modification_date = DateTime.encode(date)
+        element.set_text(modification_date)
 
 
     def get_creation_date(self):
@@ -164,8 +168,8 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:creation-date')
         if element is None:
             return None
-        date = element.get_text()
-        return DateTime.decode(date)
+        creation_date = element.get_text()
+        return DateTime.decode(creation_date)
 
 
     def set_creation_date(self, date):
@@ -178,8 +182,8 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<meta:creation-date/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        date = DateTime.encode(date)
-        element.set_text(date)
+        creation_date = DateTime.encode(date)
+        element.set_text(creation_date)
 
 
     def get_initial_creator(self):
@@ -194,8 +198,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:initial-creator')
         if element is None:
             return None
-        creator = element.get_text()
-        return creator
+        return element.get_text()
 
 
     def set_initial_creator(self, creator):
@@ -223,8 +226,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:keyword')
         if element is None:
             return None
-        keyword = element.get_text()
-        return keyword
+        return element.get_text()
 
 
     def set_keyword(self, keyword):
@@ -309,8 +311,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:generator')
         if element is None:
             return None
-        generator = element.get_text()
-        return generator
+        return element.get_text()
 
 
     def set_generator(self, generator):

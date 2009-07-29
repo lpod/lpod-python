@@ -36,13 +36,6 @@ class TestMetadata(TestCase):
         self.assertEqual(clone.get_title(), title)
 
 
-    def test_set_bad_title(self):
-        meta = self.meta
-        clone = meta.clone()
-        title = "This ain't unicode"
-        self.assertRaises(TypeError, clone.set_title, title)
-
-
     def test_get_description(self):
         meta = self.meta
         description = meta.get_description()
@@ -58,13 +51,6 @@ class TestMetadata(TestCase):
         self.assertEqual(clone.get_description(), description)
 
 
-    def test_set_bad_description(self):
-        meta = self.meta
-        clone = meta.clone()
-        description = "This ain't unicode"
-        self.assertRaises(TypeError, clone.set_description, description)
-
-
     def test_get_subject(self):
         meta = self.meta
         subject = meta.get_subject()
@@ -78,13 +64,6 @@ class TestMetadata(TestCase):
         subject = u"A new subject"
         clone.set_subject(subject)
         self.assertEqual(clone.get_subject(), subject)
-
-
-    def test_set_bad_subject(self):
-        meta = self.meta
-        clone = meta.clone()
-        subject = "This ain't unicode"
-        self.assertRaises(TypeError, clone.set_subject, subject)
 
 
     def test_get_language(self):
@@ -128,7 +107,7 @@ class TestMetadata(TestCase):
         meta = self.meta
         clone = meta.clone()
         date = '2009-06-29T14:15:45'
-        self.assertRaises(TypeError, clone.set_modification_date, date)
+        self.assertRaises(AttributeError, clone.set_modification_date, date)
 
 
     def test_get_creation_date(self):
@@ -150,7 +129,7 @@ class TestMetadata(TestCase):
         meta = self.meta
         clone = meta.clone()
         date = '2009-06-29T14:15:45'
-        self.assertRaises(TypeError, clone.set_creation_date, date)
+        self.assertRaises(AttributeError, clone.set_creation_date, date)
 
 
     def test_get_initial_creator(self):
@@ -168,13 +147,6 @@ class TestMetadata(TestCase):
         self.assertEqual(clone.get_initial_creator(), creator)
 
 
-    def test_set_bad_initial_creator(self):
-        meta = self.meta
-        clone = meta.clone()
-        creator = "This ain't unicode"
-        self.assertRaises(TypeError, clone.set_initial_creator, creator)
-
-
     def test_get_keyword(self):
         meta = self.meta
         keyword = meta.get_keyword()
@@ -188,13 +160,6 @@ class TestMetadata(TestCase):
         keyword = u"New keywords"
         clone.set_keyword(keyword)
         self.assertEqual(clone.get_keyword(), keyword)
-
-
-    def test_set_bad_keyword(self):
-        meta = self.meta
-        clone = meta.clone()
-        keyword = "This ain't unicode"
-        self.assertRaises(TypeError, clone.set_keyword, keyword)
 
 
     def test_get_editing_duration(self):
@@ -257,13 +222,6 @@ class TestMetadata(TestCase):
         self.assertEqual(clone.get_generator(), generator)
 
 
-    def test_set_bad_generator(self):
-        meta = self.meta
-        clone = meta.clone()
-        generator = "This ain't unicode"
-        self.assertRaises(TypeError, clone.set_generator, generator)
-
-
     def test_get_statistic(self):
         meta = self.meta
         statistic = meta.get_statistic()
@@ -289,13 +247,6 @@ class TestMetadata(TestCase):
                      'meta:character-count': 7}
         clone.set_statistic(statistic)
         self.assertEqual(clone.get_statistic(), statistic)
-
-
-    def test_set_bad_statistic(self):
-        meta = self.meta
-        clone = meta.clone()
-        generator = "This ain't unicode"
-        self.assertRaises(TypeError, clone.set_generator, generator)
 
 
     def test_get_user_defined_metadata(self):

@@ -49,12 +49,6 @@ class GetElementTestCase(TestCase):
         del self.document
 
 
-    def test_get_element_list_bad_context(self):
-        content = self.content
-        self.assertRaises(TypeError, content.get_paragraph_list,
-                          context=content)
-
-
     def test_get_element_missed(self):
         content = self.content
         paragraph = content.get_paragraph(999)
@@ -596,11 +590,6 @@ class TestTable(TestCase):
 
     def test_create_cell_bad(self):
         self.assertRaises(TypeError, odf_create_cell, [])
-
-
-    def test_create_cell_bad_repr(self):
-        self.assertRaises(TypeError, odf_create_cell, '',
-                          representation="This ain't unicode")
 
 
     def test_create_row(self):

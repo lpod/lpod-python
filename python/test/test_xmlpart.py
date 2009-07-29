@@ -207,7 +207,7 @@ class ElementTestCase(TestCase):
 
     def test_insert_element_bad_element(self):
         element = odf_create_element('<a/>')
-        self.assertRaises(TypeError, element.insert_element, '<b/>',
+        self.assertRaises(AttributeError, element.insert_element, '<b/>',
                           FIRST_CHILD)
 
 

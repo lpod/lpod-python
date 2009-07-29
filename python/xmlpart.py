@@ -253,7 +253,6 @@ class odf_element(object):
         dc_creator = self.get_element('//dc:creator')
         if dc_creator is None:
             return None
-        creator = dc_creator.get_text()
         return dc_creator.get_text()
 
 
