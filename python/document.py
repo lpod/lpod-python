@@ -12,7 +12,7 @@ from container import odf_new_container_from_template
 from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
-from utils import _check_arguments, Date, DateTime, _set_value_and_type
+from utils import Date, DateTime, _set_value_and_type
 from utils import Duration
 from xmlpart import odf_create_element, odf_element
 from xmlpart import odf_xmlpart, LAST_CHILD
@@ -23,114 +23,131 @@ from xmlpart import odf_xmlpart, LAST_CHILD
 #
 
 def odf_create_section(style=None):
-    # TODO add tests without style
     """Create a section element of the given style.
+
     Arguments:
 
         style -- str
 
     Return: odf_element
     """
-    _check_arguments(style=style)
-    data = '<text:section text:style-name="%s"></text:section>' % style
-    return odf_create_element(data)
+    element = odf_create_element('<text:section/>')
+    if style:
+        element.set_attribute('text:style-name', style)
+    return element
 
 
 
-def odf_create_paragraph(style=None, text=u''):
+def odf_create_paragraph(text=None, style=None):
     """Create a paragraph element of the given style containing the optional
     given text.
+
     Arguments:
 
         style -- str
+
         text -- unicode
 
     Return: odf_element
     """
-    _check_arguments(style=style, text=text)
-    data = '<text:p>%s</text:p>' % text.encode('utf_8')
-    element = odf_create_element(data)
+    element = odf_create_element('<text:p/>')
+    if text:
+        element.set_text(text)
     if style:
         element.set_attribute('text:style-name', style)
     return element
 
 
 
-def odf_create_span(style=None, text=u''):
+def odf_create_span(text=None, style=None):
     """Create a span element of the given style containing the optional
     given text.
+
     Arguments:
 
         style -- str
+
         text -- unicode
 
     Return: odf_element
     """
-    _check_arguments(style=style, text=text)
-    data = '<text:span>%s</text:span>' % text.encode('utf_8')
-    element = odf_create_element(data)
+    element = odf_create_element('<text:span/>')
+    if text:
+        element.set_text(text)
     if style:
         element.set_attribute('text:style-name', style)
     return element
 
 
 
-def odf_create_heading(level, style=None, text=u''):
+def odf_create_heading(level, text=None, style=None):
     """Create a heading element of the given style and level, containing the
     optional given text.
+
+    Level count begins at 1.
+
     Arguments:
 
         level -- int
+
         style -- str
+
         text -- unicode
 
     Return: odf_element
-
-    Level count begins at 1.
     """
-    _check_arguments(style=style, level=level, text=text)
-    data = '<text:h text:outline-level="%d">%s</text:h>'
-    element = odf_create_element(data % (level, text.encode('utf_8')))
+    data = '<text:h text:outline-level="%d"/>'
+    element = odf_create_element(data % level)
+    if text:
+        element.set_text(text)
     if style:
         element.set_attribute('text:style-name', style)
     return element
 
 
 
-def odf_create_frame(name, style, width, height, page=None, x=None, y=None):
+def odf_create_frame(name, width, height, page=None, x=None, y=None, style=None):
     """Create a frame element of the given style, width and height,
-    optionally positionned at the given x and y coordinates, in the given
-    page.
-    Arguments:
-
-        style -- str
-        width -- str
-        height -- str
-        page -- int
-        x -- str
-        y -- str
-
-    Return: odf_element
+    optionally positionned at the given x and y coordinates in the given
+    page number.
 
     Width, height, x and y are strings including the units, e.g. "10cm".
+
+    Arguments:
+
+        width -- str
+
+        height -- str
+
+        page -- int
+
+        x -- str
+
+        y -- str
+
+        style -- str
+
+    Return: odf_element
     """
     if page is None:
-        anchor = 'text:anchor-type="paragraph"'
+        options = 'text:anchor-type="paragraph"'
     else:
-        anchor = 'text:anchor-type="page" text:anchor-page-number="%d"' % page
+        options = 'text:anchor-type="page" text:anchor-page-number="%d"' % page
         if x is not None:
-            anchor += ' svg:x="%s"' % x
+            options += ' svg:x="%s"' % x
         if y is not None:
-            anchor += ' svg:y="%s"' % y
-    data = ('<draw:frame draw:name="%s" draw:style-name="%s" '
-            'svg:width="%s" svg:height="%s" %s/>')
-
-    return odf_create_element(data % (name, style, width, height, anchor))
+            options += ' svg:y="%s"' % y
+    data = '<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" %s/>'
+    element = odf_create_element(data % (name, width, height, options))
+    if style:
+        element.set_attribute('draw:style-name', style)
+    return element
 
 
 
 def odf_create_image(uri):
     """Create an image element showing the image at the given URI.
+
     Arguments:
 
         uri -- str
@@ -147,34 +164,36 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
     representation is automatically formatted but can be provided. Cell type
     can be deduced as well, unless the number is a percentage or currency. If
     cell type is "currency", the currency must be given.
+
     Arguments:
 
         value -- bool, int, float, Decimal, date, datetime, str, unicode,
                  timedelta
+
         representation -- unicode
+
         cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
                      'string' or 'time'
+
         currency -- three-letter str
 
     Return: odf_element
     """
 
     cell = odf_create_element('<table:table-cell/>')
-
     representation = _set_value_and_type(cell, value=value,
                                          representation=representation,
                                          value_type=cell_type,
                                          currency=currency)
-
     if representation is not None:
         cell.set_text_content(representation)
-
     return cell
 
 
 
 def odf_create_row(width=None):
     """Create a row element, optionally filled with "width" number of cells.
+
     Arguments:
 
         width -- int
@@ -190,58 +209,66 @@ def odf_create_row(width=None):
 
 
 
-def odf_create_column(style):
-    """Create a column element of the given style.
+def odf_create_column(style=None):
+    """Create a column element of the optionally given style.
+
     Arguments:
 
         style -- str
 
     Return: odf_element
     """
-    data = '<table:table-column table:style-name="%s"/>'
-    return odf_create_element(data % style)
+    element = odf_create_element('<table:table-column/>')
+    if style:
+        element.set_attribute('table:style-name', style)
+    return element
 
 
 
-def odf_create_table(name, style, width=None, height=None):
-    """Create a table element of the given style, with "width" columns and
-    "height" rows.
+def odf_create_table(name, width=None, height=None, style=None):
+    """Create a table element, optionally prefilled with "width" columns and
+    "height" rows, and of the optionally given style.
+
     Arguments:
 
-        style -- str
         width -- int
+
         height -- int
 
+        style -- str
+
     Return: odf_element
     """
-    data = '<table:table table:name="%s" table:style-name="%s"/>'
-    table = odf_create_element(data % (name, style))
+    name = name.encode('utf_8')
+    element = odf_create_element('<table:table table:name="%s"/>' % name)
     if width is not None or height is not None:
         width = width if width is not None else 1
         height = height if height is not None else 1
         for i in xrange(height):
             row = odf_create_row(width)
-            table.insert_element(row, LAST_CHILD)
-    return table
+            element.insert_element(row, LAST_CHILD)
+    if style:
+        element.set_attribute('table:style-name', style)
+    return element
 
 
 
 def odf_create_list_item(text=None):
     """Create a list item element.
+
+    The "text" argument is just a shortcut for the most common case. To
+    create a list item with several paragraphs or anything else (except
+    tables), first create an empty list item, and fill it using the other
+    "odf_create_*" functions.
+
     Arguments:
 
         text -- unicode
 
     Return: odf_element
-
-    The "text" argument is just a shortcut for the most common case. To create
-    a list item with several paragraphs or anything else (except tables),
-    first create an empty list item, insert it in the document, and insert
-    your element using the list item append_element function.
     """
     element = odf_create_element('<text:list-item/>')
     if text is not None:
-        _check_arguments(text=text)
         element.set_text_content(text)
     return element
 
@@ -249,26 +276,24 @@ def odf_create_list_item(text=None):
 
 def odf_create_list(text=[], style=None):
     """Create a list element.
+
     Arguments:
 
         text -- a list of unicode
+
         style -- str
 
-    The "text" argument is just a shortcut for the most common case.
-    cf. odf_create_list_item.
+    The "text" argument is just a shortcut for the most common case. To create
+    complex lists, first create an empty list, and fill it using built list
+    items.
 
     Return: odf_element
     """
     element = odf_create_element('<text:list/>')
-
-    # Auto insert "text" items
     for value in text:
         element.append_element(odf_create_list_item(text=value))
-
-    #  A style ?
     if style is not None:
         element.set_attribute('text:style-name', style)
-
     return element
 
 
@@ -276,61 +301,59 @@ def odf_create_list(text=[], style=None):
 def odf_create_style(name, family, area=None, **kw):
     """Create a style element with the given name, related to the given
     family.
+
     Arguments:
 
         name -- str
+
         family -- 'paragraph', 'text', 'section', 'table', 'tablecolumn',
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'default', 'drawing-page', 'graphic', 'presentation',
                   'control' or 'ruby'
-        area -- the "<area>-properties" where to store properties
+
+        area -- the "<area>-properties" where to store properties,
                 identical to the family by default
+
         kw -- properties to create on the fly
+
     Return: odf_element
     """
-    _check_arguments(family=family)
     data = '<style:style style:name="%s" style:family="%s"/>'
+    element = odf_create_element(data % (name, family))
     if kw:
-        raise NotImplementedError
-    return odf_create_element(data % (name, family))
-
-
-
-def odf_create_style_text_properties():
-    """Create a text properties element.
-    Return: odf_element
-    XXX probably obsolete given the new odf_create_style signature
-    """
-    return odf_create_element('<style:text-properties/>')
+        if area is None:
+            area = family
+        element.set_style_properties(kw, area=area)
+    return element
 
 
 
 def odf_create_note(text, note_class='footnote', id=None, body=None):
     """Create either a footnote or a endnote element with the given text,
     optionally referencing it using the given id.
+
     Arguments:
 
         text -- unicode
+
         note_class -- 'footnote' or 'endnote'
+
         id -- str
+
         body -- an odf_element or an unicode object
 
     Return: odf_element
     """
-    _check_arguments(text=text, note_class=note_class)
     data = ('<text:note text:note-class="%s">'
               '<text:note-citation>%s</text:note-citation>'
               '<text:note-body/>'
             '</text:note>')
     text = text.encode('utf_8')
-    note = odf_create_element(data % (note_class, text))
-
+    element = odf_create_element(data % (note_class, text))
     if id is not None:
-        note.set_attribute('text:id', id)
-
+        element.set_attribute('text:id', id)
     if body is not None:
-        note_body = note.get_element('text:note-body')
-
+        note_body = element.get_element('text:note-body')
         # Autocreate a paragraph if body = unicode
         if isinstance(body, unicode):
             note_body.set_text_content(body)
@@ -338,24 +361,25 @@ def odf_create_note(text, note_class='footnote', id=None, body=None):
             note_body.insert_element(body, LAST_CHILD)
         else:
             raise ValueError, 'unexpected type for body: "%s"' % type(body)
-
-    return note
+    return element
 
 
 
 def odf_create_annotation(creator, text, date=None):
     """Create an annotation element credited to the given creator with the
     given text, optionally dated (current date by default).
+
     Arguments:
 
         creator -- unicode
+
         text -- unicode
+
         date -- datetime
 
     Return: odf_element
     """
     # TODO allow paragraph and text styles
-    _check_arguments(creator=creator, text=text, date=date)
     data = ('<office:annotation>'
                '<dc:creator>%s</dc:creator>'
                '<dc:date>%s</dc:date>'
@@ -384,31 +408,31 @@ def odf_create_variable_decl(name, value_type):
 def odf_create_variable_set(name, value, value_type=None, display=False,
                             representation=None, style=None):
     data = '<text:variable-set text:name="%s" />'
-    variable_set = odf_create_element(data % name)
-    representation = _set_value_and_type(variable_set, value=value,
+    element = odf_create_element(data % name)
+    representation = _set_value_and_type(element, value=value,
                                          value_type=value_type,
                                          representation=representation)
     if not display:
-        variable_set.set_attribute('text:display', 'none')
+        element.set_attribute('text:display', 'none')
     else:
-        variable_set.set_text(representation)
+        element.set_text(representation)
     if style is not None:
-        variable_set.set_attribute('style:data-style-name', style)
-    return variable_set
+        element.set_attribute('style:data-style-name', style)
+    return element
 
 
 
 def odf_create_variable_get(name, value, value_type=None,
                             representation=None, style=None):
     data = '<text:variable-get text:name="%s" />'
-    variable_get = odf_create_element(data % name)
-    representation = _set_value_and_type(variable_get, value=value,
+    element = odf_create_element(data % name)
+    representation = _set_value_and_type(element, value=value,
                                          value_type=value_type,
                                          representation=representation)
-    variable_get.set_text(representation)
+    element.set_text(representation)
     if style is not None:
-        variable_get.set_attribute('style:data-style-name', style)
-    return variable_get
+        element.set_attribute('style:data-style-name', style)
+    return element
 
 
 
@@ -419,23 +443,23 @@ def odf_create_user_field_decls():
 
 def odf_create_user_field_decl(name, value, value_type=None):
     data = '<text:user-field-decl text:name="%s"/>'
-    user_field_set = odf_create_element(data % name)
-    _set_value_and_type(user_field_set, value=value, value_type=value_type)
-    return user_field_set
+    element = odf_create_element(data % name)
+    _set_value_and_type(element, value=value, value_type=value_type)
+    return element
 
 
 
 def odf_create_user_field_get(name, value, value_type=None,
                               representation=None, style=None):
     data = '<text:user-field-get text:name="%s" />'
-    user_field_get = odf_create_element(data % name)
-    representation = _set_value_and_type(user_field_get, value=value,
+    element = odf_create_element(data % name)
+    representation = _set_value_and_type(element, value=value,
                                          value_type=value_type,
                                          representation=representation)
-    user_field_get.set_text(representation)
+    element.set_text(representation)
     if style is not None:
-        user_field_get.set_attribute('style:data-style-name', style)
-    return user_field_get
+        element.set_attribute('style:data-style-name', style)
+    return element
 
 
 
@@ -445,13 +469,13 @@ def odf_create_page_number_variable(select_page=None, page_adjust=None):
     select_page -- string in ('previous', 'current', 'next')
     page_adjust -- int
     """
-    page_number = odf_create_element('<text:page-number/>')
+    element = odf_create_element('<text:page-number/>')
     if select_page is None:
         select_page = 'current'
-    page_number.set_attribute('text:select-page', select_page)
+    element.set_attribute('text:select-page', select_page)
     if page_adjust is not None:
-        page_number.set_attribute('text:page-adjust', str(page_adjust))
-    return page_number
+        element.set_attribute('text:page-adjust', str(page_adjust))
+    return element
 
 
 
@@ -463,36 +487,36 @@ def odf_create_page_count_variable():
 def odf_create_date_variable(date, fixed=False, data_style=None,
                              representation=None, date_adjust=None):
     data = '<text:date text:date-value="%s"/>'
-    date_elt = odf_create_element(data % DateTime.encode(date))
+    element = odf_create_element(data % DateTime.encode(date))
     if fixed:
-        date_elt.set_attribute('text:fixed', 'true')
+        element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        date_elt.set_attribute('style:data-style-name', data_style)
+        element.set_attribute('style:data-style-name', data_style)
     if representation is None:
         representation = Date.encode(date)
-    date_elt.set_text(representation)
+    element.set_text(representation)
     if date_adjust is not None:
-        date_elt.set_attribute('text:date-adjust',
+        element.set_attribute('text:date-adjust',
                                Duration.encode(date_adjust))
-    return date_elt
+    return element
 
 
 
 def odf_create_time_variable(time, fixed=False, data_style=None,
                              representation=None, time_adjust=None):
     data = '<text:time text:time-value="%s"/>'
-    time_elt = odf_create_element(data % DateTime.encode(time))
+    element = odf_create_element(data % DateTime.encode(time))
     if fixed:
-        time_elt.set_attribute('text:fixed', 'true')
+        element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        time_elt.set_attribute('style:data-style-name', data_style)
+        element.set_attribute('style:data-style-name', data_style)
     if representation is None:
         representation = time.strftime('%H:%M:%S')
-    time_elt.set_text(representation)
+    element.set_text(representation)
     if time_adjust is not None:
-        time_elt.set_attribute('text:time-adjust',
+        element.set_attribute('text:time-adjust',
                                Duration.encode(time_adjust))
-    return time_elt
+    return element
 
 
 
@@ -501,10 +525,10 @@ def odf_create_chapter_variable(display='name', outline_level=None):
                        'plain-number-and-name'
     """
     data = '<text:chapter text:display="%s"/>'
-    chapter = odf_create_element(data % display)
+    element = odf_create_element(data % display)
     if outline_level is not None:
-        chapter.set_attribute('text:outline-level', str(outline_level))
-    return chapter
+        element.set_attribute('text:outline-level', str(outline_level))
+    return element
 
 
 
@@ -512,70 +536,70 @@ def odf_create_filename_variable(display='full', fixed=False):
     """display can be: 'full', 'path', 'name' or 'name-and-extension'
     """
     data = '<text:file-name text:display="%s"/>'
-    filename = odf_create_element(data % display)
+    element = odf_create_element(data % display)
     if fixed:
-        filename.set_attribute('text:fixed', 'true')
-    return filename
+        element.set_attribute('text:fixed', 'true')
+    return element
 
 
 
 def odf_create_initial_creator_variable(fixed=False):
-    creator = odf_create_element('<text:initial-creator/>')
+    element = odf_create_element('<text:initial-creator/>')
     if fixed:
-        creator.set_attribute('text:fixed', 'true')
-    return creator
+        element.set_attribute('text:fixed', 'true')
+    return element
 
 
 
 def odf_create_creation_date_variable(fixed=False, data_style=None):
-    creation_date = odf_create_element('<text:creation-date/>')
+    element = odf_create_element('<text:creation-date/>')
     if fixed:
-        creation_date.set_attribute('text:fixed', 'true')
+        element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        creation_date.set_attribute('style:data-style-name', data_style)
-    return creation_date
+        element.set_attribute('style:data-style-name', data_style)
+    return element
 
 
 
 def odf_create_creation_time_variable(fixed=False, data_style=None):
-    creation_time = odf_create_element('<text:creation-time/>')
+    element = odf_create_element('<text:creation-time/>')
     if fixed:
-        creation_time.set_attribute('text:fixed', 'true')
+        element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        creation_time.set_attribute('style:data-style-name', data_style)
-    return creation_time
+        element.set_attribute('style:data-style-name', data_style)
+    return element
 
 
 
 def odf_create_description_variable(fixed=False):
-    description = odf_create_element('<text:description/>')
+    element = odf_create_element('<text:description/>')
     if fixed:
-        description.set_attribute('text:fixed', 'true')
-    return description
+        element.set_attribute('text:fixed', 'true')
+    return element
 
 
 
 def odf_create_title_variable(fixed=False):
-    title = odf_create_element('<text:title/>')
+    element = odf_create_element('<text:title/>')
     if fixed:
-        title.set_attribute('text:fixed', 'true')
-    return title
+        element.set_attribute('text:fixed', 'true')
+    return element
 
 
 
 def odf_create_subject_variable(fixed=False):
-    subject = odf_create_element('<text:subject/>')
+    element = odf_create_element('<text:subject/>')
     if fixed:
-        subject.set_attribute('text:fixed', 'true')
-    return subject
+        element.set_attribute('text:fixed', 'true')
+    return element
 
 
 
 def odf_create_keywords_variable(fixed=False):
-    keywords = odf_create_element('<text:keywords/>')
+    element = odf_create_element('<text:keywords/>')
     if fixed:
-        keywords.set_attribute('text:fixed', 'true')
-    return keywords
+        element.set_attribute('text:fixed', 'true')
+    return element
 
 
 
@@ -583,16 +607,21 @@ def odf_create_draw_page(name, style=None, master_page=None,
                          page_layout=None, id=None):
     """This element is a container for content in a drawing or presentation
     document.
+
     Arguments:
 
         name -- unicode
+
         style -- str
+
         master_page -- str
+
         page_layout -- str
+
         id -- str
+
     Return: odf_element
     """
-    _check_arguments(text=name, style=style)
     element = odf_create_element('<draw:page/>')
     element.set_attribute('draw:name', name.encode('utf_8'))
     if style:
@@ -651,12 +680,14 @@ class odf_document(object):
 
 
     def get_type(self):
-        """The type can be::
+        """
+        Get the ODF type (also called class) of this document.
 
-               chart, database, formula, graphics, graphics-template, image,
-               presentation, presentation-template, spreadsheet,
-               spreadsheet-template, text, text-master, text-template,
-               text-web
+        Return: 'chart', 'database', 'formula', 'graphics',
+            'graphics-template', 'image', 'presentation',
+            'presentation-templatemplate', 'spreadsheet',
+            'spreadsheet-template', 'text', 'text-master',
+            'text-template' or 'text-web'
         """
 
         mimetype = self.container.get_part('mimetype').strip()
@@ -727,7 +758,6 @@ class odf_document(object):
     #
 
     def get_style_list(self, family=None, category=None):
-        _check_arguments(family=family)
         attributes = {}
         if family is not None:
             attributes['style:family'] = family
@@ -741,7 +771,6 @@ class odf_document(object):
 
 
     def get_style(self, name, family, retrieve_by='name'):
-        _check_arguments(family=family)
         # 1. content
         # TODO except retrieve_by is "display-name"
         content = self.get_xmlpart('content')

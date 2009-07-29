@@ -13,9 +13,8 @@ from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
 from lpod.document import odf_create_list_item, odf_create_list
-from lpod.document import odf_create_style, odf_create_style_text_properties
+from lpod.document import odf_create_style, odf_create_span
 from lpod.document import odf_create_note, odf_create_annotation
-from lpod.document import odf_create_span
 from lpod.document import odf_create_variable_decl, odf_create_variable_set
 from lpod.document import odf_create_variable_get
 from lpod.document import odf_create_user_field_decl
@@ -153,8 +152,8 @@ class TestParagraph(TestCase):
     def test_insert_paragraph(self):
         content = self.content
         clone = content.clone()
-        paragraph = odf_create_paragraph('Text_20_body',
-                                         u'An inserted test')
+        paragraph = odf_create_paragraph(u'An inserted test',
+                                         style='Text_20_body')
         body = clone.get_text_body()
         body.insert_element(paragraph, LAST_CHILD)
         last_paragraph = clone.get_paragraph_list()[-1]
@@ -176,7 +175,7 @@ class TestSpan(TestCase):
 
     def test_create_span(self):
         # Create OK ?
-        span = odf_create_span('my_style', u'my text')
+        span = odf_create_span(u'my text', style='my_style')
         expected = ('<text:span text:style-name="my_style">'
                       'my text'
                     '</text:span>')
@@ -193,7 +192,7 @@ class TestSpan(TestCase):
 
 
     def test_get_span(self):
-        span = odf_create_span('my_style', u'my text')
+        span = odf_create_span(u'my text', style='my_style')
         clone = self.content.clone()
         paragraph = clone.get_paragraph(1)
         paragraph.wrap_text(span, offset=0)
@@ -288,8 +287,8 @@ class TestHeading(TestCase):
     def test_insert_heading(self):
         content = self.content
         clone = content.clone()
-        heading = odf_create_heading(2, 'Heading_20_2',
-                                     u'An inserted heading')
+        heading = odf_create_heading(2, u'An inserted heading',
+                                     style='Heading_20_2')
         body = clone.get_text_body()
         body.insert_element(heading, LAST_CHILD)
         last_heading = clone.get_heading_list()[-1]
@@ -313,19 +312,19 @@ class TestFrame(TestCase):
         content = self.content
 
         # Test 1
-        frame1 = odf_create_frame('frame1', 'Graphics', '10cm', '10cm')
-        expected = ('<draw:frame draw:name="frame1" '
-                    'draw:style-name="Graphics" svg:width="10cm" '
-                    'svg:height="10cm" text:anchor-type="paragraph"/>')
+        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
+        expected = ('<draw:frame draw:name="frame1" svg:width="10cm" '
+                    'svg:height="10cm" text:anchor-type="paragraph" '
+                    'draw:style-name="Graphics"/>')
         self.assertEqual(frame1.serialize(), expected)
 
         # Test 2
-        frame2 = odf_create_frame('frame2', 'Graphics', '10cm', '10cm',
-                                  page=1, x='10mm', y='10mm')
-        expected = ('<draw:frame draw:name="frame2" '
-                    'draw:style-name="Graphics" svg:width="10cm" '
-                    'svg:height="10cm" text:anchor-type="page" '
-                    'text:anchor-page-number="1" svg:x="10mm" svg:y="10mm"/>')
+        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
+                                  y='10mm', style='Graphics')
+        expected = ('<draw:frame draw:name="frame2" svg:width="10cm" '
+                      'svg:height="10cm" text:anchor-type="page" '
+                      'text:anchor-page-number="1" svg:x="10mm" '
+                      'svg:y="10mm" draw:style-name="Graphics"/>')
         self.assertEqual(frame2.serialize(), expected)
 
         # Insert OK ?
@@ -362,7 +361,8 @@ class TestImage(TestCase):
 
     def test_insert_image(self):
         content = self.content
-        frame = odf_create_frame('frame_image', 'Graphics', '0cm', '0cm')
+        frame = odf_create_frame('frame_image', '0cm', '0cm',
+                                 style='Graphics')
         image = odf_create_image('path')
         frame.insert_element(image, LAST_CHILD)
         body = content.get_text_body()
@@ -629,13 +629,14 @@ class TestTable(TestCase):
 
     def test_create_table(self):
         # Test 1
-        table = odf_create_table('a_table', 'a_style')
+        table = odf_create_table('a_table', style='a_style')
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style"/>')
         self.assertEqual(table.serialize(), expected)
 
         # Test 2
-        table = odf_create_table('a_table', 'a_style', 1, 2)
+        table = odf_create_table('a_table', width=1, height=2,
+                                 style='a_style')
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style">'
                     '<table:table-row>'
@@ -657,8 +658,8 @@ class TestTable(TestCase):
     def test_insert_table(self):
         content = self.content
         clone = content.clone()
-        table = odf_create_table('a_table', 'a_style')
-        column = odf_create_column('a_column_style')
+        table = odf_create_table('a_table', style='a_style')
+        column = odf_create_column(style='a_column_style')
         row = odf_create_row()
         cell = odf_create_cell(u"")
 
@@ -754,15 +755,6 @@ class TestStyle(TestCase):
         self.assertEqual(style.serialize(), expected)
 
 
-    def test_create_properties(self):
-        properties = odf_create_style_text_properties()
-        properties.set_attribute('fo:color', '#0000ff')
-        properties.set_attribute('fo:background-color', '#ff0000')
-        expected = ('<style:text-properties fo:color="#0000ff" '
-                      'fo:background-color="#ff0000"/>')
-        self.assertEqual(properties.serialize(), expected)
-
-
     def test_get_style_list(self):
         content = self.content
         styles = content.get_style_list()
@@ -784,11 +776,9 @@ class TestStyle(TestCase):
     def test_insert_style(self):
         content = self.content
         clone = content.clone()
-        style = odf_create_style('style1', 'paragraph')
-        properties = odf_create_style_text_properties()
-        properties.set_attribute('fo:color', '#0000ff')
-        properties.set_attribute('fo:background-color', '#ff0000')
-        style.insert_element(properties, LAST_CHILD)
+        style = odf_create_style('style1', 'paragraph', area='text',
+                **{'fo:color': '#0000ff',
+                   'fo:background-color': '#ff0000'})
         auto_styles = clone.get_category_context('automatic')
         auto_styles.insert_element(style, LAST_CHILD)
 
@@ -821,7 +811,7 @@ class TestNote(TestCase):
     def test_create_note(self):
 
         # With an odf_element
-        note_body = odf_create_paragraph('Standard', u'a footnote')
+        note_body = odf_create_paragraph(u'a footnote', style='Standard')
         note = odf_create_note(u'1', id='note1', body=note_body)
         expected = self.expected.replace('<text:p>',
                                          '<text:p text:style-name="Standard">')
@@ -1323,7 +1313,7 @@ class TestGetCell(TestCase):
         # 2 1 1 1 2 3 3 3
         # 3 1 1 1 2 3 3 3
         # 4 1 2 3 4 5 6 7
-        table = odf_create_table('a_table', 'Standard')
+        table = odf_create_table('a_table', style='Standard')
         column = odf_create_column('Standard')
         column.set_attribute('table:number-columns-repeated', '7')
         table.insert_element(column, LAST_CHILD)

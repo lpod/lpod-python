@@ -6,7 +6,6 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document, odf_create_style
-from lpod.document import odf_create_style_text_properties
 from lpod.styles import hex2rgb, rgb2hex
 from lpod.xmlpart import LAST_CHILD
 
@@ -107,15 +106,6 @@ class TestStyle(TestCase):
         self.assertEqual(style.serialize(), expected)
 
 
-    def test_create_properties(self):
-        properties = odf_create_style_text_properties()
-        properties.set_attribute('fo:color', '#0000ff')
-        properties.set_attribute('fo:background-color', '#ff0000')
-        expected = ('<style:text-properties fo:color="#0000ff" '
-                      'fo:background-color="#ff0000"/>')
-        self.assertEqual(properties.serialize(), expected)
-
-
     def test_get_style_list(self):
         styles = self.styles
         style_list = styles.get_style_list()
@@ -147,11 +137,9 @@ class TestStyle(TestCase):
     def test_insert_style(self):
         styles = self.styles
         clone = styles.clone()
-        style = odf_create_style('style1', 'paragraph')
-        properties = odf_create_style_text_properties()
-        properties.set_attribute('fo:color', '#0000ff')
-        properties.set_attribute('fo:background-color', '#ff0000')
-        style.insert_element(properties, LAST_CHILD)
+        style = odf_create_style('style1', 'paragraph', area='text',
+                                 **{'fo:color': '#0000ff',
+                                    'fo:background-color': '#ff0000'})
         context = clone.get_category_context('named')
         context.insert_element(style, LAST_CHILD)
 
