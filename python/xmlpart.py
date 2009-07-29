@@ -127,7 +127,8 @@ class odf_element(object):
     def get_element_list(self, xpath_query):
         element = self.__element
         result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
-        return [odf_element(e) for e in result]
+        cls = self.__class__
+        return [cls(e) for e in result]
 
 
     def get_element(self, xpath_query):
@@ -202,6 +203,12 @@ class odf_element(object):
         return self.__class__(parent)
 
 
+    def get_children(self):
+        element = self.__element
+        cls = self.__class__
+        return [cls(e) for e in element]
+
+
     def get_creator(self):
         dc_creator = self.get_element('//dc:creator')
         if dc_creator is None:
@@ -262,7 +269,9 @@ class odf_element(object):
 
 
     def append_element(self, element):
-        self.insert_element(element, xmlposition=LAST_CHILD)
+        """Shortcut to insert at the end.
+        """
+        self.insert_element(element, LAST_CHILD)
 
 
     def wrap_text(self, element, offset=0, length=0):
@@ -304,7 +313,7 @@ class odf_element(object):
 
     def clone(self):
         element = self.__element
-        return odf_element(deepcopy(element))
+        return self.__class__(deepcopy(element))
 
 
     def serialize(self):
@@ -329,21 +338,82 @@ class odf_element(object):
 
 
     def get_style_properties(self, area=None):
-        if not self.is_style():
-            return None
-        # TODO get the family, get the "<family>-properties" element, return
-        # a dictionary of its attributes
-        # The area can be forced for text properties inside paragraph style
-        raise NotImplementedError
+        """Get the mapping of all properties of this style. By default the
+        properties of the same family, e.g. a paragraph style and its
+        paragraph properties. Specify the area to get the text properties of
+        a paragraph style for example.
+        Arguments:
 
+            area -- str
 
-    def set_style_properties(self, properties, area=None, **kw):
+        Return: dict
+        """
         if not self.is_style():
             raise TypeError, "this element is not a style"
-        # TODO create "<family>-properties" if necessary, and apply
-        # dictionary to attributes
-        # The area can be forced for text properties inside paragraph style
-        raise NotImplementedError
+        if area is None:
+            area = self.get_attribute('style:family')
+        element = self.get_element('style:%s-properties' % area)
+        if element is None:
+            return None
+        properties = element.get_attributes()
+        # Nested properties are nested dictionaries
+        for child in element.get_children():
+            properties[child.get_name()] = child.get_attributes()
+        return properties
+
+
+    def set_style_properties(self, properties=None, area=None, **kw):
+        """Set the properties of the "area" type of this style. Properties
+        are given either as a dict or as named arguments (or both). The area
+        is identical to the style family by default. If the properties
+        element is missing, it is created.
+        Arguments:
+
+            properties -- dict
+            area -- str
+        """
+        if not self.is_style():
+            raise TypeError, "this element is not a style"
+        if area is None:
+            area = self.get_attribute('style:family')
+        element = self.get_element('style:%s-properties' % area)
+        if element is None:
+            element = odf_create_element('<style:%s-properties/>' % area)
+            self.append_element(element)
+        if properties is not None:
+            for key, value in properties.iteritems():
+                if value is None:
+                    element.del_attribute(key)
+                else:
+                    element.set_attribute(key, value)
+        for key, value in kw.iteritems():
+            if value is None:
+                element.del_attribute(key)
+            else:
+                element.set_attribute(key, value)
+
+
+    def del_style_properties(self, properties=None, area=None, *args):
+        """Delete the given properties, either by list argument or
+        positional argument (or both). Remove only from the given area,
+        identical to the style family by default.
+        Arguments:
+
+            properties -- list
+            area -- str
+        """
+        if not self.is_style():
+            raise TypeError, "this element is not a style"
+        if area is None:
+            area = self.get_attribute('style:family')
+        element = self.get_element('style:%s-properties' % area)
+        if element is None:
+            raise ValueError, "properties element is inexistent"
+        if properties is not None:
+            for key in properties:
+                element.del_attribute(key)
+        for key in args:
+            element.del_attribute(key)
 
 
 
