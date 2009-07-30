@@ -32,7 +32,9 @@ from lpod.document import odf_create_description_variable
 from lpod.document import odf_create_title_variable
 from lpod.document import odf_create_keywords_variable
 from lpod.document import odf_create_subject_variable
-from lpod.document import odf_create_draw_page
+from lpod.document import odf_create_draw_page, odf_create_link
+
+
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD, odf_element
 
@@ -1169,6 +1171,62 @@ class TestUserFields(TestCase):
 
         value = content.get_user_field_value('foo')
         self.assertEqual(value, 42)
+
+
+
+class TestLinks(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/example.odt')
+        clone = document.clone()
+
+        self.content = clone.get_xmlpart('content')
+        self.paragraph = self.content.get_paragraph(1)
+
+
+    def test_create_link1(self):
+        link = odf_create_link('http://example.com/')
+        expected = '<text:a xlink:href="http://example.com/"/>'
+        self.assertEqual(link.serialize(), expected)
+
+
+    def test_create_link2(self):
+        link = odf_create_link('http://example.com/', name=u'link2',
+                               target_frame='_blank', style='style1',
+                               visited_style='style2')
+        expected = ('<text:a xlink:href="http://example.com/" '
+                      'office:name="link2" office:target-frame-name="_blank" '
+                      'xlink:show="new" text:style-name="style1" '
+                      'text:visited-style-name="style2"/>')
+        self.assertEqual(link.serialize(), expected)
+
+
+    def test_get_link(self):
+        link1 = odf_create_link('http://example.com/', name='link1')
+        link2 = odf_create_link('http://example.com/', name='link2')
+
+        paragraph = self.paragraph
+        paragraph.append_element(link1)
+        paragraph.append_element(link2)
+
+        element = self.content.get_link(name=u'link2')
+        expected = ('<text:a xlink:href="http://example.com/" '
+                      'office:name="link2"/>')
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_get_link_list(self):
+        link1 = odf_create_link('http://example.com/', name='link1')
+        link2 = odf_create_link('http://example.com/', name='link2')
+
+        paragraph = self.paragraph
+        paragraph.append_element(link1)
+        paragraph.append_element(link2)
+
+        element = self.content.get_link_list()[1]
+        expected = ('<text:a xlink:href="http://example.com/" '
+                      'office:name="link2"/>')
+        self.assertEqual(element.serialize(), expected)
 
 
 
