@@ -34,7 +34,7 @@ from lpod.document import odf_create_keywords_variable
 from lpod.document import odf_create_subject_variable
 from lpod.document import odf_create_draw_page
 from lpod.utils import _get_cell_coordinates
-from lpod.xmlpart import LAST_CHILD
+from lpod.xmlpart import LAST_CHILD, odf_element
 
 
 class GetElementTestCase(TestCase):
@@ -1433,6 +1433,28 @@ class TestDrawPage(TestCase):
                     'presentation:presentation-page-layout-name="AL1T0" '
                     'draw:id="id1"/>')
         self.assertEqual(element.serialize(), expected)
+
+
+    def test_get_draw_page_list(self):
+        content = self.content
+        result = content.get_draw_page_list()
+        self.assertEqual(len(result), 2)
+
+
+    def test_get_draw_page_list_style(self):
+        content = self.content.clone()
+        result = content.get_draw_page_list(style='dp1')
+        self.assertEqual(len(result), 2)
+        result = content.get_draw_page_list(style='dp2')
+        self.assertEqual(len(result), 0)
+
+
+    def test_get_draw_page(self):
+        content = self.content.clone()
+        result = content.get_draw_page(name=u"Titre")
+        self.assert_(isinstance(result, odf_element))
+        result = content.get_draw_page(name=u"Conclusion")
+        self.assertEqual(result, None)
 
 
 

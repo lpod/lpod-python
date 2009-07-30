@@ -329,3 +329,17 @@ class odf_content(odf_xmlpart):
             return None
 
         return get_value(user_field_decl, value_type)
+
+
+    #
+    # Draw Pages
+    #
+    def get_draw_page_list(self, style=None, context=None):
+        return self._get_element_list('draw:page', draw_style=style,
+                                      context=context)
+
+
+    def get_draw_page(self, name=None, position=None, context=None):
+        _check_position_or_name(position, name)
+        return self._get_element('draw:page', draw_name=name,
+                                 position=position, context=context)
