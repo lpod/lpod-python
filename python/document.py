@@ -13,7 +13,7 @@ from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
 from utils import Date, DateTime, _set_value_and_type
-from utils import Duration
+from utils import Duration, _get_text
 from xmlpart import odf_create_element, odf_element
 from xmlpart import odf_xmlpart, LAST_CHILD
 
@@ -717,6 +717,26 @@ class odf_document(object):
             else:
                 raise NotImplementedError
         return self.__body
+
+
+    def get_text(self):
+        # For the moment, only "text"
+        if self.get_type() != 'text':
+            raise NotImplementedError, ('This functionality is only '
+                                        'implemented for "text" document')
+
+        body = self.get_body()
+
+        context = {'notes_counter': 0,
+                   'footnotes': [],
+                   'endnotes': []}
+
+        result = [_get_text(body, context)]
+        result.append('\n')
+        for note in context['endnotes']:
+            result.append(u'(%d) %s\n' % note)
+
+        return u''.join(result)
 
 
     def clone(self):

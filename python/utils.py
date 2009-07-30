@@ -9,7 +9,6 @@ from os.path import splitdrive, join, sep
 from sys import _getframe, modules
 
 
-
 DATE_FORMAT = '%Y-%m-%d'
 
 
@@ -322,6 +321,58 @@ def _set_value_and_type(element, value=None, value_type=None,
         element.set_attribute('office:time-value', value)
 
     return representation
+
+
+
+# Place here to avoid a cyclic import
+from xmlpart import odf_element
+def _get_text(current, context):
+
+    result = []
+    for element in current.get_children():
+
+        tag = element.get_name()
+
+        # Heading
+        if tag == 'text:h':
+            result.append(u'\n')
+            result.append(element.get_text())
+            result.append(u'\n')
+
+        # Paragraph
+        elif tag == 'text:p':
+            for obj in element.xpath('text:span|text:a|text:note|text()'):
+                if isinstance(obj, odf_element):
+                    # A note
+                    if obj.get_name() == 'text:note':
+                        context['notes_counter'] += 1
+                        notes_counter = context['notes_counter']
+                        text = obj.get_element('text:note-body').get_text()
+                        text = text.strip()
+
+                        if obj.get_attribute('text:note-class') == 'footnote':
+                            context['footnotes'].append((notes_counter, text))
+                            result.append('[%d]' % notes_counter)
+                        else:
+                            context['endnotes'].append((notes_counter, text))
+                            result.append('(%d)' % notes_counter)
+                    # An other element
+                    else:
+                        result.append(obj.get_text())
+                else:
+                    result.append(obj)
+
+            # Insert the footnotes
+            result.append(u'\n')
+            for note in context['footnotes']:
+                result.append(u'[%d] %s\n' % note)
+            context['footnotes'] = []
+
+        # Look the descendants
+        else:
+            result.append(_get_text(element, context))
+
+    return u''.join(result)
 
 
 
