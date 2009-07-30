@@ -325,7 +325,12 @@ def _set_value_and_type(element, value=None, value_type=None,
 
 
 
-def _get_value(element, value_type=None):
+######################################################################
+# Public API
+######################################################################
+def get_value(element, value_type=None):
+    """Only for "with office:value-type" elements
+    """
 
     if value_type is None:
         value_type = element.get_attribute('office:value-type')
@@ -347,7 +352,12 @@ def _get_value(element, value_type=None):
         if value is not None:
             return unicode(value)
         else:
-            return None
+            # Try with get_text
+            value = element.get_text()
+            if value != '':
+                return value
+            else:
+                return None
     elif value_type == 'time':
         value = element.get_attribute('office:time-value')
         return Duration.decode(value)
@@ -358,25 +368,41 @@ def _get_value(element, value_type=None):
 
 
 
-######################################################################
-# Public API
-######################################################################
+def set_value(element, value):
+    """Only for "with office:value-type" elements
+    """
 
-def get_value(element):
     tag = element.get_name()
 
-    value = None
+    # A table:cell ?
+    if tag == 'table:table-cell':
+        element.clear()
+        representation = _set_value_and_type(element, value=value)
+        element.set_text_content(representation)
+        return
 
-    # 1- Try with _get_value
-    if tag in ('table:cell', 'text:variable-set', 'text:user-field-decl'):
-        value = _get_value(element)
+    # A text:variable-set ?
+    if tag == 'text:variable-set':
+        name = element.get_attribute('text:name')
+        display = element.get_attribute('text:display')
+        element.clear()
 
-    # 2- Try to find text with get_text
-    if value is None:
-        text = element.get_text()
-        if text:
-            value = text
+        representation = _set_value_and_type(element, value=value)
 
-    # 3- Else => None
-    return value
+        element.set_attribute('text:name', name)
+        if display is not None:
+            element.set_attribute('text:display', display)
+        element.set_text(representation)
+        return
 
+    # A text:user-field-decl ?
+    if tag == 'text:user-field-decl':
+        name = element.get_attribute('text:name')
+        element.clear()
+        _set_value_and_type(element, value=value)
+
+        element.set_attribute('text:name', name)
+        return
+
+    # Else => error
+    raise ValueError, 'set_value: unexpected element "%s"' % tag

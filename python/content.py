@@ -4,7 +4,7 @@
 # Import from the Standard Library
 
 # Import from lpod
-from utils import _check_position_or_name, _get_cell_coordinates, _get_value
+from utils import _check_position_or_name, _get_cell_coordinates, get_value
 from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD
 
 
@@ -292,7 +292,7 @@ class odf_content(odf_xmlpart):
             return None
 
         # Get the last value
-        return _get_value(variable_sets[-1], value_type)
+        return get_value(variable_sets[-1], value_type)
 
 
     #
@@ -329,4 +329,4 @@ class odf_content(odf_xmlpart):
         if user_field_decl is None:
             return None
 
-        return _get_value(user_field_decl, value_type)
+        return get_value(user_field_decl, value_type)
