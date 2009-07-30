@@ -19,7 +19,7 @@ from lpod.utils import get_value
 
 def _get_target_directory(dirname, container_url):
 
-    # Compute a name if not gived
+    # Compute a name if not given
     if dirname is None:
         # Find the filename
         path = urlparse(container_url).path
@@ -45,33 +45,6 @@ def _get_target_directory(dirname, container_url):
             exit(0)
     vfs.make_folder(dirname)
     return vfs.open(dirname)
-
-
-
-def _extract_structured_text(odf_element):
-    result = []
-    for element in odf_element.get_children():
-        tag = element.get_name()
-        text = element.get_text()
-
-        if text == '':
-            continue
-
-        if tag == 'text:h':
-            result.append(u'\n')
-            result.append(text)
-            result.append(u'\n')
-            result.append(u'=' * len(text))
-            result.append(u'\n')
-
-        elif tag == 'text:p':
-            result.append(text)
-            result.append(u'\n')
-
-        else:
-            result.append(_extract_structured_text(element))
-
-    return u''.join(result)
 
 
 
@@ -151,10 +124,8 @@ if  __name__ == '__main__':
     doc_type = document.get_type()
     # text
     if doc_type == 'text':
-        body = document.get_body()
-        text = _extract_structured_text(body)
         text_file = target.open('text.txt', 'w')
-        text_file.write(text.encode('utf-8'))
+        text_file.write(document.get_text().encode('utf-8'))
     elif doc_type == 'spreadsheet':
         _sheet_to_csv(document, target)
 
