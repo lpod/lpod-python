@@ -61,8 +61,8 @@ def _get_abspath(local_path):
 
 
 
-def _make_xpath_query(element_name, style=None, family=None, frame_name=None,
-                      frame_style=None, table_name=None, style_name=None,
+def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
+                      draw_style=None, table_name=None, style_name=None,
                       note_class=None, text_id=None, text_name=None,
                       level=None, position=None, context=None, **kw):
     if context is None:
@@ -75,12 +75,12 @@ def _make_xpath_query(element_name, style=None, family=None, frame_name=None,
         attributes['text:style-name'] = style
     if family:
         attributes['style:family'] = family
-    if frame_name:
-        attributes['draw:name'] = frame_name
-    if frame_style:
-        attributes['draw:style-name'] = frame_style
+    if draw_name:
+        attributes['draw:name'] = draw_name
+    if draw_style:
+        attributes['draw:style-name'] = draw_style
     if table_name:
-        attributes['table:name'] = table_name
+        attributes['table:name'] = table_name.encode('utf_8')
     if style_name:
         attributes['style:name'] = style_name
     if note_class:

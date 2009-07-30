@@ -88,7 +88,7 @@ class odf_content(odf_xmlpart):
 
     def get_frame(self, name=None, position=None, context=None):
         _check_position_or_name(position, name)
-        return self._get_element('draw:frame', frame_name=name,
+        return self._get_element('draw:frame', draw_name=name,
                                  position=position, context=context)
 
 
@@ -118,7 +118,6 @@ class odf_content(odf_xmlpart):
 
 
     def get_table(self, name=None, position=None, context=None):
-        _check_position_or_name(position, name)
         return self._get_element('table:table', table_name=name,
                                  position=position, context=context)
 

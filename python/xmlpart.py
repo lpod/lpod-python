@@ -464,13 +464,13 @@ class odf_xmlpart(object):
     #
 
     def _get_element_list(self, element_name, style=None, family=None,
-                          frame_name=None, frame_style=None, table_name=None,
+                          draw_name=None, draw_style=None, table_name=None,
                           note_class=None, style_name=None, text_id=None,
                           text_name=None, level=None, position=None,
                           context=None):
         query = _make_xpath_query(element_name, style=style, family=family,
-                                  frame_name=frame_name,
-                                  frame_style=frame_style,
+                                  draw_name=draw_name,
+                                  draw_style=draw_style,
                                   table_name=table_name,
                                   style_name=style_name,
                                   note_class=note_class, text_id=text_id,
@@ -482,11 +482,11 @@ class odf_xmlpart(object):
 
 
     def _get_element(self, element_name, style=None, family=None,
-                     frame_name=None, table_name=None, style_name=None,
+                     draw_name=None, table_name=None, style_name=None,
                      text_id=None, text_name=None, level=None, position=None,
                      context=None):
         result = self._get_element_list(element_name, style=style,
-                                        family=family, frame_name=frame_name,
+                                        family=family, draw_name=draw_name,
                                         table_name=table_name,
                                         style_name=style_name,
                                         text_id=text_id, text_name=text_name,
