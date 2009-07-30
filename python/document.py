@@ -13,7 +13,7 @@ from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
 from utils import Date, DateTime, _set_value_and_type
-from utils import Duration, _get_text
+from utils import Duration
 from xmlpart import odf_create_element, odf_element
 from xmlpart import odf_xmlpart, LAST_CHILD
 
@@ -678,6 +678,60 @@ def odf_create_link(href, name=None, target_frame=None, style=None,
         element.set_attribute('text:visited-style-name', visited_style)
 
     return element
+
+
+
+#
+# Private functions
+#
+
+def _get_text(current, context):
+
+    result = []
+    for element in current.get_children():
+
+        tag = element.get_name()
+
+        # Heading
+        if tag == 'text:h':
+            result.append(u'\n')
+            result.append(element.get_text())
+            result.append(u'\n')
+
+        # Paragraph
+        elif tag == 'text:p':
+            for obj in element.xpath('text:span|text:a|text:note|text()'):
+                if isinstance(obj, odf_element):
+                    # A note
+                    if obj.get_name() == 'text:note':
+                        context['notes_counter'] += 1
+                        notes_counter = context['notes_counter']
+                        text = obj.get_element('text:note-body').get_text()
+                        text = text.strip()
+
+                        if obj.get_attribute('text:note-class') == 'footnote':
+                            context['footnotes'].append((notes_counter, text))
+                            result.append('[%d]' % notes_counter)
+                        else:
+                            context['endnotes'].append((notes_counter, text))
+                            result.append('(%d)' % notes_counter)
+                    # An other element
+                    else:
+                        result.append(obj.get_text())
+                else:
+                    result.append(obj)
+
+            # Insert the footnotes
+            result.append(u'\n')
+            for note in context['footnotes']:
+                result.append(u'[%d] %s\n' % note)
+            context['footnotes'] = []
+
+        # Look the descendants
+        else:
+            result.append(_get_text(element, context))
+
+    return u''.join(result)
 
 
 
