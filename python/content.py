@@ -343,3 +343,16 @@ class odf_content(odf_xmlpart):
         _check_position_or_name(position, name)
         return self._get_element('draw:page', draw_name=name,
                                  position=position, context=context)
+
+
+    #
+    # Links
+    #
+
+    def get_link_list(self, context=None):
+        return self._get_element_list('text:a', context=context)
+
+
+    def get_link(self, name, context=None):
+        return self._get_element('text:a', office_name=name, context=context)
+
