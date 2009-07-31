@@ -43,7 +43,6 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<dc:title/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        title = title.encode('utf_8')
         element.set_text(title)
 
 
@@ -69,7 +68,6 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<dc:description/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        description = description.encode('utf_8')
         element.set_text(description)
 
 
@@ -94,7 +92,6 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<dc:subject/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        subject = subject.encode('utf_8')
         element.set_text(subject)
 
 
@@ -111,7 +108,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:language')
         if element is None:
             return None
-        return element.get_text()
+        return str(element.get_text())
 
 
     def set_language(self, language):
@@ -133,7 +130,7 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<dc:language/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        element.set_text(language)
+        element.set_text(unicode(language))
 
 
     def get_modification_date(self):
@@ -215,7 +212,6 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<meta:initial-creator/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        creator = creator.encode('utf_8')
         element.set_text(creator)
 
 
@@ -239,7 +235,6 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<meta:keyword/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        keyword = keyword.encode('utf_8')
         element.set_text(keyword)
 
 
@@ -328,7 +323,6 @@ class odf_meta(odf_xmlpart):
         if element is None:
             element = odf_create_element('<meta:generator/>')
             self.get_meta_body().insert_element(element, LAST_CHILD)
-        generator = generator.encode('utf_8')
         element.set_text(generator)
 
 
@@ -386,26 +380,24 @@ class odf_meta(odf_xmlpart):
 
 
     def get_user_defined_metadata(self):
-        """Return a dict key / value.
+        """Return a dict of unicode/value mapping.
 
-        Value can be a: float, date, time, boolean or string.
+        Value types can be: Decimal, date, time, boolean or unicode.
         """
 
         result = {}
         for meta in self.get_element_list('//meta:user-defined'):
-
             # Read the values
-            name = meta.get_attribute('meta:name')
+            name = unicode(meta.get_attribute('meta:name'), 'utf_8')
             value_type = meta.get_attribute('meta:value-type')
             if value_type is None:
                 value_type = 'string'
             value = meta.get_text()
-
             # Interpretation
             if value_type == 'boolean':
                 result[name] = Boolean.decode(value)
             elif value_type in  ('float', 'percentage', 'currency'):
-                result[name] = float(value)
+                result[name] = Decimal(value)
             elif value_type == 'date':
                 if 'T' in value:
                     result[name] = DateTime.decode(value)
@@ -415,12 +407,10 @@ class odf_meta(odf_xmlpart):
                 result[name] = value
             elif value_type == 'time':
                 result[name] = Duration.decode(value)
-
         return result
 
 
     def set_user_defined_metadata(self, name, value):
-
         if type(value) is bool:
             value_type = 'boolean'
             value = u'true' if value else u'false'
@@ -443,18 +433,14 @@ class odf_meta(odf_xmlpart):
             value = unicode(Duration.encode(value))
         else:
             raise TypeError, 'unexpected type "%s" for value' % type(value)
-
+        name_str = name if isinstance(name, str) else name.encode('utf_8')
         # Already the same element ?
         for metadata in self.get_element_list('//meta:user-defined'):
-            if metadata.get_attribute('meta:name') == name:
+            if metadata.get_attribute('meta:name') == name_str:
                 break
         else:
             data = '<meta:user-defined meta:name="%s"/>'
-            metadata = odf_create_element(data % name)
-
+            metadata = odf_create_element(data % name_str)
+            self.get_meta_body().insert_element(metadata, LAST_CHILD)
         metadata.set_attribute('meta:value-type', value_type)
         metadata.set_text(value)
-
-        self.get_meta_body().insert_element(metadata, LAST_CHILD)
-
-

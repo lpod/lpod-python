@@ -192,7 +192,11 @@ class odf_element(object):
         uri, name = decode_qname(name)
         if uri is None:
             return element.get(name)
-        return element.get('{%s}%s' % (uri, name))
+        # XXX lxml is automatically decoding unicode
+        value = element.get('{%s}%s' % (uri, name))
+        if isinstance(value, unicode):
+            value = value.encode('utf_8')
+        return value
 
 
     def set_attribute(self, name, value):
