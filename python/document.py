@@ -714,6 +714,39 @@ def odf_create_bookmark_end(name):
 
 
 
+def odf_create_reference_mark(name):
+    """
+    Arguments:
+
+        name -- unicode
+    """
+    return odf_create_element('<text:reference-mark text:name="%s"/>' %
+                              name.encode('utf-8'))
+
+
+
+def odf_create_reference_mark_start(name):
+    """
+    Arguments:
+
+        name -- unicode
+    """
+    return odf_create_element('<text:reference-mark-start text:name="%s"/>' %
+                              name.encode('utf-8'))
+
+
+
+def odf_create_reference_mark_end(name):
+    """
+    Arguments:
+
+        name -- unicode
+    """
+    return odf_create_element('<text:reference-mark-end text:name="%s"/>' %
+                              name.encode('utf-8'))
+
+
+
 #
 # Private functions
 #
