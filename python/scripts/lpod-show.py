@@ -71,26 +71,8 @@ def _sheet_to_csv(document, target):
         name = table.get_name()
         filename = _clean_filename(name) + '.csv'
 
-        columns_nb, rows_nb = table.get_size()
-
-        csv = target.open(filename, 'w')
-        for r in range(1, rows_nb + 1):
-            row = []
-            for c in range(1, columns_nb + 1):
-                cell = table.get_cell( (c, r) )
-
-                value = get_value(cell)
-                if type(value) is unicode:
-                    value = value.encode('utf-8')
-                if type(value) is str:
-                    value = value.strip()
-                value = '' if value is None else str(value)
-                value.replace('"', "'")
-
-                row.append('"%s"' % value)
-
-            csv.write(';'.join(row))
-            csv.write('\n')
+        csv_file = target.open(filename, 'w')
+        table.export_to_csv(csv_file)
 
 
 
