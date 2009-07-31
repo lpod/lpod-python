@@ -356,3 +356,32 @@ class odf_content(odf_xmlpart):
     def get_link(self, name, context=None):
         return self._get_element('text:a', office_name=name, context=context)
 
+
+    #
+    # Bookmarks
+    #
+
+    def get_bookmark_list(self, context=None):
+        return self._get_element_list('text:bookmark', context=context)
+
+
+    def get_bookmark(self, name, context=None):
+        return self._get_element('text:bookmark', text_name=name,
+                                 context=context)
+
+    def get_bookmark_start_list(self, context=None):
+        return self._get_element_list('text:bookmark-start', context=context)
+
+
+    def get_bookmark_start(self, name, context=None):
+        return self._get_element('text:bookmark-start', text_name=name,
+                                 context=context)
+
+    def get_bookmark_end_list(self, context=None):
+        return self._get_element_list('text:bookmark-end', context=context)
+
+
+    def get_bookmark_end(self, name, context=None):
+        return self._get_element('text:bookmark-end', text_name=name,
+                                 context=context)
+
