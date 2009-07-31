@@ -369,6 +369,7 @@ class odf_content(odf_xmlpart):
         return self._get_element('text:bookmark', text_name=name,
                                  context=context)
 
+
     def get_bookmark_start_list(self, context=None):
         return self._get_element_list('text:bookmark-start', context=context)
 
@@ -376,6 +377,7 @@ class odf_content(odf_xmlpart):
     def get_bookmark_start(self, name, context=None):
         return self._get_element('text:bookmark-start', text_name=name,
                                  context=context)
+
 
     def get_bookmark_end_list(self, context=None):
         return self._get_element_list('text:bookmark-end', context=context)
@@ -385,3 +387,35 @@ class odf_content(odf_xmlpart):
         return self._get_element('text:bookmark-end', text_name=name,
                                  context=context)
 
+
+    #
+    # Reference marks
+    #
+
+    def get_reference_mark_list(self, context=None):
+        return self._get_element_list('text:reference-mark', context=context)
+
+
+    def get_reference_mark(self, name, context=None):
+        return self._get_element('text:reference-mark', text_name=name,
+                                 context=context)
+
+
+    def get_reference_mark_start_list(self, context=None):
+        return self._get_element_list('text:reference-mark-start',
+                                      context=context)
+
+
+    def get_reference_mark_start(self, name, context=None):
+        return self._get_element('text:reference-mark-start', text_name=name,
+                                 context=context)
+
+
+    def get_reference_mark_end_list(self, context=None):
+        return self._get_element_list('text:reference-mark-end',
+                                      context=context)
+
+
+    def get_reference_mark_end(self, name, context=None):
+        return self._get_element('text:reference-mark-end', text_name=name,
+                                 context=context)
