@@ -33,6 +33,9 @@ from lpod.document import odf_create_title_variable
 from lpod.document import odf_create_keywords_variable
 from lpod.document import odf_create_subject_variable
 from lpod.document import odf_create_draw_page, odf_create_link
+from lpod.document import odf_create_bookmark, odf_create_bookmark_start
+from lpod.document import odf_create_bookmark_end
+
 
 
 from lpod.utils import _get_cell_coordinates
@@ -1513,6 +1516,27 @@ class TestDrawPage(TestCase):
         self.assert_(isinstance(result, odf_element))
         result = content.get_draw_page(name=u"Conclusion")
         self.assertEqual(result, None)
+
+
+
+class BookmarkTest(TestCase):
+
+    def test_create_bookmark(self):
+        bookmark = odf_create_bookmark(u'foo')
+        expected = '<text:bookmark text:name="foo"/>'
+        self.assertEqual(bookmark.serialize(), expected)
+
+
+    def test_create_bookmark_start(self):
+        bookmark_start = odf_create_bookmark_start(u'foo')
+        expected = '<text:bookmark-start text:name="foo"/>'
+        self.assertEqual(bookmark_start.serialize(), expected)
+
+
+    def test_create_bookmark_end(self):
+        bookmark_end = odf_create_bookmark_end(u'foo')
+        expected = '<text:bookmark-end text:name="foo"/>'
+        self.assertEqual(bookmark_end.serialize(), expected)
 
 
 
