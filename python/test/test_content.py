@@ -1521,6 +1521,11 @@ class TestDrawPage(TestCase):
 
 class BookmarkTest(TestCase):
 
+    def setUp(self):
+        clone = odf_get_document('samples/example.odt').clone()
+        self.content = clone.get_xmlpart('content')
+        self.body = clone.get_body()
+
     def test_create_bookmark(self):
         bookmark = odf_create_bookmark(u'foo')
         expected = '<text:bookmark text:name="foo"/>'
@@ -1537,6 +1542,60 @@ class BookmarkTest(TestCase):
         bookmark_end = odf_create_bookmark_end(u'foo')
         expected = '<text:bookmark-end text:name="foo"/>'
         self.assertEqual(bookmark_end.serialize(), expected)
+
+
+    def test_get_bookmark(self):
+        bookmark = odf_create_bookmark(u'foo')
+        self.body.append_element(bookmark)
+
+        get = self.content.get_bookmark(name=u'foo')
+        expected = '<text:bookmark text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_bookmark_list(self):
+        bookmark = odf_create_bookmark(u'foo')
+        self.body.append_element(bookmark)
+
+        get = self.content.get_bookmark_list()[0]
+        expected = '<text:bookmark text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_bookmark_start(self):
+        bookmark_start = odf_create_bookmark_start(u'foo')
+        self.body.append_element(bookmark_start)
+
+        get = self.content.get_bookmark_start(name=u'foo')
+        expected = '<text:bookmark-start text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_bookmark_start_list(self):
+        bookmark_start = odf_create_bookmark_start(u'foo')
+        self.body.append_element(bookmark_start)
+
+        get = self.content.get_bookmark_start_list()[0]
+        expected = '<text:bookmark-start text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_bookmark_end(self):
+        bookmark_end = odf_create_bookmark_end(u'foo')
+        self.body.append_element(bookmark_end)
+
+        get = self.content.get_bookmark_end(name=u'foo')
+        expected = '<text:bookmark-end text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_bookmark_end_list(self):
+        bookmark_end = odf_create_bookmark_end(u'foo')
+        self.body.append_element(bookmark_end)
+
+        get = self.content.get_bookmark_end_list()[0]
+        expected = '<text:bookmark-end text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
 
 
 
