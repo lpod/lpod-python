@@ -681,6 +681,39 @@ def odf_create_link(href, name=None, target_frame=None, style=None,
 
 
 
+def odf_create_bookmark(name):
+    """
+    Arguments:
+
+        name -- unicode
+    """
+    return odf_create_element('<text:bookmark text:name="%s"/>' %
+                              name.encode('utf-8'))
+
+
+
+def odf_create_bookmark_start(name):
+    """
+    Arguments:
+
+        name -- unicode
+    """
+    return odf_create_element('<text:bookmark-start text:name="%s"/>' %
+                              name.encode('utf-8'))
+
+
+
+def odf_create_bookmark_end(name):
+    """
+    Arguments:
+
+        name -- unicode
+    """
+    return odf_create_element('<text:bookmark-end text:name="%s"/>' %
+                              name.encode('utf-8'))
+
+
+
 #
 # Private functions
 #
