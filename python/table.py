@@ -3,7 +3,7 @@
 
 # Import from lpod
 from document import odf_create_cell, odf_create_column, odf_create_row
-from utils import _get_cell_coordinates
+from utils import _get_cell_coordinates, get_value
 from xmlpart import odf_create_element, LAST_CHILD
 
 
@@ -100,13 +100,17 @@ class odf_table(object):
         """Create an odf_table object.
 
         We have two manners to create a new odf_table:
+
         1) With 'python' data: we must fill name, style and data. data must
            be  a matrix (a list of list) of python objects.
         2) With odf_element
 
         name -- unicode
+
         style -- string
+
         data -- list / tuple of list / tuple
+
         odf_element -- odf_element
         """
 
@@ -347,6 +351,30 @@ class odf_table(object):
                     cells.append(odf_create_cell())
 
 
+    def export_to_csv(self, target, delimiter=';', quotechar='"',
+                      lineterminator='\n', encoding='utf-8'):
+        """target must support the write method
+        """
 
+        for row in self.__rows:
+            current_row = []
+            for cell in row['cells']:
 
+                # Get value
+                value = get_value(cell)
+                if type(value) is unicode:
+                    value = value.encode(encoding)
+                if type(value) is str:
+                    value = value.strip()
+                value = '' if value is None else str(value)
+
+                # Quote
+                value = value.replace(quotechar, '\\' + quotechar)
+                value = '%s%s%s' % (quotechar, value, quotechar)
+
+                # Append !
+                current_row.append(value)
+
+            target.write(delimiter.join(current_row))
+            target.write(lineterminator)
 
