@@ -35,6 +35,9 @@ from lpod.document import odf_create_subject_variable
 from lpod.document import odf_create_draw_page, odf_create_link
 from lpod.document import odf_create_bookmark, odf_create_bookmark_start
 from lpod.document import odf_create_bookmark_end
+from lpod.document import odf_create_reference_mark
+from lpod.document import odf_create_reference_mark_start
+from lpod.document import odf_create_reference_mark_end
 
 
 
@@ -1595,6 +1598,86 @@ class BookmarkTest(TestCase):
 
         get = self.content.get_bookmark_end_list()[0]
         expected = '<text:bookmark-end text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+
+class reference_markTest(TestCase):
+
+    def setUp(self):
+        clone = odf_get_document('samples/example.odt').clone()
+        self.content = clone.get_xmlpart('content')
+        self.body = clone.get_body()
+
+    def test_create_reference_mark(self):
+        reference_mark = odf_create_reference_mark(u'foo')
+        expected = '<text:reference-mark text:name="foo"/>'
+        self.assertEqual(reference_mark.serialize(), expected)
+
+
+    def test_create_reference_mark_start(self):
+        reference_mark_start = odf_create_reference_mark_start(u'foo')
+        expected = '<text:reference-mark-start text:name="foo"/>'
+        self.assertEqual(reference_mark_start.serialize(), expected)
+
+
+    def test_create_reference_mark_end(self):
+        reference_mark_end = odf_create_reference_mark_end(u'foo')
+        expected = '<text:reference-mark-end text:name="foo"/>'
+        self.assertEqual(reference_mark_end.serialize(), expected)
+
+
+    def test_get_reference_mark(self):
+        reference_mark = odf_create_reference_mark(u'foo')
+        self.body.append_element(reference_mark)
+
+        get = self.content.get_reference_mark(name=u'foo')
+        expected = '<text:reference-mark text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_reference_mark_list(self):
+        reference_mark = odf_create_reference_mark(u'foo')
+        self.body.append_element(reference_mark)
+
+        get = self.content.get_reference_mark_list()[0]
+        expected = '<text:reference-mark text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_reference_mark_start(self):
+        reference_mark_start = odf_create_reference_mark_start(u'foo')
+        self.body.append_element(reference_mark_start)
+
+        get = self.content.get_reference_mark_start(name=u'foo')
+        expected = '<text:reference-mark-start text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_reference_mark_start_list(self):
+        reference_mark_start = odf_create_reference_mark_start(u'foo')
+        self.body.append_element(reference_mark_start)
+
+        get = self.content.get_reference_mark_start_list()[0]
+        expected = '<text:reference-mark-start text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_reference_mark_end(self):
+        reference_mark_end = odf_create_reference_mark_end(u'foo')
+        self.body.append_element(reference_mark_end)
+
+        get = self.content.get_reference_mark_end(name=u'foo')
+        expected = '<text:reference-mark-end text:name="foo"/>'
+        self.assertEqual(get.serialize(), expected)
+
+
+    def test_get_reference_mark_end_list(self):
+        reference_mark_end = odf_create_reference_mark_end(u'foo')
+        self.body.append_element(reference_mark_end)
+
+        get = self.content.get_reference_mark_end_list()[0]
+        expected = '<text:reference-mark-end text:name="foo"/>'
         self.assertEqual(get.serialize(), expected)
 
 
