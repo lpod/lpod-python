@@ -116,6 +116,8 @@ def odf_create_frame(name, width, height, page=None, x=None, y=None,
 
     Arguments:
 
+        name -- unicode
+
         width -- str
 
         height -- str
@@ -139,7 +141,8 @@ def odf_create_frame(name, width, height, page=None, x=None, y=None,
         if y is not None:
             options += ' svg:y="%s"' % y
     data = '<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" %s/>'
-    element = odf_create_element(data % (name, width, height, options))
+    element = odf_create_element(data % (name.encode('utf_8'), width, height,
+                                         options))
     if style:
         element.set_attribute('draw:style-name', style)
     return element

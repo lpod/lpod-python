@@ -189,7 +189,7 @@ class odf_table_TestCase(TestCase):
 
 
     def test_bug_openoffice(self):
-        document = odf_get_document('samples/table-example.ods')
+        document = odf_get_document('samples/table.ods')
         content = document.get_xmlpart('content')
 
         table = content.get_table('Feuille1')

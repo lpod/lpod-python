@@ -42,13 +42,13 @@ from lpod.document import odf_create_reference_mark_end
 
 
 from lpod.utils import _get_cell_coordinates
-from lpod.xmlpart import LAST_CHILD, odf_element
+from lpod.xmlpart import LAST_CHILD, NEXT_SIBLING, odf_element
 
 
 class GetElementTestCase(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/basetext.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -67,7 +67,7 @@ class GetElementTestCase(TestCase):
 class TestSection(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/basetext.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -125,7 +125,7 @@ class TestSection(TestCase):
 class TestParagraph(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/basetext.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -137,8 +137,7 @@ class TestParagraph(TestCase):
     def test_get_paragraph_list(self):
         content = self.content
         paragraphs = content.get_paragraph_list()
-        # The annotation paragraph is counted
-        self.assertEqual(len(paragraphs), 8)
+        self.assertEqual(len(paragraphs), 6)
         second = paragraphs[1]
         text = second.get_text()
         self.assertEqual(text, 'This is the second paragraph.')
@@ -186,7 +185,7 @@ class TestParagraph(TestCase):
 class TestSpan(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/span_style.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -196,7 +195,6 @@ class TestSpan(TestCase):
 
 
     def test_create_span(self):
-        # Create OK ?
         span = odf_create_span(u'my text', style='my_style')
         expected = ('<text:span text:style-name="my_style">'
                       'my text'
@@ -204,40 +202,49 @@ class TestSpan(TestCase):
         self.assertEqual(span.serialize(), expected)
 
 
-    def test_insert_span(self):
-        span = odf_create_span('my_style', u'my text')
+    def test_get_span_list(self):
+        content = self.content
+        result = content.get_span_list()
+        self.assertEqual(len(result), 2)
+        element = result[0]
+        expected = ('<text:span text:style-name="T1">'
+                      'moustache'
+                    '</text:span>')
+        self.assertEqual(element.serialize(), expected)
 
-        # Insert OK?
-        clone = self.content.clone()
-        paragraph = clone.get_paragraph(1)
-        paragraph.insert_element(span, LAST_CHILD)
+
+    def test_get_span_list_style(self):
+        content = self.content
+        result = content.get_span_list(style='T2')
+        self.assertEqual(len(result), 1)
+        element = result[0]
+        expected = ('<text:span text:style-name="T2">'
+                      'rouge'
+                    '</text:span>')
+        self.assertEqual(element.serialize(), expected)
 
 
     def test_get_span(self):
-        span = odf_create_span(u'my text', style='my_style')
+        content = self.content
+        span = content.get_span(2)
+        expected = ('<text:span text:style-name="T2">'
+                      'rouge'
+                    '</text:span>')
+        self.assertEqual(span.serialize(), expected)
+
+
+    def test_insert_span(self):
+        span = odf_create_span('my_style', u'my text')
         clone = self.content.clone()
         paragraph = clone.get_paragraph(1)
-        paragraph.wrap_text(span, offset=0)
-
-        # Get OK ?
-        span1 = clone.get_span(1)
-        span2 = clone.get_span_list()[0]
-
-        # We have the text with the tag, so, ...
-        expected = ('<text:span text:style-name="my_style">'
-                      'my text'
-                    '</text:span>'
-                    'This is the first paragraph.')
-
-        self.assertEqual(span1.serialize(), expected)
-        self.assertEqual(span2.serialize(), expected)
+        paragraph.insert_element(span, LAST_CHILD)
 
 
 
 class TestHeading(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/basetext.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -321,74 +328,64 @@ class TestHeading(TestCase):
 class TestFrame(TestCase):
 
     def setUp(self):
-        document = odf_get_document('samples/example.odt').clone()
+        document = odf_get_document('samples/frame_image.odp').clone()
         self.content = document.get_xmlpart('content')
-        self.body = document.get_body()
 
 
     def test_create_frame1(self):
-        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
-        expected = ('<draw:frame draw:name="frame1" svg:width="10cm" '
+        frame1 = odf_create_frame(u"A Frame", '10cm', '10cm',
+                                  style='Graphics')
+        expected = ('<draw:frame draw:name="A Frame" svg:width="10cm" '
                     'svg:height="10cm" text:anchor-type="paragraph" '
                     'draw:style-name="Graphics"/>')
         self.assertEqual(frame1.serialize(), expected)
 
 
     def test_create_frame2(self):
-        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
-                                  y='10mm', style='Graphics')
-        expected = ('<draw:frame draw:name="frame2" svg:width="10cm" '
+        frame2 = odf_create_frame(u"Another Frame", '10cm', '10cm', page=1,
+                                  x='10mm', y='10mm', style='Graphics')
+        expected = ('<draw:frame draw:name="Another Frame" svg:width="10cm" '
                       'svg:height="10cm" text:anchor-type="page" '
                       'text:anchor-page-number="1" svg:x="10mm" '
                       'svg:y="10mm" draw:style-name="Graphics"/>')
         self.assertEqual(frame2.serialize(), expected)
 
 
-    def test_insert_frame(self):
-        body = self.body
-
-        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
-        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
-                                  y='10mm', style='Graphics')
-
-        body.append_element(frame1)
-        body.append_element(frame2)
-
-
     def test_get_frame_by_name(self):
-        body = self.body
-
-        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
-        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
-                                  y='10mm', style='Graphics')
-
-        body.append_element(frame1)
-        body.append_element(frame2)
-
-        get = self.content.get_frame(name='frame1')
-        self.assertEqual(get.get_attribute('draw:name'), 'frame1')
+        content = self.content
+        frame = content.get_frame(name=u"Logo")
+        self.assertEqual(frame.get_name(), 'draw:frame')
 
 
     def test_get_frame_by_position(self):
-        body = self.body
+        content = self.content
+        frame = content.get_frame(position=2)
+        self.assertEqual(frame.get_attribute('presentation:class'), u'notes')
 
+
+    def test_insert_frame(self):
+        clone = self.content.clone()
         frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
         frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
                                   y='10mm', style='Graphics')
-
+        body = clone.get_presentation_body()
         body.append_element(frame1)
         body.append_element(frame2)
-
-        get = self.content.get_frame(position=2)
-        self.assertEqual(get.get_attribute('draw:name'), 'frame2')
+        result = clone.get_frame_list(style='Graphics')
+        self.assertEqual(len(result), 2)
+        element = clone.get_frame(name=u"frame1")
+        self.assertEqual(element.get_name(), 'draw:frame')
+        element = clone.get_frame(name=u"frame2")
+        self.assertEqual(element.get_name(), 'draw:frame')
 
 
 
 class TestImage(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/frame_image.odp')
         self.content = document.get_xmlpart('content')
+        self.path = 'Pictures/10000000000001D40000003C8B3889D9.png'
 
 
     def tearDown(self):
@@ -397,34 +394,51 @@ class TestImage(TestCase):
 
 
     def test_create_image(self):
-        image = odf_create_image('path')
-        expected = '<draw:image xlink:href="path"/>'
+        image = odf_create_image(self.path)
+        expected = '<draw:image xlink:href="%s"/>' % self.path
         self.assertEqual(image.serialize(), expected)
 
 
-    def test_insert_image(self):
+    def test_get_image_list(self):
         content = self.content
-        frame = odf_create_frame('frame_image', '0cm', '0cm',
+        result = content.get_image_list()
+        self.assertEqual(len(result), 1)
+        element = result[0]
+        self.assertEqual(element.get_attribute('xlink:href'), self.path)
+
+
+    def test_get_image_name(self):
+        content = self.content
+        element = content.get_image(name=u"Logo")
+        # Searched by frame but got the inner image with no name
+        self.assertEqual(element.get_attribute('xlink:href'), self.path)
+
+
+    def test_get_image_position(self):
+        content = self.content
+        element = content.get_image(position=1)
+        self.assertEqual(element.get_attribute('xlink:href'), self.path)
+
+
+    def test_insert_image(self):
+        clone = self.content.clone()
+        path = 'a/path'
+        image = odf_create_image(path)
+        frame = odf_create_frame(u"Image Frame", '0cm', '0cm',
                                  style='Graphics')
-        image = odf_create_image('path')
         frame.insert_element(image, LAST_CHILD)
-        body = content.get_text_body()
-        body.insert_element(frame, LAST_CHILD)
-
-        # XXX cannot test "insert" and "get" until the test document embeds
-        # an image
-        get = content.get_image(name='frame_image')
-        self.assertEqual(get.get_attribute('xlink:href'), 'path')
-
-        get = content.get_image(position=1)
-        self.assertEqual(get.get_attribute('xlink:href'), 'path')
+        clone.get_frame(position=1).insert_element(frame, NEXT_SIBLING)
+        element = clone.get_image(name=u"Image Frame")
+        self.assertEqual(element.get_attribute('xlink:href'), path)
+        element = clone.get_image(position=2)
+        self.assertEqual(element.get_attribute('xlink:href'), path)
 
 
 
 class TestTable(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/table.ods')
         self.content = document.get_xmlpart('content')
 
 
@@ -696,7 +710,7 @@ class TestTable(TestCase):
     def test_insert_table(self):
         content = self.content
         clone = content.clone()
-        table = odf_create_table(u'a_table', style='a_style')
+        table = odf_create_table(u"New Table", style='a_style')
         column = odf_create_column(style='a_column_style')
         row = odf_create_row()
         cell = odf_create_cell(u"")
@@ -704,7 +718,7 @@ class TestTable(TestCase):
         table.insert_element(column, LAST_CHILD)
         row.insert_element(cell, LAST_CHILD)
         table.insert_element(row, LAST_CHILD)
-        expected = ('<table:table table:name="a_table" '
+        expected = ('<table:table table:name="New Table" '
                       'table:style-name="a_style">'
                       '<table:table-column '
                         'table:style-name="a_column_style"/>'
@@ -721,7 +735,7 @@ class TestTable(TestCase):
         body.insert_element(table, LAST_CHILD)
 
         # Get OK ?
-        table = clone.get_table(name='a_table')
+        table = clone.get_table(name=u"New Table")
         self.assertEqual(table.get_attribute('table:name'), 'a_table')
 
         table = clone.get_table(position=1)
@@ -732,7 +746,7 @@ class TestTable(TestCase):
 class TestList(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/list.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -777,7 +791,7 @@ class TestList(TestCase):
 class TestStyle(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/span_style.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -833,7 +847,7 @@ class TestStyle(TestCase):
 class TestNote(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/note.odt')
         self.content = document.get_xmlpart('content')
         expected = ('<text:note text:note-class="footnote" text:id="note1">'
                       '<text:note-citation>1</text:note-citation>'
@@ -861,35 +875,33 @@ class TestNote(TestCase):
 
 
     def test_get_note(self):
-        clone = self.content.clone()
-
-        note = odf_create_note(u'1', id='note1', body=u'a footnote')
-
-        paragraph = clone.get_paragraph(1)
-        paragraph.insert_element(note, LAST_CHILD)
-
-        get = clone.get_note('note1')
-        self.assertEqual(get.serialize(), self.expected)
+        content = self.content
+        note = content.get_note('ftn0')
+        self.assertEqual(note.get_name(), 'text:note')
 
 
     def test_get_note_list(self):
-        clone = self.content.clone()
+        content = self.content
+        notes = content.get_note_list()
+        self.assertEqual(len(notes), 2)
 
-        note = odf_create_note(u'1', id='note1', body=u'a footnote')
 
-        paragraph = clone.get_paragraph(1)
-        paragraph.insert_element(note, LAST_CHILD)
 
-        get = clone.get_note_list()
-        self.assertEqual(len(get), 1)
-        self.assertEqual(get[0].serialize(), self.expected)
+    def test_get_note_list_footnote(self):
+        content = self.content
+        notes = content.get_note_list(note_class='footnote')
+        self.assertEqual(len(notes), 1)
+
+
+    def test_get_note_list_endnote(self):
+        content = self.content
+        notes = content.get_note_list(note_class='endnote')
+        self.assertEqual(len(notes), 1)
 
 
     def test_insert_note(self):
         clone = self.content.clone()
-
         note = odf_create_note(u'1', id='note1', body=u'a footnote')
-
         paragraph = clone.get_paragraph(1)
         paragraph.insert_element(note, LAST_CHILD)
 
@@ -898,7 +910,7 @@ class TestNote(TestCase):
 class TestAnnotation(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/example.odt')
+        self.document = document = odf_get_document('samples/note.odt')
         self.content = document.get_xmlpart('content')
 
 
@@ -929,9 +941,9 @@ class TestAnnotation(TestCase):
         creator = annotation.get_creator()
         self.assertEqual(creator, u"Auteur inconnu")
         date = annotation.get_date()
-        self.assertEqual(date, datetime(2009, 6, 22, 17, 18, 42))
+        self.assertEqual(date, datetime(2009, 8, 3, 12, 9, 45))
         text = annotation.get_text_content()
-        self.assertEqual(text, u"This is an annotation.")
+        self.assertEqual(text, u"Sauf qu'il est commenté !")
 
 
     def test_get_annotation_list_author(self):
@@ -950,36 +962,36 @@ class TestAnnotation(TestCase):
 
     def test_get_annotation_list_start_date(self):
         content = self.content
-        start_date = datetime(2009, 6, 1, 0, 0, 0)
+        start_date = datetime(2009, 8, 1, 0, 0, 0)
         annotations = content.get_annotation_list(start_date=start_date)
         self.assertEqual(len(annotations), 1)
 
 
     def test_get_annotation_list_bad_start_date(self):
         content = self.content
-        start_date = datetime(2009, 7, 1, 0, 0, 0)
+        start_date = datetime(2009, 9, 1, 0, 0, 0)
         annotations = content.get_annotation_list(start_date=start_date)
         self.assertEqual(len(annotations), 0)
 
 
     def test_get_annotation_list_end_date(self):
         content = self.content
-        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        end_date = datetime(2009, 9, 1, 0, 0, 0)
         annotations = content.get_annotation_list(end_date=end_date)
         self.assertEqual(len(annotations), 1)
 
 
     def test_get_annotation_list_bad_end_date(self):
         content = self.content
-        end_date = datetime(2009, 6, 1, 0, 0, 0)
+        end_date = datetime(2009, 8, 1, 0, 0, 0)
         annotations = content.get_annotation_list(end_date=end_date)
         self.assertEqual(len(annotations), 0)
 
 
     def test_get_annotation_list_start_date_end_date(self):
         content = self.content
-        start_date = datetime(2009, 6, 1, 0, 0, 0)
-        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        start_date = datetime(2009, 8, 1, 0, 0, 0)
+        end_date = datetime(2009, 9, 1, 0, 0, 0)
         annotations = content.get_annotation_list(start_date=start_date,
                                                    end_date=end_date)
         self.assertEqual(len(annotations), 1)
@@ -997,8 +1009,8 @@ class TestAnnotation(TestCase):
     def test_get_annotation_list_author_start_date_end_date(self):
         content = self.content
         creator = u"Auteur inconnu"
-        start_date = datetime(2009, 6, 1, 0, 0, 0)
-        end_date = datetime(2009, 7, 1, 0, 0, 0)
+        start_date = datetime(2009, 8, 1, 0, 0, 0)
+        end_date = datetime(2009, 9, 1, 0, 0, 0)
         annotations = content.get_annotation_list(creator=creator,
                                                    start_date=start_date,
                                                    end_date=end_date)
@@ -1046,7 +1058,7 @@ class TestAnnotation(TestCase):
 class TestVariables(TestCase):
 
     def setUp(self):
-        self.document = odf_get_document('samples/example.odt')
+        self.document = odf_get_document('samples/variable.odt')
 
 
     def test_create_variable(self):
@@ -1131,7 +1143,7 @@ class TestVariables(TestCase):
 class TestUserFields(TestCase):
 
     def setUp(self):
-        self.document = odf_get_document('samples/example.odt')
+        self.document = odf_get_document('samples/variable.odt')
 
 
     def test_create_user_field(self):
@@ -1183,7 +1195,7 @@ class TestUserFields(TestCase):
 class TestLinks(TestCase):
 
     def setUp(self):
-        document = odf_get_document('samples/example.odt')
+        document = odf_get_document('samples/basetext.odt')
         clone = document.clone()
 
         self.content = clone.get_xmlpart('content')
@@ -1239,7 +1251,7 @@ class TestLinks(TestCase):
 class TestPageNumber(TestCase):
 
     def setUp(self):
-        self.document = odf_get_document('samples/example.odt')
+        self.document = odf_get_document('samples/variable.odt')
 
 
     def test_create_page_number(self):
@@ -1525,7 +1537,7 @@ class TestDrawPage(TestCase):
 class BookmarkTest(TestCase):
 
     def setUp(self):
-        clone = odf_get_document('samples/example.odt').clone()
+        clone = odf_get_document('samples/bookmark.odt').clone()
         self.content = clone.get_xmlpart('content')
         self.body = clone.get_body()
 
@@ -1557,12 +1569,12 @@ class BookmarkTest(TestCase):
 
 
     def test_get_bookmark_list(self):
-        bookmark = odf_create_bookmark(u'foo')
-        self.body.append_element(bookmark)
-
-        get = self.content.get_bookmark_list()[0]
-        expected = '<text:bookmark text:name="foo"/>'
-        self.assertEqual(get.serialize(), expected)
+        content = self.content
+        result = self.content.get_bookmark_list()
+        self.assertEqual(len(result), 1)
+        element = result[0]
+        expected = '<text:bookmark text:name="Rep&#232;re de texte"/>'
+        self.assertEqual(element.serialize(), expected)
 
 
     def test_get_bookmark_start(self):
@@ -1605,7 +1617,7 @@ class BookmarkTest(TestCase):
 class reference_markTest(TestCase):
 
     def setUp(self):
-        clone = odf_get_document('samples/example.odt').clone()
+        clone = odf_get_document('samples/bookmark.odt').clone()
         self.content = clone.get_xmlpart('content')
         self.body = clone.get_body()
 
@@ -1655,12 +1667,13 @@ class reference_markTest(TestCase):
 
 
     def test_get_reference_mark_start_list(self):
-        reference_mark_start = odf_create_reference_mark_start(u'foo')
-        self.body.append_element(reference_mark_start)
-
-        get = self.content.get_reference_mark_start_list()[0]
-        expected = '<text:reference-mark-start text:name="foo"/>'
-        self.assertEqual(get.serialize(), expected)
+        content = self.content
+        result = content.get_reference_mark_start_list()
+        self.assertEqual(len(result), 1)
+        element = result[0]
+        expected = ('<text:reference-mark-start '
+                      'text:name="Nouvelle r&#233;f&#233;rence"/>')
+        self.assertEqual(element.serialize(), expected)
 
 
     def test_get_reference_mark_end(self):
@@ -1673,12 +1686,13 @@ class reference_markTest(TestCase):
 
 
     def test_get_reference_mark_end_list(self):
-        reference_mark_end = odf_create_reference_mark_end(u'foo')
-        self.body.append_element(reference_mark_end)
-
-        get = self.content.get_reference_mark_end_list()[0]
-        expected = '<text:reference-mark-end text:name="foo"/>'
-        self.assertEqual(get.serialize(), expected)
+        content = self.content
+        result = content.get_reference_mark_end_list()
+        self.assertEqual(len(result), 1)
+        element = result[0]
+        expected = ('<text:reference-mark-end '
+                      'text:name="Nouvelle r&#233;f&#233;rence"/>')
+        self.assertEqual(element.serialize(), expected)
 
 
 

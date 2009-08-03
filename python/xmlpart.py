@@ -184,6 +184,7 @@ class odf_element(object):
         element = self.__element
         for key, value in element.attrib.iteritems():
             attributes[get_prefixed_name(key)] = value
+        # FIXME lxml has mixed bytestring and unicode
         return attributes
 
 
@@ -192,11 +193,8 @@ class odf_element(object):
         uri, name = decode_qname(name)
         if uri is None:
             return element.get(name)
-        # XXX lxml is automatically decoding unicode
         value = element.get('{%s}%s' % (uri, name))
-        if isinstance(value, unicode):
-            value = value.encode('utf_8')
-        return value
+        return unicode(value)
 
 
     def set_attribute(self, name, value):
@@ -275,7 +273,7 @@ class odf_element(object):
         """
         element = self.__element
         text = element.xpath('string(text:p)', namespaces=ODF_NAMESPACES)
-        return unicode(text, 'utf_8')
+        return unicode(text)
 
 
     def set_text_content(self, text):
@@ -343,7 +341,9 @@ class odf_element(object):
 
 
     def serialize(self):
-        element = self.__element
+        element = deepcopy(self.__element)
+        # XXX hack over lxml: remove text outside the element
+        element.tail = None
         data = tostring(element)
         # XXX hack over lxml: remove namespaces
         return ns_stripper.sub('', data)

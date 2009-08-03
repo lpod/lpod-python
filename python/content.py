@@ -103,9 +103,16 @@ class odf_content(odf_xmlpart):
 
     def get_image(self, name=None, position=None, context=None):
         _check_position_or_name(position, name)
-        # The frame is holding the name
-        frame = self.get_frame(name=name, position=position, context=context)
-        return frame.get_element('draw:image')
+        if name:
+            # The frame is holding the name
+            frame = self._get_element('draw:frame', draw_name=name,
+                                      context=context)
+            if frame is None:
+                return None
+            return frame.get_element('draw:image')
+        # Not all frame have images so really count images
+        return self._get_element('draw:image', position=position,
+                                 context=context)
 
 
     #
@@ -175,6 +182,17 @@ class odf_content(odf_xmlpart):
     #
 
     def get_note_list(self, note_class=None, context=None):
+        """Return the list of all note element, or only the ones of the given
+        class.
+
+        Arguments:
+
+            note_class -- 'footnote' or 'endnote'
+
+            context -- odf_element
+
+        Return: list of odf_element
+        """
         return self._get_element_list('text:note', note_class=note_class,
                                       context=context)
 
