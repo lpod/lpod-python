@@ -19,7 +19,7 @@ Common features
 Common element-specific methods
 ===============================
 
-    Every ODF element in the level 1 API inherits all the features of the
+    Any ODF element in the level 1 API inherits all the features of the
     underlying XML element.
     
     Every ODF element comes with methods that directly return its parent, next
@@ -108,7 +108,8 @@ Basic text containers
     headings as well.
     
     However, a heading is a special paragraph which owns additional properties
-    related to its hierarchical level and its numbering.
+    related to its hierarchical level and its numbering. As an consequence,
+    some heading-specific methods are provided.
     
     - Heading level
         A heading owns a special property which indicates its hierarchical level
