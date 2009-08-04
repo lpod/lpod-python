@@ -30,14 +30,10 @@ class CreateElementTestCase(TestCase):
 
 class ElementTestCase(TestCase):
 
-    special_text = 'using < & " characters'
-
-
     def setUp(self):
         container = odf_get_container('samples/example.odt')
         self.container = container
-        content_part = odf_xmlpart('content', container)
-        self.content_part = content_part
+        self.content_part = content_part = odf_xmlpart('content', container)
         self.paragraph_element = content_part.get_element('//text:p[1]')
         self.annotation_element = (
                 content_part.get_element('//office:annotation[1]'))
@@ -66,6 +62,33 @@ class ElementTestCase(TestCase):
     def test_get_name(self):
         element = self.paragraph_element
         self.assertEqual(element.get_name(), 'text:p')
+
+
+    def test_clone(self):
+        element = self.paragraph_element
+        copy = element.clone()
+        self.assertNotEqual(id(element), id(copy))
+        self.assertEqual(element.get_text(), copy.get_text())
+
+
+    def test_delete(self):
+        element = odf_create_element('<a><b/></a>')
+        child = element.get_element('//b')
+        element.delete(child)
+        self.assertEqual(element.serialize(), '<a/>')
+
+
+
+class ElementAttributeTestCase(TestCase):
+
+    special_text = 'using < & " characters'
+
+
+    def setUp(self):
+        container = odf_get_container('samples/example.odt')
+        self.container = container
+        content_part = odf_xmlpart('content', container)
+        self.paragraph_element = content_part.get_element('//text:p[1]')
 
 
     def test_get_attributes(self):
@@ -129,6 +152,21 @@ class ElementTestCase(TestCase):
         self.assertEqual(element.get_attribute('text:style-name'), None)
 
 
+
+class ElementTextTestCase(TestCase):
+
+    special_text = 'using < & " characters'
+
+
+    def setUp(self):
+        container = odf_get_container('samples/example.odt')
+        self.container = container
+        content_part = odf_xmlpart('content', container)
+        self.annotation_element = (
+                content_part.get_element('//office:annotation[1]'))
+        self.paragraph_element = content_part.get_element('//text:p[1]')
+
+
     def test_get_text(self):
         element = self.paragraph_element
         text = element.get_text()
@@ -153,19 +191,6 @@ class ElementTestCase(TestCase):
         element.set_text(old_text)
 
 
-    def test_get_parent(self):
-        paragraph = self.paragraph_element
-        parent = paragraph.get_parent()
-        self.assertEqual(parent.get_name(), 'text:section')
-
-
-    def test_get_parent_root(self):
-        content = self.content_part
-        root = content.get_root()
-        parent = root.get_parent()
-        self.assertEqual(parent, None)
-
-
     def test_get_text_content(self):
         element = self.annotation_element
         text = element.get_text_content()
@@ -179,6 +204,55 @@ class ElementTestCase(TestCase):
         element.set_text_content(text)
         self.assertEqual(element.get_text_content(), text)
         element.set_text_content
+
+
+    def test_wrap_text_offset(self):
+        paragraph = self.paragraph_element.clone()
+        text = paragraph.get_text()
+        offset = text.index("first")
+        annotation = odf_create_element('<office:annotation/>')
+        paragraph.wrap_text(annotation, offset)
+        expected = ('<text:p text:style-name="Text_20_body">This is the '
+                      '<office:annotation/>first paragraph.</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_wrap_text_offset_length(self):
+        paragraph = self.paragraph_element.clone()
+        text = paragraph.get_text()
+        offset = text.index(u"first")
+        length = len(u"first")
+        span = odf_create_element('<text:span text:style-name="T1"/>')
+        paragraph.wrap_text(span, offset, length)
+        expected = ('<text:p text:style-name="Text_20_body">This is the '
+                      '<text:span text:style-name="T1">first</text:span> '
+                      'paragraph.</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+
+class ElementTraverseTestCase(TestCase):
+
+    def setUp(self):
+        container = odf_get_container('samples/example.odt')
+        self.container = container
+        self.content_part = content_part = odf_xmlpart('content', container)
+        self.annotation_element = (
+                content_part.get_element('//office:annotation[1]'))
+        self.paragraph_element = content_part.get_element('//text:p[1]')
+
+
+    def test_get_parent(self):
+        paragraph = self.paragraph_element
+        parent = paragraph.get_parent()
+        self.assertEqual(parent.get_name(), 'text:section')
+
+
+    def test_get_parent_root(self):
+        content = self.content_part
+        root = content.get_root()
+        parent = root.get_parent()
+        self.assertEqual(parent, None)
 
 
     def test_insert_element_first_child(self):
@@ -223,30 +297,6 @@ class ElementTestCase(TestCase):
         self.assertRaises(ValueError, element.insert_element, child, 999)
 
 
-    def test_wrap_text_offset(self):
-        paragraph = self.paragraph_element.clone()
-        text = paragraph.get_text()
-        offset = text.index("first")
-        annotation = odf_create_element('<office:annotation/>')
-        paragraph.wrap_text(annotation, offset)
-        expected = ('<text:p text:style-name="Text_20_body">This is the '
-                      '<office:annotation/>first paragraph.</text:p>')
-        self.assertEqual(paragraph.serialize(), expected)
-
-
-    def test_wrap_text_offset_length(self):
-        paragraph = self.paragraph_element.clone()
-        text = paragraph.get_text()
-        offset = text.index(u"first")
-        length = len(u"first")
-        span = odf_create_element('<text:span text:style-name="T1"/>')
-        paragraph.wrap_text(span, offset, length)
-        expected = ('<text:p text:style-name="Text_20_body">This is the '
-                      '<text:span text:style-name="T1">first</text:span> '
-                      'paragraph.</text:p>')
-        self.assertEqual(paragraph.serialize(), expected)
-
-
     def test_get_children(self):
         element = self.annotation_element
         children = element.get_children()
@@ -255,6 +305,21 @@ class ElementTestCase(TestCase):
         self.assertEqual(child.get_name(), 'dc:creator')
         child = children[-1]
         self.assertEqual(child.get_name(), 'text:p')
+
+
+
+class ElementStylePropertiesTestCase(TestCase):
+
+    def setUp(self):
+        container = odf_get_container('samples/example.odt')
+        self.container = container
+        content_part = odf_xmlpart('content', container)
+        self.content_part = content_part
+        self.paragraph_element = content_part.get_element('//text:p[1]')
+        self.annotation_element = (
+                content_part.get_element('//office:annotation[1]'))
+        query = '//style:style[@style:family="paragraph"][1]'
+        self.style_element = content_part.get_element(query)
 
 
     def test_get_style_properties(self):
@@ -323,20 +388,6 @@ class ElementTestCase(TestCase):
         style = self.style_element
         self.assertRaises(ValueError, style.del_style_properties,
                           area='toto')
-
-
-    def test_clone(self):
-        element = self.paragraph_element
-        copy = element.clone()
-        self.assertNotEqual(id(element), id(copy))
-        self.assertEqual(element.get_text(), copy.get_text())
-
-
-    def test_delete(self):
-        element = odf_create_element('<a><b/></a>')
-        child = element.get_element('//b')
-        element.delete(child)
-        self.assertEqual(element.serialize(), '<a/>')
 
 
 
