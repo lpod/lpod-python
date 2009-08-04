@@ -194,6 +194,8 @@ class odf_element(object):
         if uri is None:
             return element.get(name)
         value = element.get('{%s}%s' % (uri, name))
+        if value is None:
+            return None
         return unicode(value)
 
 

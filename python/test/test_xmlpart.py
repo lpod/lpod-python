@@ -84,8 +84,14 @@ class ElementTestCase(TestCase):
     def test_get_attribute_namespace(self):
         element = self.paragraph_element
         text = element.get_attribute('text:style-name')
-        self.assert_(isinstance(text, str))
+        self.assert_(isinstance(text, unicode))
         self.assertEqual(text, "Text_20_body")
+
+
+    def test_get_attribute_none(self):
+        element = self.paragraph_element
+        dummy = element.get_attribute('and_now_for_sth_completely_different')
+        self.assertEqual(dummy, None)
 
 
     def test_set_attribute(self):
