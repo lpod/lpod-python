@@ -151,34 +151,9 @@ Basic text containers
         
     - Hyperlinks
     
-        A hyperlink can be associated to a substring in a paragraph.
-        
-    - Range bookmarks
+        A hyperlink can be defined in order to associate a part of the content
+        of a paragraph/heading to the URI of an external resource.
     
-        A range bookmark is an identified text range which is not limited to
-        a paragraph. It's a named content area, not dependant of the document
-        tree structure. It starts somewhere in a paragraph and stops somewhere
-        in the same paragraph or in a following one. The API allows the user
-        to create a range bookmark and name it through an existing content, as
-        well as to retrieve and extract it according to its name.
-        
-        A retrieved range bookmark can be safely removed through a single
-        method.
-        
-        A range bookmark can be safely processed only if it's entirely
-        contained in the calling context. A context that is not the whole
-        document can contain a bookmark start or a bookmark end but not both.
-        In addition, a bookmark spreading across several elements gets
-        corrupt if the element containing its start point or its end point
-        is later removed.
-        
-        Bookmark-based methods allow the user to get the start and end points
-        and check the integrity of a bookmark.
-        
-        [Beware, there are two kinds of bookmarks. The simplest one represents
-        a position in a text content, and it's described later (see "Text
-        marks and indices"). A position bookmark has no content.
-        
     Unlike paragraphs and headings, spans are created "in place", i.e. their
     creation methods create and directly insert them in the document.
     
@@ -189,10 +164,9 @@ Basic text containers
     of a given length at a given position in the element; in this case, the
     user has to provide length and position options instead of a regex string.
     
-    Text spans can be nested without limits. However, while a range bookmark
-    can start within a span of any kind and end anywhere out of this span,
-    a styling or hyperlinking span is always entirely included in the area of
-    its starting point (paragraph or text span). 
+    Text spans can be nested without limits. However, a styling or
+    hyperlinking span is always entirely included in the area of its starting 
+    point (paragraph or text span). 
 
 Text marks and indices
 ======================
@@ -221,10 +195,65 @@ Text marks and indices
     In order to put a bookmark according to a regex that could be matched more
     than once in the same paragraph, it's possible to combine the position and
     text options, so the search area begins at the given position.
+    
+    A bookmark can be retrieved by its unique name. The ODF element then can be
+    obtained as the parent of the bookmark element. However, if the bookmark
+    is located inside a span, its parent is the span element instead of a
+    regular paragraph. So another method is provided, that returns the main
+    text container of the bookmark. In the following example, the first line
+    returns the parent of a given bookmark (whatever the kind of element),
+    while the second one returns the paragraph (or heading) where the bookmark
+    is located::
+    
+        context.get_bookmark("BM1").parent
+        context.get_paragraph_by_bookmark("BM1")
+        
+    Another method allows the user to get the offset of a given bookmark in
+    the host ODF element. Beware: this offset is related to the text of the
+    parent element (which could be a text span).
+    
+- Range bookmarks
+    
+    A range bookmark is an identified text range which can spread across
+    paragraph frontiers. It's a named content area, not dependant of the
+    document tree structure. It starts somewhere in a paragraph and stops
+    somewhere in the same paragraph or in a following one. Technically,
+    it's a pair of special position bookmarks, so called bookmark start
+    and bookmark end, owning the same name.
+    
+    The API allows the user to create a range bookmark and name it through
+    an existing content, as well as to retrieve and extract it according to
+    its name.
+    
+    Provided methods allow the user to get
+    
+        - the pair of elements containing the bookmark start and the
+        bookmark end (possibly the same);
+        
+        - the text content of the bookmark (without the structure).
+    
+    A retrieved range bookmark can be safely removed through a single
+    method.
+        
+    A range bookmark can be safely processed only if it's entirely
+    contained in the calling context. A context that is not the whole
+    document can contain a bookmark start or a bookmark end but not both.
+    In addition, a bookmark spreading across several elements gets
+    corrupt if the element containing its start point or its end point
+    is later removed.
 
 - Tables of content TODO
 - Indices TODO
-- Annotations
+- Notes
+
+    Generally speaking, a note is an object whose main function is to allow
+    the user to set some text content out of the main document body but
+    to structurally associate this content to a specific location in the
+    document body. [TBC] 
+
+    
+
+
 - Change tracking TODO
 
 Structured containers
