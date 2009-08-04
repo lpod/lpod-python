@@ -351,6 +351,12 @@ class TestFrame(TestCase):
         self.assertEqual(frame2.serialize(), expected)
 
 
+    def test_get_frame_list(self):
+        content = self.content
+        result = content.get_frame_list()
+        self.assertEqual(len(result), 2)
+
+
     def test_get_frame_by_name(self):
         content = self.content
         frame = content.get_frame(name=u"Logo")
