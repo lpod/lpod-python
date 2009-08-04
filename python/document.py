@@ -106,27 +106,23 @@ def odf_create_heading(level, text=None, style=None):
 
 
 
-def odf_create_frame(name, width, height, page=None, x=None, y=None,
+def odf_create_frame(name, size, page=None, position=None,
                      style=None):
-    """Create a frame element of the given style, width and height,
-    optionally positionned at the given x and y coordinates in the given
-    page number.
+    """Create a frame element of the given size. If positionned by page, give
+    the page number and the x, y position.
 
-    Width, height, x and y are strings including the units, e.g. "10cm".
+    Size is a 2-tuple (width, height) and position is a 2-tuple (left,
+    top); both are strings including the unit, e.g. ('10cm', '15cm').
 
     Arguments:
 
         name -- unicode
 
-        width -- str
-
-        height -- str
+        size -- (str, str)
 
         page -- int
 
-        x -- str
-
-        y -- str
+        position -- (str, str)
 
         style -- str
 
@@ -136,10 +132,8 @@ def odf_create_frame(name, width, height, page=None, x=None, y=None,
         options = 'text:anchor-type="paragraph"'
     else:
         options = 'text:anchor-type="page" text:anchor-page-number="%d"' % page
-        if x is not None:
-            options += ' svg:x="%s"' % x
-        if y is not None:
-            options += ' svg:y="%s"' % y
+        if position:
+            options += ' svg:x="%s" svg:y="%s"' % position
     data = '<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" %s/>'
     element = odf_create_element(data % (name.encode('utf_8'), width, height,
                                          options))
@@ -152,6 +146,8 @@ def odf_create_frame(name, width, height, page=None, x=None, y=None,
 def odf_create_image(uri):
     """Create an image element showing the image at the given URI.
 
+    Warning: image elements must be stored in a frame.
+
     Arguments:
 
         uri -- str
@@ -159,6 +155,30 @@ def odf_create_image(uri):
     Return: odf_element
     """
     return odf_create_element('<draw:image xlink:href="%s"/>' % uri)
+
+
+
+def odf_create_imageframe(uri, size, link=False, position=None):
+    """Create a ready-to-use image image, since it must be embedded in a
+    frame. Size is a 2-tuple (width, height) and position is a 2-tuple (left,
+    top); both are strings including the unit, e.g. ('21cm', '29.7cm'). Images
+    are supposed to be embedded by default; if they remain outside the
+    packaging, set link to True.
+
+    Arguments:
+
+        uri -- str
+
+        size -- (str, str)
+
+        link -- bool
+
+        position -- (str, str)
+
+
+    Return: odf_element
+    """
+    raise NotImplementedError
 
 
 
@@ -261,23 +281,27 @@ def odf_create_table(name, width=None, height=None, style=None):
 
 
 
-def odf_create_list_item(text=None):
+def odf_create_list_item(text_or_element=None):
     """Create a list item element.
 
-    The "text" argument is just a shortcut for the most common case. To
+    Sending a unicode text is just a shortcut for the most common case. To
     create a list item with several paragraphs or anything else (except
     tables), first create an empty list item, and fill it using the other
     "odf_create_*" functions.
 
     Arguments:
 
-        text -- unicode
+        text -- unicode or odf_element
 
     Return: odf_element
     """
     element = odf_create_element('<text:list-item/>')
-    if text is not None:
-        element.set_text_content(text)
+    if type(text_or_element) is unicode:
+        element.set_text_content(text_or_element)
+    elif isinstance(text_or_element, odf_element):
+        element.append_element(text_or_element)
+    else:
+        raise TypeError, "expected unicode or odf_element"
     return element
 
 
@@ -899,6 +923,17 @@ class odf_document(object):
             result.append(u'(%d) %s\n' % note)
 
         return u''.join(result)
+
+
+    def add_file(self, uri_or_file):
+        raise NotImplementedError
+        if isinstance(uri_or_file, str):
+            file = vfs.open(uri_or_file)
+        data= file.read()
+        # TODO generate something like Pictures/10000000000001D40000003C8B3889D9.png"
+        name = xxx
+        self.container.set_part(xxx, data)
+        return name
 
 
     def clone(self):
