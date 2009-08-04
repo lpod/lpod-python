@@ -26,12 +26,12 @@ class odf_content(odf_xmlpart):
     # Sections
     #
 
-    def get_section_list(self, style=None, context=None):
+    def get_section_list(self, style=None, regex=None, context=None):
         return self._get_element_list('text:section', style=style,
-                                      context=context)
+                                      regex=regex, context=context)
 
 
-    def get_section(self, position, context=None):
+    def get_section_by_position(self, position, context=None):
         return self._get_element('text:section', position=position,
                                  context=context)
 
@@ -40,13 +40,18 @@ class odf_content(odf_xmlpart):
     # Paragraphs
     #
 
-    def get_paragraph_list(self, style=None, context=None):
-        return self._get_element_list('text:p', style=style, context=context)
+    def get_paragraph_list(self, style=None, regex=None, context=None):
+        return self._get_element_list('text:p', style=style, regex=regex,
+                                      context=context)
 
 
-    def get_paragraph(self, position, context=None):
+    def get_paragraph_by_position(self, position, context=None):
         return self._get_element('text:p', position=position,
                                  context=context)
+
+
+    def get_paragraph_by_content(self, regex, context=None):
+        return self._get_element('text:p', regex=regex, context=context)
 
 
     #
@@ -253,15 +258,15 @@ class odf_content(odf_xmlpart):
 
 
     def get_style(self, name_or_element, family):
-        if isinstance(name_or_element, odf_element):
-            if not name_or_element.is_style():
-                raise ValueError, "element is not a style element"
-            return name_or_element
-        elif type(name_or_element) is str:
+        if type(name_or_element) is str:
             context = self.get_category_context('automatic')
             return self._get_element('style:style',
                                      style_name=name_or_element,
                                      family=family, context=context)
+        elif isinstance(name_or_element, odf_element):
+            if not name_or_element.is_style():
+                raise ValueError, "element is not a style element"
+            return name_or_element
         raise TypeError, "style name or element expected"
 
 
