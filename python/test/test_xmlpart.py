@@ -340,6 +340,34 @@ class ElementTestCase(TestCase):
 
 
 
+class RegexTestCase(TestCase):
+
+    def setUp(self):
+        self.container = odf_get_container('samples/example.odt')
+        self.content = odf_xmlpart('content', self.container)
+
+
+    def tearDown(self):
+        del self.content
+        del self.container
+
+
+    def test_match_paragraph(self):
+        # TODO u"ère" dans un paragraph
+        raise NotImplementedError
+
+
+    def test_match_span(self):
+        # TODO u"roug" dans un span
+        raise NotImplementedError
+
+
+    def test_match_inner_span(self):
+        # TODO u"roug" depuis le paragraphe
+        raise NotImplementedError
+
+
+
 class XmlNamespaceTestCase(TestCase):
     """We must be able to use the API with unknown prefix/namespace"""
 

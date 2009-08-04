@@ -239,6 +239,11 @@ class odf_element(object):
             element.text = text
 
 
+    def match(self, substring):
+        # TODO support regex
+        return substring in self.get_text()
+
+
     def get_parent(self):
         element = self.__element
         parent = element.getparent()
