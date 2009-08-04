@@ -1,7 +1,20 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 # LGPL modified compatible Apache
 
-Here the doc!
+Build the doc
+-------------
+Before attempting to build the documentation, you should install the python
+part of the lpOD project. For more information see the INSTALL file located in
+lpod_dir/python/INSTALL.
+
+Then, run the Makefile to build the doc with one of the following target:
+
+  html
+  latex
+  pdf
+  changes
+  linkcheck
+  release
 
 TODO
 ----
