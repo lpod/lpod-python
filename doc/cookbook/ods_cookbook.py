@@ -15,7 +15,7 @@ body = document.get_body()
 # Delete the 3 default sheets
 body.clear()
 
-for id, csv_name in enumerate(glob('*.csv')):
+for id, csv_name in enumerate(glob('./files/*.csv')):
     tab = create_table_from_csv(u'tab_%s' % id , csv_name)
     body.append_element(tab)
 
