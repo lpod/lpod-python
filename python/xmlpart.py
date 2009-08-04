@@ -494,7 +494,8 @@ class odf_xmlpart(object):
                           draw_name=None, draw_style=None, table_name=None,
                           note_class=None, style_name=None, text_id=None,
                           text_name=None, office_name=None, level=None,
-                          position=None, regex=None, context=None):
+                          image_link=None, href=None, position=None,
+                          regex=None, context=None):
         query = _make_xpath_query(element_name, style=style, family=family,
                                   draw_name=draw_name,
                                   draw_style=draw_style,
@@ -502,9 +503,9 @@ class odf_xmlpart(object):
                                   style_name=style_name,
                                   note_class=note_class, text_id=text_id,
                                   text_name=text_name, office_name=office_name,
-                                  level=level, position=position,
-                                  context=context)
-        if regex:
+                                  level=level, image_link=image_link,
+                                  position=position, context=context)
+        if regex or href:
             raise NotImplementedError
         if context is None:
             return self.get_element_list(query)
@@ -514,15 +515,16 @@ class odf_xmlpart(object):
     def _get_element(self, element_name, style=None, family=None,
                      draw_name=None, table_name=None, style_name=None,
                      text_id=None, text_name=None, office_name=None,
-                     level=None, position=None, regex=None, context=None):
+                     level=None, href=None, position=None, regex=None,
+                     context=None):
         result = self._get_element_list(element_name, style=style,
                                         family=family, draw_name=draw_name,
                                         table_name=table_name,
                                         style_name=style_name,
                                         text_id=text_id, text_name=text_name,
                                         office_name=office_name, level=level,
-                                        position=position, regex=regex,
-                                        context=context)
+                                        href=href, position=position,
+                                        regex=regex, context=context)
         if result:
             return result[0]
         return None

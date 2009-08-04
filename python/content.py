@@ -63,8 +63,13 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_span(self, position, context=None):
+    def get_span_by_position(self, position, context=None):
         return self._get_element('text:span', position=position,
+                                 context=context)
+
+
+    def get_span_by_content(self, regex, context=None):
+        return self._get_element('text:span', regex=regex,
                                  context=context)
 
 
@@ -77,8 +82,13 @@ class odf_content(odf_xmlpart):
                                        context=context)
 
 
-    def get_heading(self, position, level=None, context=None):
+    def get_heading_by_position(self, position, level=None, context=None):
         return self._get_element('text:h', position=position, level=level,
+                                 context=context)
+
+
+    def get_heading_by_content(self, regex, level=None, context=None):
+        return self._get_element('text:h', regex=regex, level=level,
                                  context=context)
 
 
@@ -91,95 +101,81 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_frame(self, name=None, position=None, context=None):
-        _check_position_or_name(position, name)
+    def get_frame_by_name(self, name, context=None):
         return self._get_element('draw:frame', draw_name=name,
-                                 position=position, context=context)
+                                 context=context)
+
+
+    def get_frame_by_position(self, position, context=None):
+        return self._get_element('draw:frame', position=position,
+                                 context=context)
 
 
     #
     # Images
     #
 
-    def get_image_list(self, style=None, context=None):
+    def get_image_list(self, style=None, link=None, href=None, context=None):
+        """Get all image elements matching the criteria. Style is the style
+        name. Set link to False to get only internal images, and True to
+        get only external images (not in the container). Href is a regex to
+        find all images with their path matching.
+
+        Arguments:
+
+            style -- str
+
+            link -- bool
+
+            href -- unicode regex
+
+            context -- odf_element
+
+        Return: list of odf_element
+        """
         return self._get_element_list('draw:image', style=style,
-                                      context=context)
+                                      image_link=link, href=href, context=context)
 
 
-    def get_image(self, name=None, position=None, context=None):
-        _check_position_or_name(position, name)
-        if name:
-            # The frame is holding the name
-            frame = self._get_element('draw:frame', draw_name=name,
-                                      context=context)
-            if frame is None:
-                return None
-            return frame.get_element('draw:image')
-        # Not all frame have images so really count images
+    def get_image_by_name(self, name, context=None):
+        # The frame is holding the name
+        frame = self._get_element('draw:frame', draw_name=name,
+                                  context=context)
+        if frame is None:
+            return None
+        return frame.get_element('draw:image')
+
+
+    def get_image_by_position(self, position, context=None):
         return self._get_element('draw:image', position=position,
                                  context=context)
+
+
+    def get_image_by_path(self, regex, context=None):
+        return self._get_element('draw:image', href=regex, context=context)
 
 
     #
     # Tables
     #
 
-    def get_table_list(self, style=None, context=None):
+    def get_table_list(self, style=None, regex=None, context=None):
         return self._get_element_list('table:table', style=style,
-                                      context=context)
+                                      regex=regex, context=context)
 
 
-    def get_table(self, name=None, position=None, context=None):
+    def get_table_by_name(self, name, context=None):
         return self._get_element('table:table', table_name=name,
-                                 position=position, context=context)
+                                 context=context)
 
 
-    #
-    # Rows
-    #
-
-    def get_row_list(self, style=None, context=None):
-        return self._get_element_list('table:table-row', style=style,
-                                      context=context)
+    def get_table_by_position(self, position, context=None):
+        return self._get_element('table:table', position=position,
+                                 context=context)
 
 
-    #
-    # Cells
-    #
-
-    def get_cell_list(self, style=None, context=None):
-        return self._get_element_list('table:table-cell', style=style,
-                                      context=context)
-
-
-    # Warning: This function gives just a "read only" odf_element
-    def get_cell(self, name, context):
-        # The coordinates of your cell
-        x, y = _get_cell_coordinates(name)
-
-        # First, we must find the good row
-        cell_y = 0
-        for row in self.get_row_list(context=context):
-            repeat = row.get_attribute('table:number-rows-repeated')
-            repeat = int(repeat) if repeat is not None else 1
-            if cell_y + 1 <= y and y <= (cell_y + repeat):
-                break
-            cell_y += repeat
-        else:
-            raise IndexError, 'I cannot find cell "%s"' % name
-
-        # Second, we must find the good cell
-        cell_x = 0
-        for cell in self.get_cell_list(context=row):
-            repeat = cell.get_attribute('table:number-columns-repeated')
-            repeat = int(repeat) if repeat is not None else 1
-            if cell_x + 1 <= x and x <= (cell_x + repeat):
-                break
-            cell_x += repeat
-        else:
-            raise IndexError, 'i cannot find your cell "%s"' % name
-
-        return cell
+    def get_table_by_content(self, regex, context=None):
+        return self._get_element('table:table', regex=regex, context=context)
 
 
     #

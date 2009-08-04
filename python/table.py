@@ -263,6 +263,7 @@ class odf_table(object):
     # Public API
     #
 
+    # FIXME rename to "to_odf_element()"
     def get_odf_element(self):
 
         # 1) Create the table:table
@@ -279,6 +280,10 @@ class odf_table(object):
         return table
 
 
+    #
+    # Cells
+    #
+
     def get_cell(self, coordinates):
         x, y = _get_cell_coordinates(coordinates)
         return self.__rows[y - 1]['cells'][x - 1]
@@ -290,12 +295,27 @@ class odf_table(object):
         self.__rows[y - 1]['cells'][x - 1] = odf_cell
 
 
+    def get_cell_list(self, regex=None, style=None):
+        # TODO return list of coordinates
+        raise NotImplementedError
+
+
     def get_size(self):
         return len(self.__columns), len(self.__rows)
 
 
     def get_name(self):
         return self.__table_attributes['table:name']
+
+
+    #
+    # Rows
+    #
+
+    def get_row_list(self, regex=None, style=None):
+        # TODO return list of row numbers (the 3 of (0, 3),
+        # not the letter '4' of 'A4')
+        raise NotImplementedError
 
 
     # XXX Add a cells argument ??
@@ -317,6 +337,16 @@ class odf_table(object):
                 rows.append({'attributes': {},
                              'cells': [ odf_create_cell()
                                         for i in range(row_size) ]})
+
+
+    #
+    # Columns
+    #
+
+    def get_column_list(self, regex=None, style=None):
+        # TODO return list of column numbers (the 0 of (0, 3),
+        # not the letter 'A' of 'A4')
+        raise NotImplementedError
 
 
     # XXX Add a cells argument ??
