@@ -71,17 +71,14 @@ page.append_element(draw_imageframe2)
 # Add the page to the body
 body.append_element(page)
 
+text_element = odf_create_heading(1, text=u'First Slide')
 
 # Get a new page, page2 copy of page1
-page2 = page.clone('page2')
-
-#page2 = body.get_clone('page2', page)
-#page2 = body.get_copy('page2', page)
-
-frame = page2.get_frame()
-
-
-
+### Warning check if page name are unique
+page2 = page.clone()
+el = page2.get_heading_by_content(u'First')
+el.set_text(u'Second Slide')
+body.append_element(page2)
 
 # Save
 document.save('presentation.odp', pretty=True)
