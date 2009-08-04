@@ -248,6 +248,22 @@ class odf_element(object):
         return self.__class__(parent)
 
 
+    def get_next_sibling(self):
+        element = self.__element
+        next = element.getnext()
+        if next is None:
+            return None
+        return self.__class__(next)
+
+
+    def get_prev_sibling(self):
+        element = self.__element
+        prev = element.getprevious()
+        if prev is None:
+            return None
+        return self.__class__(prev)
+
+
     def get_children(self):
         element = self.__element
         cls = self.__class__
