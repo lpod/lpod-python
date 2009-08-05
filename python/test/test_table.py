@@ -192,7 +192,7 @@ class odf_table_TestCase(TestCase):
         document = odf_get_document('samples/table.ods')
         content = document.get_xmlpart('content')
 
-        table = content.get_table('Feuille1')
+        table = content.get_table_by_name(u'Feuille1')
         table = odf_table(odf_element=table)
 
         self.assertEqual(table.get_size(), (1024, 9))
