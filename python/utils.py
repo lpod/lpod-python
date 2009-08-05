@@ -77,7 +77,7 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
     if family:
         attributes['style:family'] = family
     if draw_name:
-        attributes['draw:name'] = draw_name
+        attributes['draw:name'] = draw_name.encode('utf_8')
     if draw_style:
         attributes['draw:style-name'] = draw_style.encode('utf_8')
     if table_name:
@@ -89,7 +89,7 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
     if text_id:
         attributes['text:id'] = text_id
     if text_name:
-        attributes['text:name'] = text_name
+        attributes['text:name'] = text_name.encode('utf_8')
     if office_name:
         attributes['office:name'] = office_name
     if level:

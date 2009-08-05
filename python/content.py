@@ -4,7 +4,7 @@
 # Import from the Standard Library
 
 # Import from lpod
-from utils import _get_cell_coordinates, get_value
+from utils import get_value
 from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD
 
 
