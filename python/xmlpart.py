@@ -93,6 +93,21 @@ def get_prefixed_name(tag):
 
 
 
+class_registry = {}
+
+def register_element_class(name, cls):
+    if name in class_registry:
+        raise ValueError,  'element "%s" already registered' % name
+    class_registry[name] = cls
+
+
+
+def make_odf_element(native_element):
+    cls = class_registry.get(native_element.tag,  odf_element)
+    return cls(native_element)
+
+
+
 def odf_create_element(element_data):
     if not isinstance(element_data, str):
         raise TypeError, "element data is not str"
@@ -168,8 +183,7 @@ class odf_element(object):
     def get_element_list(self, xpath_query):
         element = self.__element
         result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
-        cls = self.__class__
-        return [cls(e) for e in result]
+        return [make_odf_element(e) for e in result]
 
 
     def get_element(self, xpath_query):
@@ -254,7 +268,7 @@ class odf_element(object):
         if parent is None:
             # Already at root
             return None
-        return self.__class__(parent)
+        return make_odf_element(parent)
 
 
     def get_next_sibling(self):
@@ -262,7 +276,7 @@ class odf_element(object):
         next = element.getnext()
         if next is None:
             return None
-        return self.__class__(next)
+        return make_odf_element(next)
 
 
     def get_prev_sibling(self):
@@ -270,13 +284,12 @@ class odf_element(object):
         prev = element.getprevious()
         if prev is None:
             return None
-        return self.__class__(prev)
+        return make_odf_element(prev)
 
 
     def get_children(self):
         element = self.__element
-        cls = self.__class__
-        return [cls(e) for e in element]
+        return [make_odf_element(e) for e in element]
 
 
     def get_creator(self):
@@ -352,7 +365,7 @@ class odf_element(object):
             elif type(obj) is _ElementUnicodeResult:
                 result.append(unicode(obj))
             else:
-                result.append(self.__class__(obj))
+                result.append(make_odf_element(obj))
         return result
 
 
