@@ -361,30 +361,32 @@ def odf_create_style(name, family, area=None, **kw):
 
 
 
-def odf_create_note(text, note_class='footnote', id=None, body=None):
+def odf_create_note(note_class='footnote', id=None, citation=None, body=None):
     """Create either a footnote or a endnote element with the given text,
     optionally referencing it using the given id.
 
     Arguments:
 
-        text -- unicode
-
         note_class -- 'footnote' or 'endnote'
 
         id -- str
+
+        citation -- unicode
 
         body -- an odf_element or an unicode object
 
     Return: odf_element
     """
     data = ('<text:note text:note-class="%s">'
-              '<text:note-citation>%s</text:note-citation>'
+              '<text:note-citation/>'
               '<text:note-body/>'
             '</text:note>')
-    text = text.encode('utf_8')
-    element = odf_create_element(data % (note_class, text))
+    element = odf_create_element(data)
     if id is not None:
         element.set_attribute('text:id', id)
+    if citation is not None:
+        note_citation = element.get_element('text:note-citation')
+        note_citation.set_text(citation)
     if body is not None:
         note_body = element.get_element('text:note-body')
         # Autocreate a paragraph if body = unicode

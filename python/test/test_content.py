@@ -872,13 +872,13 @@ class TestNote(TestCase):
 
         # With an odf_element
         note_body = odf_create_paragraph(u'a footnote', style='Standard')
-        note = odf_create_note(u'1', id='note1', body=note_body)
+        note = odf_create_note(citation=u'1', id='note1', body=note_body)
         expected = self.expected.replace('<text:p>',
                                          '<text:p text:style-name="Standard">')
         self.assertEqual(note.serialize(), expected)
 
         # With an unicode object
-        note = odf_create_note(u'1', id='note1', body=u'a footnote')
+        note = odf_create_note(citation=u'1', id='note1', body=u'a footnote')
         self.assertEqual(note.serialize(), self.expected)
 
 
@@ -909,7 +909,7 @@ class TestNote(TestCase):
 
     def test_insert_note(self):
         clone = self.content.clone()
-        note = odf_create_note(u'1', id='note1', body=u'a footnote')
+        note = odf_create_note(citation=u'1', id='note1', body=u'a footnote')
         paragraph = clone.get_paragraph_by_position(1)
         paragraph.insert_element(note, LAST_CHILD)
 
