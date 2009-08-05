@@ -94,8 +94,6 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
         attributes['office:name'] = office_name
     if level:
         attributes['text:outline-level'] = level
-    if image_link:
-        raise NotImplementedError
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]
