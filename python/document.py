@@ -401,32 +401,39 @@ def odf_create_note(note_class='footnote', note_id=None, citation=None,
 
 
 
-def odf_create_annotation(creator, text, date=None):
+def odf_create_annotation(text_or_element=None, creator=None, date=None):
     """Create an annotation element credited to the given creator with the
     given text, optionally dated (current date by default).
 
     Arguments:
 
-        creator -- unicode
+        text -- unicode or odf_element
 
-        text -- unicode
+        creator -- unicode
 
         date -- datetime
 
     Return: odf_element
     """
     # TODO allow paragraph and text styles
-    data = ('<office:annotation>'
-               '<dc:creator>%s</dc:creator>'
-               '<dc:date>%s</dc:date>'
-               '<text:p>%s</text:p>'
-            '</office:annotation>')
-    creator = creator.encode('utf_8')
+    element = odf_create_element('<office:annotation/>')
+    if text_or_element:
+        if type(text_or_element) is unicode:
+            element.set_text_content(text_or_element)
+        elif isinstance(text_or_element, odf_element):
+            element.append(text_or_element)
+        else:
+            raise TypeError
+    #if creator is None:
+        # TODO get the login name
+    raise NotImplementedError
+    if creator:
+        creator = creator.encode('utf_8')
     if date is None:
         date = datetime.now()
     date = DateTime.encode(date)
     text = text.encode('utf_8')
-    return odf_create_element(data % (creator, date, text))
+    return element
 
 
 

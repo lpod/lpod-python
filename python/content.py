@@ -206,8 +206,8 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_note_by_id(self, text_id, context=None):
-        return self._get_element('text:note', text_id=text_id,
+    def get_note_by_id(self, note_id, context=None):
+        return self._get_element('text:note', text_id=note_id,
                                  context=context)
 
 

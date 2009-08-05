@@ -512,6 +512,11 @@ class odf_element(object):
         raise NotImplementedError
 
 
+    def insert_annotation(self, annotation_element, text_or_element=None,
+                          creator=None, date=None):
+        raise NotImplementedError
+
+
 
 class odf_xmlpart(object):
     """Representation of an XML part.
