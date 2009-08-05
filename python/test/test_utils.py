@@ -51,26 +51,6 @@ class GenerateXPathTestCase(TestCase):
 
 
 
-class CheckPositionNameTestCase(TestCase):
-
-    def setUp(self):
-        self.document = odf_get_document('samples/example.odt')
-
-
-    def tearDown(self):
-        del self.document
-
-
-    def test_position_name(self):
-        document = self.document
-        content = document.get_xmlpart('content')
-        self.assertRaises(ValueError, content.get_frame, position=1,
-                          name='foo')
-        self.assertRaises(ValueError, content.get_frame, position=None,
-                          name=None)
-
-
-
 class DateTimeTestCase(TestCase):
 
     def test_encode(self):
