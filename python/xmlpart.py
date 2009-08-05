@@ -4,7 +4,7 @@
 # Import from the Standard Library
 from copy import deepcopy
 from cStringIO import StringIO
-from re import compile
+from re import search
 
 # Import from lxml
 from lxml.etree import parse, fromstring, tostring, _Element
@@ -257,9 +257,7 @@ class odf_element(object):
         """ True if the text of the odf_element match one or more times the
             pattern.
         """
-        regex = compile(pattern)
-        text = self.get_text()
-        return regex.search(text) is not None
+        return search(pattern, text) is not None
 
 
     def get_parent(self):

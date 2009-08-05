@@ -413,16 +413,16 @@ class RegexTestCase(TestCase):
 
 
     def test_match_span(self):
-        """ Match text in a span from the parent paragraph
+        """ Match text in a span from the span
         """
-        match = self.paragraph.match(u'roug')
+        match = self.span.match(u'moust')
         return self.assertTrue(match)
 
 
     def test_match_inner_span(self):
-        """ Match text in a span from the span
+        """ Match text in a span from the parent paragraph
         """
-        match = self.span.match(u'moust')
+        match = self.paragraph.match(u'roug')
         return self.assertTrue(match)
 
 
