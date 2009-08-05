@@ -501,6 +501,17 @@ class odf_element(object):
         raise NotImplementedError
 
 
+    #
+    # Notes
+    #
+
+    def insert_note(self, note_element,  note_class='footnote', note_id=None,
+                    citation=None, body=None, *args, **kw):
+        # TODO complain if the note has no note_id or citation
+        # TODO note_id may be a function called with note_id(*args, **kw)
+        raise NotImplementedError
+
+
 
 class odf_xmlpart(object):
     """Representation of an XML part.

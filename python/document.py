@@ -361,15 +361,16 @@ def odf_create_style(name, family, area=None, **kw):
 
 
 
-def odf_create_note(note_class='footnote', id=None, citation=None, body=None):
+def odf_create_note(note_class='footnote', note_id=None, citation=None,
+                    body=None):
     """Create either a footnote or a endnote element with the given text,
-    optionally referencing it using the given id.
+    optionally referencing it using the given note_id.
 
     Arguments:
 
         note_class -- 'footnote' or 'endnote'
 
-        id -- str
+        note_id -- str
 
         citation -- unicode
 
@@ -382,8 +383,8 @@ def odf_create_note(note_class='footnote', id=None, citation=None, body=None):
               '<text:note-body/>'
             '</text:note>')
     element = odf_create_element(data)
-    if id is not None:
-        element.set_attribute('text:id', id)
+    if note_id is not None:
+        element.set_attribute('text:id', note_id)
     if citation is not None:
         note_citation = element.get_element('text:note-citation')
         note_citation.set_text(citation)
@@ -639,8 +640,8 @@ def odf_create_keywords_variable(fixed=False):
 
 
 
-def odf_create_draw_page(name, master_page=None, page_layout=None, id=None,
-                         style=None):
+def odf_create_draw_page(name, master_page=None, page_layout=None,
+                         note_id=None, style=None):
     """This element is a container for content in a drawing or presentation
     document.
 
@@ -652,7 +653,7 @@ def odf_create_draw_page(name, master_page=None, page_layout=None, id=None,
 
         page_layout -- str
 
-        id -- str
+        note_id -- str
 
         style -- str
 
@@ -667,8 +668,8 @@ def odf_create_draw_page(name, master_page=None, page_layout=None, id=None,
     if page_layout:
         element.set_attribute('presentation:presentation-page-layout-name',
                               page_layout)
-    if id:
-        element.set_attribute('draw:id', id)
+    if note_id:
+        element.set_attribute('draw:id', note_id)
     return element
 
 
