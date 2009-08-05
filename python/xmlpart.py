@@ -468,6 +468,27 @@ class odf_element(object):
             element.del_attribute(key)
 
 
+    #
+    # Lists
+    #
+
+    def is_list(self):
+        return self.get_name() == 'text:list'
+
+
+    def insert_item(self, text, position):
+        if not self.is_list():
+            raise TypeError, 'this element is not a list'
+        raise NotImplementedError
+
+
+
+    def append_item(self, text):
+        if not self.is_list():
+            raise TypeError, 'this element is not a list'
+        raise NotImplementedError
+
+
 
 class odf_xmlpart(object):
     """Representation of an XML part.
