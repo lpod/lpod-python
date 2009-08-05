@@ -59,7 +59,7 @@ class GetElementTestCase(TestCase):
 
     def test_get_element_missed(self):
         content = self.content
-        paragraph = content.get_paragraph(999)
+        paragraph = content.get_paragraph_by_position(999)
         self.assertEqual(paragraph, None)
 
 
@@ -116,7 +116,7 @@ class TestSection(TestCase):
 
     def test_get_section(self):
         content = self.content
-        section = content.get_section(2)
+        section = content.get_section_by_position(2)
         name = section.get_attribute('text:name')
         self.assertEqual(name, "Section2")
 
@@ -154,7 +154,7 @@ class TestParagraph(TestCase):
 
     def test_get_paragraph_list_context(self):
         content = self.content
-        section2 = content.get_section(2)
+        section2 = content.get_section_by_position(2)
         paragraphs = content.get_paragraph_list(context=section2)
         self.assertEqual(len(paragraphs), 1)
         paragraph = paragraphs[0]
@@ -164,7 +164,7 @@ class TestParagraph(TestCase):
 
     def test_get_paragraph(self):
         content = self.content
-        paragraph = content.get_paragraph(4)
+        paragraph = content.get_paragraph_by_position(4)
         text = paragraph.get_text()
         expected = 'This is the first paragraph of the second title.'
         self.assertEqual(text, expected)
@@ -226,7 +226,7 @@ class TestSpan(TestCase):
 
     def test_get_span(self):
         content = self.content
-        span = content.get_span(2)
+        span = content.get_span_by_position(2)
         expected = ('<text:span text:style-name="T2">'
                       'rouge'
                     '</text:span>')
@@ -236,7 +236,7 @@ class TestSpan(TestCase):
     def test_insert_span(self):
         span = odf_create_span('my_style', u'my text')
         clone = self.content.clone()
-        paragraph = clone.get_paragraph(1)
+        paragraph = clone.get_paragraph_by_position(1)
         paragraph.insert_element(span, LAST_CHILD)
 
 
@@ -291,7 +291,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list_context(self):
         content = self.content
-        section2 = content.get_section(2)
+        section2 = content.get_section_by_position(2)
         headings = content.get_heading_list(context=section2)
         self.assertEqual(len(headings), 1)
         heading = headings[0]
@@ -301,14 +301,14 @@ class TestHeading(TestCase):
 
     def test_get_heading(self):
         content = self.content
-        heading = content.get_heading(2)
+        heading = content.get_heading_by_position(2)
         text = heading.get_text()
         self.assertEqual(text, u'Level 2 Title')
 
 
     def test_get_heading_level(self):
         content = self.content
-        heading = content.get_heading(1, level=2)
+        heading = content.get_heading_by_position(1, level=2)
         text = heading.get_text()
         self.assertEqual(text, u'Level 2 Title')
 
@@ -360,13 +360,13 @@ class TestFrame(TestCase):
 
     def test_get_frame_by_name(self):
         content = self.content
-        frame = content.get_frame(name=u"Logo")
+        frame = content.get_frame_by_name(u"Logo")
         self.assertEqual(frame.get_name(), 'draw:frame')
 
 
     def test_get_frame_by_position(self):
         content = self.content
-        frame = content.get_frame(position=2)
+        frame = content.get_frame_by_position(2)
         self.assertEqual(frame.get_attribute('presentation:class'), u'notes')
 
 
@@ -381,9 +381,9 @@ class TestFrame(TestCase):
         body.append_element(frame2)
         result = clone.get_frame_list(style='Graphics')
         self.assertEqual(len(result), 2)
-        element = clone.get_frame(name=u"frame1")
+        element = clone.get_frame_by_name(u"frame1")
         self.assertEqual(element.get_name(), 'draw:frame')
-        element = clone.get_frame(name=u"frame2")
+        element = clone.get_frame_by_name(u"frame2")
         self.assertEqual(element.get_name(), 'draw:frame')
 
 
@@ -417,14 +417,14 @@ class TestImage(TestCase):
 
     def test_get_image_name(self):
         content = self.content
-        element = content.get_image(name=u"Logo")
+        element = content.get_image_by_name(u"Logo")
         # Searched by frame but got the inner image with no name
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
     def test_get_image_position(self):
         content = self.content
-        element = content.get_image(position=1)
+        element = content.get_image_by_position(1)
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
@@ -435,10 +435,10 @@ class TestImage(TestCase):
         frame = odf_create_frame(u"Image Frame", size=('0cm', '0cm'),
                                  style='Graphics')
         frame.insert_element(image, LAST_CHILD)
-        clone.get_frame(position=1).insert_element(frame, NEXT_SIBLING)
-        element = clone.get_image(name=u"Image Frame")
+        clone.get_frame_by_position(1).insert_element(frame, NEXT_SIBLING)
+        element = clone.get_image_by_name(u"Image Frame")
         self.assertEqual(element.get_attribute('xlink:href'), path)
-        element = clone.get_image(position=2)
+        element = clone.get_image_by_position(2)
         self.assertEqual(element.get_attribute('xlink:href'), path)
 
 
@@ -743,10 +743,10 @@ class TestTable(TestCase):
         body.insert_element(table, LAST_CHILD)
 
         # Get OK ?
-        table = clone.get_table(name=u"New Table")
+        table = clone.get_table_by_name(u"New Table")
         self.assertEqual(table.get_attribute('table:name'), 'a_table')
 
-        table = clone.get_table(position=1)
+        table = clone.get_table_by_position(1)
         self.assertEqual(table.get_attribute('table:name'), 'a_table')
 
 
@@ -884,7 +884,7 @@ class TestNote(TestCase):
 
     def test_get_note(self):
         content = self.content
-        note = content.get_note('ftn0')
+        note = content.get_note_by_id('ftn0')
         self.assertEqual(note.get_name(), 'text:note')
 
 
@@ -910,7 +910,7 @@ class TestNote(TestCase):
     def test_insert_note(self):
         clone = self.content.clone()
         note = odf_create_note(u'1', id='note1', body=u'a footnote')
-        paragraph = clone.get_paragraph(1)
+        paragraph = clone.get_paragraph_by_position(1)
         paragraph.insert_element(note, LAST_CHILD)
 
 
@@ -1053,7 +1053,7 @@ class TestAnnotation(TestCase):
         creator = u"Plato"
         text = u"It's like you're in a cave."
         annotation = odf_create_annotation(creator, text)
-        context = clone.get_paragraph(1)
+        context = clone.get_paragraph_by_position(1)
         context.wrap_text(annotation, offset=27)
         annotations = clone.get_annotation_list()
         self.assertEqual(len(annotations), 2)
@@ -1207,7 +1207,7 @@ class TestLinks(TestCase):
         clone = document.clone()
 
         self.content = clone.get_xmlpart('content')
-        self.paragraph = self.content.get_paragraph(1)
+        self.paragraph = self.content.get_paragraph_by_position(1)
 
 
     def test_create_link1(self):
@@ -1235,7 +1235,7 @@ class TestLinks(TestCase):
         paragraph.append_element(link1)
         paragraph.append_element(link2)
 
-        element = self.content.get_link(name=u'link2')
+        element = self.content.get_link_by_name(u'link2')
         expected = ('<text:a xlink:href="http://example.com/" '
                       'office:name="link2"/>')
         self.assertEqual(element.serialize(), expected)
@@ -1470,23 +1470,6 @@ class TestGetCell(TestCase):
         self.assertEqual((x, y), (731, 123))
 
 
-    def test_get_cell(self):
-        content = self.content
-        table = content.get_table(name='a_table')
-
-        cell = content.get_cell('D3', table)
-        paragraph = content.get_paragraph(1, context=cell)
-        self.assertEqual(paragraph.get_text(), '2')
-
-        cell = content.get_cell('F3', table)
-        paragraph = content.get_paragraph(1, context=cell)
-        self.assertEqual(paragraph.get_text(), '3')
-
-        cell = content.get_cell('D4', table)
-        paragraph = content.get_paragraph(1, context=cell)
-        self.assertEqual(paragraph.get_text(), '4')
-
-
 
 class TestDrawPage(TestCase):
 
@@ -1535,9 +1518,9 @@ class TestDrawPage(TestCase):
 
     def test_get_draw_page(self):
         content = self.content.clone()
-        result = content.get_draw_page(name=u"Titre")
+        result = content.get_draw_page_by_name(u"Titre")
         self.assert_(isinstance(result, odf_element))
-        result = content.get_draw_page(name=u"Conclusion")
+        result = content.get_draw_page_by_name(u"Conclusion")
         self.assertEqual(result, None)
 
 
@@ -1571,7 +1554,7 @@ class BookmarkTest(TestCase):
         bookmark = odf_create_bookmark(u'foo')
         self.body.append_element(bookmark)
 
-        get = self.content.get_bookmark(name=u'foo')
+        get = self.content.get_bookmark_by_name(u'foo')
         expected = '<text:bookmark text:name="foo"/>'
         self.assertEqual(get.serialize(), expected)
 
@@ -1589,7 +1572,7 @@ class BookmarkTest(TestCase):
         bookmark_start = odf_create_bookmark_start(u'foo')
         self.body.append_element(bookmark_start)
 
-        get = self.content.get_bookmark_start(name=u'foo')
+        get = self.content.get_bookmark_start_by_name(u'foo')
         expected = '<text:bookmark-start text:name="foo"/>'
         self.assertEqual(get.serialize(), expected)
 
@@ -1607,7 +1590,7 @@ class BookmarkTest(TestCase):
         bookmark_end = odf_create_bookmark_end(u'foo')
         self.body.append_element(bookmark_end)
 
-        get = self.content.get_bookmark_end(name=u'foo')
+        get = self.content.get_bookmark_end_by_name(u'foo')
         expected = '<text:bookmark-end text:name="foo"/>'
         self.assertEqual(get.serialize(), expected)
 
@@ -1651,7 +1634,7 @@ class reference_markTest(TestCase):
         reference_mark = odf_create_reference_mark(u'foo')
         self.body.append_element(reference_mark)
 
-        get = self.content.get_reference_mark(name=u'foo')
+        get = self.content.get_reference_mark_by_name(u'foo')
         expected = '<text:reference-mark text:name="foo"/>'
         self.assertEqual(get.serialize(), expected)
 
@@ -1669,7 +1652,7 @@ class reference_markTest(TestCase):
         reference_mark_start = odf_create_reference_mark_start(u'foo')
         self.body.append_element(reference_mark_start)
 
-        get = self.content.get_reference_mark_start(name=u'foo')
+        get = self.content.get_reference_mark_start_by_name(u'foo')
         expected = '<text:reference-mark-start text:name="foo"/>'
         self.assertEqual(get.serialize(), expected)
 
@@ -1688,7 +1671,7 @@ class reference_markTest(TestCase):
         reference_mark_end = odf_create_reference_mark_end(u'foo')
         self.body.append_element(reference_mark_end)
 
-        get = self.content.get_reference_mark_end(name=u'foo')
+        get = self.content.get_reference_mark_end_by_name(u'foo')
         expected = '<text:reference-mark-end text:name="foo"/>'
         self.assertEqual(get.serialize(), expected)
 

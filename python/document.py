@@ -135,6 +135,7 @@ def odf_create_frame(name, size=('1cm', '1cm'), page=None,
         if position:
             options += ' svg:x="%s" svg:y="%s"' % position
     data = '<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" %s/>'
+    width, height = size
     element = odf_create_element(data % (name.encode('utf_8'), width, height,
                                          options))
     if style:
@@ -300,7 +301,7 @@ def odf_create_list_item(text_or_element=None):
         element.set_text_content(text_or_element)
     elif isinstance(text_or_element, odf_element):
         element.append_element(text_or_element)
-    else:
+    elif text_or_element is not None:
         raise TypeError, "expected unicode or odf_element"
     return element
 

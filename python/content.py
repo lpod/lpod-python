@@ -206,7 +206,7 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_note(self, text_id, context=None):
+    def get_note_by_id(self, text_id, context=None):
         return self._get_element('text:note', text_id=text_id,
                                  context=context)
 
@@ -381,7 +381,13 @@ class odf_content(odf_xmlpart):
     #
 
     def get_link_list(self, name=None, title=None, context=None):
+        if name or title:
+            raise NotImplementedError
         return self._get_element_list('text:a', context=context)
+
+
+    def get_link_by_name(self, name, context=None):
+        raise NotImplementedError
 
 
     #
