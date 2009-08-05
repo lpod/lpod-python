@@ -394,8 +394,10 @@ class ElementStylePropertiesTestCase(TestCase):
 class RegexTestCase(TestCase):
 
     def setUp(self):
-        self.container = odf_get_container('samples/example.odt')
+        self.container = odf_get_container('samples/span_style.odt')
         self.content = odf_xmlpart('content', self.container)
+        self.paragraph = self.content.get_element('//text:p')
+        self.span = self.paragraph.get_element('//text:span')
 
 
     def tearDown(self):
@@ -404,18 +406,24 @@ class RegexTestCase(TestCase):
 
 
     def test_match_paragraph(self):
-        # TODO u"ère" dans un paragraph
-        raise NotImplementedError
+        """ Match text in a paragraph
+        """
+        match = self.paragraph.match(u'ère')
+        return self.assertTrue(match)
 
 
     def test_match_span(self):
-        # TODO u"roug" dans un span
-        raise NotImplementedError
+        """ Match text in a span from the parent paragraph
+        """
+        match = self.paragraph.match(u'roug')
+        return self.assertTrue(match)
 
 
     def test_match_inner_span(self):
-        # TODO u"roug" depuis le paragraphe
-        raise NotImplementedError
+        """ Match text in a span from the span
+        """
+        match = self.span.match(u'moust')
+        return self.assertTrue(match)
 
 
 

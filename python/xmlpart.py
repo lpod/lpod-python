@@ -239,9 +239,13 @@ class odf_element(object):
             element.text = text
 
 
-    def match(self, substring):
-        # TODO support regex
-        return substring in self.get_text()
+    def match(self, pattern):
+        """ True if the text of the odf_element match one or more times the
+            pattern.
+        """
+        regex = compile(pattern)
+        text = self.get_text()
+        return regex.search(text) is not None
 
 
     def get_parent(self):
