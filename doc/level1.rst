@@ -203,7 +203,6 @@ Text marks and indices
    the host ODF element. Beware: this offset is related to the text of the
    parent element (which could be a text span).
 
->>>>>>> Added note related stuff:doc/level1.rst
 - Range bookmarks
 
    A range bookmark is an identified text range which can spread across
