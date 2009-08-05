@@ -15,7 +15,7 @@ and associated resources across a virtual file system.
 
 class: odf_container
 --------------------
-	
+  
 The odf_container represents the physical Open Document package, whatever
 the storage option. The package consists of either a zip compressed archive
 including XML and non-XML parts, of a flat, uncompressed XML file.
@@ -33,96 +33,95 @@ Constructors
 ~~~~~~~~~~~~
 
 odf_get_container(uri)
-	Instantiates an odf_container object which is a read-write interface to
-	an existing ODF package corresponding to the given URI. The package may
-	be an ODF-compliant zip or an ODF-compliant flat XML file.
+  Instantiates an odf_container object which is a read-write interface to
+  an existing ODF package corresponding to the given URI. The package may
+  be an ODF-compliant zip or an ODF-compliant flat XML file.
 
 odf_new_container_from_class({document_class})
-	Returns a new odf_container corresponding to the given ODF document class
-	(i.e. presently text, spreadsheet, presentation, or drawing).
-	
+  Returns a new odf_container corresponding to the given ODF document class
+  (i.e. presently text, spreadsheet, presentation, or drawing).
+  
 odf_new_container_from_template(uri)
-	Returns a new odf_container instantiated from an existing ODF template
-    package. Same as odf_get_container(), but the template package is
-    read-only.
+  Returns a new odf_container instantiated from an existing ODF template
+  package. Same as odf_get_container(), but the template package is read-only.
 
 Methods
 ~~~~~~~
 
 clone()
-	Returns a new odf_container that is a copy of the current instance.
+  Returns a new odf_container that is a copy of the current instance.
 
 del_part(part_name)
-	Deletes a part in the container. The target part is selected
-	according to the same rules as with get_part().
-	
-	This part deletion applies to the odf_container object but not
-	immediately to the physical underlying package. It's made
-	persistent by the next save() call, like any other change
-	regarding an odf_container.
+  Deletes a part in the container. The target part is selected
+  according to the same rules as with get_part().
+  
+  This part deletion applies to the odf_container object but not
+  immediately to the physical underlying package. It's made
+  persistent by the next save() call, like any other change
+  regarding an odf_container.
 
 get_part(part_name)
-	Extracts and returns a part, i.e. either a member file of the package,
-	if the physical container is a regular ODF zip archive, or a subset of
-	the XML content, if the package is a flat XML file. The extracted part
-	is returned as raw data; it's not parsed or interpreted in any way.
-	
-	The part to be extracted depends on the given part_name and is selected
-	according to the following rules:
-	
-	If part_name is "content", "styles", "meta" or "settings", then the
-	selected part is the "part_name.xml" member file in case of zip archive
-	or the "office:document-part_name" in case of flat XML file.
-	
-	For any other part, the given part_name must be either the explicit
-	path/name of the needed resource in the zip package, or the full name
-	of the needed element in the XML flat file. With flat XML packages,
-	it's assumed that the root element is always <office:document> and
-	the selected part_name is always a direct child of the root element.
-	
-	The return value is null if the given part_name doesn't match an
-	existing part.
+  Extracts and returns a part, i.e. either a member file of the package,
+  if the physical container is a regular ODF zip archive, or a subset of
+  the XML content, if the package is a flat XML file. The extracted part
+  is returned as raw data; it's not parsed or interpreted in any way.
+  
+  The part to be extracted depends on the given part_name and is selected
+  according to the following rules:
+  
+  If part_name is "content", "styles", "meta" or "settings", then the
+  selected part is the "part_name.xml" member file in case of zip archive
+  or the "office:document-part_name" in case of flat XML file.
+  
+  For any other part, the given part_name must be either the explicit
+  path/name of the needed resource in the zip package, or the full name
+  of the needed element in the XML flat file. With flat XML packages,
+  it's assumed that the root element is always <office:document> and
+  the selected part_name is always a direct child of the root element.
+  
+  The return value is null if the given part_name doesn't match an
+  existing part.
 
 save()
-	Commits every change previously done through other odf_container
-	methods and makes them persistent in the underlying physical
-	container. Without argument, the changes are committed in the
-	source container (i.e. the physical file used to create the
-	odf_container instance using get_container()). Without argument,
-	this method fails if the current odf_container has been created
-	using odf_new_container() or odf_new_container_from_template().
-	
+  Commits every change previously done through other odf_container
+  methods and makes them persistent in the underlying physical
+  container. Without argument, the changes are committed in the
+  source container (i.e. the physical file used to create the
+  odf_container instance using get_container()). Without argument,
+  this method fails if the current odf_container has been created
+  using odf_new_container() or odf_new_container_from_template().
+  
 save(packaging)
-	Like save(), but with a specified packaging format, which possibly
-	differs from the packaging format of the source document. Allowed
-	package types are "zip" and "flat". 
+  Like save(), but with a specified packaging format, which possibly
+  differs from the packaging format of the source document. Allowed
+  package types are "zip" and "flat". 
 
 save(uri)
-	Like save(), but with an explicit target which is not the source
-	container. The source container remains unchanged. Behaves just like
-	the "save as..." feature of a typical desktop application.
-	
+  Like save(), but with an explicit target which is not the source
+  container. The source container remains unchanged. Behaves just like
+  the "save as..." feature of a typical desktop application.
+  
 save(uri, packaging)
-	Like save(), but with an explicit target which is not the source
-	container and a specified packaging format, which possibly
-	differs from the packaging format of the source document. Allowed
-	package types are "zip" and "flat".
+  Like save(), but with an explicit target which is not the source
+  container and a specified packaging format, which possibly
+  differs from the packaging format of the source document. Allowed
+  package types are "zip" and "flat".
 
 set_part(part_name, data)
-	Creates or replaces a part in the current odf_container using external
-	raw data.
-	
-	The target part_name is selected according to the same rules as with
-	get_part().
-	
-	As with del_part(), the change applies to the odf_container object in
-	memory but it doesn't affect the corresponding persistent package
-	before the next call of the save() method.
-	
-	The provided data is used "as is", without any package consistency
-	check. If the current odf_container is a flat XML package, the user
-	is responsible of the XML well-formedness and ODF compliance of this
-	material.
+  Creates or replaces a part in the current odf_container using external
+  raw data.
+  
+  The target part_name is selected according to the same rules as with
+  get_part().
+  
+  As with del_part(), the change applies to the odf_container object in
+  memory but it doesn't affect the corresponding persistent package
+  before the next call of the save() method.
+  
+  The provided data is used "as is", without any package consistency
+  check. If the current odf_container is a flat XML package, the user
+  is responsible of the XML well-formedness and ODF compliance of this
+  material.
 
 save(uri, packaging)
     Saves the container to the optionally given URI (or by default the same
@@ -169,22 +168,22 @@ Constructor
 ~~~~~~~~~~~
 
 odf_xmlpart(part_name, container)
-	Instantiates an odf_xmlpart object from the XML content of a given
-	part in a previously created odf_container object. The given part_name
-	must correspond to an existing ODF XML part name. The given name is
-	just the functional name of the part, not the real storage name which
-	depends on the packaging type of the container. The return value is
-	an odf_xmlpart instance, or null if case of failure for any reason. 
+  Instantiates an odf_xmlpart object from the XML content of a given
+  part in a previously created odf_container object. The given part_name
+  must correspond to an existing ODF XML part name. The given name is
+  just the functional name of the part, not the real storage name which
+  depends on the packaging type of the container. The return value is
+  an odf_xmlpart instance, or null if case of failure for any reason. 
 
 General I/O Methods
 ~~~~~~~~~~~~~~~~~~~
 
 container()
-	Returns the odf_container object from which the current instance has
-	been extracted.
+  Returns the odf_container object from which the current instance has
+  been extracted.
 
 events()
-	**TBD**
+  **TBD**
 
 
 odf_xmlpart
@@ -206,16 +205,16 @@ Methods
 ~~~~~~~
 
 get_element_list(xpath_expr)
-    Returns the list of odf_element matching the given XPath expression in the
-    whole part. An empty list is returned if no element matches.
+  Returns the list of odf_element matching the given XPath expression in the
+  whole part. An empty list is returned if no element matches.
 
 get_element(xpath_expr)
-    Returns the first odf_element matching the given XPath expression in the
-	whole part. Null is returned if no element matches.
+  Returns the first odf_element matching the given XPath expression in the
+  whole part. Null is returned if no element matches.
 
 serialize(pretty)
-    Returns the part as an XML document string. If pretty is true, the XML is
-    pretty printed.
+  Returns the part as an XML document string. If pretty is true, the XML is
+  pretty printed.
 
 delete(child)
     Deletes a child odf_element from the part.
