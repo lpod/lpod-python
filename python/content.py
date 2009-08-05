@@ -4,7 +4,7 @@
 # Import from the Standard Library
 
 # Import from lpod
-from utils import _check_position_or_name, _get_cell_coordinates, get_value
+from utils import _get_cell_coordinates, get_value
 from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD
 
 
@@ -109,6 +109,14 @@ class odf_content(odf_xmlpart):
     def get_frame_by_position(self, position, context=None):
         return self._get_element('draw:frame', position=position,
                                  context=context)
+
+
+    def get_frame_by_title(self, regex, context=None):
+        raise NotImplementedError
+
+
+    def get_frame_by_description(self, regex,  context=None):
+        raise NotImplementedError
 
 
     #
@@ -358,22 +366,22 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_draw_page(self, name=None, position=None, context=None):
-        _check_position_or_name(position, name)
+    def get_draw_page_by_name(self, name, context=None):
         return self._get_element('draw:page', draw_name=name,
-                                 position=position, context=context)
+                                 context=context)
+
+
+    def get_draw_page_by_position(self, position, context=None):
+        return self._get_element('draw:page', position=position,
+                                 context=context)
 
 
     #
     # Links
     #
 
-    def get_link_list(self, context=None):
+    def get_link_list(self, name=None, , title=None, context=None):
         return self._get_element_list('text:a', context=context)
-
-
-    def get_link(self, name, context=None):
-        return self._get_element('text:a', office_name=name, context=context)
 
 
     #
@@ -384,7 +392,7 @@ class odf_content(odf_xmlpart):
         return self._get_element_list('text:bookmark', context=context)
 
 
-    def get_bookmark(self, name, context=None):
+    def get_bookmark_by_name(self, name, context=None):
         return self._get_element('text:bookmark', text_name=name,
                                  context=context)
 
@@ -393,7 +401,7 @@ class odf_content(odf_xmlpart):
         return self._get_element_list('text:bookmark-start', context=context)
 
 
-    def get_bookmark_start(self, name, context=None):
+    def get_bookmark_start_by_name(self, name, context=None):
         return self._get_element('text:bookmark-start', text_name=name,
                                  context=context)
 
@@ -402,7 +410,7 @@ class odf_content(odf_xmlpart):
         return self._get_element_list('text:bookmark-end', context=context)
 
 
-    def get_bookmark_end(self, name, context=None):
+    def get_bookmark_end_by_name(self, name, context=None):
         return self._get_element('text:bookmark-end', text_name=name,
                                  context=context)
 
@@ -415,7 +423,7 @@ class odf_content(odf_xmlpart):
         return self._get_element_list('text:reference-mark', context=context)
 
 
-    def get_reference_mark(self, name, context=None):
+    def get_reference_mark_by_name(self, name, context=None):
         return self._get_element('text:reference-mark', text_name=name,
                                  context=context)
 
@@ -425,7 +433,7 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_reference_mark_start(self, name, context=None):
+    def get_reference_mark_start_by_name(self, name, context=None):
         return self._get_element('text:reference-mark-start', text_name=name,
                                  context=context)
 
@@ -435,6 +443,6 @@ class odf_content(odf_xmlpart):
                                       context=context)
 
 
-    def get_reference_mark_end(self, name, context=None):
+    def get_reference_mark_end_by_name(self, name, context=None):
         return self._get_element('text:reference-mark-end', text_name=name,
                                  context=context)

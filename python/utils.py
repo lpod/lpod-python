@@ -145,12 +145,6 @@ def _get_cell_coordinates(obj):
 
 
 
-def _check_position_or_name(position, name):
-    if not ((position is None) ^ (name is None)):
-        raise ValueError, 'You must choose either position or name'
-
-
-
 class Date(object):
 
     @staticmethod
