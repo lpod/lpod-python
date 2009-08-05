@@ -306,6 +306,12 @@ Structured containers
 
 - Tables
 - Lists
+
+  .. figure:: figures/lpod_list.*
+     :align: center
+
+
+
 - Data pilot (pivot) tables TODO
 - Sections
 - Draw pages TODO
