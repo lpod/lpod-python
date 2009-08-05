@@ -4,10 +4,9 @@
 # Import from lpod
 from lpod.document import odf_new_document_from_type
 from lpod.document import odf_create_paragraph, odf_create_heading
-from lpod.document import odf_create_list, odf_create_list_item
-from lpod.document import odf_create_note, odf_create_annotation
 
-
+from lpod.document import odf_create_drawpage
+from lpod.document import odf_create_textframe, odf_create_imageframe
 
 # helper function
 def get_thumbnail_file(filename):
@@ -21,8 +20,6 @@ def get_thumbnail_file(filename):
     im.close()
     filedescriptor.seek(0)
     return filedescriptor
-
-
 
 # Creation of the document
 document = odf_new_document_from_type('presentation')
@@ -39,8 +36,8 @@ draw_textframe1 = odf_create_textframe(text_elment,
                                        position=('1cm', '0cm'))
 page.append_element(draw_textframe1)
 
-# if first arg is texte a paragraph is created
-draw_textframe1 = odf_create_textframe(u"Noël",
+# if first arg is text a paragraph is created
+draw_textframe2 = odf_create_textframe(u"Noël",
                                        size=('5cm', '100mm'),
                                        position=('1cm', '0cm'))
 page.append_element(draw_textframe2)
@@ -57,7 +54,7 @@ page.append_element(draw_imageframe1)
 
 
 # Add an image frame from a file descriptor
-filedescriptor = get_thumbnail_file(u'images/zoé.jpg'):
+filedescriptor = get_thumbnail_file(u'images/zoé.jpg')
 document.addfile(filedescriptor)
 
 draw_imageframe2 = odf_create_imageframe(filedescriptor,

@@ -5,7 +5,6 @@
 from lpod.document import odf_new_document_from_type
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_list, odf_create_list_item
-from lpod.document import odf_create_note, odf_create_annotation
 
 # Creation of the document
 document = odf_new_document_from_type('text')
@@ -23,20 +22,14 @@ body.append_element(paragraph)
 my_list = odf_create_list([u'thé', u'café'])
 item = odf_create_list_item(u'chocolat')
 my_list.append_element(item)
+my_list.append_element(u'Chicoré')
 body.append_element(my_list)
 
-# Footnote, endnote, annotations
-footnote = odf_create_note(u'1', id='note1', body=u'A footnote')
-paragraph = odf_create_paragraph(text=u'A paragraph with a footnote.')
-
-##offset = len(u'A paragraph')
-##paragraph.wrap_text(footnote, offset=offset)
-##body.append_element(paragraph)
-
-paragraph.add_footnote(footnote, place="xxx")
-paragraph.add_endnote(footnote, place=34)
-paragraph.add_annotation(footnote, place='')
-paragraph.add_note(footnote, type="footnote", place="")
+# Footnote
+paragraph = odf_create_paragraph(text=u'A paragraph with a footnote in it.')
+note = u'Author, A. (2007). "How to cite references", New York: McGraw-Hill.'
+paragraph.add_footnote(u'1', id='note1', place='footnote', body=note)
+body.append_element(paragraph)
 
 # Save
-document.save('basic-text.odt', pretty=True)
+document.save('text_cookbook.odt', pretty=True)
