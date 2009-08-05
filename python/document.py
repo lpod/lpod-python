@@ -27,7 +27,7 @@ def odf_create_section(style=None):
 
     Arguments:
 
-        style -- str
+        style -- unicode
 
     Return: odf_element
     """
@@ -44,7 +44,7 @@ def odf_create_paragraph(text=None, style=None):
 
     Arguments:
 
-        style -- str
+        style -- unicode
 
         text -- unicode
 
@@ -65,7 +65,7 @@ def odf_create_span(text=None, style=None):
 
     Arguments:
 
-        style -- str
+        style -- unicode
 
         text -- unicode
 
@@ -80,7 +80,8 @@ def odf_create_span(text=None, style=None):
 
 
 
-def odf_create_heading(level, text=None, style=None):
+def odf_create_heading(level, text=None, restart_numnering=False,
+                       start_value=None, style=None):
     """Create a heading element of the given style and level, containing the
     optional given text.
 
@@ -90,9 +91,9 @@ def odf_create_heading(level, text=None, style=None):
 
         level -- int
 
-        style -- str
-
         text -- unicode
+
+        style -- unicode
 
     Return: odf_element
     """
@@ -100,6 +101,10 @@ def odf_create_heading(level, text=None, style=None):
     element = odf_create_element(data % level)
     if text:
         element.set_text(text)
+    if restart_numnering:
+        raise NotImplementedError
+    if start_value:
+        raise NotImplementedError
     if style:
         element.set_attribute('text:style-name', style)
     return element
@@ -124,7 +129,7 @@ def odf_create_frame(name, size=('1cm', '1cm'), page=None,
 
         position -- (str, str)
 
-        style -- str
+        style -- unicode
 
     Return: odf_element
     """
@@ -159,7 +164,7 @@ def odf_create_image(uri):
 
 
 
-def odf_create_imageframe(uri, size, position=None):
+def odf_create_imageframe(uri, size, position=None, style=None):
     """Create a ready-to-use image image, since it must be embedded in a
     frame. Size is a 2-tuple (width, height) and position is a 2-tuple (left,
     top); both are strings including the unit, e.g. ('21cm', '29.7cm'). Images
@@ -172,10 +177,9 @@ def odf_create_imageframe(uri, size, position=None):
 
         size -- (str, str)
 
-        link -- bool
-
         position -- (str, str)
 
+        style -- unicode
 
     Return: odf_element
     """
@@ -183,6 +187,7 @@ def odf_create_imageframe(uri, size, position=None):
 
 
 
+# XXX useful?
 def odf_create_cell(value=None, representation=None, cell_type=None,
                     currency=None):
     """Create a cell element containing the given value. The textual
@@ -216,6 +221,7 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
 
 
 
+# XXX useful?
 def odf_create_row(width=None):
     """Create a row element, optionally filled with "width" number of cells.
 
@@ -234,12 +240,13 @@ def odf_create_row(width=None):
 
 
 
+# XXX useful?
 def odf_create_column(style=None):
     """Create a column element of the optionally given style.
 
     Arguments:
 
-        style -- str
+        style -- unicode
 
     Return: odf_element
     """
@@ -258,13 +265,11 @@ def odf_create_table(name, width=None, height=None, style=None):
 
         name -- unicode
 
-        style -- str
-
         width -- int
 
         height -- int
 
-        style -- str
+        style -- unicode
 
     Return: odf_element
     """
@@ -314,7 +319,7 @@ def odf_create_list(text=[], style=None):
 
         text -- a list of unicode
 
-        style -- str
+        style -- unicode
 
     The "text" argument is just a shortcut for the most common case. To create
     complex lists, first create an empty list, and fill it using built list
@@ -337,7 +342,7 @@ def odf_create_style(name, family, area=None, **kw):
 
     Arguments:
 
-        name -- str
+        name -- unicode
 
         family -- 'paragraph', 'text', 'section', 'table', 'tablecolumn',
                   'table-row', 'table-cell', 'table-page', 'chart',
@@ -698,23 +703,18 @@ def odf_create_link(href, name=None, target_frame=None, style=None,
         visited_style -- string
     """
     element = odf_create_element('<text:a xlink:href="%s"/>' % href)
-
     if name is not None:
         element.set_attribute('office:name', name.encode('utf-8'))
-
     if target_frame is not None:
         element.set_attribute('office:target-frame-name', target_frame)
         if target_frame == '_blank':
             element.set_attribute('xlink:show', 'new')
         else:
             element.set_attribute('xlink:show', 'replace')
-
     if style is not None:
         element.set_attribute('text:style-name', style)
-
     if visited_style is not None:
         element.set_attribute('text:visited-style-name', visited_style)
-
     return element
 
 
@@ -1009,7 +1009,7 @@ class odf_document(object):
 
         Arguments:
 
-            name -- str (name) or unicode (display name)
+            name -- unicode
 
             family -- str
 

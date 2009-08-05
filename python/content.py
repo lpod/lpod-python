@@ -262,7 +262,7 @@ class odf_content(odf_xmlpart):
 
 
     def get_style(self, name_or_element, family):
-        if type(name_or_element) is str:
+        if type(name_or_element) is unicode:
             context = self.get_category_context('automatic')
             return self._get_element('style:style',
                                      style_name=name_or_element,

@@ -73,17 +73,17 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
     query.append(element_name)
     attributes = kw
     if style:
-        attributes['text:style-name'] = style
+        attributes['text:style-name'] = style.encode('utf_8')
     if family:
         attributes['style:family'] = family
     if draw_name:
         attributes['draw:name'] = draw_name
     if draw_style:
-        attributes['draw:style-name'] = draw_style
+        attributes['draw:style-name'] = draw_style.encode('utf_8')
     if table_name:
         attributes['table:name'] = table_name.encode('utf_8')
     if style_name:
-        attributes['style:name'] = style_name
+        attributes['style:name'] = style_name.encode('utf_8')
     if note_class:
         attributes['text:note-class'] = note_class
     if text_id:

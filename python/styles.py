@@ -105,10 +105,7 @@ class odf_styles(odf_xmlpart):
 
     def get_style(self, name_or_element, family, category=None,
                   retrieve_by='name'):
-        if isinstance(name_or_element, odf_element):
-            if not name_or_element.is_style():
-                raise ValueError, "element is not a style element"
-        elif type(name_or_element) is str:
+        if type(name_or_element) is unicode:
             if family == 'page-layout':
                 query = _make_xpath_query('style:page-layout',
                                           style_name=name_or_element)
@@ -120,6 +117,9 @@ class odf_styles(odf_xmlpart):
                 return self.get_element(query)
             else:
                 return context.get_element(query)
+        elif isinstance(name_or_element, odf_element):
+            if not name_or_element.is_style():
+                raise ValueError, "element is not a style element"
         raise TypeError, "style name or element expected"
 
 
