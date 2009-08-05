@@ -426,6 +426,36 @@ class RegexTestCase(TestCase):
         return self.assertTrue(match)
 
 
+    def test_simple_regex(self):
+        """ Match a simple regex
+        """
+        match = self.paragraph.match(u'che roug')
+        return self.assertTrue(match)
+
+
+    def test_intermediate_regex(self):
+        """ Match an intermediate regex
+        """
+        match = self.paragraph.match(u'moustache (blanche|rouge)')
+        return self.assertTrue(match)
+
+
+    def test_complex_regex(self):
+        """ Match a complex regex
+        """
+        # The (?<=...) part is pointless as we don't try to get groups from
+        # a MatchObject. However, it's a valid regex expression.
+        match = self.paragraph.match(ur'(?<=m)(ou)\w+(che) (blan\2|r\1ge)')
+        return self.assertTrue(match)
+
+
+    def test_failing_match(self):
+        """ Test a regex that doesn't match
+        """
+        match = self.paragraph.match(u'Le Père moustache')
+        return self.assertFalse(match)
+
+
 
 class XmlNamespaceTestCase(TestCase):
     """We must be able to use the API with unknown prefix/namespace"""
