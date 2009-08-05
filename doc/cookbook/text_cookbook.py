@@ -19,10 +19,20 @@ paragraph = odf_create_paragraph(text=u'lpOD generated Document')
 body.append_element(paragraph)
 
 # A list
-my_list = odf_create_list([u'thé', u'café'])
-item = odf_create_list_item(u'chocolat')
-my_list.append_element(item)
-my_list.append_element(u'Chicoré')
+my_list = odf_create_list([u'chocolat', u'café'])
+
+item = odf_create_list_item(u'thé')
+item.append_element(odf_create_list([u'thé vert', u'thé rouge']))
+
+my_list.append_item(item)
+
+my_list.insert_item(u'Chicoré', position=1)
+
+the = my_list.get_item_by_content('thé')
+my_list.insert_item(u'Chicoré', before=the)
+my_list.insert_item(u'Chicoré', after=the)
+
+
 body.append_element(my_list)
 
 # Footnote
