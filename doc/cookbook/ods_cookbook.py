@@ -20,6 +20,6 @@ for id, csv_name in enumerate(glob('./files/*.csv')):
     body.append_element(tab)
 
 # Save
-document.save('make-ods-from-csv.ods', pretty=True)
+document.save('spreadsheet.ods', pretty=True)
 
 
