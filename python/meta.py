@@ -433,14 +433,13 @@ class odf_meta(odf_xmlpart):
             value = unicode(Duration.encode(value))
         else:
             raise TypeError, 'unexpected type "%s" for value' % type(value)
-        name_str = name if isinstance(name, str) else name.encode('utf_8')
         # Already the same element ?
         for metadata in self.get_element_list('//meta:user-defined'):
-            if metadata.get_attribute('meta:name') == name_str:
+            if metadata.get_attribute('meta:name') == name:
                 break
         else:
             data = '<meta:user-defined meta:name="%s"/>'
-            metadata = odf_create_element(data % name_str)
+            metadata = odf_create_element(data % name.encode('utf_8'))
             self.get_meta_body().insert_element(metadata, LAST_CHILD)
         metadata.set_attribute('meta:value-type', value_type)
         metadata.set_text(value)

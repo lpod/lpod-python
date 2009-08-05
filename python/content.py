@@ -380,7 +380,7 @@ class odf_content(odf_xmlpart):
     # Links
     #
 
-    def get_link_list(self, name=None, , title=None, context=None):
+    def get_link_list(self, name=None, title=None, context=None):
         return self._get_element_list('text:a', context=context)
 
 
