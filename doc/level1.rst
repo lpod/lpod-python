@@ -313,7 +313,7 @@ Structured containers
 
 - Data pilot (pivot) tables TODO
 - Sections
-- Draw pages TODO
+- Draw pages
 
   .. figure:: figures/lpod_drawpage.*
      :align: center
@@ -338,15 +338,81 @@ Styles
 ======
 
 - Text styles
+
+- List styles
+
+- Outline style
+
+   According to the ODF 1.1 specification, "the outline style is a list style
+   that is applied to all headings within a text document where the heading's
+   paragraph style does not define a list style to use itself". In other words,
+   it's a list of default styles for headings according to their respective
+   hierarchical levels.
+   
+   The outline style should define a style for each heading level in use in the
+   document.
+   
+   The API allows the user to initialize the outline style (if not previously
+   existing in the document), and to create, retrieve and update it for any
+   level.
+   
+   A get_outline_style() method allows the user to get access to the outline
+   style structure. This returned object bears the other outline style related
+   methods. If the outline style is not initialized yet, get_outline_style()
+   returns a null value. If needed, the outline style can be initialized
+   through odf_create_outline_style() followed by insert_outline_style().
+   Of course, it's possible to replace the creation method by cloning the
+   outline style of another document or a style database. The creation method
+   doesn't require any argument and its only purpose is to create an empty
+   structure available for later outline level style definitions.
+   
+   From the outline style object, the user can get or set any outline level
+   style, identified by its hierarchical level. As an example, the following
+   code retrieves the default style for the level 4 headings::
+   
+      os = document.get_outline_style()
+      l4style = os.get_level_style(4)
+   
+   The API allows the user to set style attributes for any level, knowing that
+   a level is identified by a positive integer starting from 1. With the
+   current version of the lpOD level 1 API, a few outline level style
+   attributes are supported, namely:
+   
+      - 'prefix': a string that should be displayed before the heading number;
+      - 'suffix': a string that should be displayed before the heading number;
+      - 'format': the number display format (ex: '1', 'A');
+      - 'display levels': the number of levels whose numbers are displayed at
+      the current level;
+      - 'start value': the first number of a heading at this level;
+      - 'style': the name of the style to use to format the number (that is a
+      regular text style).
+   
+   These attributes (or some of them) can be set or changed through a common
+   outline style based method set_level_style(), taking a level number at its
+   first argument and one or more attribute/value pairs, as in the following
+   example::
+   
+      os = document.get_outline_style()
+      os.set_level_style(1, start=5, prefix='(', suffix=')', format='A')
+      
+   According to the example above, the default numbering scheme for level 1
+   headings will be (A), (B), (C), and so on.
+   
+   Attributes and properties which are not explicitly supported through
+   predefined parameter names in the present version of the API could always
+   be set through the element-oriented methods of the level 0 API, knowing
+   that get_level_style() returns a regular element.
+
+   [See: http://dita.xml.org/wiki/research-document-structure-in-odf]
+   
 - Graphic styles TODO
+
+- Data formatting TODO
+
 - Page styles TODO
 
   .. figure:: figures/lpod_page_style.*
      :align: center
-
-- Data formatting styles
-- text:outline-style
-   see: http://dita.xml.org/wiki/research-document-structure-in-odf
 
 Metadata
 ========
