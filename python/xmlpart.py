@@ -494,8 +494,7 @@ class odf_xmlpart(object):
                           draw_name=None, draw_style=None, table_name=None,
                           note_class=None, style_name=None, text_id=None,
                           text_name=None, office_name=None, level=None,
-                          image_link=None, href=None, position=None,
-                          regex=None, context=None):
+                          href=None, position=None, regex=None, context=None):
         query = _make_xpath_query(element_name, style=style, family=family,
                                   draw_name=draw_name,
                                   draw_style=draw_style,
@@ -503,8 +502,8 @@ class odf_xmlpart(object):
                                   style_name=style_name,
                                   note_class=note_class, text_id=text_id,
                                   text_name=text_name, office_name=office_name,
-                                  level=level, image_link=image_link,
-                                  position=position, context=context)
+                                  level=level, position=position,
+                                  context=context)
         if regex or href:
             raise NotImplementedError
         if context is None:

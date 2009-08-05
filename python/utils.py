@@ -64,8 +64,8 @@ def _get_abspath(local_path):
 def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
                       draw_style=None, table_name=None, style_name=None,
                       note_class=None, text_id=None, text_name=None,
-                      office_name=None, level=None, image_link=None,
-                      position=None, context=None, **kw):
+                      office_name=None, level=None, position=None,
+                      context=None, **kw):
     if context is None:
         query = ['//']
     else:

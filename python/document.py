@@ -106,8 +106,8 @@ def odf_create_heading(level, text=None, style=None):
 
 
 
-def odf_create_frame(name, size, page=None, position=None,
-                     style=None):
+def odf_create_frame(name, size=('1cm', '1cm'), page=None,
+                     position=('0cm', '0cm'), style=None):
     """Create a frame element of the given size. If positionned by page, give
     the page number and the x, y position.
 
@@ -158,7 +158,7 @@ def odf_create_image(uri):
 
 
 
-def odf_create_imageframe(uri, size, link=False, position=None):
+def odf_create_imageframe(uri, size, position=None):
     """Create a ready-to-use image image, since it must be embedded in a
     frame. Size is a 2-tuple (width, height) and position is a 2-tuple (left,
     top); both are strings including the unit, e.g. ('21cm', '29.7cm'). Images

@@ -333,7 +333,7 @@ class TestFrame(TestCase):
 
 
     def test_create_frame1(self):
-        frame1 = odf_create_frame(u"A Frame", '10cm', '10cm',
+        frame1 = odf_create_frame(u"A Frame", size=('10cm', '10cm'),
                                   style='Graphics')
         expected = ('<draw:frame draw:name="A Frame" svg:width="10cm" '
                     'svg:height="10cm" text:anchor-type="paragraph" '
@@ -342,8 +342,9 @@ class TestFrame(TestCase):
 
 
     def test_create_frame2(self):
-        frame2 = odf_create_frame(u"Another Frame", '10cm', '10cm', page=1,
-                                  x='10mm', y='10mm', style='Graphics')
+        frame2 = odf_create_frame(u"Another Frame", size=('10cm', '10cm'),
+                                  page=1, position=('10mm', '10mm'),
+                                  style='Graphics')
         expected = ('<draw:frame draw:name="Another Frame" svg:width="10cm" '
                       'svg:height="10cm" text:anchor-type="page" '
                       'text:anchor-page-number="1" svg:x="10mm" '
@@ -371,9 +372,10 @@ class TestFrame(TestCase):
 
     def test_insert_frame(self):
         clone = self.content.clone()
-        frame1 = odf_create_frame('frame1', '10cm', '10cm', style='Graphics')
-        frame2 = odf_create_frame('frame2', '10cm', '10cm', page=1, x='10mm',
-                                  y='10mm', style='Graphics')
+        frame1 = odf_create_frame('frame1', size=('10cm', '10cm'),
+                                  style='Graphics')
+        frame2 = odf_create_frame('frame2', size=('10cm', '10cm'), page=1,
+                                  position=('10mm', '10mm'), style='Graphics')
         body = clone.get_presentation_body()
         body.append_element(frame1)
         body.append_element(frame2)
@@ -430,7 +432,7 @@ class TestImage(TestCase):
         clone = self.content.clone()
         path = 'a/path'
         image = odf_create_image(path)
-        frame = odf_create_frame(u"Image Frame", '0cm', '0cm',
+        frame = odf_create_frame(u"Image Frame", size=('0cm', '0cm'),
                                  style='Graphics')
         frame.insert_element(image, LAST_CHILD)
         clone.get_frame(position=1).insert_element(frame, NEXT_SIBLING)

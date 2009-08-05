@@ -115,7 +115,7 @@ class odf_content(odf_xmlpart):
     # Images
     #
 
-    def get_image_list(self, style=None, link=None, href=None, context=None):
+    def get_image_list(self, style=None, href=None, context=None):
         """Get all image elements matching the criteria. Style is the style
         name. Set link to False to get only internal images, and True to
         get only external images (not in the container). Href is a regex to
@@ -133,8 +133,8 @@ class odf_content(odf_xmlpart):
 
         Return: list of odf_element
         """
-        return self._get_element_list('draw:image', style=style,
-                                      image_link=link, href=href, context=context)
+        return self._get_element_list('draw:image', style=style, href=href,
+                                      context=context)
 
 
     def get_image_by_name(self, name, context=None):

@@ -388,7 +388,7 @@ class odf_meta(odf_xmlpart):
         result = {}
         for meta in self.get_element_list('//meta:user-defined'):
             # Read the values
-            name = unicode(meta.get_attribute('meta:name'), 'utf_8')
+            name = meta.get_attribute('meta:name')
             value_type = meta.get_attribute('meta:value-type')
             if value_type is None:
                 value_type = 'string'
