@@ -388,7 +388,8 @@ class odf_content(odf_xmlpart):
 
 
     def get_link_by_name(self, name, context=None):
-        raise NotImplementedError
+        # XXX unicity guaranteed?
+        return self._get_element('text:a', office_name=name, context=context)
 
 
     #
