@@ -97,7 +97,7 @@ class odf_content(odf_xmlpart):
     #
 
     def get_frame_list(self, style=None, context=None):
-        return self._get_element_list('draw:frame', style=style,
+        return self._get_element_list('draw:frame', draw_style=style,
                                       context=context)
 
 
