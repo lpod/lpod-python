@@ -15,5 +15,6 @@ __installation_path__ = _get_abspath('')
 # Register element classes
 import heading
 import list
+import page
 import paragraph
 import style
