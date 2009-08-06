@@ -123,21 +123,21 @@ class TestStyle(TestCase):
 
     def test_get_style_automatic(self):
         styles = self.styles
-        style = styles.get_style('Mpm1', 'page-layout')
+        style = styles.get_style(u'Mpm1', 'page-layout')
         # XXX page layout is not found
         self.assertNotEqual(style, None)
 
 
     def test_get_style_named(self):
         styles = self.styles
-        style = styles.get_style('Heading_20_1', 'paragraph')
+        style = styles.get_style(u'Heading_20_1', 'paragraph')
         self.assertNotEqual(style, None)
 
 
     def test_insert_style(self):
         styles = self.styles
         clone = styles.clone()
-        style = odf_create_style('style1', 'paragraph', area='text',
+        style = odf_create_style(u'style1', 'paragraph', area='text',
                                  **{'fo:color': '#0000ff',
                                     'fo:background-color': '#ff0000'})
         context = clone.get_category_context('named')
@@ -148,7 +148,7 @@ class TestStyle(TestCase):
                       '<style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>'
                     '</style:style>')
-        get1 = clone.get_style('style1', 'paragraph')
+        get1 = clone.get_style(u'style1', 'paragraph')
         self.assertEqual(get1.serialize(), expected)
 
 

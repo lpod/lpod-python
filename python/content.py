@@ -262,6 +262,17 @@ class odf_content(odf_xmlpart):
 
 
     def get_style(self, name_or_element, family):
+        """Return the style uniquely identified by the name/family pair. If
+        the argument is already a style object, it will return it.
+
+        Arguments:
+
+            name_or_element -- unicode or odf_element
+
+            family -- str
+
+        Return: odf_element or None if not found
+        """
         if type(name_or_element) is unicode:
             context = self.get_category_context('automatic')
             return self._get_element('style:style',

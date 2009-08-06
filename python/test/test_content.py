@@ -829,7 +829,7 @@ class TestStyle(TestCase):
 
     def test_get_style_automatic(self):
         content = self.content
-        style = content.get_style('P1', 'paragraph')
+        style = content.get_style(u'P1', 'paragraph')
         self.assertNotEqual(style, None)
 
 
@@ -847,7 +847,7 @@ class TestStyle(TestCase):
                       '<style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>'
                     '</style:style>')
-        get1 = clone.get_style('style1', 'paragraph')
+        get1 = clone.get_style(u'style1', 'paragraph')
         self.assertEqual(get1.serialize(), expected)
 
 
@@ -872,7 +872,8 @@ class TestNote(TestCase):
 
         # With an odf_element
         note_body = odf_create_paragraph(u'a footnote', style='Standard')
-        note = odf_create_note(citation=u'1', id='note1', body=note_body)
+        note = odf_create_note(note_id='note1', citation=u'1',
+                               body=note_body)
         expected = self.expected.replace('<text:p>',
                                          '<text:p text:style-name="Standard">')
         self.assertEqual(note.serialize(), expected)
@@ -909,7 +910,8 @@ class TestNote(TestCase):
 
     def test_insert_note(self):
         clone = self.content.clone()
-        note = odf_create_note(citation=u'1', id='note1', body=u'a footnote')
+        note = odf_create_note(note_id='note1', citation=u'1',
+                               body=u'a footnote')
         paragraph = clone.get_paragraph_by_position(1)
         paragraph.insert_element(note, LAST_CHILD)
 
@@ -1490,10 +1492,9 @@ class TestDrawPage(TestCase):
 
 
     def test_create_complex_page(self):
-        element = odf_create_draw_page(u"Introduction",
+        element = odf_create_draw_page(u"Introduction", page_id='id1',
                                        master_page='prs-novelty',
-                                       page_layout='AL1T0', id='id1',
-                                       style='dp1')
+                                       page_layout='AL1T0', style='dp1')
         expected = ('<draw:page draw:name="Introduction" '
                     'draw:style-name="dp1" '
                     'draw:master-page-name="prs-novelty" '

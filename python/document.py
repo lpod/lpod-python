@@ -329,7 +329,7 @@ def odf_create_list(text=[], style=None):
     """
     element = odf_create_element('<text:list/>')
     for value in text:
-        element.append_element(odf_create_list_item(text=value))
+        element.append_element(odf_create_list_item(text_or_element=value))
     if style is not None:
         element.set_attribute('text:style-name', style)
     return element
@@ -357,7 +357,7 @@ def odf_create_style(name, family, area=None, **kw):
     Return: odf_element
     """
     data = '<style:style style:name="%s" style:family="%s"/>'
-    element = odf_create_element(data % (name, family))
+    element = odf_create_element(data % (name.encode('utf_8'), family))
     if kw:
         if area is None:
             area = family
@@ -652,8 +652,8 @@ def odf_create_keywords_variable(fixed=False):
 
 
 
-def odf_create_draw_page(name, master_page=None, page_layout=None,
-                         note_id=None, style=None):
+def odf_create_draw_page(name, page_id=None, master_page=None,
+                         page_layout=None, style=None):
     """This element is a container for content in a drawing or presentation
     document.
 
@@ -665,7 +665,7 @@ def odf_create_draw_page(name, master_page=None, page_layout=None,
 
         page_layout -- str
 
-        note_id -- str
+        page_id -- str
 
         style -- str
 
@@ -680,8 +680,8 @@ def odf_create_draw_page(name, master_page=None, page_layout=None,
     if page_layout:
         element.set_attribute('presentation:presentation-page-layout-name',
                               page_layout)
-    if note_id:
-        element.set_attribute('draw:id', note_id)
+    if page_id:
+        element.set_attribute('draw:id', page_id)
     return element
 
 
