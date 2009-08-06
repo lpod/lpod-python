@@ -175,7 +175,7 @@ class TestParagraph(TestCase):
         clone = content.clone()
         paragraph = odf_create_paragraph(u'An inserted test',
                                          style='Text_20_body')
-        body = clone.get_text_body()
+        body = clone.get_body()
         body.insert_element(paragraph, LAST_CHILD)
         last_paragraph = clone.get_paragraph_list()[-1]
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
@@ -318,7 +318,7 @@ class TestHeading(TestCase):
         clone = content.clone()
         heading = odf_create_heading(2, u'An inserted heading',
                                      style='Heading_20_2')
-        body = clone.get_text_body()
+        body = clone.get_body()
         body.insert_element(heading, LAST_CHILD)
         last_heading = clone.get_heading_list()[-1]
         self.assertEqual(last_heading.get_text(), u'An inserted heading')
@@ -372,11 +372,11 @@ class TestFrame(TestCase):
 
     def test_insert_frame(self):
         clone = self.content.clone()
-        frame1 = odf_create_frame('frame1', size=('10cm', '10cm'),
+        frame1 = odf_create_frame(u"frame1", size=('10cm', '10cm'),
                                   style='Graphics')
-        frame2 = odf_create_frame('frame2', size=('10cm', '10cm'), page=1,
+        frame2 = odf_create_frame(u"frame2", size=('10cm', '10cm'), page=1,
                                   position=('10mm', '10mm'), style='Graphics')
-        body = clone.get_presentation_body()
+        body = clone.get_body()
         body.append_element(frame1)
         body.append_element(frame2)
         result = clone.get_frame_list(style='Graphics')
@@ -739,15 +739,15 @@ class TestTable(TestCase):
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
 
-        body = clone.get_text_body()
+        body = clone.get_body()
         body.insert_element(table, LAST_CHILD)
 
         # Get OK ?
         table = clone.get_table_by_name(u"New Table")
-        self.assertEqual(table.get_attribute('table:name'), 'a_table')
+        self.assertEqual(table.get_attribute('table:name'), u"New Table")
 
-        table = clone.get_table_by_position(1)
-        self.assertEqual(table.get_attribute('table:name'), 'a_table')
+        table = clone.get_table_by_position(4)
+        self.assertEqual(table.get_attribute('table:name'), u"New Table")
 
 
 
@@ -786,7 +786,7 @@ class TestList(TestCase):
         item = odf_create_list_item()
         a_list = odf_create_list(style='a_style')
         a_list.insert_element(item, LAST_CHILD)
-        body = clone.get_text_body()
+        body = clone.get_body()
         body.insert_element(a_list, LAST_CHILD)
 
         expected = ('<text:list text:style-name="a_style">'
@@ -1133,7 +1133,7 @@ class TestVariables(TestCase):
         # ---
 
         variable_set = odf_create_variable_set('foo', value=42)
-        body = content.get_text_body()
+        body = content.get_body()
         body.insert_element(variable_set, LAST_CHILD)
 
         variable_sets = content.get_variable_sets('foo')
@@ -1459,7 +1459,7 @@ class TestGetCell(TestCase):
             row.insert_element(cell, LAST_CHILD)
         table.insert_element(row, LAST_CHILD)
 
-        body = content.get_text_body()
+        body = content.get_body()
         body.insert_element(table, LAST_CHILD)
 
 

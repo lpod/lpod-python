@@ -10,16 +10,8 @@ from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD
 
 class odf_content(odf_xmlpart):
 
-    def get_text_body(self):
-        return self.get_element('//office:text')
-
-
-    def get_spreadsheet_body(self):
-        return self.get_element('//office:spreadsheet')
-
-
-    def get_presentation_body(self):
-        return self.get_element('//office:presentation')
+    def get_body(self):
+        return self.get_element('//office:body/*[1]')
 
 
     #
@@ -300,7 +292,7 @@ class odf_content(odf_xmlpart):
             from document import odf_create_variable_decls
 
             # Variable only in a "text" document ?
-            body = self.get_text_body()
+            body = self.get_body()
             body.insert_element(odf_create_variable_decls(), FIRST_CHILD)
             variable_decls = body.get_element('//text:variable-decls')
 
@@ -341,9 +333,7 @@ class odf_content(odf_xmlpart):
         user_field_decls = self.get_element('//text:user-field-decls')
         if user_field_decls is None:
             from document import odf_create_user_field_decls
-
-            # User fields only in a "text" document ?
-            body = self.get_text_body()
+            body = self.get_body()
             body.insert_element(odf_create_user_field_decls(), FIRST_CHILD)
             user_field_decls = body.get_element('//text:user-field-decls')
 
