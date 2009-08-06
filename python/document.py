@@ -428,16 +428,14 @@ def odf_create_annotation(text_or_element=None, creator=None, date=None):
         elif isinstance(text_or_element, odf_element):
             element.append(text_or_element)
         else:
-            raise TypeError
+            raise TypeError, 'expected unicode or odf_element'
     #if creator is None:
         # TODO get the login name
-    raise NotImplementedError
     if creator:
-        creator = creator.encode('utf_8')
+        element.set_creator(creator)
     if date is None:
         date = datetime.now()
-    date = DateTime.encode(date)
-    text = text.encode('utf_8')
+    element.set_date(date)
     return element
 
 

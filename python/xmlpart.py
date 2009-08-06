@@ -291,19 +291,39 @@ class odf_element(object):
         return [make_odf_element(e) for e in element]
 
 
+    #
+    # Shortcuts expected to be reusable over several elements
+    #
+
     def get_creator(self):
-        dc_creator = self.get_element('//dc:creator')
+        dc_creator = self.get_element('dc:creator')
         if dc_creator is None:
             return None
         return dc_creator.get_text()
 
 
+    def set_creator(self, creator):
+        dc_creator = self.get_element('dc:creator')
+        if dc_creator is None:
+            dc_creator = odf_create_element('<dc:creator/>')
+            self.append_element(dc_creator)
+        dc_creator.set_text(creator)
+
+
     def get_date(self):
-        dc_date = self.get_element('//dc:date')
+        dc_date = self.get_element('dc:date')
         if dc_date is None:
             return None
         date = dc_date.get_text()
         return DateTime.decode(date)
+
+
+    def set_date(self, date):
+        dc_date = self.get_element('dc:date')
+        if dc_date is None:
+            dc_date = odf_create_element('<dc:date/>')
+            self.append_element(dc_date)
+        dc_date.set_text(DateTime.encode(date))
 
 
     def get_text_content(self):
@@ -547,7 +567,8 @@ class odf_xmlpart(object):
                           draw_name=None, draw_style=None, table_name=None,
                           note_class=None, style_name=None, text_id=None,
                           text_name=None, office_name=None, level=None,
-                          href=None, position=None, regex=None, context=None):
+                          href=None, position=None, regex=None,
+                          context=None):
         query = _make_xpath_query(element_name, style=style, family=family,
                                   draw_name=draw_name,
                                   draw_style=draw_style,

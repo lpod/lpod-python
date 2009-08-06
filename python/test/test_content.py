@@ -931,14 +931,14 @@ class TestAnnotation(TestCase):
 
     def test_create_annotation(self):
         # Create
-        annotation = odf_create_annotation(u"Plato", u"Lost Dialogs",
-                datetime(2009, 6, 22, 17, 18, 42))
+        annotation = odf_create_annotation(u"Lost Dialogs", creator=u"Plato",
+                date=datetime(2009, 6, 22, 17, 18, 42))
         expected = ('<office:annotation>'
-                      '<dc:creator>Plato</dc:creator>'
-                      '<dc:date>2009-06-22T17:18:42</dc:date>'
                       '<text:p>'
                         'Lost Dialogs'
                       '</text:p>'
+                      '<dc:creator>Plato</dc:creator>'
+                      '<dc:date>2009-06-22T17:18:42</dc:date>'
                     '</office:annotation>')
         self.assertEqual(annotation.serialize(), expected)
 
@@ -1054,7 +1054,7 @@ class TestAnnotation(TestCase):
         clone = content.clone()
         creator = u"Plato"
         text = u"It's like you're in a cave."
-        annotation = odf_create_annotation(creator, text)
+        annotation = odf_create_annotation(text, creator=creator)
         context = clone.get_paragraph_by_position(1)
         context.wrap_text(annotation, offset=27)
         annotations = clone.get_annotation_list()
