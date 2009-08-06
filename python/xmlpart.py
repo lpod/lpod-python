@@ -95,10 +95,12 @@ def get_prefixed_name(tag):
 
 class_registry = {}
 
-def register_element_class(name, cls):
-    if name in class_registry:
-        raise ValueError,  'element "%s" already registered' % name
-    class_registry[name] = cls
+def register_element_class(qname, cls):
+    # Turn tag name into what lxml is expecting
+    tag = '{%s}%s' % decode_qname(qname)
+    if tag in class_registry:
+        raise ValueError,  'element "%s" already registered' % qname
+    class_registry[tag] = cls
 
 
 
@@ -115,7 +117,7 @@ def odf_create_element(element_data):
         raise ValueError, "element data is empty"
     data = ns_document_data.format(element=element_data)
     root = fromstring(data)
-    return odf_element(root[0])
+    return make_odf_element(root[0])
 
 
 
@@ -135,10 +137,10 @@ class odf_element(object):
         return '%s "%s"' % (object.__str__(self), self.get_name())
 
 
-    # wrap_text must a private function
-    def wrap_text(self, odf_element, offset=0, length=0):
+    # TODO wrap_text must a private function
+    def wrap_text(self, element, offset=0, length=0):
         current = self.__element
-        element = odf_element.__element
+        element = element.__element
 
         total = 0
         for text in current.xpath('text()'):
@@ -411,130 +413,6 @@ class odf_element(object):
     def delete(self, child):
         element = self.__element
         element.remove(child.__element)
-
-
-    #
-    # Style-specific API without subclassing yet
-    #
-
-    def is_style(self):
-        return self.get_attribute('style:name') is not None
-
-
-    def get_style_properties(self, area=None):
-        """Get the mapping of all properties of this style. By default the
-        properties of the same family, e.g. a paragraph style and its
-        paragraph properties. Specify the area to get the text properties of
-        a paragraph style for example.
-        Arguments:
-
-            area -- str
-
-        Return: dict
-        """
-        if not self.is_style():
-            raise TypeError, "this element is not a style"
-        if area is None:
-            area = self.get_attribute('style:family')
-        element = self.get_element('style:%s-properties' % area)
-        if element is None:
-            return None
-        properties = element.get_attributes()
-        # Nested properties are nested dictionaries
-        for child in element.get_children():
-            properties[child.get_name()] = child.get_attributes()
-        return properties
-
-
-    def set_style_properties(self, properties=None, area=None, **kw):
-        """Set the properties of the "area" type of this style. Properties
-        are given either as a dict or as named arguments (or both). The area
-        is identical to the style family by default. If the properties
-        element is missing, it is created.
-        Arguments:
-
-            properties -- dict
-            area -- str
-        """
-        if not self.is_style():
-            raise TypeError, "this element is not a style"
-        if area is None:
-            area = self.get_attribute('style:family')
-        element = self.get_element('style:%s-properties' % area)
-        if element is None:
-            element = odf_create_element('<style:%s-properties/>' % area)
-            self.append_element(element)
-        if properties is not None:
-            for key, value in properties.iteritems():
-                if value is None:
-                    element.del_attribute(key)
-                else:
-                    element.set_attribute(key, value)
-        for key, value in kw.iteritems():
-            if value is None:
-                element.del_attribute(key)
-            else:
-                element.set_attribute(key, value)
-
-
-    def del_style_properties(self, properties=None, area=None, *args):
-        """Delete the given properties, either by list argument or
-        positional argument (or both). Remove only from the given area,
-        identical to the style family by default.
-        Arguments:
-
-            properties -- list
-            area -- str
-        """
-        if not self.is_style():
-            raise TypeError, "this element is not a style"
-        if area is None:
-            area = self.get_attribute('style:family')
-        element = self.get_element('style:%s-properties' % area)
-        if element is None:
-            raise ValueError, "properties element is inexistent"
-        if properties is not None:
-            for key in properties:
-                element.del_attribute(key)
-        for key in args:
-            element.del_attribute(key)
-
-
-    #
-    # Lists
-    #
-
-    def is_list(self):
-        return self.get_name() == 'text:list'
-
-
-    def insert_item(self, text, position):
-        if not self.is_list():
-            raise TypeError, 'this element is not a list'
-        raise NotImplementedError
-
-
-
-    def append_item(self, text):
-        if not self.is_list():
-            raise TypeError, 'this element is not a list'
-        raise NotImplementedError
-
-
-    #
-    # Notes
-    #
-
-    def insert_note(self, note_element,  note_class='footnote', note_id=None,
-                    citation=None, body=None, *args, **kw):
-        # TODO complain if the note has no note_id or citation
-        # TODO note_id may be a function called with note_id(*args, **kw)
-        raise NotImplementedError
-
-
-    def insert_annotation(self, annotation_element, text_or_element=None,
-                          creator=None, date=None):
-        raise NotImplementedError
 
 
 

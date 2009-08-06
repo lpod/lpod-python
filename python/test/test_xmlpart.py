@@ -37,8 +37,6 @@ class ElementTestCase(TestCase):
         self.paragraph_element = content_part.get_element('//text:p[1]')
         self.annotation_element = (
                 content_part.get_element('//office:annotation[1]'))
-        query = '//style:style[@style:family="paragraph"][1]'
-        self.style_element = content_part.get_element(query)
 
 
     def tearDown(self):
@@ -305,89 +303,6 @@ class ElementTraverseTestCase(TestCase):
         self.assertEqual(child.get_name(), 'dc:creator')
         child = children[-1]
         self.assertEqual(child.get_name(), 'text:p')
-
-
-
-class ElementStylePropertiesTestCase(TestCase):
-
-    def setUp(self):
-        container = odf_get_container('samples/example.odt')
-        self.container = container
-        content_part = odf_xmlpart('content', container)
-        self.content_part = content_part
-        self.paragraph_element = content_part.get_element('//text:p[1]')
-        self.annotation_element = (
-                content_part.get_element('//office:annotation[1]'))
-        query = '//style:style[@style:family="paragraph"][1]'
-        self.style_element = content_part.get_element(query)
-
-
-    def test_get_style_properties(self):
-        style = self.style_element
-        self.assert_(style.is_style())
-        properties = style.get_style_properties()
-        self.assert_(isinstance(properties, dict))
-        self.assertEqual(len(properties), 12)
-        self.assertEqual(properties['fo:margin-left'], "0cm")
-
-
-    def test_get_style_properties_area(self):
-        style = self.style_element
-        properties = style.get_style_properties(area='text')
-        self.assert_(isinstance(properties, dict))
-        self.assertEqual(len(properties), 1)
-        self.assertEqual(properties['fo:hyphenate'], "false")
-
-
-    def test_get_style_properties_bad_element(self):
-        element = self.paragraph_element
-        self.assertRaises(TypeError, element.get_style_properties)
-
-
-    def test_get_style_properties_bad_area(self):
-        style = self.style_element
-        properties = style.get_style_properties(area='toto')
-        self.assertEqual(properties, None)
-
-
-    def test_set_style_properties(self):
-        style = self.style_element.clone()
-        style.set_style_properties({'fo:color': '#f00'})
-        properties = style.get_style_properties()
-        self.assertEqual(len(properties), 13)
-        self.assertEqual(properties['fo:color'], "#f00")
-
-
-    def test_set_style_properties_area(self):
-        style = self.style_element.clone()
-        style.set_style_properties({'fo:color': '#f00'}, area='text')
-        properties = style.get_style_properties(area='text')
-        self.assertEqual(len(properties), 2)
-        self.assertEqual(properties['fo:color'], "#f00")
-
-
-    def test_set_style_properties_new_area(self):
-        style = self.style_element.clone()
-        properties = style.get_style_properties(area='toto')
-        self.assertEqual(properties, None)
-        style.set_style_properties({'fo:color': '#f00'}, area='toto')
-        properties = style.get_style_properties(area='toto')
-        self.assertEqual(len(properties), 1)
-        self.assertEqual(properties['fo:color'], "#f00")
-
-
-    def test_del_style_properties(self):
-        style = self.style_element.clone()
-        style.del_style_properties(['fo:margin-left'])
-        properties = style.get_style_properties()
-        self.assertEqual(len(properties), 11)
-        self.assertRaises(KeyError, properties.__getitem__, 'fo:margin-left')
-
-
-    def test_del_style_properties_bad_area(self):
-        style = self.style_element
-        self.assertRaises(ValueError, style.del_style_properties,
-                          area='toto')
 
 
 
