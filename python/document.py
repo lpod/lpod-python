@@ -387,7 +387,7 @@ def odf_create_note(note_class='footnote', note_id=None, citation=None,
               '<text:note-citation/>'
               '<text:note-body/>'
             '</text:note>')
-    element = odf_create_element(data)
+    element = odf_create_element(data % note_class)
     if note_id is not None:
         element.set_attribute('text:id', note_id)
     if citation is not None:
@@ -399,7 +399,7 @@ def odf_create_note(note_class='footnote', note_id=None, citation=None,
         if isinstance(body, unicode):
             note_body.set_text_content(body)
         elif isinstance(body, odf_element):
-            note_body.insert_element(body, LAST_CHILD)
+            note_body.append_element(body)
         else:
             raise ValueError, 'unexpected type for body: "%s"' % type(body)
     return element

@@ -879,7 +879,8 @@ class TestNote(TestCase):
         self.assertEqual(note.serialize(), expected)
 
         # With an unicode object
-        note = odf_create_note(citation=u'1', id='note1', body=u'a footnote')
+        note = odf_create_note(note_id='note1', citation=u'1',
+                               body=u'a footnote')
         self.assertEqual(note.serialize(), self.expected)
 
 
