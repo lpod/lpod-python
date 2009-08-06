@@ -91,8 +91,7 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
     if text_name:
         attributes['text:name'] = text_name.encode('utf_8')
     if office_name:
-        # XXX maybe unicode too
-        attributes['office:name'] = office_name
+        attributes['office:name'] = office_name.encode('utf_8')
     if level:
         attributes['text:outline-level'] = level
     # Sort attributes for reproducible test cases
