@@ -5,12 +5,12 @@
 from xmlpart import register_element_class, odf_element
 
 
-class odf_page(odf_element):
-    """Specialised element for pages of a presentation.
+class odf_draw_page(odf_element):
+    """Specialised element for pages of presentation and drawing.
     """
     # TODO rename the page
     pass
 
 
 
-register_element_class('draw:page', odf_page)
+register_element_class('draw:page', odf_draw_page)
