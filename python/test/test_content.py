@@ -351,7 +351,7 @@ class TestFrame(TestCase):
 
     def test_create_frame2(self):
         frame2 = odf_create_frame(u"Another Frame", size=('10cm', '10cm'),
-                                  anchor_type='page', page=1,
+                                  anchor_type='page', page_number=1,
                                   position=('10mm', '10mm'), style='Graphics')
         expected = ('<draw:frame draw:name="Another Frame" svg:width="10cm" '
                       'svg:height="10cm" text:anchor-type="page" '
@@ -382,8 +382,9 @@ class TestFrame(TestCase):
         clone = self.content.clone()
         frame1 = odf_create_frame(u"frame1", size=('10cm', '10cm'),
                                   style='Graphics')
-        frame2 = odf_create_frame(u"frame2", size=('10cm', '10cm'), page=1,
-                                  position=('10mm', '10mm'), style='Graphics')
+        frame2 = odf_create_frame(u"frame2", size=('10cm', '10cm'),
+                                  page_number=1, position=('10mm', '10mm'),
+                                  style='Graphics')
         body = clone.get_body()
         body.append_element(frame1)
         body.append_element(frame2)

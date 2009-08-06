@@ -112,7 +112,7 @@ def odf_create_heading(level, text=None, restart_numnering=False,
 
 
 def odf_create_frame(name, size=('1cm', '1cm'), anchor_type='paragraph',
-                     page=None, position=None, style=None):
+                     page_number=None, position=None, style=None):
     """Create a frame element of the given size. If positioned by page, give
     the page number and the x, y position.
 
@@ -127,7 +127,7 @@ def odf_create_frame(name, size=('1cm', '1cm'), anchor_type='paragraph',
 
         anchor_type -- 'page', 'frame', 'paragraph', 'char' or 'as-char'
 
-        page -- int
+        page -- int (when anchor_type == 'page')
 
         position -- (str, str)
 
@@ -140,8 +140,8 @@ def odf_create_frame(name, size=('1cm', '1cm'), anchor_type='paragraph',
     element = odf_create_element(data % (name, size[0],
                                          size[1], anchor_type))
 
-    if page is not None:
-        element.set_attribute('text:anchor-page-number', str(page))
+    if page_number is not None:
+        element.set_attribute('text:anchor-page-number', str(page_number))
 
     if position is not None:
         x, y = position
