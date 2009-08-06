@@ -103,9 +103,11 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
                                                       value=str(value)))
         else:
             query.append('[@{qname}]'.format(qname=qname))
+    query = ''.join(query)
     if position is not None:
-        query.append('[{position}]'.format(position=str(position)))
-    return ''.join(query)
+        query = '({query})[{position}]'.format(query=query,
+                                               position=str(position))
+    return query
 
 
 

@@ -34,19 +34,19 @@ class GenerateXPathTestCase(TestCase):
 
     def test_position(self):
         query = _make_xpath_query('text:h', position=2)
-        self.assertEqual(query, '//text:h[2]')
+        self.assertEqual(query, '(//text:h)[2]')
 
 
     def test_attribute_position(self):
         query = _make_xpath_query('text:p', style='Standard', position=2)
-        self.assertEqual(query, '//text:p[@text:style-name="Standard"][2]')
+        self.assertEqual(query, '(//text:p[@text:style-name="Standard"])[2]')
 
 
     def test_two_attributes_position(self):
         query = _make_xpath_query('text:h', style='Standard', level=1,
                                   position=2)
-        expected = ('//text:h[@text:outline-level="1"]'
-                    '[@text:style-name="Standard"][2]')
+        expected = ('(//text:h[@text:outline-level="1"]'
+                    '[@text:style-name="Standard"])[2]')
         self.assertEqual(query, expected)
 
 
