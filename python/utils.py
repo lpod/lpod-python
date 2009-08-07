@@ -292,7 +292,6 @@ def _set_value_and_type(element, value=None, value_type=None,
             value_type = 'string'
         if representation is None:
             representation = value
-        value = value.encode('utf_8')
     elif type(value) is timedelta:
         if value_type is None:
             value_type = 'time'
