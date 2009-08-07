@@ -1,10 +1,63 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
+# Import from the Standard Library
+from csv import reader, Sniffer
+
 # Import from lpod
 from document import odf_create_cell, odf_create_column, odf_create_row
-from utils import _get_cell_coordinates, get_value
+from utils import _get_cell_coordinates, get_value, Date, DateTime, Duration
+from utils import Boolean
+from vfs import vfs
 from xmlpart import odf_create_element, LAST_CHILD
+
+
+
+def _get_python_value(data, encoding):
+    data = unicode(data, encoding)
+
+    # An int ?
+    try:
+        return int(data)
+    except ValueError:
+        pass
+
+    # An float ?
+    try:
+        return float(data)
+    except ValueError:
+        pass
+
+    # A Date ?
+    try:
+        return Date.decode(data)
+    except ValueError:
+        pass
+
+    # A DateTime ?
+    try:
+        # Two tests: "yyyy-mm-dd hh:mm:ss" or "yyyy-mm-ddThh:mm:ss"
+        return DateTime.decode(data.replace(' ', 'T'))
+    except ValueError:
+        pass
+
+    # A Duration ?
+    try:
+        return Duration.decode(data)
+    except ValueError:
+        pass
+
+    # A Boolean ?
+    try:
+        # "True" or "False" with a .lower
+        return Boolean.decode(data.lower())
+    except ValueError:
+        pass
+
+    # XXX Try some other types ?
+
+    # So a text
+    return data
 
 
 
@@ -103,7 +156,7 @@ class odf_table(object):
 
         1) With 'python' data: we must fill name, style and data. data must
            be  a matrix (a list of list) of python objects.
-        2) With odf_element
+        2) With an odf_element
 
         name -- unicode
 
@@ -407,4 +460,52 @@ class odf_table(object):
 
             target.write(delimiter.join(current_row))
             target.write(lineterminator)
+
+
+
+def import_from_csv(fileobj, name, style, delimiter=None, quotechar=None,
+                    lineterminator=None, encoding='utf-8'):
+    """Convert the CSV fileobj to a odf_table.
+
+    Arguments:
+
+      fileobj -- a file object or an URI
+
+      name -- unicode
+
+      style -- string
+
+      delimiter -- string
+
+      quotechar -- string
+
+      lineterminator -- string
+
+      encoding -- string
+    """
+
+    # Load the data
+    # XXX We load the entire file, this can be a problem with a very big file
+    if isinstance(fileobj, str):
+        fileobj = vfs.open(fileobj)
+    data = fileobj.read().splitlines(True)
+
+    # Sniff the dialect
+    sample = ''.join(data[:10])
+    dialect = Sniffer().sniff(sample)
+
+    # We can overload the result
+    if delimiter is not None:
+        dialect.delimiter = delimiter
+    if quotechar is not None:
+        dialect.quotechar = quotechar
+    if lineterminator is not None:
+        dialect.lineterminator = lineterminator
+
+    # Make the rows
+    csv = reader(data, dialect)
+    rows = [ [ _get_python_value(value, encoding) for value in line]
+             for line in csv ]
+
+    return odf_table(name=name, style=style, data=rows)
 
