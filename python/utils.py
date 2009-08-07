@@ -73,41 +73,41 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
     query.append(element_name)
     attributes = kw
     if style:
-        attributes['text:style-name'] = style.encode('utf_8')
+        attributes['text:style-name'] = style
     if family:
         attributes['style:family'] = family
     if draw_name:
-        attributes['draw:name'] = draw_name.encode('utf_8')
+        attributes['draw:name'] = draw_name
     if draw_style:
-        attributes['draw:style-name'] = draw_style.encode('utf_8')
+        attributes['draw:style-name'] = draw_style
     if table_name:
-        attributes['table:name'] = table_name.encode('utf_8')
+        attributes['table:name'] = table_name
     if style_name:
-        attributes['style:name'] = style_name.encode('utf_8')
+        attributes['style:name'] = style_name
     if note_class:
         attributes['text:note-class'] = note_class
     if text_id:
         attributes['text:id'] = text_id
     if text_name:
-        attributes['text:name'] = text_name.encode('utf_8')
+        attributes['text:name'] = text_name
     if office_name:
-        attributes['office:name'] = office_name.encode('utf_8')
+        attributes['office:name'] = office_name
     if office_title:
-        attributes['office:title'] = office_title.encode('utf_8')
+        attributes['office:title'] = office_title
     if level:
         attributes['text:outline-level'] = level
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]
         if value is not None:
-            query.append('[@{qname}="{value}"]'.format(qname=qname,
-                                                      value=str(value)))
+            query.append(u'[@{qname}="{value}"]'.format(qname=qname,
+                                                        value=unicode(value)))
         else:
-            query.append('[@{qname}]'.format(qname=qname))
+            query.append(u'[@{qname}]'.format(qname=qname))
     query = ''.join(query)
     if position is not None:
-        query = '({query})[{position}]'.format(query=query,
-                                               position=str(position))
+        query = u'({query})[{position}]'.format(query=query,
+                                                position=str(position))
     return query
 
 
