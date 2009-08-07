@@ -11,7 +11,7 @@ from lxml.etree import parse, fromstring, tostring, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
-from utils import _get_abspath, DateTime
+from utils import _get_abspath, DateTime, convert_unicode
 from utils import _make_xpath_query
 
 
@@ -111,10 +111,11 @@ def make_odf_element(native_element):
 
 
 def odf_create_element(element_data):
-    if not isinstance(element_data, str):
-        raise TypeError, "element data is not str"
+    if not isinstance(element_data, (str, unicode)):
+        raise TypeError, "element data is not str/unicode"
     if not element_data.strip():
         raise ValueError, "element data is empty"
+    element_data = convert_unicode(element_data)
     data = ns_document_data.format(element=element_data)
     root = fromstring(data)
     return make_odf_element(root[0])

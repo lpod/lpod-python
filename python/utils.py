@@ -405,3 +405,15 @@ def set_value(element, value):
 
     # Else => error
     raise ValueError, 'set_value: unexpected element "%s"' % tag
+
+
+
+def convert_unicode(text):
+    result = []
+    for c in text:
+        code = ord(c)
+        if code >= 128:
+            result.append('&#%d;' % code)
+        else:
+            result.append(c)
+    return ''.join(result)
