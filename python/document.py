@@ -684,7 +684,7 @@ def odf_create_draw_page(name, page_id=None, master_page=None,
 
 
 
-def odf_create_link(href, name=None, target_frame=None, style=None,
+def odf_create_link(href, name=None, title=None, target_frame=None, style=None,
                     visited_style=None):
     """Return a text:a odf_element.
 
@@ -693,6 +693,8 @@ def odf_create_link(href, name=None, target_frame=None, style=None,
         href -- string (an URI)
 
         name -- unicode
+
+        title -- unicode
 
         target_name -- '_self', '_blank', '_parent', '_top'
 
@@ -703,6 +705,8 @@ def odf_create_link(href, name=None, target_frame=None, style=None,
     element = odf_create_element('<text:a xlink:href="%s"/>' % href)
     if name is not None:
         element.set_attribute('office:name', name.encode('utf-8'))
+    if title is not None:
+        element.set_attribute('office:title', title.encode('utf-8'))
     if target_frame is not None:
         element.set_attribute('office:target-frame-name', target_frame)
         if target_frame == '_blank':

@@ -64,8 +64,8 @@ def _get_abspath(local_path):
 def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
                       draw_style=None, table_name=None, style_name=None,
                       note_class=None, text_id=None, text_name=None,
-                      office_name=None, level=None, position=None,
-                      context=None, **kw):
+                      office_name=None, office_title=None, level=None,
+                      position=None, context=None, **kw):
     if context is None:
         query = ['//']
     else:
@@ -92,6 +92,8 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
         attributes['text:name'] = text_name.encode('utf_8')
     if office_name:
         attributes['office:name'] = office_name.encode('utf_8')
+    if office_title:
+        attributes['office:title'] = office_title.encode('utf_8')
     if level:
         attributes['text:outline-level'] = level
     # Sort attributes for reproducible test cases

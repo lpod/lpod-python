@@ -444,8 +444,8 @@ class odf_xmlpart(object):
     def _get_element_list(self, element_name, style=None, family=None,
                           draw_name=None, draw_style=None, table_name=None,
                           note_class=None, style_name=None, text_id=None,
-                          text_name=None, office_name=None, level=None,
-                          href=None, position=None, regex=None,
+                          text_name=None, office_name=None, office_title=None,
+                          level=None, href=None, position=None, regex=None,
                           context=None):
         query = _make_xpath_query(element_name, style=style, family=family,
                                   draw_name=draw_name,
@@ -454,6 +454,7 @@ class odf_xmlpart(object):
                                   style_name=style_name,
                                   note_class=note_class, text_id=text_id,
                                   text_name=text_name, office_name=office_name,
+                                  office_title=office_title,
                                   level=level, position=position,
                                   context=context)
         if regex or href:
@@ -466,14 +467,15 @@ class odf_xmlpart(object):
     def _get_element(self, element_name, style=None, family=None,
                      draw_name=None, table_name=None, style_name=None,
                      text_id=None, text_name=None, office_name=None,
-                     level=None, href=None, position=None, regex=None,
-                     context=None):
+                     office_title=None, level=None, href=None, position=None,
+                     regex=None, context=None):
         result = self._get_element_list(element_name, style=style,
                                         family=family, draw_name=draw_name,
                                         table_name=table_name,
                                         style_name=style_name,
                                         text_id=text_id, text_name=text_name,
-                                        office_name=office_name, level=level,
+                                        office_name=office_name,
+                                        office_title=office_title, level=level,
                                         href=href, position=position,
                                         regex=regex, context=context)
         if result:

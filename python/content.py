@@ -382,9 +382,8 @@ class odf_content(odf_xmlpart):
     #
 
     def get_link_list(self, name=None, title=None, context=None):
-        if name or title:
-            raise NotImplementedError
-        return self._get_element_list('text:a', context=context)
+        return self._get_element_list('text:a', office_name=name,
+                                      office_title=title, context=context)
 
 
     def get_link_by_name(self, name, context=None):
