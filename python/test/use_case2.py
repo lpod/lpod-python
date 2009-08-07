@@ -144,11 +144,11 @@ body.insert_element(paragraph, LAST_CHILD)
 # 6- A variable
 # -------------
 
-# A variable "foo" with the value 42
-variable_set = odf_create_variable_set('foo', value=42)
+# A variable "spam" with the value 42
+variable_set = odf_create_variable_set('spam', value=42)
 
 value_type = variable_set.get_attribute('office:value-type')
-variable_decl = odf_create_variable_decl('foo', value_type)
+variable_decl = odf_create_variable_decl('spam', value_type)
 
 # Insert
 heading = odf_create_heading(1, text=u'A variable')
@@ -157,14 +157,14 @@ body.insert_element(heading, LAST_CHILD)
 decl = content.get_variable_decls()
 decl.insert_element(variable_decl, LAST_CHILD)
 
-text = u'Set of foo.'
+text = u'Set of spam.'
 paragraph = odf_create_paragraph('Standard', text)
 body.insert_element(paragraph, LAST_CHILD)
 paragraph.wrap_text(variable_set, offset=len(text))
 
-text = u'The value of foo is: '
-value = content.get_variable_value('foo')
-variable_get = odf_create_variable_get('foo', value)
+text = u'The value of spam is: '
+value = content.get_variable_value('spam')
+variable_get = odf_create_variable_get('spam', value)
 paragraph = odf_create_paragraph('Standard', text)
 body.insert_element(paragraph, LAST_CHILD)
 paragraph.wrap_text(variable_get, offset=len(text))

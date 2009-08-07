@@ -41,8 +41,9 @@ from lpod.document import odf_create_reference_mark_end
 
 
 
-from lpod.utils import _get_cell_coordinates
+from lpod.utils import _get_cell_coordinates, convert_unicode
 from lpod.xmlpart import LAST_CHILD, NEXT_SIBLING, odf_element
+
 
 
 class GetElementTestCase(TestCase):
@@ -771,12 +772,12 @@ class TestList(TestCase):
 
     def test_create_list(self):
         item = odf_create_list_item()
-        a_list = odf_create_list([u'foo'])
-        expected = ('<text:list>'
-                      '<text:list-item>'
-                        '<text:p>foo</text:p>'
-                      '</text:list-item>'
-                    '</text:list>')
+        a_list = odf_create_list([u'你好 Zoé'])
+        expected = (('<text:list>'
+                       '<text:list-item>'
+                         '<text:p>%s</text:p>'
+                       '</text:list-item>'
+                     '</text:list>') % convert_unicode(u'你好 Zoé'))
         self.assertEqual(a_list.serialize(), expected)
 
 
@@ -1077,39 +1078,40 @@ class TestVariables(TestCase):
         # decl
         # ----
 
-        variable_decl = odf_create_variable_decl('foo', 'float')
+        variable_decl = odf_create_variable_decl(u'你好 Zoé', 'float')
         expected = ('<text:variable-decl office:value-type="float" '
-                      'text:name="foo"/>')
+                      'text:name="%s"/>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_decl.serialize(), expected)
 
         # set
         # ---
 
         # A float ?
-        variable_set = odf_create_variable_set('foo', value=42)
-        expected = ('<text:variable-set text:name="foo" '
+        variable_set = odf_create_variable_set(u'你好 Zoé', value=42)
+        expected = ('<text:variable-set text:name="%s" '
                       'office:value-type="float" office:value="42" '
-                      'text:display="none"/>')
+                      'text:display="none"/>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_set.serialize(), expected)
 
         # A datetime ?
         date = datetime(2009, 5, 17, 23, 23, 00)
-        variable_set = odf_create_variable_set('foo', value=date, display=True)
-        expected = ('<text:variable-set text:name="foo" '
+        variable_set = odf_create_variable_set(u'你好 Zoé', value=date,
+                                               display=True)
+        expected = ('<text:variable-set text:name="%s" '
                       'office:value-type="date" '
                       'office:date-value="2009-05-17T23:23:00">'
                       '2009-05-17T23:23:00'
-                    '</text:variable-set>')
+                    '</text:variable-set>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_set.serialize(), expected)
 
         # get
         # ---
 
-        variable_get = odf_create_variable_get('foo', value=42)
-        expected = ('<text:variable-get text:name="foo" '
+        variable_get = odf_create_variable_get(u'你好 Zoé', value=42)
+        expected = ('<text:variable-get text:name="%s" '
                       'office:value-type="float" office:value="42">'
                       '42'
-                    '</text:variable-get>')
+                    '</text:variable-get>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_get.serialize(), expected)
 
 
@@ -1121,32 +1123,32 @@ class TestVariables(TestCase):
         # ----
 
         decls = content.get_variable_decls()
-        variable_decl = odf_create_variable_decl('foo', 'float')
+        variable_decl = odf_create_variable_decl(u'你好 Zoé', 'float')
         decls.insert_element(variable_decl, LAST_CHILD)
 
-        variable_decl = content.get_variable_decl('foo')
+        variable_decl = content.get_variable_decl(u'你好 Zoé')
         expected = ('<text:variable-decl office:value-type="float" '
-                      'text:name="foo"/>')
+                      'text:name="%s"/>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_decl.serialize(), expected)
 
         # set
         # ---
 
-        variable_set = odf_create_variable_set('foo', value=42)
+        variable_set = odf_create_variable_set(u'你好 Zoé', value=42)
         body = content.get_body()
         body.insert_element(variable_set, LAST_CHILD)
 
-        variable_sets = content.get_variable_sets('foo')
+        variable_sets = content.get_variable_sets(u'你好 Zoé')
         self.assertEqual(len(variable_sets), 1)
-        expected = ('<text:variable-set text:name="foo" '
+        expected = ('<text:variable-set text:name="%s" '
                       'office:value-type="float" office:value="42" '
-                      'text:display="none"/>')
+                      'text:display="none"/>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_sets[0].serialize(), expected)
 
         # get value
         # ---------
 
-        value = content.get_variable_value('foo')
+        value = content.get_variable_value(u'你好 Zoé')
         self.assertEqual(value, 42)
 
 
@@ -1162,20 +1164,21 @@ class TestUserFields(TestCase):
         # decl
         # ----
 
-        user_field_decl = odf_create_user_field_decl('foo', 42)
-        expected = ('<text:user-field-decl text:name="foo" '
-                      'office:value-type="float" office:value="42"/>')
+        user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
+        expected = (('<text:user-field-decl text:name="%s" '
+                       'office:value-type="float" office:value="42"/>') %
+                      convert_unicode(u'你好 Zoé'))
         self.assertEqual(user_field_decl.serialize(), expected)
 
 
         # get
         # ---
 
-        user_field_get = odf_create_user_field_get('foo', value=42)
-        expected = ('<text:user-field-get text:name="foo" '
+        user_field_get = odf_create_user_field_get(u'你好 Zoé', value=42)
+        expected = ('<text:user-field-get text:name="%s" '
                       'office:value-type="float" office:value="42">'
                       '42'
-                    '</text:user-field-get>')
+                    '</text:user-field-get>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(user_field_get.serialize(), expected)
 
 
@@ -1187,18 +1190,19 @@ class TestUserFields(TestCase):
         # ----
 
         decls = content.get_user_field_decls()
-        user_field_decl = odf_create_user_field_decl('foo', 42)
+        user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
         decls.insert_element(user_field_decl, LAST_CHILD)
 
-        user_field_decl = content.get_user_field_decl('foo')
-        expected = ('<text:user-field-decl text:name="foo" '
-                      'office:value-type="float" office:value="42"/>')
+        user_field_decl = content.get_user_field_decl(u'你好 Zoé')
+        expected = (('<text:user-field-decl text:name="%s" '
+                       'office:value-type="float" office:value="42"/>') %
+                      convert_unicode(u'你好 Zoé'))
         self.assertEqual(user_field_decl.serialize(), expected)
 
         # get value
         # ---------
 
-        value = content.get_user_field_value('foo')
+        value = content.get_user_field_value(u'你好 Zoé')
         self.assertEqual(value, 42)
 
 
@@ -1601,29 +1605,33 @@ class BookmarkTest(TestCase):
         self.body = clone.get_body()
 
     def test_create_bookmark(self):
-        bookmark = odf_create_bookmark(u'foo')
-        expected = '<text:bookmark text:name="foo"/>'
+        bookmark = odf_create_bookmark(u'你好 Zoé')
+        expected = ('<text:bookmark text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(bookmark.serialize(), expected)
 
 
     def test_create_bookmark_start(self):
-        bookmark_start = odf_create_bookmark_start(u'foo')
-        expected = '<text:bookmark-start text:name="foo"/>'
+        bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
+        expected = ('<text:bookmark-start text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(bookmark_start.serialize(), expected)
 
 
     def test_create_bookmark_end(self):
-        bookmark_end = odf_create_bookmark_end(u'foo')
-        expected = '<text:bookmark-end text:name="foo"/>'
+        bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
+        expected = ('<text:bookmark-end text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(bookmark_end.serialize(), expected)
 
 
     def test_get_bookmark(self):
-        bookmark = odf_create_bookmark(u'foo')
+        bookmark = odf_create_bookmark(u'你好 Zoé')
         self.body.append_element(bookmark)
 
-        get = self.content.get_bookmark_by_name(u'foo')
-        expected = '<text:bookmark text:name="foo"/>'
+        get = self.content.get_bookmark_by_name(u'你好 Zoé')
+        expected = ('<text:bookmark text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
@@ -1637,38 +1645,42 @@ class BookmarkTest(TestCase):
 
 
     def test_get_bookmark_start(self):
-        bookmark_start = odf_create_bookmark_start(u'foo')
+        bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
         self.body.append_element(bookmark_start)
 
-        get = self.content.get_bookmark_start_by_name(u'foo')
-        expected = '<text:bookmark-start text:name="foo"/>'
+        get = self.content.get_bookmark_start_by_name(u'你好 Zoé')
+        expected = ('<text:bookmark-start text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_bookmark_start_list(self):
-        bookmark_start = odf_create_bookmark_start(u'foo')
+        bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
         self.body.append_element(bookmark_start)
 
         get = self.content.get_bookmark_start_list()[0]
-        expected = '<text:bookmark-start text:name="foo"/>'
+        expected = ('<text:bookmark-start text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_bookmark_end(self):
-        bookmark_end = odf_create_bookmark_end(u'foo')
+        bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
         self.body.append_element(bookmark_end)
 
-        get = self.content.get_bookmark_end_by_name(u'foo')
-        expected = '<text:bookmark-end text:name="foo"/>'
+        get = self.content.get_bookmark_end_by_name(u'你好 Zoé')
+        expected = ('<text:bookmark-end text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_bookmark_end_list(self):
-        bookmark_end = odf_create_bookmark_end(u'foo')
+        bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
         self.body.append_element(bookmark_end)
 
         get = self.content.get_bookmark_end_list()[0]
-        expected = '<text:bookmark-end text:name="foo"/>'
+        expected = ('<text:bookmark-end text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
@@ -1681,47 +1693,53 @@ class reference_markTest(TestCase):
         self.body = clone.get_body()
 
     def test_create_reference_mark(self):
-        reference_mark = odf_create_reference_mark(u'foo')
-        expected = '<text:reference-mark text:name="foo"/>'
+        reference_mark = odf_create_reference_mark(u'你好 Zoé')
+        expected = ('<text:reference-mark text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(reference_mark.serialize(), expected)
 
 
     def test_create_reference_mark_start(self):
-        reference_mark_start = odf_create_reference_mark_start(u'foo')
-        expected = '<text:reference-mark-start text:name="foo"/>'
+        reference_mark_start = odf_create_reference_mark_start(u'你好 Zoé')
+        expected = ('<text:reference-mark-start text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(reference_mark_start.serialize(), expected)
 
 
     def test_create_reference_mark_end(self):
-        reference_mark_end = odf_create_reference_mark_end(u'foo')
-        expected = '<text:reference-mark-end text:name="foo"/>'
+        reference_mark_end = odf_create_reference_mark_end(u'你好 Zoé')
+        expected = ('<text:reference-mark-end text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(reference_mark_end.serialize(), expected)
 
 
     def test_get_reference_mark(self):
-        reference_mark = odf_create_reference_mark(u'foo')
+        reference_mark = odf_create_reference_mark(u'你好 Zoé')
         self.body.append_element(reference_mark)
 
-        get = self.content.get_reference_mark_by_name(u'foo')
-        expected = '<text:reference-mark text:name="foo"/>'
+        get = self.content.get_reference_mark_by_name(u'你好 Zoé')
+        expected = ('<text:reference-mark text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_reference_mark_list(self):
-        reference_mark = odf_create_reference_mark(u'foo')
+        reference_mark = odf_create_reference_mark(u'你好 Zoé')
         self.body.append_element(reference_mark)
 
         get = self.content.get_reference_mark_list()[0]
-        expected = '<text:reference-mark text:name="foo"/>'
+        expected = ('<text:reference-mark text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_reference_mark_start(self):
-        reference_mark_start = odf_create_reference_mark_start(u'foo')
+        reference_mark_start = odf_create_reference_mark_start(u'你好 Zoé')
         self.body.append_element(reference_mark_start)
 
-        get = self.content.get_reference_mark_start_by_name(u'foo')
-        expected = '<text:reference-mark-start text:name="foo"/>'
+        get = self.content.get_reference_mark_start_by_name(u'你好 Zoé')
+        expected = ('<text:reference-mark-start text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
@@ -1736,11 +1754,12 @@ class reference_markTest(TestCase):
 
 
     def test_get_reference_mark_end(self):
-        reference_mark_end = odf_create_reference_mark_end(u'foo')
+        reference_mark_end = odf_create_reference_mark_end(u'你好 Zoé')
         self.body.append_element(reference_mark_end)
 
-        get = self.content.get_reference_mark_end_by_name(u'foo')
-        expected = '<text:reference-mark-end text:name="foo"/>'
+        get = self.content.get_reference_mark_end_by_name(u'你好 Zoé')
+        expected = ('<text:reference-mark-end text:name="%s"/>' %
+                    convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 

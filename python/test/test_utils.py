@@ -10,7 +10,7 @@ from lpod.document import odf_get_document, odf_create_cell
 from lpod.document import odf_create_variable_set, odf_create_user_field_decl
 from lpod.utils import _make_xpath_query
 from lpod.utils import DateTime, Duration, Boolean
-from lpod.utils import get_value, set_value
+from lpod.utils import get_value, set_value, convert_unicode
 
 
 class GenerateXPathTestCase(TestCase):
@@ -111,37 +111,40 @@ class Set_Get_ValueTestCase(TestCase):
         cell = odf_create_cell(42)
         self.assertEqual(get_value(cell), 42)
 
-        set_value(cell, u'foo')
+        set_value(cell, u'你好 Zoé')
         expected = ('<table:table-cell office:value-type="string" '
-                      'office:string-value="foo">'
+                      'office:string-value="%s">'
                       '<text:p>'
-                        'foo'
+                        '%s'
                       '</text:p>'
-                    '</table:table-cell>')
+                    '</table:table-cell>') % (
+                                (convert_unicode(u'你好 Zoé'),) * 2)
         self.assertEqual(cell.serialize(), expected)
 
 
     def test_with_variable(self):
 
-        variable_set = odf_create_variable_set('foo', 42)
+        variable_set = odf_create_variable_set(u'你好 Zoé', 42)
         self.assertEqual(get_value(variable_set), 42)
 
-        set_value(variable_set, u'foo')
+        set_value(variable_set, u'你好 Zoé')
         expected = ('<text:variable-set office:value-type="string" '
-                      'office:string-value="foo" text:name="foo" '
+                      'office:string-value="%s" text:name="%s" '
                       'text:display="none">'
-                      'foo'
-                    '</text:variable-set>')
+                      '%s'
+                    '</text:variable-set>') % (
+                            (convert_unicode(u'你好 Zoé'),) * 3)
         self.assertEqual(variable_set.serialize(), expected)
 
 
     def test_with_user_field(self):
-        user_field_decl = odf_create_user_field_decl('foo', 42)
+        user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
         self.assertEqual(get_value(user_field_decl), 42)
 
-        set_value(user_field_decl, u'foo')
-        expected = ('<text:user-field-decl office:value-type="string" '
-                      'office:string-value="foo" text:name="foo"/>')
+        set_value(user_field_decl, u'你好 Zoé')
+        expected = (('<text:user-field-decl office:value-type="string" '
+                       'office:string-value="%s" text:name="%s"/>') %
+                            ((convert_unicode(u'你好 Zoé'),) * 2))
         self.assertEqual(user_field_decl.serialize(), expected)
 
 
