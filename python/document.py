@@ -111,9 +111,9 @@ def odf_create_heading(level, text=None, restart_numnering=False,
 
 
 
-def odf_create_frame(name, size=('1cm', '1cm'), page=None,
-                     position=('0cm', '0cm'), style=None):
-    """Create a frame element of the given size. If positionned by page, give
+def odf_create_frame(name, size=('1cm', '1cm'), anchor_type='paragraph',
+                     page=None, position=None, style=None):
+    """Create a frame element of the given size. If positioned by page, give
     the page number and the x, y position.
 
     Size is a 2-tuple (width, height) and position is a 2-tuple (left,
@@ -125,6 +125,8 @@ def odf_create_frame(name, size=('1cm', '1cm'), page=None,
 
         size -- (str, str)
 
+        anchor_type -- 'page', 'frame', 'paragraph', 'char' or 'as-char'
+
         page -- int
 
         position -- (str, str)
@@ -133,18 +135,22 @@ def odf_create_frame(name, size=('1cm', '1cm'), page=None,
 
     Return: odf_element
     """
-    if page is None:
-        options = 'text:anchor-type="paragraph"'
-    else:
-        options = 'text:anchor-type="page" text:anchor-page-number="%d"' % page
-        if position:
-            options += ' svg:x="%s" svg:y="%s"' % position
-    data = '<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" %s/>'
-    width, height = size
-    element = odf_create_element(data % (name.encode('utf_8'), width, height,
-                                         options))
-    if style:
+    data = ('<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" '
+            'text:anchor-type="%s"/>')
+    element = odf_create_element(data % (name.encode('utf-8'), size[0],
+                                         size[1], anchor_type))
+
+    if page is not None:
+        element.set_attribute('text:anchor-page-number', str(page))
+
+    if position is not None:
+        x, y = position
+        element.set_attribute('svg:x', x)
+        element.set_attribute('svg:y', y)
+
+    if style is not None:
         element.set_attribute('draw:style-name', style)
+
     return element
 
 
@@ -935,7 +941,8 @@ class odf_document(object):
         if isinstance(uri_or_file, str):
             file = vfs.open(uri_or_file)
         data= file.read()
-        # TODO generate something like Pictures/10000000000001D40000003C8B3889D9.png"
+        # TODO generate something like
+        # Pictures/10000000000001D40000003C8B3889D9.png"
         name = xxx
         self.container.set_part(xxx, data)
         return name

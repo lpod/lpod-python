@@ -343,8 +343,8 @@ class TestFrame(TestCase):
 
     def test_create_frame2(self):
         frame2 = odf_create_frame(u"Another Frame", size=('10cm', '10cm'),
-                                  page=1, position=('10mm', '10mm'),
-                                  style='Graphics')
+                                  anchor_type='page', page=1,
+                                  position=('10mm', '10mm'), style='Graphics')
         expected = ('<draw:frame draw:name="Another Frame" svg:width="10cm" '
                       'svg:height="10cm" text:anchor-type="page" '
                       'text:anchor-page-number="1" svg:x="10mm" '
