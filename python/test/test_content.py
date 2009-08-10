@@ -800,7 +800,8 @@ class TestList(TestCase):
         breakfast = odf_create_list()
         breakfast.insert_item(u'spam', 1)
         breakfast.insert_item(u'eggs', 2)
-        breakfast.insert_item(u'ham', -1)
+        item = odf_create_list_item(u'ham')
+        breakfast.insert_item(item, -1)
 
         expected = ('<text:list>'
                       '<text:list-item>'
@@ -822,7 +823,8 @@ class TestList(TestCase):
         breakfast = odf_create_list()
         breakfast.append_item(u'spam')
         breakfast.append_item(u'ham')
-        breakfast.append_item(u'eggs')
+        item = odf_create_list_item(u'eggs')
+        breakfast.append_item(item)
 
         expected = ('<text:list>'
                       '<text:list-item>'
