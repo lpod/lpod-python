@@ -135,9 +135,9 @@ def odf_create_frame(name, size=('1cm', '1cm'), anchor_type='paragraph',
 
     Return: odf_element
     """
-    data = ('<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" '
-            'text:anchor-type="%s"/>')
-    element = odf_create_element(data % (name.encode('utf-8'), size[0],
+    data = (u'<draw:frame draw:name="%s" svg:width="%s" svg:height="%s" '
+            u'text:anchor-type="%s"/>')
+    element = odf_create_element(data % (name, size[0],
                                          size[1], anchor_type))
 
     if page is not None:
@@ -279,8 +279,8 @@ def odf_create_table(name, width=None, height=None, style=None):
 
     Return: odf_element
     """
-    name = name.encode('utf_8')
-    element = odf_create_element('<table:table table:name="%s"/>' % name)
+    name = name
+    element = odf_create_element(u'<table:table table:name="%s"/>' % name)
     if width is not None or height is not None:
         width = width if width is not None else 1
         height = height if height is not None else 1
@@ -362,8 +362,8 @@ def odf_create_style(name, family, area=None, **kw):
 
     Return: odf_element
     """
-    data = '<style:style style:name="%s" style:family="%s"/>'
-    element = odf_create_element(data % (name.encode('utf_8'), family))
+    data = u'<style:style style:name="%s" style:family="%s"/>'
+    element = odf_create_element(data % (name, family))
     if kw:
         if area is None:
             area = family
@@ -452,14 +452,14 @@ def odf_create_variable_decls():
 
 
 def odf_create_variable_decl(name, value_type):
-    data = '<text:variable-decl office:value-type="%s" text:name="%s"/>'
+    data = u'<text:variable-decl office:value-type="%s" text:name="%s"/>'
     return odf_create_element(data % (value_type, name))
 
 
 
 def odf_create_variable_set(name, value, value_type=None, display=False,
                             representation=None, style=None):
-    data = '<text:variable-set text:name="%s" />'
+    data = u'<text:variable-set text:name="%s" />'
     element = odf_create_element(data % name)
     representation = _set_value_and_type(element, value=value,
                                          value_type=value_type,
@@ -476,7 +476,7 @@ def odf_create_variable_set(name, value, value_type=None, display=False,
 
 def odf_create_variable_get(name, value, value_type=None,
                             representation=None, style=None):
-    data = '<text:variable-get text:name="%s" />'
+    data = u'<text:variable-get text:name="%s" />'
     element = odf_create_element(data % name)
     representation = _set_value_and_type(element, value=value,
                                          value_type=value_type,
@@ -494,7 +494,7 @@ def odf_create_user_field_decls():
 
 
 def odf_create_user_field_decl(name, value, value_type=None):
-    data = '<text:user-field-decl text:name="%s"/>'
+    data = u'<text:user-field-decl text:name="%s"/>'
     element = odf_create_element(data % name)
     _set_value_and_type(element, value=value, value_type=value_type)
     return element
@@ -503,7 +503,7 @@ def odf_create_user_field_decl(name, value, value_type=None):
 
 def odf_create_user_field_get(name, value, value_type=None,
                               representation=None, style=None):
-    data = '<text:user-field-get text:name="%s" />'
+    data = u'<text:user-field-get text:name="%s" />'
     element = odf_create_element(data % name)
     representation = _set_value_and_type(element, value=value,
                                          value_type=value_type,
@@ -676,7 +676,7 @@ def odf_create_draw_page(name, page_id=None, master_page=None,
     Return: odf_element
     """
     element = odf_create_element('<draw:page/>')
-    element.set_attribute('draw:name', name.encode('utf_8'))
+    element.set_attribute(u'draw:name', name)
     if style:
         element.set_attribute('draw:style-name', style)
     if master_page:
@@ -710,9 +710,9 @@ def odf_create_link(href, name=None, title=None, target_frame=None, style=None,
     """
     element = odf_create_element('<text:a xlink:href="%s"/>' % href)
     if name is not None:
-        element.set_attribute('office:name', name.encode('utf-8'))
+        element.set_attribute('office:name', name)
     if title is not None:
-        element.set_attribute('office:title', title.encode('utf-8'))
+        element.set_attribute('office:title', title)
     if target_frame is not None:
         element.set_attribute('office:target-frame-name', target_frame)
         if target_frame == '_blank':
@@ -733,8 +733,8 @@ def odf_create_bookmark(name):
 
         name -- unicode
     """
-    return odf_create_element('<text:bookmark text:name="%s"/>' %
-                              name.encode('utf-8'))
+    return odf_create_element(u'<text:bookmark text:name="%s"/>' %
+                              name)
 
 
 
@@ -744,8 +744,8 @@ def odf_create_bookmark_start(name):
 
         name -- unicode
     """
-    return odf_create_element('<text:bookmark-start text:name="%s"/>' %
-                              name.encode('utf-8'))
+    return odf_create_element(u'<text:bookmark-start text:name="%s"/>' %
+                              name)
 
 
 
@@ -755,8 +755,8 @@ def odf_create_bookmark_end(name):
 
         name -- unicode
     """
-    return odf_create_element('<text:bookmark-end text:name="%s"/>' %
-                              name.encode('utf-8'))
+    return odf_create_element(u'<text:bookmark-end text:name="%s"/>' %
+                              name)
 
 
 
@@ -766,8 +766,8 @@ def odf_create_reference_mark(name):
 
         name -- unicode
     """
-    return odf_create_element('<text:reference-mark text:name="%s"/>' %
-                              name.encode('utf-8'))
+    return odf_create_element(u'<text:reference-mark text:name="%s"/>' %
+                              name)
 
 
 
@@ -777,8 +777,8 @@ def odf_create_reference_mark_start(name):
 
         name -- unicode
     """
-    return odf_create_element('<text:reference-mark-start text:name="%s"/>' %
-                              name.encode('utf-8'))
+    return odf_create_element(u'<text:reference-mark-start text:name="%s"/>' %
+                              name)
 
 
 
@@ -788,8 +788,8 @@ def odf_create_reference_mark_end(name):
 
         name -- unicode
     """
-    return odf_create_element('<text:reference-mark-end text:name="%s"/>' %
-                              name.encode('utf-8'))
+    return odf_create_element(u'<text:reference-mark-end text:name="%s"/>' %
+                              name)
 
 
 
