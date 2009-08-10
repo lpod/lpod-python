@@ -259,13 +259,17 @@ class odf_element(object):
             from table import odf_table
             table = odf_table(odf_element=self)
             return table.get_text()
+        elif tag == 'draw:image':
+            return u'[Image: %s]\n' % self.get_attribute('xlink:href')
 
         # General case
-        query = 'text:p|text:span|text:a|text:tab|text:note|text()'
+        query = ('text:p|text:span|text:a|text:tab|text:note|draw:image|'
+                 'draw:frame|draw:text-box|text()')
         for obj in self.xpath(query):
             if isinstance(obj, odf_element):
                 result.append(obj.get_text(context))
-            else:
+            # No text with these elements
+            elif tag not in ('draw:frame', 'draw:text-box'):
                 result.append(obj)
         return u''.join(result)
 

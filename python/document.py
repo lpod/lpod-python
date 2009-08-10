@@ -832,6 +832,10 @@ def _get_text(current, context):
             result.append(_get_text(element, context))
             result.append(u'\n')
 
+        # Image
+        elif tag == 'draw:image':
+            result.append(element.get_text())
+
         # Look the descendants
         else:
             result.append(_get_text(element, context))
