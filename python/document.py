@@ -827,6 +827,10 @@ def _get_text(current, context):
             table = odf_table(odf_element=element)
             result.append(table.get_text())
 
+        # TOC
+        elif tag == 'text:table-of-content':
+            result.append(_get_text(element, context))
+            result.append(u'\n')
 
         # Look the descendants
         else:
