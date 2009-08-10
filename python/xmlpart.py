@@ -377,10 +377,12 @@ class odf_element(object):
         element.text = text
 
 
-    def insert_element(self, element, xmlposition):
+    def insert_element(self, element, xmlposition=None, position=None):
         current = self.__element
         element = element.__element
-        if xmlposition is FIRST_CHILD:
+        if position is not None:
+            current.insert(position, element)
+        elif xmlposition is FIRST_CHILD:
             current.insert(0, element)
         elif xmlposition is LAST_CHILD:
             current.append(element)
