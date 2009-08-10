@@ -419,6 +419,17 @@ class XmlPartTestCase(TestCase):
         self.assertEqual(content_bytes, serialized)
 
 
+    def test_pretty_serialize(self):
+        # With pretty = True
+        element = odf_create_element('<root><a>spam</a><b/></root>')
+        serialized = element.serialize(pretty=True)
+        expected = ('<root>\n'
+                    '  <a>spam</a>\n'
+                    '  <b/>\n'
+                    '</root>\n')
+        self.assertEqual(serialized, expected)
+
+
     def test_clone(self):
         # Testing that the clone works on subclasses too
         from lpod.content import odf_content
