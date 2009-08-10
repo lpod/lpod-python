@@ -428,11 +428,9 @@ class odf_element(object):
         return self.__class__(deepcopy(element))
 
 
-    def serialize(self):
+    def serialize(self, pretty=False):
         element = deepcopy(self.__element)
-        # XXX hack over lxml: remove text outside the element
-        element.tail = None
-        data = tostring(element)
+        data = tostring(element, with_tail=False, pretty_print=pretty)
         # XXX hack over lxml: remove namespaces
         return ns_stripper.sub('', data)
 
