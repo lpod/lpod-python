@@ -30,12 +30,20 @@ Basic text
 
    # Import from lpod
    from lpod.document import odf_create_list, odf_create_list_item
+   my_list = odf_create_list([u'chocolat', u'café'])
+   
+   item = odf_create_list_item(u'Du thé')
+   item.append_element(odf_create_list([u'thé vert', u'thé rouge']))
+   my_list.append_item(item)
+   
+   # insert item by position 
+   my_list.insert_item(u'Chicoré', position=1)
+   
+   # insert item by relativ position 
+   the = my_list.get_item_by_content('thé')
+   my_list.insert_item(u'Chicoré', before=the)
+   my_list.insert_item(u'Chicoré', after=the)
 
-   # A list
-   my_list = odf_create_list([u'thé', u'café'])
-   item = odf_create_list_item(u'chocolat')
-   my_list.append_element(item)
-   my_list.append_element(u'Chicoré')
    body.append_element(my_list)
 
 - And footnote::
