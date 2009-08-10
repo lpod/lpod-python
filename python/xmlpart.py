@@ -234,16 +234,32 @@ class odf_element(object):
             del element.attrib['{%s}%s' % (uri, name)]
 
 
-    def get_text(self):
-        # Hook
-        if self.get_name() == 'text:tab':
+    def get_text(self, context=None):
+        result = []
+
+        # Hook => special cases
+        tag = self.get_name()
+        if tag == 'text:tab':
             return u' ... '
+        elif tag == 'text:note' and context is not None:
+            context['notes_counter'] += 1
+            notes_counter = context['notes_counter']
+            text = self.get_element('text:note-body').get_text()
+            text = text.strip()
+
+            if self.get_attribute('text:note-class') == 'footnote':
+                context['footnotes'].append((notes_counter, text))
+                result.append('[%d]' % notes_counter)
+            else:
+                context['endnotes'].append((notes_counter, text))
+                result.append('(%d)' % notes_counter)
+            return u''.join(result)
 
         # General case
-        result = []
-        for obj in self.xpath('text:p|text:span|text:a|text:tab|text()'):
+        query = 'text:p|text:span|text:a|text:tab|text:note|text()'
+        for obj in self.xpath(query):
             if isinstance(obj, odf_element):
-                result.append(obj.get_text())
+                result.append(obj.get_text(context))
             else:
                 result.append(obj)
         return u''.join(result)

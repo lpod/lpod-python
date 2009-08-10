@@ -807,32 +807,12 @@ def _get_text(current, context):
         # Heading
         if tag == 'text:h':
             result.append(u'\n')
-            result.append(element.get_text())
+            result.append(element.get_text(context))
             result.append(u'\n')
 
         # Paragraph
         elif tag == 'text:p':
-            query = 'text:span|text:a|text:tab|text:note|text()'
-            for obj in element.xpath(query):
-                if isinstance(obj, odf_element):
-                    # A note
-                    if obj.get_name() == 'text:note':
-                        context['notes_counter'] += 1
-                        notes_counter = context['notes_counter']
-                        text = obj.get_element('text:note-body').get_text()
-                        text = text.strip()
-
-                        if obj.get_attribute('text:note-class') == 'footnote':
-                            context['footnotes'].append((notes_counter, text))
-                            result.append('[%d]' % notes_counter)
-                        else:
-                            context['endnotes'].append((notes_counter, text))
-                            result.append('(%d)' % notes_counter)
-                    # An other element
-                    else:
-                        result.append(obj.get_text())
-                else:
-                    result.append(obj)
+            result.append(element.get_text(context))
 
             # Insert the footnotes
             result.append(u'\n')
