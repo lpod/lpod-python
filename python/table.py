@@ -333,6 +333,15 @@ class odf_table(object):
         return table
 
 
+    def get_text(self, context=None):
+        result = []
+        for row in self.__rows:
+            for cell in row['cells']:
+                result.append(cell.get_text())
+                result.append(u'\n')
+        return u''.join(result)
+
+
     #
     # Cells
     #

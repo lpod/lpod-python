@@ -820,6 +820,14 @@ def _get_text(current, context):
                 result.append(u'[%d] %s\n' % note)
             context['footnotes'] = []
 
+        # Table
+        elif tag == 'table:table':
+            # XXX Remove this cyclic import
+            from table import odf_table
+            table = odf_table(odf_element=element)
+            result.append(table.get_text())
+
+
         # Look the descendants
         else:
             result.append(_get_text(element, context))

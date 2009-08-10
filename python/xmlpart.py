@@ -254,6 +254,11 @@ class odf_element(object):
                 context['endnotes'].append((notes_counter, text))
                 result.append('(%d)' % notes_counter)
             return u''.join(result)
+        elif tag == 'text:table':
+            # XXX Remove this cyclic import
+            from table import odf_table
+            table = odf_table(odf_element=self)
+            return table.get_text()
 
         # General case
         query = 'text:p|text:span|text:a|text:tab|text:note|text()'
