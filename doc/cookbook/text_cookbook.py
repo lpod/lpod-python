@@ -21,7 +21,7 @@ body.append_element(paragraph)
 # A list
 my_list = odf_create_list([u'chocolat', u'café'])
 
-item = odf_create_list_item(u'thé')
+item = odf_create_list_item(u'Du thé')
 item.append_element(odf_create_list([u'thé vert', u'thé rouge']))
 
 my_list.append_item(item)

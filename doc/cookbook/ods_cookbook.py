@@ -6,7 +6,7 @@ from glob import glob
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
-from lpod.table import odf_table, create_table_from_csv
+from lpod.table import create_table_from_csv
 
 # Get elements
 document = odf_new_document_from_type('spreadsheet')
