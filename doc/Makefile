@@ -23,7 +23,7 @@ PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d .build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 .PHONY: help clean html latex pdf pdf-figures png-figures changes linkcheck \
-		release autodocs
+		release autodocs lpod-check
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -40,13 +40,19 @@ clean:
 	-rm -rf figures
 	-rm -rf autodocs
 
-html: png-figures autodocs
+lpod-check:
+	@if [ x$(PYTHON) == "x" ]; then \
+		echo "Please, you must first install lpod"; \
+		exit 1; \
+	fi
+
+html: lpod-check png-figures autodocs
 	mkdir -p .build/html .build/doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) .build/html
 	@echo
 	@echo "Build finished. The HTML pages are in .build/html."
 
-latex: pdf-figures autodocs
+latex: lpod-check pdf-figures autodocs
 	mkdir -p .build/latex .build/doctrees
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) .build/latex
 	@echo
