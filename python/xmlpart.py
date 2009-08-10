@@ -235,8 +235,13 @@ class odf_element(object):
 
 
     def get_text(self):
+        # Hook
+        if self.get_name() == 'text:tab':
+            return u' ... '
+
+        # General case
         result = []
-        for obj in self.xpath('text:p|text:span|text:a|text()'):
+        for obj in self.xpath('text:p|text:span|text:a|text:tab|text()'):
             if isinstance(obj, odf_element):
                 result.append(obj.get_text())
             else:

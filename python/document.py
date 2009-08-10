@@ -812,7 +812,8 @@ def _get_text(current, context):
 
         # Paragraph
         elif tag == 'text:p':
-            for obj in element.xpath('text:span|text:a|text:note|text()'):
+            query = 'text:span|text:a|text:tab|text:note|text()'
+            for obj in element.xpath(query):
                 if isinstance(obj, odf_element):
                     # A note
                     if obj.get_name() == 'text:note':
