@@ -337,9 +337,72 @@ Graphic content
 Styles
 ======
 
+   A style controls the formatting and/or layout properties of a family of
+   content objects. It's identified by its own name and its family.
+   In the lpOD API, the family has a larger acception than in the OpenDocument
+   specification. In the ODF specification, the family is indicated sometimes
+   by the value of an explicit 'style:family' attribute, and sometimes by the
+   XML tag of the style element itself.
+   
+   In order to hide the complexity of the ODF data structure, the level 1 API
+   allows the user to handle any style as a high level odf_style object.
+   
+   Any style is created through a common odf_create_style() function with the
+   name and the family as its mandatory arguments. Additional arguments can
+   be required according to the family.
+   
+   The odf_create_style() function creates a free element, not included in a
+   document. This element (or a clone of it) is available to be attached later
+   to a document through a generic, document-based insert_style() method.
+   
+   A style can be inserted as either 'common' (or named and visible for the
+   user of a typical office application) or 'automatic', according a boolean
+   'common' option, whose default value is true. A common style may have a
+   secondary unique name which is its 'display name', which can be set through
+   an additional option.
+   
+   Of course, a style is really in use when one or more content objects
+   explicitly reference it through its style property.
+   
+   The API allows the user to retrieve and select an existing style by name and
+   family. The display name, if set, may be used as a replacement of the name
+   for retrieval.
+   
+   Once selected, a style could be removed from the document through a standard
+   level 0 element deletion method.
+
 - Text styles
 
+   A text style can be defined either to control the layout of a text container,
+   i.e. a paragraph, or to control a text range inside a paragraph. So the API
+   allows the user to handle two families of text styles, so called 'text'
+   and 'paragraph'. For any style in the text or paragraph families, the 'text'
+   class is recommended.
+   
+   - Text family
+   
+      [TBC]
+   
+   - Paragraph family
+   
+      [TBC]
+
 - List styles
+
+   A list style is a set of styles that control the formatting properties of
+   the list items a every hierachical level. As a consequence, a list style
+   is a named container including a particular style definition for each level.
+   
+   The API allows the user to create a list style (if not previously existing
+   in the document), and to create, retrieve and update it for any level.
+   
+   A new list style, available for later insertion in a document, is created
+   through the odf_create_list_style() function. The only one mandatory
+   ment is the style name, which should be unique as a list style name in the
+   document. An optional display name argument is allowed; if provided, the
+   display name should be unique as well. Once created, a list style can be
+   inserted in a document through the generic insert_style() method. 
+   
 
 - Outline style
 
@@ -360,7 +423,7 @@ Styles
    style structure. This returned object bears the other outline style related
    methods. If the outline style is not initialized yet, get_outline_style()
    returns a null value. If needed, the outline style can be initialized
-   through odf_create_outline_style() followed by insert_outline_style().
+   through odf_create_outline_style() followed by insert_style().
    Of course, it's possible to replace the creation method by cloning the
    outline style of another document or a style database. The creation method
    doesn't require any argument and its only purpose is to create an empty
