@@ -796,6 +796,106 @@ class TestList(TestCase):
         self.assertEqual(a_list.serialize(), expected)
 
 
+    def test_insert_item(self):
+        breakfast = odf_create_list()
+        breakfast.insert_item(u'spam', 1)
+        breakfast.insert_item(u'eggs', 2)
+        breakfast.insert_item(u'ham', -1)
+
+        expected = ('<text:list>'
+                      '<text:list-item>'
+                        '<text:p>spam</text:p>'
+                      '</text:list-item>'
+                      '<text:list-item>'
+                        '<text:p>ham</text:p>'
+                      '</text:list-item>'
+                      '<text:list-item>'
+                        '<text:p>eggs</text:p>'
+                      '</text:list-item>'
+                    '</text:list>')
+        # TODO Use the true list element in the body of the document instead of
+        # the element just created.
+        self.assertEqual(breakfast.serialize(), expected)
+
+
+    def test_append_item(self):
+        breakfast = odf_create_list()
+        breakfast.append_item(u'spam')
+        breakfast.append_item(u'ham')
+        breakfast.append_item(u'eggs')
+
+        expected = ('<text:list>'
+                      '<text:list-item>'
+                        '<text:p>spam</text:p>'
+                      '</text:list-item>'
+                      '<text:list-item>'
+                        '<text:p>ham</text:p>'
+                      '</text:list-item>'
+                      '<text:list-item>'
+                        '<text:p>eggs</text:p>'
+                      '</text:list-item>'
+                    '</text:list>')
+        # TODO Use the true list element in the body of the document instead of
+        # the element just created.
+        self.assertEqual(breakfast.serialize(), expected)
+
+
+    def test_insert_sub_item(self):
+        # XXX Fail until a true odf_list element is implemented
+        breakfast = odf_create_list()
+        spam = odf_create_list_item(u'spam')
+        ham = odf_create_list_item(u'ham')
+        eggs = odf_create_list_item(u'eggs')
+
+        spam.insert_item(ham, 1)
+        ham.insert_item(eggs, 1)
+
+        breakfast.insert_item(spam, 0)
+
+        expected = ('<text:list>'
+                       '<text:list-item>'
+                         '<text:p>spam</text:p>'
+                          '<text:list-item>'
+                            '<text:p>ham</text:p>'
+                            '<text:list-item>'
+                              '<text:p>eggs</text:p>'
+                            '</text:list-item>'
+                          '</text:list-item>'
+                       '</text:list-item>'
+                     '</text:list>')
+        # TODO Use the true list element in the body of the document instead of
+        # the element just created.
+        self.assertEqual(breakfast.serialize(), expected)
+
+
+    def test_append_sub_item(self):
+        # XXX Fail until a true odf_list element is implemented
+        breakfast = odf_create_list()
+        spam = odf_create_list_item(u'spam')
+        ham = odf_create_list_item(u'ham')
+        eggs = odf_create_list_item(u'eggs')
+
+        spam.append_item(ham)
+        ham.append_item(eggs)
+
+        breakfast.append_item(spam)
+
+        expected = ('<text:list>'
+                       '<text:list-item>'
+                         '<text:p>spam</text:p>'
+                          '<text:list-item>'
+                            '<text:p>ham</text:p>'
+                            '<text:list-item>'
+                              '<text:p>eggs</text:p>'
+                            '</text:list-item>'
+                          '</text:list-item>'
+                       '</text:list-item>'
+                     '</text:list>')
+        # TODO Use the true list element in the body of the document instead of
+        # the element just created.
+        self.assertEqual(breakfast.serialize(), expected)
+
+
 
 class TestStyle(TestCase):
 
