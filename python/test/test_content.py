@@ -64,6 +64,13 @@ class GetElementTestCase(TestCase):
         self.assertEqual(paragraph, None)
 
 
+    def test_get_element_list(self):
+        content = self.content
+        regex = ur'(first|second|a) paragraph'
+        paragraphs = content._get_element_list('//text:p', regex=regex)
+        self.assertEqual(len(paragraphs), 4)
+
+
 
 class TestSection(TestCase):
 

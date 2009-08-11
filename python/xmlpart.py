@@ -488,11 +488,16 @@ class odf_xmlpart(object):
                                   office_title=office_title,
                                   level=level, position=position,
                                   context=context)
-        if regex or href:
+        if href:
             raise NotImplementedError
         if context is None:
-            return self.get_element_list(query)
-        return context.get_element_list(query)
+            elements = self.get_element_list(query)
+        else:
+            elements = context.get_element_list(query)
+        # Filter the elements with the regex
+        if regex is not None:
+            return [element for element in elements if element.match(regex)]
+        return elements
 
 
     def _get_element(self, element_name, style=None, family=None,
