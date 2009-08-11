@@ -29,6 +29,11 @@ class odf_content(odf_xmlpart):
                                  context=context)
 
 
+    def get_section_by_content(self, regex, context=None):
+        return self._get_element('text:section', regex=regex,
+                                 context=context)
+
+
     #
     # Paragraphs
     #
@@ -51,8 +56,8 @@ class odf_content(odf_xmlpart):
     # Span
     #
 
-    def get_span_list(self, style=None, context=None):
-        return self._get_element_list('text:span', style=style,
+    def get_span_list(self, style=None, regex=None, context=None):
+        return self._get_element_list('text:span', style=style, regex=regex,
                                       context=context)
 
 
@@ -70,9 +75,10 @@ class odf_content(odf_xmlpart):
     # Headings
     #
 
-    def get_heading_list(self, style=None, level=None, context=None):
+    def get_heading_list(self, style=None, level=None, regex=None,
+                         context=None):
         return self._get_element_list('text:h', style=style, level=level,
-                                       context=context)
+                                       regex=regex, context=context)
 
 
     def get_heading_by_position(self, position, level=None, context=None):
@@ -89,9 +95,9 @@ class odf_content(odf_xmlpart):
     # Frames
     #
 
-    def get_frame_list(self, style=None, context=None):
+    def get_frame_list(self, style=None, regex=None, context=None):
         return self._get_element_list('draw:frame', draw_style=style,
-                                      context=context)
+                                      regex=regex, context=context)
 
 
     def get_frame_by_name(self, name, context=None):
@@ -104,19 +110,16 @@ class odf_content(odf_xmlpart):
                                  context=context)
 
 
-    def get_frame_by_title(self, regex, context=None):
-        raise NotImplementedError
-
-
-    def get_frame_by_description(self, regex,  context=None):
-        raise NotImplementedError
+    def get_frame_by_content(self, regex, context=None):
+        return self._get_element('draw:frame', regex=regex, context=context)
 
 
     #
     # Images
     #
 
-    def get_image_list(self, style=None, href=None, context=None):
+    def get_image_list(self, style=None, href=None, regex=None,
+                       context=None):
         """Get all image elements matching the criteria. Style is the style
         name. Set link to False to get only internal images, and True to
         get only external images (not in the container). Href is a regex to
@@ -135,7 +138,7 @@ class odf_content(odf_xmlpart):
         Return: list of odf_element
         """
         return self._get_element_list('draw:image', style=style, href=href,
-                                      context=context)
+                                      regex=regex, context=context)
 
 
     def get_image_by_name(self, name, context=None):
@@ -154,6 +157,10 @@ class odf_content(odf_xmlpart):
 
     def get_image_by_path(self, regex, context=None):
         return self._get_element('draw:image', href=regex, context=context)
+
+
+    def get_image_by_content(self, regex, context=None):
+        return self._get_element('draw:image', regex=regex, context=context)
 
 
     #
@@ -183,7 +190,7 @@ class odf_content(odf_xmlpart):
     # Notes
     #
 
-    def get_note_list(self, note_class=None, context=None):
+    def get_note_list(self, note_class=None, regex=None, context=None):
         """Return the list of all note element, or only the ones of the given
         class.
 
@@ -196,7 +203,7 @@ class odf_content(odf_xmlpart):
         Return: list of odf_element
         """
         return self._get_element_list('text:note', note_class=note_class,
-                                      context=context)
+                                      regex=regex, context=context)
 
 
     def get_note_by_id(self, note_id, context=None):
@@ -204,16 +211,21 @@ class odf_content(odf_xmlpart):
                                  context=context)
 
 
+    def get_note_by_content(self, regex, context=None):
+        return self._get_element('text:note', regex=regex, context=context)
+
+
     #
     # Annotations
     #
 
     def get_annotation_list(self, creator=None, start_date=None,
-                            end_date=None, context=None):
+                            end_date=None, regex=None, context=None):
         """XXX end date is not included (as expected in Python).
         """
         annotations = []
         for annotation in self._get_element_list('office:annotation',
+                                                 regex=regex,
                                                  context=context):
             if creator is not None and creator != annotation.get_creator():
                 continue
@@ -227,11 +239,11 @@ class odf_content(odf_xmlpart):
 
 
     def get_annotation(self, creator=None, start_date=None, end_date=None,
-                       context=None):
+                       regex=None, context=None):
         annotations = self.get_annotation_list(creator=creator,
                                                start_date=start_date,
                                                end_date=end_date,
-                                               context=context)
+                                               regex=regex, context=context)
         if annotations:
             return annotations[0]
         return None
@@ -363,9 +375,9 @@ class odf_content(odf_xmlpart):
     #
     # Draw Pages
     #
-    def get_draw_page_list(self, style=None, context=None):
+    def get_draw_page_list(self, style=None, regex=None, context=None):
         return self._get_element_list('draw:page', draw_style=style,
-                                      context=context)
+                                      regex=regex, context=context)
 
 
     def get_draw_page_by_name(self, name, context=None):
@@ -378,18 +390,26 @@ class odf_content(odf_xmlpart):
                                  context=context)
 
 
+    def get_draw_page_by_content(self, regex, context=None):
+        return self._get_element('draw:page', regex=regex, context=context)
+
+
     #
     # Links
     #
 
-    def get_link_list(self, name=None, title=None, context=None):
+    def get_link_list(self, name=None, title=None, regex=None, context=None):
         return self._get_element_list('text:a', office_name=name,
-                                      office_title=title, context=context)
+                                      office_title=title, regex=regex,
+                                      context=context)
 
 
     def get_link_by_name(self, name, context=None):
-        # XXX unicity guaranteed?
         return self._get_element('text:a', office_name=name, context=context)
+
+
+    def get_link_by_content(self, regex, context=None):
+        return self._get_element('text:a', regex=regex, context=context)
 
 
     #
