@@ -43,7 +43,8 @@ class StylePropertiesTestCase(TestCase):
 
     def test_get_style_properties_bad_element(self):
         element = self.paragraph_element
-        self.assertRaises(AttributeError, element.get_style_properties)
+        self.assertRaises(AttributeError, element.__getattribute__,
+                          'get_style_properties')
 
 
     def test_get_style_properties_bad_area(self):
