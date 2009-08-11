@@ -115,7 +115,7 @@ if  __name__ == '__main__':
 
     # text
     if doc_type == 'text':
-        text = document.get_text()
+        text = document.get_formated_text()
 
         if opts.stdout:
             print text

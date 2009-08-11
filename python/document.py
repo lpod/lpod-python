@@ -794,57 +794,6 @@ def odf_create_reference_mark_end(name):
 
 
 #
-# Private functions
-#
-
-def _get_text(current, context):
-
-    result = []
-    for element in current.get_children():
-
-        tag = element.get_name()
-
-        # Heading
-        if tag == 'text:h':
-            result.append(u'\n')
-            result.append(element.get_text(context))
-            result.append(u'\n')
-
-        # Paragraph
-        elif tag == 'text:p':
-            result.append(element.get_text(context))
-
-            # Insert the footnotes
-            result.append(u'\n')
-            for note in context['footnotes']:
-                result.append(u'[%d] %s\n' % note)
-            context['footnotes'] = []
-
-        # Table
-        elif tag == 'table:table':
-            # XXX Remove this cyclic import
-            from table import odf_table
-            table = odf_table(odf_element=element)
-            result.append(table.get_text())
-
-        # TOC
-        elif tag == 'text:table-of-content':
-            result.append(_get_text(element, context))
-            result.append(u'\n')
-
-        # Image
-        elif tag == 'draw:image':
-            result.append(element.get_text())
-
-        # Look the descendants
-        else:
-            result.append(_get_text(element, context))
-
-    return u''.join(result)
-
-
-
-#
 # The odf_document object
 #
 
@@ -913,19 +862,25 @@ class odf_document(object):
         return self.__body
 
 
-    def get_text(self):
-        # For the moment, only "text"
+    def get_formated_text(self):
+        # For the moment, only "type='text'"
         if self.get_type() != 'text':
             raise NotImplementedError, ('This functionality is only '
-                                        'implemented for "text" document')
+                                        'implemented for a "text" document')
 
-        body = self.get_body()
-
+        # Initialize an empty context
         context = {'notes_counter': 0,
                    'footnotes': [],
                    'endnotes': []}
 
-        result = [_get_text(body, context)]
+        body = self.get_body()
+
+        # Get the text
+        result = []
+        for element in body.get_children():
+            result.append(element.get_formated_text(context))
+
+        # Append the end notes
         result.append('\n')
         for note in context['endnotes']:
             result.append(u'(%d) %s\n' % note)

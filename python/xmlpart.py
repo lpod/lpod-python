@@ -234,44 +234,16 @@ class odf_element(object):
             del element.attrib['{%s}%s' % (uri, name)]
 
 
-    def get_text(self, context=None):
-        result = []
+    def get_text(self):
+        """This function returns a "raw" version of the text
+        """
+        return u''.join(self.__element.itertext())
 
-        # Hook => special cases
-        tag = self.get_name()
-        if tag == 'text:tab':
-            return u' ... '
-        elif tag == 'text:note' and context is not None:
-            context['notes_counter'] += 1
-            notes_counter = context['notes_counter']
-            text = self.get_element('text:note-body').get_text()
-            text = text.strip()
 
-            if self.get_attribute('text:note-class') == 'footnote':
-                context['footnotes'].append((notes_counter, text))
-                result.append('[%d]' % notes_counter)
-            else:
-                context['endnotes'].append((notes_counter, text))
-                result.append('(%d)' % notes_counter)
-            return u''.join(result)
-        elif tag == 'text:table':
-            # XXX Remove this cyclic import
-            from table import odf_table
-            table = odf_table(odf_element=self)
-            return table.get_text()
-        elif tag == 'draw:image':
-            return u'[Image: %s]\n' % self.get_attribute('xlink:href')
-
-        # General case
-        query = ('text:p|text:span|text:a|text:tab|text:note|draw:image|'
-                 'draw:frame|draw:text-box|text()')
-        for obj in self.xpath(query):
-            if isinstance(obj, odf_element):
-                result.append(obj.get_text(context))
-            # No text with these elements
-            elif tag not in ('draw:frame', 'draw:text-box'):
-                result.append(obj)
-        return u''.join(result)
+    def get_formated_text(self, context):
+        """This function must return a beautiful version of the text
+        """
+        return u''
 
 
     def set_text(self, text, after=False):
@@ -414,9 +386,7 @@ class odf_element(object):
         result = []
         for obj in elements:
             # The results of a xpath query can be a str
-            if type(obj) is _ElementStringResult:
-                result.append(str(obj))
-            elif type(obj) is _ElementUnicodeResult:
+            if type(obj) in (_ElementStringResult, _ElementUnicodeResult):
                 result.append(unicode(obj))
             else:
                 result.append(make_odf_element(obj))

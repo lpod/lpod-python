@@ -20,5 +20,25 @@ class odf_paragraph(odf_element):
         raise NotImplementedError
 
 
+    def get_formated_text(self, context):
+        result = []
+        for obj in self.xpath('*|text()'):
+            if type(obj) is unicode:
+                result.append(obj)
+            else:
+                tag = obj.get_name()
+                if tag in ('text:a', 'text:span'):
+                    # XXX
+                    obj.get_formated_text(context)
+
+        # Insert the footnotes
+        result.append(u'\n')
+        for note in context['footnotes']:
+            result.append(u'[%d] %s\n' % note)
+        context['footnotes'] = []
+
+        return u''.join(result)
+
+
 
 register_element_class('text:p', odf_paragraph)

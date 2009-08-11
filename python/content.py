@@ -10,6 +10,7 @@ from xmlpart import odf_element, odf_xmlpart, FIRST_CHILD
 
 class odf_content(odf_xmlpart):
 
+    # XXX Bad name, we can think that the function returns office:body
     def get_body(self):
         return self.get_element('//office:body/*[1]')
 
