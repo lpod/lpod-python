@@ -843,7 +843,6 @@ class TestList(TestCase):
 
 
     def test_insert_sub_item(self):
-        breakfast = odf_create_list()
         spam = odf_create_list([u'spam'])
         ham = odf_create_list([u'ham'])
         eggs = odf_create_list([u'eggs'])
@@ -876,7 +875,6 @@ class TestList(TestCase):
 
 
     def test_append_sub_item(self):
-        breakfast = odf_create_list()
         spam = odf_create_list([u'spam'])
         ham = odf_create_list([u'ham'])
         eggs = odf_create_list([u'eggs'])
@@ -906,6 +904,70 @@ class TestList(TestCase):
         # TODO Use the true list element in the body of the document instead of
         # the element just created.
         self.assertEqual(spam.serialize(), expected)
+
+
+    def test_nested_list(self):
+        breakfast = odf_create_list()
+        spam = odf_create_list_item(u'spam')
+        ham = odf_create_list_item(u'ham')
+        eggs = odf_create_list_item(u'eggs')
+        # First way: a list in an item, right next to a paragraph
+        spam.append_element(odf_create_list([u'thé', u'café', u'chocolat']))
+        breakfast.append_item(spam)
+        breakfast.append_item(ham)
+        breakfast.append_item(eggs)
+        # Second way: a list as an item
+        breakfast.append_item(breakfast.clone())
+
+        expected = ('<text:list>\n'
+                    '  <text:list-item>\n'
+                    '    <text:p>spam</text:p>\n'
+                    '    <text:list>\n'
+                    '      <text:list-item>\n'
+                    '        <text:p>th&#233;</text:p>\n'
+                    '      </text:list-item>\n'
+                    '      <text:list-item>\n'
+                    '        <text:p>caf&#233;</text:p>\n'
+                    '      </text:list-item>\n'
+                    '      <text:list-item>\n'
+                    '        <text:p>chocolat</text:p>\n'
+                    '      </text:list-item>\n'
+                    '    </text:list>\n'
+                    '  </text:list-item>\n'
+                    '  <text:list-item>\n'
+                    '    <text:p>ham</text:p>\n'
+                    '  </text:list-item>\n'
+                    '  <text:list-item>\n'
+                    '    <text:p>eggs</text:p>\n'
+                    '  </text:list-item>\n'
+                    '  <text:list-item>\n'
+                    '    <text:list>\n'
+                    '      <text:list-item>\n'
+                    '        <text:p>spam</text:p>\n'
+                    '        <text:list>\n'
+                    '          <text:list-item>\n'
+                    '            <text:p>th&#233;</text:p>\n'
+                    '          </text:list-item>\n'
+                    '          <text:list-item>\n'
+                    '            <text:p>caf&#233;</text:p>\n'
+                    '          </text:list-item>\n'
+                    '          <text:list-item>\n'
+                    '            <text:p>chocolat</text:p>\n'
+                    '          </text:list-item>\n'
+                    '        </text:list>\n'
+                    '      </text:list-item>\n'
+                    '      <text:list-item>\n'
+                    '        <text:p>ham</text:p>\n'
+                    '      </text:list-item>\n'
+                    '      <text:list-item>\n'
+                    '        <text:p>eggs</text:p>\n'
+                    '      </text:list-item>\n'
+                    '    </text:list>\n'
+                    '  </text:list-item>\n'
+                    '</text:list>\n')
+        # TODO Use the true list element in the body of the document instead of
+        # the element just created.
+        self.assertEqual(breakfast.serialize(pretty=True), expected)
 
 
     def test_insert_before(self):
