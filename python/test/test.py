@@ -8,6 +8,7 @@ from unittest import TestLoader, TestSuite, TextTestRunner
 import test_container
 import test_content
 import test_document
+import test_list
 import test_meta
 import test_style
 import test_styles
