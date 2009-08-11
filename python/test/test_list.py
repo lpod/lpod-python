@@ -8,7 +8,7 @@ from unittest import TestCase, main
 from lpod.document import odf_get_document, odf_create_list
 from lpod.document import odf_create_list_item
 from lpod.utils import convert_unicode
-from lpod.xmlpart import LAST_CHILD, NEXT_SIBLING, odf_element
+from lpod.xmlpart import LAST_CHILD
 
 
 class TestList(TestCase):
@@ -324,6 +324,51 @@ class TestList(TestCase):
                     '  <text:p>eggs</text:p>\n'
                     '</text:list-item>\n')
         self.assertEqual(item.serialize(pretty=True), expected)
+
+
+    def test_get_formated_text(self):
+        # Create the items
+        spam = odf_create_list_item(u'In this picture, there are 47 people;\n'
+                                    u'none of them can be seen.')
+        ham = odf_create_list_item(u'In this film, we hope to show you the\n'
+                                   u'value of not being seen.\n')
+        eggs = odf_create_list_item(u'Here is Mr. Bagthorpe of London, '
+                                    u'SE14.\n')
+        foo = odf_create_list_item(u'He cannot be seen.')
+        bar = odf_create_list_item(u'Now I am going to ask him to stand up.')
+        baz = odf_create_list_item(u'Mr. Bagthorpe, will you stand up please?')
+        # Create the lists
+        how_not_to_be_seen1 = odf_create_list()
+        how_not_to_be_seen2 = odf_create_list()
+        how_not_to_be_seen3 = odf_create_list()
+        # Fill the lists
+        # First list
+        how_not_to_be_seen1.append_item(spam)
+        # Second list
+        how_not_to_be_seen2.append_item(ham)
+        how_not_to_be_seen2.append_item(eggs)
+        how_not_to_be_seen2.append_item(foo)
+        # Third list
+        how_not_to_be_seen3.append_item(bar)
+        how_not_to_be_seen3.append_item(baz)
+        # Create the final nested list (how_not_to_be_seen1)
+        spam.append_element(how_not_to_be_seen2)
+        foo.append_element(how_not_to_be_seen3)
+
+        # Initialize an empty context
+        context = {'notes_counter': 0,
+                   'footnotes': [],
+                   'endnotes': []}
+        expected = (u'- In this picture, there are 47 people;\n'
+                    u'  none of them can be seen.\n'
+                    u'  - In this film, we hope to show you the\n'
+                    u'    value of not being seen.\n'
+                    u'  - Here is Mr. Bagthorpe of London, SE14.\n'
+                    u'  - He cannot be seen.\n'
+                    u'    - Now I am going to ask him to stand up.\n'
+                    u'    - Mr. Bagthorpe, will you stand up please?\n')
+        self.assertEqual(how_not_to_be_seen1.get_formated_text(context),
+                         expected)
 
 
 
