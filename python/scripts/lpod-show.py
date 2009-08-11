@@ -16,7 +16,7 @@ from lpod.table import odf_table
 
 
 
-def _get_target_directory(dirname, container_url):
+def get_target_directory(dirname, container_url):
 
     # Compute a name if not given
     if dirname is None:
@@ -47,7 +47,7 @@ def _get_target_directory(dirname, container_url):
 
 
 
-def _clean_filename(filename):
+def clean_filename(filename):
     filename = filename.encode('utf-8')
 
     allowed_characters = set([u'.', u'-', u'_', u'@'])
@@ -61,14 +61,14 @@ def _clean_filename(filename):
 
 
 
-def _sheet_to_csv(document, target):
+def sheet_to_csv(document, target):
     content = document.get_xmlpart('content')
 
     for table in content.get_table_list():
         table = odf_table(odf_element=table)
 
         name = table.get_name()
-        filename = _clean_filename(name) + '.csv'
+        filename = clean_filename(name) + '.csv'
 
         csv_file = target.open(filename, 'w')
         table.export_to_csv(csv_file)
@@ -90,6 +90,11 @@ if  __name__ == '__main__':
                            'name of this directory. By default a name is '
                            'computed based on the input file name.')
 
+    # "sdtout"
+    parser.add_option('--stdout', dest='stdout', action='store_true',
+                      default=False,
+                  help='For an odt, dump "text.txt" in the standard output.')
+
     # Parse !
     opts, args = parser.parse_args()
 
@@ -99,16 +104,29 @@ if  __name__ == '__main__':
         exit(1)
     container_url = args[0]
 
-    target = _get_target_directory(opts.dirname, container_url)
+    # Open it!
     document = odf_get_document(container_url)
-
     doc_type = document.get_type()
+
+    # Arguments OK ?
+    if opts.stdout and doc_type != 'text':
+        parser.print_help()
+        exit(1)
+
     # text
     if doc_type == 'text':
-        text_file = target.open('text.txt', 'w')
-        text_file.write(document.get_text().encode('utf-8'))
+        text = document.get_text()
+
+        if opts.stdout:
+            print text
+        else:
+            target = get_target_directory(opts.dirname, container_url)
+            text_file = target.open('text.txt', 'w')
+            text_file.write(text.encode('utf-8'))
+    # spreadsheet
     elif doc_type == 'spreadsheet':
-        _sheet_to_csv(document, target)
+        target = get_target_directory(opts.dirname, container_url)
+        sheet_to_csv(document, target)
 
 
 
