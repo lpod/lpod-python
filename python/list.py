@@ -7,9 +7,28 @@ from xmlpart import PREV_SIBLING, NEXT_SIBLING
 from document import odf_create_list_item
 
 
+def get_parent_item(element):
+        while element.get_name() != 'text:list-item':
+            element = element.get_parent()
+        return element
+
+
+
 class odf_list(odf_element):
     """Specialised element for lists.
     """
+
+    def get_item_list_by_content(self, regex):
+        paragraphs = self.get_element_list('//text:p')
+        return [get_parent_item(paragraph) for paragraph in paragraphs
+                                               if paragraph.match(regex)]
+
+    def get_item_by_content(self, regex):
+        items = self.get_item_list_by_content(regex)
+        if items:
+            return items[0]
+        return None
+
 
     def insert_item(self, item, position=None, before=None, after=None):
         # Check if the item is already a list-item

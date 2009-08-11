@@ -1026,6 +1026,55 @@ class TestList(TestCase):
         self.assertEqual(breakfast.serialize(), expected)
 
 
+    def test_get_item_by_content(self):
+        # Create the items
+        spam = odf_create_list_item(u'spam')
+        ham = odf_create_list_item(u'ham')
+        eggs = odf_create_list_item(u'eggs')
+        # Create the corresponding lists
+        spam_list = odf_create_list()
+        ham_list = odf_create_list()
+        eggs_list = odf_create_list()
+        # Fill the lists
+        spam_list.append_item(spam)
+        ham_list.append_item(ham)
+        eggs_list.append_item(eggs)
+        # Create the final nested list (spam_list)
+        spam.append_element(ham_list)
+        ham.append_element(eggs_list)
+
+        item = spam_list.get_item_by_content(ur'spam')
+        expected = ('<text:list-item>\n'
+                    '  <text:p>spam</text:p>\n'
+                    '  <text:list>\n'
+                    '    <text:list-item>\n'
+                    '      <text:p>ham</text:p>\n'
+                    '      <text:list>\n'
+                    '        <text:list-item>\n'
+                    '          <text:p>eggs</text:p>\n'
+                    '        </text:list-item>\n'
+                    '      </text:list>\n'
+                    '    </text:list-item>\n'
+                    '  </text:list>\n'
+                    '</text:list-item>\n')
+        self.assertEqual(item.serialize(pretty=True), expected)
+        item = spam_list.get_item_by_content(ur'ham')
+        expected = ('<text:list-item>\n'
+                    '  <text:p>ham</text:p>\n'
+                    '  <text:list>\n'
+                    '    <text:list-item>\n'
+                    '      <text:p>eggs</text:p>\n'
+                    '    </text:list-item>\n'
+                    '  </text:list>\n'
+                    '</text:list-item>\n')
+        self.assertEqual(item.serialize(pretty=True), expected)
+        item = spam_list.get_item_by_content(ur'eggs')
+        expected = ('<text:list-item>\n'
+                    '  <text:p>eggs</text:p>\n'
+                    '</text:list-item>\n')
+        self.assertEqual(item.serialize(pretty=True), expected)
+
+
 
 class TestStyle(TestCase):
 
