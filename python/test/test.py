@@ -16,7 +16,7 @@ import test_xmlpart
 
 
 test_modules = [test_utils, test_container, test_xmlpart, test_style,
-                test_content, test_styles, test_meta, test_document]
+                test_content, test_styles, test_meta, test_document, test_list]
 
 
 loader = TestLoader()
