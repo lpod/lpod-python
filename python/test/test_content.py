@@ -366,6 +366,13 @@ class TestFrame(TestCase):
         self.assertEqual(len(result), 2)
 
 
+    def test_get_frame_list_title(self):
+        content = self.content
+        result = content.get_frame_list(title=u"Intitulé")
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get_name(), 'draw:frame')
+
+
     def test_get_frame_by_name(self):
         content = self.content
         frame = content.get_frame_by_name(u"Logo")
@@ -376,6 +383,12 @@ class TestFrame(TestCase):
         content = self.content
         frame = content.get_frame_by_position(2)
         self.assertEqual(frame.get_attribute('presentation:class'), u'notes')
+
+
+    def test_get_frame_by_description(self):
+        content = self.content
+        element = content.get_frame_by_description(u"描述")
+        self.assertEqual(element.get_name(), 'draw:frame')
 
 
     def test_insert_frame(self):

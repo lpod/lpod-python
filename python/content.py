@@ -95,8 +95,10 @@ class odf_content(odf_xmlpart):
     # Frames
     #
 
-    def get_frame_list(self, style=None, regex=None, context=None):
+    def get_frame_list(self, style=None, title=None, description=None,
+                       regex=None, context=None):
         return self._get_element_list('draw:frame', draw_style=style,
+                                      svg_title=title, svg_desc=description,
                                       regex=regex, context=context)
 
 
@@ -112,6 +114,16 @@ class odf_content(odf_xmlpart):
 
     def get_frame_by_content(self, regex, context=None):
         return self._get_element('draw:frame', regex=regex, context=context)
+
+
+    def get_frame_by_title(self, regex, context=None):
+        return self._get_element('draw:frame', svg_title=regex,
+                                 context=context)
+
+
+    def get_frame_by_description(self, regex, context=None):
+        return self._get_element('draw:frame', svg_desc=regex,
+                                 context=context)
 
 
     #
