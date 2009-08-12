@@ -13,7 +13,6 @@ from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
-from lpod.document import odf_create_list_item, odf_create_list
 from lpod.document import odf_create_style, odf_create_span
 from lpod.document import odf_create_note, odf_create_annotation
 from lpod.document import odf_create_variable_decl, odf_create_variable_set
@@ -1065,27 +1064,22 @@ class TestVariables(TestCase):
         self.document = odf_get_document('samples/variable.odt')
 
 
-    def test_create_variable(self):
-
-        # decl
-        # ----
-
+    def test_create_variable_decl(self):
         variable_decl = odf_create_variable_decl(u'你好 Zoé', 'float')
         expected = ('<text:variable-decl office:value-type="float" '
                       'text:name="%s"/>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_decl.serialize(), expected)
 
-        # set
-        # ---
 
-        # A float ?
+    def test_create_variable_set_float(self):
         variable_set = odf_create_variable_set(u'你好 Zoé', value=42)
         expected = ('<text:variable-set text:name="%s" '
                       'office:value-type="float" office:value="42" '
                       'text:display="none"/>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_set.serialize(), expected)
 
-        # A datetime ?
+
+    def test_create_variable_set_datetime(self):
         date = datetime(2009, 5, 17, 23, 23, 00)
         variable_set = odf_create_variable_set(u'你好 Zoé', value=date,
                                                display=True)
@@ -1096,9 +1090,8 @@ class TestVariables(TestCase):
                     '</text:variable-set>') % convert_unicode(u'你好 Zoé')
         self.assertEqual(variable_set.serialize(), expected)
 
-        # get
-        # ---
 
+    def test_create_variable_get(self):
         variable_get = odf_create_variable_get(u'你好 Zoé', value=42)
         expected = ('<text:variable-get text:name="%s" '
                       'office:value-type="float" office:value="42">'
@@ -1107,41 +1100,32 @@ class TestVariables(TestCase):
         self.assertEqual(variable_get.serialize(), expected)
 
 
-    def test_get_variable(self):
+    def test_get_variable_decl(self):
         clone = self.document.clone()
         content = clone.get_xmlpart('content')
-
-        # decl
-        # ----
-
-        decls = content.get_variable_decls()
-        variable_decl = odf_create_variable_decl(u'你好 Zoé', 'float')
-        decls.insert_element(variable_decl, LAST_CHILD)
-
-        variable_decl = content.get_variable_decl(u'你好 Zoé')
+        variable_decl = content.get_variable_decl(u"Variabilité")
         expected = ('<text:variable-decl office:value-type="float" '
-                      'text:name="%s"/>') % convert_unicode(u'你好 Zoé')
+                      'text:name="%s"/>' % convert_unicode(u"Variabilité"))
         self.assertEqual(variable_decl.serialize(), expected)
 
-        # set
-        # ---
 
-        variable_set = odf_create_variable_set(u'你好 Zoé', value=42)
-        body = content.get_body()
-        body.insert_element(variable_set, LAST_CHILD)
-
-        variable_sets = content.get_variable_sets(u'你好 Zoé')
+    def test_get_variable_set(self):
+        clone = self.document.clone()
+        content = clone.get_xmlpart('content')
+        variable_sets = content.get_variable_sets(u"Variabilité")
         self.assertEqual(len(variable_sets), 1)
         expected = ('<text:variable-set text:name="%s" '
-                      'office:value-type="float" office:value="42" '
-                      'text:display="none"/>') % convert_unicode(u'你好 Zoé')
+                      'office:value-type="float" office:value="123" '
+                      'style:data-style-name="N1">123</text:variable-set>' %
+                        convert_unicode(u"Variabilité"))
         self.assertEqual(variable_sets[0].serialize(), expected)
 
-        # get value
-        # ---------
 
-        value = content.get_variable_value(u'你好 Zoé')
-        self.assertEqual(value, 42)
+    def test_get_variable_get(self):
+        clone = self.document.clone()
+        content = clone.get_xmlpart('content')
+        value = content.get_variable_value(u"Variabilité")
+        self.assertEqual(value, 123)
 
 
 
