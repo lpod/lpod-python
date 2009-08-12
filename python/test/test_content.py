@@ -1170,6 +1170,188 @@ class TestUserFields(TestCase):
 
 
 
+# TODO On all the following variable tests, interact with the document
+
+class TestPageNumber(TestCase):
+
+    def test_create_page_number(self):
+        page_number = odf_create_page_number_variable()
+        expected = '<text:page-number text:select-page="current"/>'
+        self.assertEqual(page_number.serialize(), expected)
+
+
+    def test_create_page_number_complex(self):
+        page_number = odf_create_page_number_variable(select_page='next',
+                                                      page_adjust=1)
+        expected = ('<text:page-number text:select-page="next" '
+                    'text:page-adjust="1"/>')
+        self.assertEqual(page_number.serialize(), expected)
+
+
+
+class TestPageCount(TestCase):
+
+    def test_create_page_count(self):
+        page_count = odf_create_page_count_variable()
+        expected = '<text:page-count/>'
+        self.assertEqual(page_count.serialize(), expected)
+
+
+
+class TestDate(TestCase):
+
+    def test_create_date(self):
+        date_elt = odf_create_date_variable(datetime(2009, 7, 20))
+        expected = ('<text:date text:date-value="2009-07-20T00:00:00">'
+                      '2009-07-20'
+                    '</text:date>')
+        self.assertEqual(date_elt.serialize(), expected)
+
+
+    def test_create_date_fixed(self):
+        date_elt = odf_create_date_variable(datetime(2009, 7, 20),
+                                            fixed=True)
+        expected = ('<text:date text:date-value="2009-07-20T00:00:00" '
+                      'text:fixed="true">'
+                      '2009-07-20'
+                    '</text:date>')
+        self.assertEqual(date_elt.serialize(), expected)
+
+
+    def test_create_date_representation(self):
+        date_elt =  odf_create_date_variable(datetime(2009, 7, 20),
+                                             representation=u'20 juil. 09')
+        expected = ('<text:date text:date-value="2009-07-20T00:00:00">'
+                      '20 juil. 09'
+                    '</text:date>')
+        self.assertEqual(date_elt.serialize(), expected)
+
+
+
+class TestTime(TestCase):
+
+    def test_create_time(self):
+        time_elt = odf_create_time_variable(time(19,30))
+        expected = ('<text:time text:time-value="1900-01-01T19:30:00">'
+                      '19:30:00'
+                    '</text:time>')
+        self.assertEqual(time_elt.serialize(), expected)
+
+
+    def test_create_time_fixed(self):
+        time_elt = odf_create_time_variable(time(19, 30), fixed=True)
+        expected = ('<text:time text:time-value="1900-01-01T19:30:00" '
+                      'text:fixed="true">'
+                      '19:30:00'
+                    '</text:time>')
+        self.assertEqual(time_elt.serialize(), expected)
+
+
+    def test_create_time_representation(self):
+        time_elt =  odf_create_time_variable(time(19, 30),
+                                    representation=u'19h30')
+        expected = ('<text:time text:time-value="1900-01-01T19:30:00">'
+                      '19h30'
+                    '</text:time>')
+        self.assertEqual(time_elt.serialize(), expected)
+
+
+
+class TestChapter(TestCase):
+
+    def test_create_chapter(self):
+        chapter = odf_create_chapter_variable()
+        expected = '<text:chapter text:display="name"/>'
+        self.assertEqual(chapter.serialize(), expected)
+
+
+    def test_create_chapter_complex(self):
+        chapter = odf_create_chapter_variable(display='number-and-name',
+                                              outline_level=1)
+        expected = ('<text:chapter text:display="number-and-name" '
+                      'text:outline-level="1"/>')
+        self.assertEqual(chapter.serialize(), expected)
+
+
+
+class TestFilename(TestCase):
+
+    def test_create_filename(self):
+        filename = odf_create_filename_variable()
+        expected = '<text:file-name text:display="full"/>'
+        self.assertEqual(filename.serialize(), expected)
+
+
+    def test_create_filename_fixed(self):
+        filename = odf_create_filename_variable(fixed=True)
+        expected = '<text:file-name text:display="full" text:fixed="true"/>'
+        self.assertEqual(filename.serialize(), expected)
+
+
+
+class TestInitialCreator(TestCase):
+
+    def test_create_initial_creator(self):
+        elt = odf_create_initial_creator_variable()
+        expected = '<text:initial-creator/>'
+        self.assertEqual(elt.serialize(), expected)
+
+
+
+class TestCreationDate(TestCase):
+
+    def test_create_creation_date(self):
+        elt = odf_create_creation_date_variable()
+        expected = '<text:creation-date/>'
+        self.assertEqual(elt.serialize(), expected)
+
+
+
+class TestCreationTime(TestCase):
+
+    def test_create_creation_time(self):
+        elt = odf_create_creation_time_variable()
+        expected = '<text:creation-time/>'
+        self.assertEqual(elt.serialize(), expected)
+
+
+
+class TestDescription(TestCase):
+
+    def test_create_description(self):
+        elt = odf_create_description_variable()
+        expected = '<text:description/>'
+        self.assertEqual(elt.serialize(), expected)
+
+
+
+class TestTitle(TestCase):
+
+    def test_create_title(self):
+        elt = odf_create_title_variable()
+        expected = '<text:title/>'
+        self.assertEqual(elt.serialize(), expected)
+
+
+
+class TestSubject(TestCase):
+
+    def test_create_subject(self):
+        elt = odf_create_subject_variable()
+        expected = '<text:subject/>'
+        self.assertEqual(elt.serialize(), expected)
+
+
+
+class TestKeywords(TestCase):
+
+    def test_create_keywords(self):
+        elt = odf_create_keywords_variable()
+        expected = '<text:keywords/>'
+        self.assertEqual(elt.serialize(), expected)
+
+
+
 class TestLinks(TestCase):
 
     def setUp(self):
@@ -1292,165 +1474,6 @@ class TestLinks(TestCase):
 
 
 
-class TestPageNumber(TestCase):
-
-    def setUp(self):
-        self.document = odf_get_document('samples/variable.odt')
-
-
-    def test_create_page_number(self):
-
-        # Simple
-        page_number = odf_create_page_number_variable()
-        expected = '<text:page-number text:select-page="current"/>'
-        self.assertEqual(page_number.serialize(), expected)
-
-        # With arguments
-        page_number = odf_create_page_number_variable(select_page='next',
-                                                      page_adjust=1)
-        expected = ('<text:page-number text:select-page="next" '
-                    'text:page-adjust="1"/>')
-        self.assertEqual(page_number.serialize(), expected)
-
-
-
-class TestPageCount(TestCase):
-
-    def test_create_page_number(self):
-
-        page_count = odf_create_page_count_variable()
-        expected = '<text:page-count/>'
-        self.assertEqual(page_count.serialize(), expected)
-
-
-
-class TestDate(TestCase):
-
-    def test_create_date(self):
-
-        # Simple
-        date_elt = odf_create_date_variable(datetime(2009, 7, 20))
-        expected = ('<text:date text:date-value="2009-07-20T00:00:00">'
-                      '2009-07-20'
-                    '</text:date>')
-        self.assertEqual(date_elt.serialize(), expected)
-
-        # Fixed
-        date_elt = odf_create_date_variable(datetime(2009, 7, 20),
-                                            fixed=True)
-        expected = ('<text:date text:date-value="2009-07-20T00:00:00" '
-                      'text:fixed="true">'
-                      '2009-07-20'
-                    '</text:date>')
-        self.assertEqual(date_elt.serialize(), expected)
-
-        # Change the representation
-        date_elt =  odf_create_date_variable(datetime(2009, 7, 20),
-                                             representation=u'20 juil. 09')
-        expected = ('<text:date text:date-value="2009-07-20T00:00:00">'
-                      '20 juil. 09'
-                    '</text:date>')
-        self.assertEqual(date_elt.serialize(), expected)
-
-
-
-class TestTime(TestCase):
-
-    def test_create_time(self):
-
-        # Simple
-        time_elt = odf_create_time_variable(time(19,30))
-        expected = ('<text:time text:time-value="1900-01-01T19:30:00">'
-                      '19:30:00'
-                    '</text:time>')
-        self.assertEqual(time_elt.serialize(), expected)
-
-        # Fixed
-        time_elt = odf_create_time_variable(time(19, 30), fixed=True)
-        expected = ('<text:time text:time-value="1900-01-01T19:30:00" '
-                      'text:fixed="true">'
-                      '19:30:00'
-                    '</text:time>')
-        self.assertEqual(time_elt.serialize(), expected)
-
-        # Change the representation
-        time_elt =  odf_create_time_variable(time(19, 30),
-                                    representation=u'19h30')
-        expected = ('<text:time text:time-value="1900-01-01T19:30:00">'
-                      '19h30'
-                    '</text:time>')
-        self.assertEqual(time_elt.serialize(), expected)
-
-
-
-class TestChapter(TestCase):
-
-    def test_create_chapter(self):
-
-        # Simple
-        chapter = odf_create_chapter_variable()
-        expected = '<text:chapter text:display="name"/>'
-        self.assertEqual(chapter.serialize(), expected)
-
-        # Complex
-        chapter = odf_create_chapter_variable(display='number-and-name',
-                                              outline_level=1)
-        expected = ('<text:chapter text:display="number-and-name" '
-                      'text:outline-level="1"/>')
-        self.assertEqual(chapter.serialize(), expected)
-
-
-
-class TestFilename(TestCase):
-
-    def test_create_filename(self):
-
-        # Simple
-        filename = odf_create_filename_variable()
-        expected = '<text:file-name text:display="full"/>'
-        self.assertEqual(filename.serialize(), expected)
-
-        # Fixed
-        filename = odf_create_filename_variable(fixed=True)
-        expected = '<text:file-name text:display="full" text:fixed="true"/>'
-        self.assertEqual(filename.serialize(), expected)
-
-
-
-class TestSomeMetaInformations(TestCase):
-
-    def test_create_elements(self):
-
-        elt = odf_create_initial_creator_variable()
-        expected = '<text:initial-creator/>'
-        self.assertEqual(elt.serialize(), expected)
-
-        elt = odf_create_creation_date_variable()
-        expected = '<text:creation-date/>'
-        self.assertEqual(elt.serialize(), expected)
-
-        elt = odf_create_creation_time_variable()
-        expected = '<text:creation-time/>'
-        self.assertEqual(elt.serialize(), expected)
-
-        elt = odf_create_description_variable()
-        expected = '<text:description/>'
-        self.assertEqual(elt.serialize(), expected)
-
-        elt = odf_create_title_variable()
-        expected = '<text:title/>'
-        self.assertEqual(elt.serialize(), expected)
-
-        elt = odf_create_subject_variable()
-        expected = '<text:subject/>'
-        self.assertEqual(elt.serialize(), expected)
-
-        elt = odf_create_keywords_variable()
-        expected = '<text:keywords/>'
-        self.assertEqual(elt.serialize(), expected)
-
-
-
 class TestGetCell(TestCase):
 
     def setUp(self):
@@ -1567,6 +1590,7 @@ class BookmarkTest(TestCase):
         self.content = clone.get_xmlpart('content')
         self.body = clone.get_body()
 
+
     def test_create_bookmark(self):
         bookmark = odf_create_bookmark(u'你好 Zoé')
         expected = ('<text:bookmark text:name="%s"/>' %
@@ -1654,6 +1678,7 @@ class reference_markTest(TestCase):
         clone = odf_get_document('samples/bookmark.odt').clone()
         self.content = clone.get_xmlpart('content')
         self.body = clone.get_body()
+
 
     def test_create_reference_mark(self):
         reference_mark = odf_create_reference_mark(u'你好 Zoé')
