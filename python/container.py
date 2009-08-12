@@ -92,7 +92,7 @@ class odf_container(object):
         """Open a Zip object on the archive ODF.
         """
         data = self.__get_data()
-        # This is efficient because the data is not duplicated
+        # StringIO will not duplicate the string, how big it is
         filelike = StringIO(data)
         if self.__zipfile is None:
             self.__zipfile = ZipFile(filelike)
