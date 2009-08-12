@@ -865,34 +865,29 @@ class odf_document(object):
     def get_formated_text(self):
         # XXX Fix thix cyclic import
         from table import odf_table
-
         # For the moment, only "type='text'"
         if self.get_type() != 'text':
             raise NotImplementedError, ('This functionality is only '
                                         'implemented for a "text" document')
-
         # Initialize an empty context
         context = {'notes_counter': 0,
                    'footnotes': [],
                    'endnotes': []}
-
         body = self.get_body()
-
         # Get the text
         result = []
         for element in body.get_children():
-            # XXX table:table is not an odf_element => Bad
             if element.get_name() == 'table:table':
                 table = odf_table(odf_element=element)
                 result.append(table.get_formated_text(context))
             else:
                 result.append(element.get_formated_text(context))
-
         # Append the end notes
-        result.append('\n')
-        for note in context['endnotes']:
-            result.append(u'(%d) %s\n' % note)
-
+        endnotes = context['endnotes']
+        if endnotes:
+            result.append(u'\n------\n')
+            for citation, body in endnotes:
+                result.append(u'(%s) %s\n' % (citation, body))
         return u''.join(result)
 
 
