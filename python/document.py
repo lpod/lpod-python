@@ -882,6 +882,17 @@ class odf_document(object):
                 result.append(table.get_formated_text(context))
             else:
                 result.append(element.get_formated_text(context))
+                # Insert the notes
+                footnotes = context['footnotes']
+                # Separate text from notes
+                if footnotes:
+                    result.append(u'---\n')
+                    for citation, body in footnotes:
+                        result.append(u'[%s] %s\n' % (citation, body))
+                    # Append a \n after the notes
+                    result.append(u'\n')
+                    # Reset for the next paragraph
+                    context['footnotes'] = []
         # Append the end notes
         endnotes = context['endnotes']
         if endnotes:

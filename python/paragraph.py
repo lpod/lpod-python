@@ -57,17 +57,6 @@ class odf_paragraph(odf_element):
     def get_formated_text(self, context):
         result = [_get_formated_text(self, context, with_text=True)]
         result.append(u'\n')
-        # Insert the notes
-        footnotes = context['footnotes']
-        # Separate text from notes
-        if footnotes:
-            result.append(u'---\n')
-            for citation, body in footnotes:
-                result.append(u'[%s] %s\n' % (citation, body))
-            # Append a \n after the notes
-            result.append(u'\n')
-            # Reset for the next paragraph
-            context['footnotes'] = []
         return u''.join(result)
 
 

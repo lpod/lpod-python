@@ -894,6 +894,22 @@ class TestNote(TestCase):
         paragraph.insert_element(note, LAST_CHILD)
 
 
+    def test_get_formeted_text(self):
+        document = self.document
+        content = self.content
+        paragraph = content.get_element('//text:p')
+        list_whith_note = odf_create_list()
+        list_whith_note.append_item(paragraph)
+        body = content.get_body()
+        body.append_element(list_whith_note)
+        expected = (u"- Un paragraphe[1] d'apparence(i) banale.\n"
+                    u"---\n"
+                    u"[1] C'est-à-dire l'élément « text:p ».\n\n"
+                    u"\n------\n"
+                    u"(i) Les apparences sont trompeuses !\n")
+        self.assertEqual(document.get_formated_text(), expected)
+
+
 
 class TestAnnotation(TestCase):
 
