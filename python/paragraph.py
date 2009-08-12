@@ -2,6 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
+from table import odf_table
 from xmlpart import register_element_class, odf_element
 
 
@@ -36,13 +37,22 @@ def _get_formated_text(element, context, with_text):
                 else:
                     context['endnotes'].append((notes_counter, text))
                     result.append('(%d)' % notes_counter)
+            # Table
+            elif tag == 'table:table':
+                table = odf_table(odf_element=obj)
+                result.append(table.get_formated_text(context))
 
     # Paragraph => insert the notes
     if element.get_name() == 'text:p':
         result.append(u'\n')
-        for note in context['footnotes']:
+        footnotes = context['footnotes']
+        # XXX Sort the footnotes
+        for note in footnotes:
             result.append(u'[%d] %s\n' % note)
-        context['footnotes'] = []
+        # Append a \n after the notes
+        if footnotes:
+            context['footnotes'] = []
+            result.append(u'\n')
 
     return u''.join(result)
 

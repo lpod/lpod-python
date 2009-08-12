@@ -333,12 +333,25 @@ class odf_table(object):
         return table
 
 
-    def get_text(self, context=None, shaped=False):
+    def get_formated_text(self, context):
         result = []
         for row in self.__rows:
             for cell in row['cells']:
-                result.append(get_value(cell))
+                value = get_value(cell, try_get_text=False)
+
+                # None ?
+                if value is None:
+                    # Try with get_formated_text on the elements
+                    value = []
+                    for element in cell.get_children():
+                        value.append(element.get_formated_text(context))
+                    value = u''.join(value)
+                else:
+                    value = unicode(value)
+
+                result.append(value)
                 result.append(u'\n')
+            result.append(u'\n')
         return u''.join(result)
 
 

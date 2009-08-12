@@ -327,7 +327,7 @@ def _set_value_and_type(element, value=None, value_type=None,
 ######################################################################
 # Public API
 ######################################################################
-def get_value(element, value_type=None):
+def get_value(element, value_type=None, try_get_text=True):
     """Only for "with office:value-type" elements
     """
 
@@ -350,13 +350,14 @@ def get_value(element, value_type=None):
         value = element.get_attribute('office:string-value')
         if value is not None:
             return unicode(value)
-        else:
-            # Try with get_text
+
+        # XXX: get_text or get_formated_text ???
+        if try_get_text:
             value = element.get_text()
             if value != '':
                 return value
-            else:
-                return None
+        return None
+
     elif value_type == 'time':
         value = element.get_attribute('office:time-value')
         return Duration.decode(value)
