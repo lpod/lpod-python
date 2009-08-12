@@ -5,19 +5,29 @@
 from unittest import TestLoader, TestSuite, TextTestRunner
 
 # Import tests
+import test_bookmark
 import test_container
 import test_content
 import test_document
+import test_draw_page
+import test_heading
 import test_list
 import test_meta
+import test_note
+import test_paragraph
+import test_reference
 import test_style
 import test_styles
+import test_table
 import test_utils
+import test_variable
 import test_xmlpart
 
 
-test_modules = [test_utils, test_container, test_xmlpart, test_style,
-                test_content, test_styles, test_meta, test_document, test_list]
+test_modules = [test_bookmark, test_container, test_content, test_document,
+        test_draw_page, test_heading, test_list, test_meta, test_note,
+        test_paragraph, test_reference, test_style, test_styles, test_table,
+        test_utils, test_variable, test_xmlpart]
 
 
 loader = TestLoader()

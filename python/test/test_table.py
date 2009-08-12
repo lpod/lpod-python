@@ -2,12 +2,17 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from the Standard Library
+from datetime import date, datetime, timedelta
+from decimal import Decimal
 from unittest import TestCase, main
-from datetime import datetime
 
 # Import from lpod
+from lpod.document import odf_new_document_from_type
+from lpod.document import odf_create_table, odf_create_column
+from lpod.document import odf_create_row
 from lpod.table import odf_table
-from lpod.xmlpart import odf_create_element
+from lpod.utils import _get_cell_coordinates
+from lpod.xmlpart import LAST_CHILD, odf_create_element
 from lpod.document import odf_create_cell, odf_get_document
 
 
@@ -52,6 +57,370 @@ def get_example():
     data.append('</table:table>')
 
     return ''.join(data)
+
+
+
+class TestGetCell(TestCase):
+
+    def setUp(self):
+        self.document = document = odf_new_document_from_type('text')
+        self.content = content = document.get_xmlpart('content')
+
+        # Encode this table
+        #   A B C D E F G
+        # 1 1 1 1 2 3 3 3
+        # 2 1 1 1 2 3 3 3
+        # 3 1 1 1 2 3 3 3
+        # 4 1 2 3 4 5 6 7
+        table = odf_create_table(u'a_table', style='Standard')
+        column = odf_create_column('Standard')
+        column.set_attribute('table:number-columns-repeated', '7')
+        table.insert_element(column, LAST_CHILD)
+
+        # 3 x "1 1 1 2 3 3 3"
+        row = odf_create_row()
+        row.set_attribute('table:number-rows-repeated', '3')
+        # 3 x "1"
+        cell = odf_create_cell(u'1')
+        cell.set_attribute('table:number-columns-repeated', '3')
+        row.insert_element(cell, LAST_CHILD)
+        # 1 x "2"
+        cell = odf_create_cell(u'2')
+        row.insert_element(cell, LAST_CHILD)
+        # 3 x "3"
+        cell = odf_create_cell(u'3')
+        cell.set_attribute('table:number-columns-repeated', '3')
+        row.insert_element(cell, LAST_CHILD)
+
+        table.insert_element(row, LAST_CHILD)
+
+        # 1 x "1 2 3 4 5 6 7"
+        row = odf_create_row()
+        for i in xrange(1, 8):
+            cell = odf_create_cell(unicode(i))
+            row.insert_element(cell, LAST_CHILD)
+        table.insert_element(row, LAST_CHILD)
+
+        body = content.get_body()
+        body.insert_element(table, LAST_CHILD)
+
+
+    def tearDown(self):
+        del self.content
+        del self.document
+
+
+    def test_get_cell_coordinates(self):
+        x, y = _get_cell_coordinates('ABC123')
+        self.assertEqual((x, y), (731, 123))
+
+
+
+class TestTable(TestCase):
+
+    def setUp(self):
+        self.document = document = odf_get_document('samples/table.ods')
+        self.content = document.get_xmlpart('content')
+
+
+    def tearDown(self):
+        del self.content
+        del self.document
+
+
+
+    def test_create_cell_bool(self):
+        cell = odf_create_cell(True)
+        expected = ('<table:table-cell office:value-type="boolean" '
+                      'office:boolean-value="true">'
+                      '<text:p>true</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_bool_repr(self):
+        cell = odf_create_cell(True, representation=u"VRAI")
+        expected = ('<table:table-cell office:value-type="boolean" '
+                      'office:boolean-value="true">'
+                      '<text:p>VRAI</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_int(self):
+        cell = odf_create_cell(23)
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="23">'
+                      '<text:p>23</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_int_repr(self):
+        cell = odf_create_cell(23, representation=u"00023")
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="23">'
+                      '<text:p>00023</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_float(self):
+        cell = odf_create_cell(3.141592654)
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="3.141592654">'
+                      '<text:p>3.141592654</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_float_repr(self):
+        cell = odf_create_cell(3.141592654, representation=u"3,14")
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="3.141592654">'
+                      '<text:p>3,14</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_decimal(self):
+        cell = odf_create_cell(Decimal('2.718281828'))
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="2.718281828">'
+                      '<text:p>2.718281828</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_decimal_repr(self):
+        cell = odf_create_cell(Decimal('2.718281828'),
+                               representation=u"2,72")
+        expected = ('<table:table-cell office:value-type="float" '
+                      'office:value="2.718281828">'
+                      '<text:p>2,72</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_date(self):
+        cell = odf_create_cell(date(2009, 6, 30))
+        expected = ('<table:table-cell office:value-type="date" '
+                      'office:date-value="2009-06-30">'
+                      '<text:p>2009-06-30</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_date_repr(self):
+        cell = odf_create_cell(date(2009, 6, 30),
+                               representation=u"30/6/2009")
+        expected = ('<table:table-cell office:value-type="date" '
+                      'office:date-value="2009-06-30">'
+                      '<text:p>30/6/2009</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_datetime(self):
+        cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18))
+        expected = ('<table:table-cell office:value-type="date" '
+                'office:date-value="2009-06-30T17:33:18">'
+                      '<text:p>2009-06-30T17:33:18</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_datetime_repr(self):
+        cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18),
+                               representation=u"30/6/2009 17:33")
+        expected = ('<table:table-cell office:value-type="date" '
+                'office:date-value="2009-06-30T17:33:18">'
+                      '<text:p>30/6/2009 17:33</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_str(self):
+        cell = odf_create_cell('red')
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="red">'
+                      '<text:p>red</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_str_repr(self):
+        cell = odf_create_cell('red', representation=u"Red")
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="red">'
+                      '<text:p>Red</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_unicode(self):
+        cell = odf_create_cell(u"Plato")
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="Plato">'
+                      '<text:p>Plato</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_unicode_repr(self):
+        cell = odf_create_cell(u"Plato", representation=u"P.")
+        expected = ('<table:table-cell office:value-type="string" '
+                      'office:string-value="Plato">'
+                      '<text:p>P.</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_timedelta(self):
+        cell = odf_create_cell(timedelta(0, 8))
+        expected = ('<table:table-cell office:value-type="time" '
+                      'office:time-value="PT00H00M08S">'
+                      '<text:p>PT00H00M08S</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_timedelta_repr(self):
+        cell = odf_create_cell(timedelta(0, 8), representation=u"00:00:08")
+        expected = ('<table:table-cell office:value-type="time" '
+                      'office:time-value="PT00H00M08S">'
+                      '<text:p>00:00:08</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_percentage(self):
+        cell = odf_create_cell(90, cell_type='percentage')
+        expected = ('<table:table-cell office:value-type="percentage" '
+                      'office:value="90">'
+                      '<text:p>90</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_percentage_repr(self):
+        cell = odf_create_cell(90, representation=u"90 %",
+                               cell_type='percentage')
+        expected = ('<table:table-cell office:value-type="percentage" '
+                      'office:value="90">'
+                      '<text:p>90 %</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_currency(self):
+        cell = odf_create_cell(1.54, cell_type='currency', currency='EUR')
+        expected = ('<table:table-cell office:value-type="currency" '
+                      'office:value="1.54" office:currency="EUR">'
+                      '<text:p>1.54</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_currency_repr(self):
+        cell = odf_create_cell(1.54, representation=u"1,54 €",
+                               cell_type='currency', currency='EUR')
+        expected = ('<table:table-cell office:value-type="currency" '
+                      'office:value="1.54" office:currency="EUR">'
+                      '<text:p>1,54 &#8364;</text:p>'
+                    '</table:table-cell>')
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_create_cell_bad(self):
+        self.assertRaises(TypeError, odf_create_cell, [])
+
+
+    def test_create_row(self):
+        # Test 1
+        row = odf_create_row()
+        expected = '<table:table-row/>'
+        self.assertEqual(row.serialize(), expected)
+
+        # Test 2
+        row = odf_create_row(1)
+        expected = ('<table:table-row>'
+                      '<table:table-cell office:value-type="string" '
+                        'office:string-value="">'
+                        '<text:p></text:p>'
+                      '</table:table-cell>'
+                    '</table:table-row>')
+        self.assertEqual(row.serialize(), expected)
+
+
+    def test_create_column(self):
+        # Test create
+        column = odf_create_column('a_style')
+        expected = '<table:table-column table:style-name="a_style"/>'
+        self.assertEqual(column.serialize(), expected)
+
+
+    def test_create_table(self):
+        # Test 1
+        table = odf_create_table(u'a_table', style='a_style')
+        expected = ('<table:table table:name="a_table" '
+                    'table:style-name="a_style"/>')
+        self.assertEqual(table.serialize(), expected)
+
+        # Test 2
+        table = odf_create_table(u'a_table', width=1, height=2,
+                                 style='a_style')
+        expected = ('<table:table table:name="a_table" '
+                    'table:style-name="a_style">'
+                    '<table:table-row>'
+                      '<table:table-cell office:value-type="string" '
+                        'office:string-value="">'
+                        '<text:p></text:p>'
+                      '</table:table-cell>'
+                    '</table:table-row>'
+                    '<table:table-row>'
+                      '<table:table-cell office:value-type="string" '
+                        'office:string-value="">'
+                        '<text:p></text:p>'
+                      '</table:table-cell>'
+                    '</table:table-row>'
+                    '</table:table>')
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_insert_table(self):
+        content = self.content
+        clone = content.clone()
+        table = odf_create_table(u"New Table", style='a_style')
+        column = odf_create_column(style='a_column_style')
+        row = odf_create_row()
+        cell = odf_create_cell(u"")
+
+        table.insert_element(column, LAST_CHILD)
+        row.insert_element(cell, LAST_CHILD)
+        table.insert_element(row, LAST_CHILD)
+        expected = ('<table:table table:name="New Table" '
+                      'table:style-name="a_style">'
+                      '<table:table-column '
+                        'table:style-name="a_column_style"/>'
+                      '<table:table-row>'
+                        '<table:table-cell office:value-type="string" '
+                          'office:string-value="">'
+                          '<text:p></text:p>'
+                        '</table:table-cell>'
+                      '</table:table-row>'
+                    '</table:table>')
+        self.assertEqual(table.serialize(), expected)
+
+        body = clone.get_body()
+        body.insert_element(table, LAST_CHILD)
+
+        # Get OK ?
+        table = clone.get_table_by_name(u"New Table")
+        self.assertEqual(table.get_attribute('table:name'), u"New Table")
+
+        table = clone.get_table_by_position(4)
+        self.assertEqual(table.get_attribute('table:name'), u"New Table")
 
 
 
