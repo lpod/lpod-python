@@ -7,6 +7,7 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.document import odf_get_document
 from lpod.document import odf_create_paragraph
+from lpod.paragraph import odf_paragraph
 from lpod.xmlpart import LAST_CHILD
 
 
@@ -48,6 +49,12 @@ class TestParagraph(TestCase):
         paragraph = paragraphs[0]
         text = paragraph.get_text()
         self.assertEqual(text, "First paragraph of the second section.")
+
+
+    def test_odf_paragraph(self):
+        content = self.content
+        paragraph = content.get_paragraph_by_position(1)
+        self.assert_(isinstance(paragraph, odf_paragraph))
 
 
     def test_get_paragraph(self):

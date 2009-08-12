@@ -69,10 +69,15 @@ class TestHeading(TestCase):
         self.assertEqual(text, u"First Title of the Second Section");
 
 
+    def test_odf_heading(self):
+        content = self.content
+        heading = content.get_heading_by_position(1)
+        self.assert_(isinstance(heading, odf_heading))
+
+
     def test_get_heading(self):
         content = self.content
         heading = content.get_heading_by_position(2)
-        self.assert_(isinstance(heading, odf_heading))
         text = heading.get_text()
         self.assertEqual(text, u'Level 2 Title')
 
