@@ -5,6 +5,49 @@
 from xmlpart import register_element_class, odf_element
 
 
+
+def _get_formated_text(element, context, with_text):
+    result = []
+
+    if with_text:
+        objects = element.xpath('*|text()')
+    else:
+        objects = element.get_children()
+
+    for obj in objects:
+        if type(obj) is unicode:
+            result.append(obj)
+        else:
+            tag = obj.get_name()
+            # Good tags with text
+            if tag in ('text:span', 'text:a', 'text:p'):
+                result.append(_get_formated_text(obj, context, True))
+            # Note
+            elif tag == 'text:note':
+                context['notes_counter'] += 1
+                notes_counter = context['notes_counter']
+                note_body = obj.get_element('text:note-body')
+                text = _get_formated_text(note_body, context, False)
+                text = text.strip()
+
+                if obj.get_attribute('text:note-class') == 'footnote':
+                    context['footnotes'].append((notes_counter, text))
+                    result.append('[%d]' % notes_counter)
+                else:
+                    context['endnotes'].append((notes_counter, text))
+                    result.append('(%d)' % notes_counter)
+
+    # Paragraph => insert the notes
+    if element.get_name() == 'text:p':
+        result.append(u'\n')
+        for note in context['footnotes']:
+            result.append(u'[%d] %s\n' % note)
+        context['footnotes'] = []
+
+    return u''.join(result)
+
+
+
 class odf_paragraph(odf_element):
     """Specialised element for paragraphs.
     """
@@ -21,23 +64,7 @@ class odf_paragraph(odf_element):
 
 
     def get_formated_text(self, context):
-        result = []
-        for obj in self.xpath('*|text()'):
-            if type(obj) is unicode:
-                result.append(obj)
-            else:
-                tag = obj.get_name()
-                if tag in ('text:a', 'text:span'):
-                    # XXX
-                    obj.get_formated_text(context)
-
-        # Insert the footnotes
-        result.append(u'\n')
-        for note in context['footnotes']:
-            result.append(u'[%d] %s\n' % note)
-        context['footnotes'] = []
-
-        return u''.join(result)
+        return _get_formated_text(self, context, True)
 
 
 
