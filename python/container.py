@@ -195,7 +195,7 @@ class odf_container(object):
         for name in self.__dict__:
             # "__zipfile" is not safe to copy
             # but can be recreated from "__data"
-            if name in ('uri', '__zipfile'):
+            if name in ('uri', '_odf_container__zipfile'):
                 setattr(clone, name, None)
             else:
                 value = getattr(self, name)

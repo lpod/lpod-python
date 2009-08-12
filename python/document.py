@@ -908,7 +908,7 @@ class odf_document(object):
             file = vfs.open(uri_or_file)
         data= file.read()
         # TODO generate something like
-        # Pictures/10000000000001D40000003C8B3889D9.png"
+        # "Pictures/10000000000001D40000003C8B3889D9.png"
         name = xxx
         self.container.set_part(xxx, data)
         return name
