@@ -1135,11 +1135,7 @@ class TestUserFields(TestCase):
         self.document = odf_get_document('samples/variable.odt')
 
 
-    def test_create_user_field(self):
-
-        # decl
-        # ----
-
+    def test_create_user_field_decl(self):
         user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
         expected = (('<text:user-field-decl text:name="%s" '
                        'office:value-type="float" office:value="42"/>') %
@@ -1147,9 +1143,7 @@ class TestUserFields(TestCase):
         self.assertEqual(user_field_decl.serialize(), expected)
 
 
-        # get
-        # ---
-
+    def test_create_user_field_get(self):
         user_field_get = odf_create_user_field_get(u'你好 Zoé', value=42)
         expected = ('<text:user-field-get text:name="%s" '
                       'office:value-type="float" office:value="42">'
@@ -1158,28 +1152,21 @@ class TestUserFields(TestCase):
         self.assertEqual(user_field_get.serialize(), expected)
 
 
-    def test_get_user_field(self):
+    def test_get_user_field_decl(self):
         clone = self.document.clone()
         content = clone.get_xmlpart('content')
-
-        # decl
-        # ----
-
-        decls = content.get_user_field_decls()
-        user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
-        decls.insert_element(user_field_decl, LAST_CHILD)
-
-        user_field_decl = content.get_user_field_decl(u'你好 Zoé')
-        expected = (('<text:user-field-decl text:name="%s" '
-                       'office:value-type="float" office:value="42"/>') %
-                      convert_unicode(u'你好 Zoé'))
+        user_field_decl = content.get_user_field_decl(u"Champêtre")
+        expected = ('<text:user-field-decl office:value-type="float" '
+                      'office:value="1" text:name="%s"/>' %
+                      convert_unicode(u"Champêtre"))
         self.assertEqual(user_field_decl.serialize(), expected)
 
-        # get value
-        # ---------
 
-        value = content.get_user_field_value(u'你好 Zoé')
-        self.assertEqual(value, 42)
+    def test_get_user_field_get(self):
+        clone = self.document.clone()
+        content = clone.get_xmlpart('content')
+        value = content.get_user_field_value(u"Champêtre")
+        self.assertEqual(value, True)
 
 
 
