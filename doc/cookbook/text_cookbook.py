@@ -28,7 +28,7 @@ my_list.append_item(item)
 
 my_list.insert_item(u'Chicoré', position=1)
 
-the = my_list.get_item_by_content('thé')
+the = my_list.get_item_by_content(u'thé')
 my_list.insert_item(u'Chicoré', before=the)
 my_list.insert_item(u'Chicoré', after=the)
 

@@ -262,6 +262,9 @@ class odf_element(object):
         """ True if the text of the odf_element match one or more times the
             pattern.
         """
+        # Lead to a failure if the pattern should be an unicode but it is a
+        # string
+        pattern = unicode(pattern)
         text = self.get_text()
         return search(pattern, text) is not None
 
