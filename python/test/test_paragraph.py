@@ -25,7 +25,7 @@ class TestParagraph(TestCase):
     def test_get_paragraph_list(self):
         content = self.content
         paragraphs = content.get_paragraph_list()
-        self.assertEqual(len(paragraphs), 6)
+        self.assertEqual(len(paragraphs), 7)
         second = paragraphs[1]
         text = second.get_text()
         self.assertEqual(text, 'This is the second paragraph.')
@@ -44,7 +44,7 @@ class TestParagraph(TestCase):
         content = self.content
         section2 = content.get_section_by_position(2)
         paragraphs = content.get_paragraph_list(context=section2)
-        self.assertEqual(len(paragraphs), 1)
+        self.assertEqual(len(paragraphs), 2)
         paragraph = paragraphs[0]
         text = paragraph.get_text()
         self.assertEqual(text, "First paragraph of the second section.")

@@ -98,6 +98,27 @@ class TestLinks(TestCase):
         self.assertEqual(element.serialize(), expected)
 
 
+    def test_get_link_list_href(self):
+        link1 = odf_create_link('http://example.com/', name='link1',
+                                title='title1')
+        link2 = odf_create_link('http://example.com/', name='link2',
+                                title='title2')
+
+        paragraph = self.paragraph
+        paragraph.append_element(link1)
+        paragraph.append_element(link2)
+
+        # href
+        elements = self.content.get_link_list(href=ur'\.com')
+        self.assertEqual(len(elements), 2)
+
+
+    def test_href_from_existing_document(self):
+        content = self.content
+        links = content.get_link_list(href=ur'lpod')
+        self.assertEqual(len(links), 1)
+
+
     def test_get_link_list_name_and_title(self):
         link1 = odf_create_link('http://example.com/', name='link1',
                                 title='title1')
@@ -113,6 +134,21 @@ class TestLinks(TestCase):
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link1" office:title="title1"/>')
         self.assertEqual(element.serialize(), expected)
+
+
+    def test_get_link_by_path(self):
+        content = self.content
+        link = content.get_link_by_path(ur'lpod')
+        href = link.get_attribute('xlink:href')
+        self.assertEqual(href, u'http://lpod-project.org/')
+
+
+    def test_get_link_by_path_context(self):
+        content = self.content
+        section2 = content.get_section_by_position(2)
+        link = content.get_link_by_path(ur'\.org', context=section2)
+        href = link.get_attribute('xlink:href')
+        self.assertEqual(href, u'http://lpod-project.org/')
 
 
     def test_get_link_list_not_found(self):

@@ -407,14 +407,19 @@ class odf_content(odf_xmlpart):
     # Links
     #
 
-    def get_link_list(self, name=None, title=None, regex=None, context=None):
+    def get_link_list(self, name=None, title=None, href=None, regex=None,
+                      context=None):
         return self._get_element_list('text:a', office_name=name,
-                                      office_title=title, regex=regex,
-                                      context=context)
+                                      office_title=title, href=href,
+                                      regex=regex, context=context)
 
 
     def get_link_by_name(self, name, context=None):
         return self._get_element('text:a', office_name=name, context=context)
+
+
+    def get_link_by_path(self, regex, context=None):
+        return self._get_element('text:a', href=regex, context=context)
 
 
     def get_link_by_content(self, regex, context=None):

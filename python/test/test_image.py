@@ -38,16 +38,22 @@ class TestImage(TestCase):
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
-    def test_get_image_name(self):
+    def test_get_image_by_name(self):
         content = self.content
         element = content.get_image_by_name(u"Logo")
         # Searched by frame but got the inner image with no name
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
-    def test_get_image_position(self):
+    def test_get_image_by_position(self):
         content = self.content
         element = content.get_image_by_position(1)
+        self.assertEqual(element.get_attribute('xlink:href'), self.path)
+
+
+    def test_get_image_by_path(self):
+        content = self.content
+        element = content.get_image_by_path('.png')
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 

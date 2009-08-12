@@ -462,8 +462,6 @@ class odf_xmlpart(object):
                                   office_title=office_title,
                                   level=level, position=position,
                                   context=context)
-        if href:
-            raise NotImplementedError
         if context is None:
             elements = self.get_element_list(query)
         else:
@@ -472,6 +470,13 @@ class odf_xmlpart(object):
         if regex is not None:
             elements = [element for element in elements
                                 if element.match(regex)]
+        if href is not None:
+            filtered = []
+            for element in elements:
+                href_attr = element.get_attribute('xlink:href')
+                if search(href, href_attr) is not None:
+                    filtered.append(element)
+            elements = filtered
         for variable, childname in [(svg_title, 'svg:title'),
                                     (svg_desc, 'svg:desc')]:
             if variable:
