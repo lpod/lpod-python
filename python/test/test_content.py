@@ -37,9 +37,7 @@ from lpod.document import odf_create_bookmark_end
 from lpod.document import odf_create_reference_mark
 from lpod.document import odf_create_reference_mark_start
 from lpod.document import odf_create_reference_mark_end
-
-
-
+from lpod.document import odf_create_list
 from lpod.utils import _get_cell_coordinates, convert_unicode
 from lpod.xmlpart import LAST_CHILD, NEXT_SIBLING, odf_element
 
@@ -893,7 +891,7 @@ class TestNote(TestCase):
         paragraph.insert_element(note, LAST_CHILD)
 
 
-    def test_get_formeted_text(self):
+    def test_get_formated_text(self):
         document = self.document
         content = self.content
         paragraph = content.get_element('//text:p')
