@@ -1,8 +1,6 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
-# Import from the Standard Library
-
 # Import from lpod
 from lpod.utils import _make_xpath_query
 from lpod.xmlpart import odf_element, odf_xmlpart

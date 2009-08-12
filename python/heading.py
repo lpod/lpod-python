@@ -2,8 +2,39 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from xmlpart import register_element_class
 from paragraph import odf_paragraph
+from xmlpart import register_element_class, odf_create_element
+
+
+def odf_create_heading(level, text=None, restart_numbering=False,
+                       start_value=None, style=None):
+    """Create a heading element of the given style and level, containing the
+    optional given text.
+
+    Level count begins at 1.
+
+    Arguments:
+
+        level -- int
+
+        text -- unicode
+
+        style -- unicode
+
+    Return: odf_element
+    """
+    data = '<text:h text:outline-level="%d"/>'
+    element = odf_create_element(data % level)
+    if text:
+        element.set_text(text)
+    if restart_numbering:
+        raise NotImplementedError
+    if start_value:
+        raise NotImplementedError
+    if style:
+        element.set_attribute('text:style-name', style)
+    return element
+
 
 
 class odf_heading(odf_paragraph):

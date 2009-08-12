@@ -5,6 +5,36 @@
 from xmlpart import register_element_class, odf_create_element, odf_element
 
 
+def odf_create_style(name, family, area=None, **kw):
+    """Create a style element with the given name, related to the given
+    family.
+
+    Arguments:
+
+        name -- unicode
+
+        family -- 'paragraph', 'text', 'section', 'table', 'tablecolumn',
+                  'table-row', 'table-cell', 'table-page', 'chart',
+                  'default', 'drawing-page', 'graphic', 'presentation',
+                  'control' or 'ruby'
+
+        area -- the "<area>-properties" where to store properties,
+                identical to the family by default
+
+        kw -- properties to create on the fly
+
+    Return: odf_element
+    """
+    data = u'<style:style style:name="%s" style:family="%s"/>'
+    element = odf_create_element(data % (name, family))
+    if kw:
+        if area is None:
+            area = family
+        element.set_style_properties(kw, area=area)
+    return element
+
+
+
 class odf_style(odf_element):
     """Specialised element for styles, yet generic to all style types.
     """

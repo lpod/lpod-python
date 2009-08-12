@@ -6,8 +6,65 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.container import odf_get_container
-from lpod.style import odf_style
+from lpod.document import odf_get_document
+from lpod.style import odf_create_style, odf_style
 from lpod.xmlpart import odf_xmlpart
+
+
+class TestStyle(TestCase):
+
+    def setUp(self):
+        self.document = document = odf_get_document('samples/span_style.odt')
+        self.content = document.get_xmlpart('content')
+
+
+    def tearDown(self):
+        del self.content
+        del self.document
+
+
+    def test_create_style(self):
+        style = odf_create_style('style1', 'paragraph')
+        expected = ('<style:style style:name="style1" '
+                      'style:family="paragraph"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_get_style_list(self):
+        content = self.content
+        styles = content.get_style_list()
+        self.assertEqual(len(styles), 3)
+
+
+    def test_get_style_list_family(self):
+        content = self.content
+        styles = content.get_style_list(family='paragraph')
+        self.assertEqual(len(styles), 1)
+
+
+    def test_get_style_automatic(self):
+        content = self.content
+        style = content.get_style(u'P1', 'paragraph')
+        self.assertNotEqual(style, None)
+
+
+    def test_insert_style(self):
+        content = self.content
+        clone = content.clone()
+        style = odf_create_style('style1', 'paragraph', area='text',
+                **{'fo:color': '#0000ff',
+                   'fo:background-color': '#ff0000'})
+        auto_styles = clone.get_category_context('automatic')
+        auto_styles.append_element(style)
+
+        expected = ('<style:style style:name="style1" '
+                                 'style:family="paragraph">'
+                      '<style:text-properties fo:color="#0000ff" '
+                                             'fo:background-color="#ff0000"/>'
+                    '</style:style>')
+        get1 = clone.get_style(u'style1', 'paragraph')
+        self.assertEqual(get1.serialize(), expected)
+
 
 
 class StylePropertiesTestCase(TestCase):

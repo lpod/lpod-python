@@ -2,8 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from xmlpart import register_element_class, odf_element
-
+from xmlpart import register_element_class, odf_element, odf_create_element
 
 
 def _get_formated_text(element, context, with_text=True):
@@ -36,6 +35,27 @@ def _get_formated_text(element, context, with_text=True):
                         container.append((citation, body))
                         result.append(marker % citation)
     return u''.join(result)
+
+
+
+def odf_create_paragraph(text=None, style=None):
+    """Create a paragraph element of the given style containing the optional
+    given text.
+
+    Arguments:
+
+        style -- unicode
+
+        text -- unicode
+
+    Return: odf_element
+    """
+    element = odf_create_element('<text:p/>')
+    if text:
+        element.set_text(text)
+    if style:
+        element.set_attribute('text:style-name', style)
+    return element
 
 
 

@@ -5,9 +5,8 @@
 from csv import reader, Sniffer
 
 # Import from lpod
-from document import odf_create_cell, odf_create_column, odf_create_row
-from utils import _get_cell_coordinates, get_value, Date, DateTime, Duration
-from utils import Boolean
+from utils import Boolean, Date, DateTime, Duration
+from utils import get_value, _get_cell_coordinates, _set_value_and_type
 from vfs import vfs
 from xmlpart import odf_create_element, LAST_CHILD
 
@@ -144,6 +143,106 @@ def _append_odf_row(odf_row, rows):
     else:
         rows.append({'attributes': odf_row.get_attributes(),
                      'cells': cells})
+
+
+
+# XXX useful?
+def odf_create_cell(value=None, representation=None, cell_type=None,
+                    currency=None):
+    """Create a cell element containing the given value. The textual
+    representation is automatically formatted but can be provided. Cell type
+    can be deduced as well, unless the number is a percentage or currency. If
+    cell type is "currency", the currency must be given.
+
+    Arguments:
+
+        value -- bool, int, float, Decimal, date, datetime, str, unicode,
+                 timedelta
+
+        representation -- unicode
+
+        cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
+                     'string' or 'time'
+
+        currency -- three-letter str
+
+    Return: odf_element
+    """
+
+    cell = odf_create_element('<table:table-cell/>')
+    representation = _set_value_and_type(cell, value=value,
+                                         representation=representation,
+                                         value_type=cell_type,
+                                         currency=currency)
+    if representation is not None:
+        cell.set_text_content(representation)
+    return cell
+
+
+
+# XXX useful?
+def odf_create_row(width=None):
+    """Create a row element, optionally filled with "width" number of cells.
+
+    Arguments:
+
+        width -- int
+
+    Return: odf_element
+    """
+    row = odf_create_element('<table:table-row/>')
+    if width is not None:
+        for i in xrange(width):
+            cell = odf_create_cell(u"")
+            row.insert_element(cell, LAST_CHILD)
+    return row
+
+
+
+# XXX useful?
+def odf_create_column(style=None):
+    """Create a column element of the optionally given style.
+
+    Arguments:
+
+        style -- unicode
+
+    Return: odf_element
+    """
+    element = odf_create_element('<table:table-column/>')
+    if style:
+        element.set_attribute('table:style-name', style)
+    return element
+
+
+
+def odf_create_table(name, width=None, height=None, style=None):
+    """Create a table element, optionally prefilled with "width" columns and
+    "height" rows, and of the optionally given style.
+
+    Arguments:
+
+        name -- unicode
+
+        width -- int
+
+        height -- int
+
+        style -- unicode
+
+    Return: odf_element
+    """
+    name = name
+    element = odf_create_element(u'<table:table table:name="%s"/>' % name)
+    if width is not None or height is not None:
+        width = width if width is not None else 1
+        height = height if height is not None else 1
+        for i in xrange(height):
+            row = odf_create_row(width)
+            element.insert_element(row, LAST_CHILD)
+    if style:
+        element.set_attribute('table:style-name', style)
+    return element
 
 
 
