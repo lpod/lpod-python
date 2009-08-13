@@ -3,6 +3,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from uuid import uuid4
 
 # Import from lpod
 from container import ODF_PARTS, odf_get_container
@@ -12,6 +13,7 @@ from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
 from xmlpart import odf_xmlpart
+from vfs import vfs
 
 
 class odf_document(object):
@@ -120,14 +122,14 @@ class odf_document(object):
 
 
     def add_file(self, uri_or_file):
-        raise NotImplementedError
-        if isinstance(uri_or_file, str):
+        if type(uri_or_file) is unicode or type(uri_or_file) is str:
+            uri_or_file = uri_or_file.encode('utf_8')
             file = vfs.open(uri_or_file)
+        else:
+            file = uri_or_file
+        name = 'Pictures/%s' % uuid4()
         data= file.read()
-        # TODO generate something like
-        # "Pictures/10000000000001D40000003C8B3889D9.png"
-        name = xxx
-        self.container.set_part(xxx, data)
+        self.container.set_part(name, data)
         return name
 
 
