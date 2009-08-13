@@ -59,12 +59,27 @@ class TestDrawPage(TestCase):
         self.assert_(isinstance(draw_page, odf_draw_page))
 
 
-    def test_get_draw_page(self):
+    def test_get_draw_page_by_name(self):
         content = self.content.clone()
         good = content.get_draw_page_by_name(u"Titre")
         self.assertNotEqual(good, None)
         bad = content.get_draw_page_by_name(u"Conclusion")
         self.assertEqual(bad, None)
+
+
+    def test_get_page_name(self):
+        content = self.content
+        page = content.get_draw_page_by_position(1)
+        self.assertEqual(page.get_page_name(), u"Titre")
+
+
+    def test_set_page_name(self):
+        content = self.content.clone()
+        page = content.get_draw_page_by_position(1)
+        name = u"Intitulé"
+        self.assertNotEqual(page.get_page_name(), name)
+        page.set_page_name(u"Intitulé")
+        self.assertEqual(page.get_page_name(), name)
 
 
 

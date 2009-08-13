@@ -42,8 +42,12 @@ def odf_create_draw_page(name, page_id=None, master_page=None,
 class odf_draw_page(odf_element):
     """Specialised element for pages of presentation and drawing.
     """
-    # TODO rename the page
-    pass
+    def get_page_name(self):
+        return self.get_attribute('draw:name')
+
+
+    def set_page_name(self, name):
+        self.set_attribute('draw:name', name)
 
 
 
