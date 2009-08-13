@@ -62,10 +62,11 @@ def odf_create_paragraph(text=None, style=None):
 class odf_paragraph(odf_element):
     """Specialised element for paragraphs.
     """
-    def insert_note(self, note_element,  note_class='footnote', note_id=None,
-                    citation=None, body=None, *args, **kw):
+    def insert_note(self, note_element=None, note_class='footnote',
+                    note_id=None, citation=None, body=None, *args, **kw):
         # TODO complain if the note has no note_id or citation
         # TODO note_id may be a function called with note_id(*args, **kw)
+        # TODO choose where to insert
         raise NotImplementedError
 
 

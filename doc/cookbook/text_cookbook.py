@@ -3,8 +3,9 @@
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
-from lpod.document import odf_create_paragraph, odf_create_heading
-from lpod.document import odf_create_list, odf_create_list_item
+from lpod.paragraph import odf_create_paragraph
+from lpod.heading import odf_create_heading
+from lpod.list import odf_create_list, odf_create_list_item
 
 # Creation of the document
 document = odf_new_document_from_type('text')
@@ -38,7 +39,7 @@ body.append_element(my_list)
 # Footnote
 paragraph = odf_create_paragraph(text=u'A paragraph with a footnote in it.')
 note = u'Author, A. (2007). "How to cite references", New York: McGraw-Hill.'
-paragraph.add_footnote(u'1', id='note1', place='footnote', body=note)
+paragraph.insert_note(note_id='note1', citation=u'1', body=note)
 body.append_element(paragraph)
 
 # Save
