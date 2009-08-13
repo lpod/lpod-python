@@ -5,8 +5,8 @@
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.document import odf_get_document, odf_create_draw_page
-from lpod.draw_page import odf_draw_page
+from lpod.document import odf_get_document
+from lpod.draw_page import odf_create_draw_page, odf_draw_page
 
 
 class TestDrawPage(TestCase):

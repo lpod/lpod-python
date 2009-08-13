@@ -7,22 +7,22 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.document import odf_create_variable_decl, odf_create_variable_set
-from lpod.document import odf_create_variable_get
-from lpod.document import odf_create_user_field_decl
-from lpod.document import odf_create_user_field_get
-from lpod.document import odf_create_page_number_variable
-from lpod.document import odf_create_page_count_variable
-from lpod.document import odf_create_date_variable, odf_create_time_variable
-from lpod.document import odf_create_chapter_variable
-from lpod.document import odf_create_filename_variable
-from lpod.document import odf_create_initial_creator_variable
-from lpod.document import odf_create_creation_date_variable
-from lpod.document import odf_create_creation_time_variable
-from lpod.document import odf_create_description_variable
-from lpod.document import odf_create_title_variable
-from lpod.document import odf_create_keywords_variable
-from lpod.document import odf_create_subject_variable
+from lpod.variable import odf_create_variable_decl, odf_create_variable_set
+from lpod.variable import odf_create_variable_get
+from lpod.variable import odf_create_user_field_decl
+from lpod.variable import odf_create_user_field_get
+from lpod.variable import odf_create_page_number_variable
+from lpod.variable import odf_create_page_count_variable
+from lpod.variable import odf_create_date_variable, odf_create_time_variable
+from lpod.variable import odf_create_chapter_variable
+from lpod.variable import odf_create_filename_variable
+from lpod.variable import odf_create_initial_creator_variable
+from lpod.variable import odf_create_creation_date_variable
+from lpod.variable import odf_create_creation_time_variable
+from lpod.variable import odf_create_description_variable
+from lpod.variable import odf_create_title_variable
+from lpod.variable import odf_create_keywords_variable
+from lpod.variable import odf_create_subject_variable
 from lpod.utils import convert_unicode
 
 

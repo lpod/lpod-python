@@ -6,8 +6,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.document import odf_create_heading
-from lpod.heading import odf_heading
+from lpod.heading import odf_create_heading, odf_heading
 from lpod.xmlpart import LAST_CHILD
 
 

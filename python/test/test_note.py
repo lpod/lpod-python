@@ -7,8 +7,9 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.document import odf_create_note, odf_create_annotation
-from lpod.document import odf_create_list, odf_create_paragraph
+from lpod.note import odf_create_note, odf_create_annotation
+from lpod.list import odf_create_list
+from lpod.paragraph import odf_create_paragraph
 from lpod.xmlpart import LAST_CHILD
 
 

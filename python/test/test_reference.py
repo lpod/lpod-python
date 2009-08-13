@@ -6,9 +6,9 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.document import odf_create_reference_mark
-from lpod.document import odf_create_reference_mark_start
-from lpod.document import odf_create_reference_mark_end
+from lpod.reference import odf_create_reference_mark
+from lpod.reference import odf_create_reference_mark_start
+from lpod.reference import odf_create_reference_mark_end
 from lpod.utils import convert_unicode
 
 

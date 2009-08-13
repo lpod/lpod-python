@@ -6,7 +6,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.document import odf_create_link
+from lpod.link import odf_create_link
 
 
 class TestLinks(TestCase):

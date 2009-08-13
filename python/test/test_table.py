@@ -7,13 +7,11 @@ from decimal import Decimal
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.document import odf_new_document_from_type
-from lpod.document import odf_create_table, odf_create_column
-from lpod.document import odf_create_row
-from lpod.table import odf_table
+from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.table import odf_create_table, odf_create_column
+from lpod.table import odf_create_row, odf_create_cell, odf_table
 from lpod.utils import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD, odf_create_element
-from lpod.document import odf_create_cell, odf_get_document
 
 
 

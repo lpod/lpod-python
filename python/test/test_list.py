@@ -5,8 +5,8 @@
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.document import odf_get_document, odf_create_list
-from lpod.document import odf_create_list_item
+from lpod.document import odf_get_document
+from lpod.list import odf_create_list, odf_create_list_item
 from lpod.utils import convert_unicode
 from lpod.xmlpart import LAST_CHILD
 

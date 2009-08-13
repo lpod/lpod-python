@@ -6,7 +6,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.document import odf_create_frame
+from lpod.frame import odf_create_frame
 
 
 class TestFrame(TestCase):

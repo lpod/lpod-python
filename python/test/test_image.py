@@ -6,7 +6,8 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.document import odf_create_frame, odf_create_image
+from lpod.frame import odf_create_frame
+from lpod.image import odf_create_image
 from lpod.xmlpart import LAST_CHILD, NEXT_SIBLING
 
 
