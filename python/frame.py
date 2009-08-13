@@ -13,6 +13,9 @@ def odf_create_frame(name, size=('1cm', '1cm'), anchor_type='paragraph',
     Size is a 2-tuple (width, height) and position is a 2-tuple (left,
     top); both are strings including the unit, e.g. ('10cm', '15cm').
 
+    Frames are not useful by themselves. You may consider calling
+    odf_create_image_frame or odf_create_text_frame directly.
+
     Arguments:
 
         name -- unicode
@@ -46,3 +49,49 @@ def odf_create_frame(name, size=('1cm', '1cm'), anchor_type='paragraph',
         element.set_attribute('draw:style-name', style)
 
     return element
+
+
+
+def odf_create_image_frame(uri, size, position=None, style=None):
+    """Create a ready-to-use image image, since it must be embedded in a
+    frame. Size is a 2-tuple (width, height) and position is a 2-tuple (left,
+    top); both are strings including the unit, e.g. ('21cm', '29.7cm'). Images
+    are supposed to be embedded by default; if they remain outside the
+    packaging, set link to True.
+
+    Arguments:
+
+        uri -- str
+
+        size -- (str, str)
+
+        position -- (str, str)
+
+        style -- unicode
+
+    Return: odf_element
+    """
+    raise NotImplementedError
+
+
+
+def odf_create_text_frame(text_or_element, size, position=None, style=None):
+    """Create a ready-to-use image image, since it must be embedded in a
+    frame. Size is a 2-tuple (width, height) and position is a 2-tuple (left,
+    top); both are strings including the unit, e.g. ('21cm', '29.7cm'). Images
+    are supposed to be embedded by default; if they remain outside the
+    packaging, set link to True.
+
+    Arguments:
+
+        uri -- str
+
+        size -- (str, str)
+
+        position -- (str, str)
+
+        style -- unicode
+
+    Return: odf_element
+    """
+    raise NotImplementedError

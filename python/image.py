@@ -17,26 +17,3 @@ def odf_create_image(uri):
     Return: odf_element
     """
     return odf_create_element('<draw:image xlink:href="%s"/>' % uri)
-
-
-
-def odf_create_imageframe(uri, size, position=None, style=None):
-    """Create a ready-to-use image image, since it must be embedded in a
-    frame. Size is a 2-tuple (width, height) and position is a 2-tuple (left,
-    top); both are strings including the unit, e.g. ('21cm', '29.7cm'). Images
-    are supposed to be embedded by default; if they remain outside the
-    packaging, set link to True.
-
-    Arguments:
-
-        uri -- str
-
-        size -- (str, str)
-
-        position -- (str, str)
-
-        style -- unicode
-
-    Return: odf_element
-    """
-    raise NotImplementedError
