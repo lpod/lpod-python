@@ -39,7 +39,7 @@ class TestFrame(TestCase):
     def test_get_frame_list(self):
         content = self.content
         result = content.get_frame_list()
-        self.assertEqual(len(result), 2)
+        self.assertEqual(len(result), 4)
 
 
     def test_get_frame_list_title(self):
@@ -57,7 +57,7 @@ class TestFrame(TestCase):
 
     def test_get_frame_by_position(self):
         content = self.content
-        frame = content.get_frame_by_position(2)
+        frame = content.get_frame_by_position(4)
         self.assertEqual(frame.get_attribute('presentation:class'), u'notes')
 
 
