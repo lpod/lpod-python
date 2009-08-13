@@ -3,10 +3,12 @@
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
-from lpod.document import odf_create_paragraph, odf_create_heading
+from lpod.draw_page import odf_create_draw_page
+from lpod.frame import odf_create_text_frame, odf_create_image_frame
+from lpod.paragraph import odf_create_paragraph
 
-from lpod.document import odf_create_drawpage
-from lpod.document import odf_create_textframe, odf_create_imageframe
+PPC = 72 * 2.54
+
 
 # helper function
 def get_thumbnail_file(filename):
@@ -17,62 +19,55 @@ def get_thumbnail_file(filename):
     im.thumbnail((300, 400), Image.ANTIALIAS)
     filedescriptor = StringIO()
     im.save(filedescriptor, 'JPEG', quality=80)
-    im.close()
     filedescriptor.seek(0)
-    return filedescriptor
+    return filedescriptor, (im.size[0] / PPC), (im.size[1] / PPC)
+
+
 
 # Creation of the document
 document = odf_new_document_from_type('presentation')
-body = document.get_body()
+content = document.get_xmlpart('content')
+body = content.get_body()
 
-# DrawPage 1
-page = odf_create_drawpage('page1')
+# The document already contains a page
+page = content.get_draw_page_by_position(1)
 
-# Add a frame with a draw_text_box
-text_element = odf_create_heading(1, text=u'First Slide')
-
-draw_textframe1 = odf_create_textframe(text_elment,
-                                       size=('5cm', '100mm'),
-                                       position=('1cm', '0cm'))
+# Add a frame with a text box
+text_element = odf_create_paragraph(u'First Slide')
+draw_textframe1 = odf_create_text_frame(text_element,
+                                        size=('5cm', '100mm'),
+                                        position=('3.5cm', '30.6mm'))
 page.append_element(draw_textframe1)
 
-# if first arg is text a paragraph is created
-draw_textframe2 = odf_create_textframe(u"Noël",
-                                       size=('5cm', '100mm'),
-                                       position=('1cm', '0cm'))
+# If first arg is text a paragraph is created
+draw_textframe2 = odf_create_text_frame(u"Noël",
+                                        size=('5cm', '100mm'),
+                                        position=('20cm', '14cm'))
 page.append_element(draw_textframe2)
 
-
 # Add an image frame from a file name
-local_uri = document.addfile(u'images/zoé.jpg')
-draw_imageframe1 = odf_create_imageframe(local_uri,
-                                         size=('5cm', '100mm'),
-                                         position=('1cm', '0cm'))
+local_uri = document.add_file(u'images/zoé.jpg')
+draw_imageframe1 = odf_create_image_frame(local_uri,
+                                          size=('6cm', '24.2mm'),
+                                          position=('1cm', '10cm'))
 page.append_element(draw_imageframe1)
 
-
-
 # Add an image frame from a file descriptor
-filedescriptor = get_thumbnail_file(u'images/zoé.jpg')
-document.addfile(filedescriptor)
-
-draw_imageframe2 = odf_create_imageframe(filedescriptor,
-                                         size=('5cm', '100mm'),
-                                         position=('1cm', '0cm'))
-
+filedescriptor, width, height = get_thumbnail_file(u'images/zoé.jpg')
+local_uri = document.add_file(filedescriptor)
+draw_imageframe2 = odf_create_image_frame(local_uri,
+                                          size=('%scm' % width,
+                                                '%scm' % height),
+                                          position=('12cm', '2cm'))
 page.append_element(draw_imageframe2)
-
 
 # Add the page to the body
 body.append_element(page)
 
-text_element = odf_create_heading(1, text=u'First Slide')
-
 # Get a new page, page2 copy of page1
 page2 = page.clone()
-page2.rename('page2')
-
-head = page2.get_heading_by_content(u'First')
+page2.set_page_name(u'Page 2')
+head = content.get_paragraph_by_content(u'First', context=page2)
 head.set_text(u'Second Slide')
 body.append_element(page2)
 
