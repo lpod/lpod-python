@@ -6,7 +6,9 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.frame import odf_create_frame
+from lpod.frame import odf_create_frame, odf_create_image_frame
+from lpod.frame import odf_create_text_frame
+from lpod.heading import odf_create_heading
 
 
 class TestFrame(TestCase):
@@ -16,24 +18,24 @@ class TestFrame(TestCase):
         self.content = document.get_xmlpart('content')
 
 
-    def test_create_frame1(self):
-        frame1 = odf_create_frame(u"A Frame", size=('10cm', '10cm'),
-                                  style='Graphics')
-        expected = ('<draw:frame draw:name="A Frame" svg:width="10cm" '
-                    'svg:height="10cm" text:anchor-type="paragraph" '
-                    'draw:style-name="Graphics"/>')
-        self.assertEqual(frame1.serialize(), expected)
+    def test_create_frame(self):
+        frame = odf_create_frame(u"A Frame", size=('10cm', '10cm'),
+                                 style='Graphics')
+        expected = ('<draw:frame svg:width="10cm" svg:height="10cm" '
+                      'text:anchor-type="paragraph" '
+                      'draw:name="A Frame" draw:style-name="Graphics"/>')
+        self.assertEqual(frame.serialize(), expected)
 
 
-    def test_create_frame2(self):
-        frame2 = odf_create_frame(u"Another Frame", size=('10cm', '10cm'),
-                                  anchor_type='page', page_number=1,
-                                  position=('10mm', '10mm'), style='Graphics')
-        expected = ('<draw:frame draw:name="Another Frame" svg:width="10cm" '
-                      'svg:height="10cm" text:anchor-type="page" '
+    def test_create_frame_page(self):
+        frame = odf_create_frame(u"Another Frame", size=('10cm', '10cm'),
+                                 anchor_type='page', page_number=1,
+                                 position=('10mm', '10mm'), style='Graphics')
+        expected = ('<draw:frame svg:width="10cm" svg:height="10cm" '
+                      'text:anchor-type="page" draw:name="Another Frame" '
                       'text:anchor-page-number="1" svg:x="10mm" '
                       'svg:y="10mm" draw:style-name="Graphics"/>')
-        self.assertEqual(frame2.serialize(), expected)
+        self.assertEqual(frame.serialize(), expected)
 
 
     def test_get_frame_list(self):
@@ -63,8 +65,8 @@ class TestFrame(TestCase):
 
     def test_get_frame_by_description(self):
         content = self.content
-        element = content.get_frame_by_description(u"描述")
-        self.assertEqual(element.get_name(), 'draw:frame')
+        frame = content.get_frame_by_description(u"描述")
+        self.assertEqual(frame.get_name(), 'draw:frame')
 
 
     def test_insert_frame(self):
@@ -83,6 +85,55 @@ class TestFrame(TestCase):
         self.assertEqual(element.get_name(), 'draw:frame')
         element = clone.get_frame_by_name(u"frame2")
         self.assertEqual(element.get_name(), 'draw:frame')
+
+
+
+class TestImageFrame(TestCase):
+
+    def test_create_image_frame(self):
+        frame = odf_create_image_frame('Pictures/zoe.jpg')
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'text:anchor-type="paragraph">'
+                      '<draw:image xlink:href="Pictures/zoe.jpg"/>'
+                    '</draw:frame>')
+        self.assertEqual(frame.serialize(), expected)
+
+
+    def test_create_image_frame_text(self):
+        frame = odf_create_image_frame('Pictures/zoe.jpg',
+                                         text=u"Zoé")
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'text:anchor-type="paragraph">'
+                      '<draw:image xlink:href="Pictures/zoe.jpg">'
+                        '<text:p>Zo&#233;</text:p>'
+                      '</draw:image>'
+                    '</draw:frame>')
+        self.assertEqual(frame.serialize(), expected)
+
+
+class TestTextFrame(TestCase):
+
+    def test_create_text_frame(self):
+        frame = odf_create_text_frame(u"Zoé")
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'text:anchor-type="paragraph">'
+                      '<draw:text-box>'
+                        '<text:p>Zo&#233;</text:p>'
+                      '</draw:text-box>'
+                    '</draw:frame>')
+        self.assertEqual(frame.serialize(), expected)
+
+
+    def test_create_text_frame_element(self):
+        heading = odf_create_heading(1, u"Zoé")
+        frame = odf_create_text_frame(heading)
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'text:anchor-type="paragraph">'
+                      '<draw:text-box>'
+                        '<text:h text:outline-level="1">Zo&#233;</text:h>'
+                      '</draw:text-box>'
+                    '</draw:frame>')
+        self.assertEqual(frame.serialize(), expected)
 
 
 
