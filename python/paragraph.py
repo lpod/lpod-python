@@ -1,7 +1,11 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
+# Import from the Standard Library
+from types import FunctionType
+
 # Import from lpod
+from note import odf_create_note
 from xmlpart import register_element_class, odf_element, odf_create_element
 
 
@@ -69,10 +73,24 @@ class odf_paragraph(odf_element):
     """
     def insert_note(self, note_element=None, note_class='footnote',
                     note_id=None, citation=None, body=None, *args, **kw):
-        # TODO complain if the note has no note_id or citation
-        # TODO note_id may be a function called with note_id(*args, **kw)
+        if note_element is None:
+            note_element = odf_create_note(note_class=note_class,
+                                           note_id=note_id,
+                                           citation=citation, body=body)
+        if note_class:
+            note_element.set_attribute('text:note-class', note_class)
+        if note_id:
+            if type(note_id) is FunctionType:
+                note_id = note_id(*args, **kw)
+            note_element.set_attribute('text:id', note_id)
+        if not note_element.get_attribute('text:id'):
+            raise ValueError, "notes must have an id"
+        if citation:
+            note_element.set_attribute('text:note-citation', citation)
+        if not note_element.get_attribute('text:note-citation'):
+            raise ValueError, "notes must have a citation"
         # TODO choose where to insert
-        raise NotImplementedError
+        self.append_element(note_element)
 
 
     def insert_annotation(self, annotation_element, text_or_element=None,
