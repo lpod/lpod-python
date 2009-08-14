@@ -7,7 +7,7 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.document import odf_get_document
 from lpod.frame import odf_create_frame, odf_create_image_frame
-from lpod.frame import odf_create_text_frame
+from lpod.frame import odf_create_text_frame, odf_frame
 from lpod.heading import odf_create_heading
 
 
@@ -134,6 +134,43 @@ class TestTextFrame(TestCase):
                       '</draw:text-box>'
                     '</draw:frame>')
         self.assertEqual(frame.serialize(), expected)
+
+
+
+class TestOdfFrame(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/frame_image.odp').clone()
+        self.content = document.get_xmlpart('content')
+        self.size = size = ('1cm', '2mm')
+        self.position = position = ('3in', '4pt')
+        self.frame = odf_create_frame(size=size, position=position)
+
+
+    def test_get_frame(self):
+        content = self.content
+        frame = content.get_frame_by_position(1)
+        self.assert_(isinstance(frame, odf_frame))
+
+
+    def test_get_size(self):
+        self.assertEqual(self.frame.get_size(), self.size)
+
+
+    def test_set_size(self):
+        frame = self.frame.clone()
+        frame.set_size(self.position)
+        self.assertEqual(frame.get_size(), self.position)
+
+
+    def test_get_position(self):
+        self.assertEqual(self.frame.get_position(), self.position)
+
+
+    def test_set_position(self):
+        frame = self.frame.clone()
+        frame.set_position(self.size)
+        self.assertEqual(frame.get_position(), self.size)
 
 
 

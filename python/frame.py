@@ -3,7 +3,7 @@
 
 # Import from lpod
 from image import odf_create_image
-from xmlpart import odf_create_element
+from xmlpart import odf_create_element, odf_element, register_element_class
 
 
 def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
@@ -107,3 +107,30 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
         text_box.append_element(text_or_element)
     frame.append_element(text_box)
     return frame
+
+
+
+class odf_frame(odf_element):
+
+    def get_size(self):
+        get_attr = self.get_attribute
+        return get_attr('svg:width'), get_attr('svg:height')
+
+
+    def set_size(self, size):
+        self.set_attribute('svg:width', size[0])
+        self.set_attribute('svg:height', size[1])
+
+
+    def get_position(self):
+        get_attr = self.get_attribute
+        return get_attr('svg:x'), get_attr('svg:y')
+
+
+    def set_position(self, position):
+        self.set_attribute('svg:x', position[0])
+        self.set_attribute('svg:y', position[1])
+
+
+
+register_element_class('draw:frame', odf_frame)
