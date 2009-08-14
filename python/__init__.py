@@ -18,3 +18,4 @@ import heading
 import list
 import paragraph
 import style
+import toc
