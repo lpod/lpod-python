@@ -37,6 +37,8 @@ def _get_formated_text(element, context, with_text=True):
             # Tabulation
             elif tag == 'text:tab':
                 result.append(u'\t')
+            else:
+                result.append(obj.get_formated_text(context))
     return u''.join(result)
 
 

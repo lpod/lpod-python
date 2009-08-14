@@ -18,4 +18,5 @@ import heading
 import list
 import paragraph
 import style
+import frame
 import toc

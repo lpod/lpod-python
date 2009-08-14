@@ -132,5 +132,26 @@ class odf_frame(odf_element):
         self.set_attribute('svg:y', position[1])
 
 
+    def get_formated_text(self, context):
+        result = []
+        for element in self.get_children():
+            tag = element.get_name()
+            if tag == 'draw:image':
+                result.append(u'[Image %s]\n' %
+                              element.get_attribute('xlink:href'))
+            elif tag == 'draw:text-box':
+                subresult = [u'  ']
+                for element in element.get_children():
+                    subresult.append(element.get_formated_text(context))
+                subresult = u''.join(subresult)
+                subresult = subresult.replace(u'\n', u'\n  ')
+                subresult.rstrip(' ')
+                result.append(subresult)
+            else:
+                result.append(element.get_formated_text(context))
+        result.append(u'\n')
+        return u''.join(result)
+
+
 
 register_element_class('draw:frame', odf_frame)
