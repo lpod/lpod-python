@@ -19,6 +19,10 @@ def odf_create_heading(level, text=None, restart_numbering=False,
 
         text -- unicode
 
+        restart_numbering -- bool
+
+        start_value -- int
+
         style -- unicode
 
     Return: odf_element
@@ -28,9 +32,9 @@ def odf_create_heading(level, text=None, restart_numbering=False,
     if text:
         element.set_text(text)
     if restart_numbering:
-        raise NotImplementedError
+        element.set_attribute('text:restart-numbering', 'true')
     if start_value:
-        raise NotImplementedError
+        element.set_attribute('text:start-value', start_value)
     if style:
         element.set_attribute('text:style-name', style)
     return element
