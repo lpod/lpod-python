@@ -40,7 +40,8 @@ class GenerateXPathTestCase(TestCase):
 
     def test_attribute_position(self):
         query = _make_xpath_query('text:p', style='Standard', position=2)
-        self.assertEqual(query, '(descendant::text:p[@text:style-name="Standard"])[2]')
+        self.assertEqual(query,
+                '(descendant::text:p[@text:style-name="Standard"])[2]')
 
 
     def test_two_attributes_position(self):
@@ -105,12 +106,31 @@ class BooleanTestCase(TestCase):
 
 
 
-class Set_Get_ValueTestCase(TestCase):
+class Get_ValueTestCase(TestCase):
 
     def test_with_cell(self):
 
         cell = odf_create_cell(42)
         self.assertEqual(get_value(cell), 42)
+
+
+    def test_with_variable(self):
+
+        variable_set = odf_create_variable_set(u'你好 Zoé', 42)
+        self.assertEqual(get_value(variable_set), 42)
+
+
+    def test_with_user_field(self):
+        user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
+        self.assertEqual(get_value(user_field_decl), 42)
+
+
+
+class Set_Get_ValueTestCase(TestCase):
+
+    def test_with_cell(self):
+
+        cell = odf_create_cell(42)
 
         set_value(cell, u'你好 Zoé')
         expected = ('<table:table-cell office:value-type="string" '
@@ -126,7 +146,6 @@ class Set_Get_ValueTestCase(TestCase):
     def test_with_variable(self):
 
         variable_set = odf_create_variable_set(u'你好 Zoé', 42)
-        self.assertEqual(get_value(variable_set), 42)
 
         set_value(variable_set, u'你好 Zoé')
         expected = ('<text:variable-set office:value-type="string" '
@@ -140,7 +159,6 @@ class Set_Get_ValueTestCase(TestCase):
 
     def test_with_user_field(self):
         user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
-        self.assertEqual(get_value(user_field_decl), 42)
 
         set_value(user_field_decl, u'你好 Zoé')
         expected = (('<text:user-field-decl office:value-type="string" '

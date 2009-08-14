@@ -29,8 +29,7 @@ class TestNote(TestCase):
         self.expected = expected
 
 
-    def test_create_note(self):
-
+    def test_create_note1(self):
         # With an odf_element
         note_body = odf_create_paragraph(u'a footnote', style='Standard')
         note = odf_create_note(note_id='note1', citation=u'1',
@@ -39,6 +38,8 @@ class TestNote(TestCase):
                                          '<text:p text:style-name="Standard">')
         self.assertEqual(note.serialize(), expected)
 
+
+    def test_create_note2(self):
         # With an unicode object
         note = odf_create_note(note_id='note1', citation=u'1',
                                body=u'a footnote')

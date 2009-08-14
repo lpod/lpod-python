@@ -358,13 +358,15 @@ class TestTable(TestCase):
         self.assertEqual(column.serialize(), expected)
 
 
-    def test_create_table(self):
+    def test_create_table1(self):
         # Test 1
         table = odf_create_table(u'a_table', style='a_style')
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="a_style"/>')
         self.assertEqual(table.serialize(), expected)
 
+
+    def test_create_table2(self):
         # Test 2
         table = odf_create_table(u'a_table', width=1, height=2,
                                  style='a_style')
@@ -387,8 +389,6 @@ class TestTable(TestCase):
 
 
     def test_insert_table(self):
-        content = self.content
-        clone = content.clone()
         table = odf_create_table(u"New Table", style='a_style')
         column = odf_create_column(style='a_column_style')
         row = odf_create_row()
@@ -410,6 +410,12 @@ class TestTable(TestCase):
                     '</table:table>')
         self.assertEqual(table.serialize(), expected)
 
+
+    def test_get_table_by_name(self):
+        content = self.content
+        clone = content.clone()
+
+        table = odf_create_table(u"New Table", style='a_style')
         body = clone.get_body()
         body.insert_element(table, LAST_CHILD)
 
@@ -417,6 +423,16 @@ class TestTable(TestCase):
         table = clone.get_table_by_name(u"New Table")
         self.assertEqual(table.get_attribute('table:name'), u"New Table")
 
+
+    def test_get_table_by_position(self):
+        content = self.content
+        clone = content.clone()
+
+        table = odf_create_table(u"New Table", style='a_style')
+        body = clone.get_body()
+        body.insert_element(table, LAST_CHILD)
+
+        # Get OK ?
         table = clone.get_table_by_position(4)
         self.assertEqual(table.get_attribute('table:name'), u"New Table")
 
@@ -424,7 +440,7 @@ class TestTable(TestCase):
 
 class odf_table_TestCase(TestCase):
 
-    def test_create_table(self):
+    def test_create_table_with_data(self):
 
         expected = ('<table:table table:name="table1" '
                       'table:style-name="Standard">'
@@ -455,18 +471,48 @@ class odf_table_TestCase(TestCase):
         # With the python data
         data = [ (u'A float', 3.14),
                  (u'A date', datetime(1975, 5, 7)) ]
-        table1 = odf_table('table1', 'Standard', data)
-        data1 = table1.get_odf_element().serialize()
+        table = odf_table('table1', 'Standard', data)
+        serialized = table.get_odf_element().serialize()
 
-        self.assertEqual(data1, expected)
+        self.assertEqual(serialized, expected)
+
+
+    def test_create_table_with_odf_element(self):
+
+        expected = ('<table:table table:name="table1" '
+                      'table:style-name="Standard">'
+                      '<table:table-column table:style-name="Standard" '
+                      'table:number-columns-repeated="2"/>'
+                      '<table:table-row>'
+                        '<table:table-cell office:value-type="string" '
+                          'office:string-value="A float">'
+                          '<text:p>A float</text:p>'
+                        '</table:table-cell>'
+                        '<table:table-cell office:value-type="float" '
+                          'office:value="3.14">'
+                          '<text:p>3.14</text:p>'
+                        '</table:table-cell>'
+                      '</table:table-row>'
+                      '<table:table-row>'
+                        '<table:table-cell office:value-type="string" '
+                          'office:string-value="A date">'
+                          '<text:p>A date</text:p>'
+                        '</table:table-cell>'
+                        '<table:table-cell office:value-type="date" '
+                          'office:date-value="1975-05-07T00:00:00">'
+                          '<text:p>1975-05-07T00:00:00</text:p>'
+                        '</table:table-cell>'
+                      '</table:table-row>'
+                    '</table:table>')
+
 
         # With an odf_element
         odf_element = odf_create_element(expected)
 
-        table2 = odf_table(odf_element=odf_element)
-        data2 = table2.get_odf_element().serialize()
+        table = odf_table(odf_element=odf_element)
+        serialized = table.get_odf_element().serialize()
 
-        self.assertEqual(data2, expected)
+        self.assertEqual(serialized, expected)
 
 
     def test_create_with_repeat(self):
