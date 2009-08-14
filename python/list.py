@@ -103,16 +103,17 @@ class odf_list(odf_element):
 
 
     def get_formated_text(self, context):
-        result = u''
+        result = []
         for list_item in self.get_element_list('text:list-item'):
-            text = u''
+            text = []
             for children in list_item.get_children():
-                text += children.get_formated_text(context)
+                text.append(children.get_formated_text(context))
+            text = u''.join(text)
             text = text.strip('\n')
             # Indent the text
             text = u'- %s\n' % text.replace(u'\n', u'\n  ')
-            result += text
-        return result
+            result.append(text)
+        return u''.join(result)
 
 
 
