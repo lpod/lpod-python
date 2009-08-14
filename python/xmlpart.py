@@ -347,7 +347,8 @@ class odf_element(object):
         """Like "set_text" but applied to the embedded paragraph:
         annotations, cells...
         """
-        paragraph = self.get_element('text:p')
+        # Was made descendant for text:p in draw:text-box in draw:frame
+        paragraph = self.get_element('descendant::text:p')
         if paragraph is None:
             paragraph = odf_create_element('<text:p/>')
             self.insert_element(paragraph, FIRST_CHILD)
