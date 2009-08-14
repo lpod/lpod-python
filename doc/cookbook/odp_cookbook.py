@@ -67,9 +67,19 @@ body.append_element(page)
 # Get a new page, page2 copy of page1
 page2 = page.clone()
 page2.set_page_name(u'Page 2')
-head = content.get_paragraph_by_content(u'First', context=page2)
-head.set_text(u'Second Slide')
+paragraph = content.get_paragraph_by_content(u'First', context=page2)
+paragraph.set_text(u'Second Slide')
 body.append_element(page2)
+
+# Build a new page from scratch
+page3 = odf_create_draw_page(u"Page 3")
+frame = content.get_frame_by_content(u"Second").clone()
+frame.set_size(('10cm', '100mm'))
+frame.set_position(('100mm', '10cm'))
+# A shortcut to hit embedded paragraph
+frame.set_text_content(u"Third Slide")
+page3.append_element(frame)
+body.append_element(page3)
 
 # Save
 document.save('presentation.odp', pretty=True)
