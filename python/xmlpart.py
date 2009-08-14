@@ -11,7 +11,7 @@ from lxml.etree import parse, fromstring, tostring, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
-from utils import _get_abspath, DateTime, convert_unicode
+from utils import _get_abspath, convert_unicode
 from utils import _make_xpath_query
 
 
@@ -297,41 +297,6 @@ class odf_element(object):
     def get_children(self):
         element = self.__element
         return [make_odf_element(e) for e in element]
-
-
-    #
-    # Shortcuts expected to be reusable over several elements
-    #
-
-    def get_creator(self):
-        dc_creator = self.get_element('dc:creator')
-        if dc_creator is None:
-            return None
-        return dc_creator.get_text()
-
-
-    def set_creator(self, creator):
-        dc_creator = self.get_element('dc:creator')
-        if dc_creator is None:
-            dc_creator = odf_create_element('<dc:creator/>')
-            self.append_element(dc_creator)
-        dc_creator.set_text(creator)
-
-
-    def get_date(self):
-        dc_date = self.get_element('dc:date')
-        if dc_date is None:
-            return None
-        date = dc_date.get_text()
-        return DateTime.decode(date)
-
-
-    def set_date(self, date):
-        dc_date = self.get_element('dc:date')
-        if dc_date is None:
-            dc_date = odf_create_element('<dc:date/>')
-            self.append_element(dc_date)
-        dc_date.set_text(DateTime.encode(date))
 
 
     def get_text_content(self):
