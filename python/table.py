@@ -3,6 +3,7 @@
 
 # Import from the Standard Library
 from csv import reader, Sniffer
+from re import search
 
 # Import from lpod
 from utils import Boolean, Date, DateTime, Duration
@@ -148,7 +149,7 @@ def _append_odf_row(odf_row, rows):
 
 # XXX useful?
 def odf_create_cell(value=None, representation=None, cell_type=None,
-                    currency=None):
+                    currency=None, style=None):
     """Create a cell element containing the given value. The textual
     representation is automatically formatted but can be provided. Cell type
     can be deduced as well, unless the number is a percentage or currency. If
@@ -166,6 +167,8 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
 
         currency -- three-letter str
 
+        style -- unicode
+
     Return: odf_element
     """
 
@@ -176,6 +179,8 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
                                          currency=currency)
     if representation is not None:
         cell.set_text_content(representation)
+    if style is not None:
+        cell.set_attribute('table:style-name', style)
     return cell
 
 
@@ -470,8 +475,27 @@ class odf_table(object):
 
 
     def get_cell_list(self, regex=None, style=None):
-        # TODO return list of coordinates
-        raise NotImplementedError
+        coordinates = []
+        cells = []
+        rows = self.__rows
+        # Get all the cells
+        for y, row in enumerate(rows):
+            for x, cell in enumerate(row['cells']):
+                cells.append((cell, x, y))
+        # Filter the cells with the regex
+        if regex:
+            cells = [(cell, x, y) for cell, x, y in cells
+                                  if cell.match(regex)]
+        # Filter the cells with the style
+        if style:
+            filter = []
+            for cell, x, y in cells:
+                style_name = cell.get_attribute('table:style-name')
+                if style_name and search(style, style_name):
+                    filter.append((cell, x, y))
+            cells = filter
+        # Return only the coordinates
+        return [(x, y) for cell, x, y in cells]
 
 
     def get_size(self):

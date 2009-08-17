@@ -17,11 +17,12 @@ from lpod.xmlpart import LAST_CHILD, odf_create_element
 
 def get_example():
     # Encode this table
-    #   A B C D E F G
-    # 1 1 1 1 2 3 3 3
-    # 2 1 1 1 2 3 3 3
-    # 3 1 1 1 2 3 3 3
-    # 4 1 2 3 4 5 6 7
+    #   |A B C D E F G
+    # --+-------------
+    # 1 |1 1 1 2 3 3 3
+    # 2 |1 1 1 2 3 3 3
+    # 3 |1 1 1 2 3 3 3
+    # 4 |1 2 3 4 5 6 7
 
     # Header
     data = ['<table:table table:name="a_table" '
@@ -544,6 +545,28 @@ class odf_table_TestCase(TestCase):
                       '<text:p>A date</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell_A2.serialize(), expected)
+
+
+    def test_get_cell_list_regex(self):
+        data = get_example()
+        odf_element = odf_create_element(data)
+        table = odf_table(odf_element=odf_element)
+        expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
+                       (5, 2), (6, 2), (2, 3)]
+        coordinates = table.get_cell_list(regex=ur'3')
+        self.assertEqual(coordinates, expected)
+
+
+    def test_get_cell_list_style(self):
+        data = get_example()
+        odf_element = odf_create_element(data)
+        table = odf_table(odf_element=odf_element)
+        for i in xrange(7):
+            cell = odf_create_cell(value=i, style=u'a_style')
+            table.set_cell((i, 0), cell)
+        expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
+        coordinates = table.get_cell_list(style=ur'a_style')
+        self.assertEqual(coordinates, expected)
 
 
     def test_get_odf_element(self):
