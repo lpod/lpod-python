@@ -431,8 +431,7 @@ class odf_table(object):
     # Public API
     #
 
-    # FIXME rename to "to_odf_element()"
-    def get_odf_element(self):
+    def to_odf_element(self):
         # 1) Create the table:table
         table = odf_create_element('<table:table/>')
         for key, value in self.__table_attributes.iteritems():

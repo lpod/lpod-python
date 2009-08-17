@@ -473,7 +473,7 @@ class odf_table_TestCase(TestCase):
         data = [ (u'A float', 3.14),
                  (u'A date', datetime(1975, 5, 7)) ]
         table = odf_table('table1', 'Standard', data)
-        serialized = table.get_odf_element().serialize()
+        serialized = table.to_odf_element().serialize()
 
         self.assertEqual(serialized, expected)
 
@@ -511,7 +511,7 @@ class odf_table_TestCase(TestCase):
         odf_element = odf_create_element(expected)
 
         table = odf_table(odf_element=odf_element)
-        serialized = table.get_odf_element().serialize()
+        serialized = table.to_odf_element().serialize()
 
         self.assertEqual(serialized, expected)
 
@@ -671,12 +671,12 @@ class odf_table_TestCase(TestCase):
         self.assertEqual(coordinates, expected)
 
 
-    def test_get_odf_element(self):
+    def test_to_odf_element(self):
         data = get_example()
         odf_element = odf_create_element(data)
         table = odf_table(odf_element=odf_element)
 
-        table_serialized = table.get_odf_element().serialize()
+        table_serialized = table.to_odf_element().serialize()
         self.assertEqual(table_serialized, data)
 
 
@@ -686,7 +686,7 @@ class odf_table_TestCase(TestCase):
                  (2, 2, 2, 2))
         # Force repeat
         table1 = odf_table(name=u'table', style='Standard', data=data1)
-        table1 = odf_table(odf_element=table1.get_odf_element())
+        table1 = odf_table(odf_element=table1.to_odf_element())
 
         # Change the value of C2 to 3, not with a new cell, but with the same
         cell = table1.get_cell('C2')
@@ -700,8 +700,8 @@ class odf_table_TestCase(TestCase):
                  (2, 2, 2, 2))
         table2 = odf_table(name=u'table', style='Standard', data=data2)
 
-        self.assertEqual(table1.get_odf_element().serialize(),
-                         table2.get_odf_element().serialize())
+        self.assertEqual(table1.to_odf_element().serialize(),
+                         table2.to_odf_element().serialize())
 
 
     def test_set_cell_table(self):
@@ -710,7 +710,7 @@ class odf_table_TestCase(TestCase):
                  (2, 2, 2, 2))
         # Force repeat
         table1 = odf_table(name=u'table', style='Standard', data=data1)
-        table1 = odf_table(odf_element=table1.get_odf_element())
+        table1 = odf_table(odf_element=table1.to_odf_element())
 
         # Change the value of C2 to 3 with a new cell
         cell = odf_create_cell(3)
@@ -722,8 +722,8 @@ class odf_table_TestCase(TestCase):
                  (2, 2, 2, 2))
         table2 = odf_table(name=u'table', style='Standard', data=data2)
 
-        self.assertEqual(table1.get_odf_element().serialize(),
-                         table2.get_odf_element().serialize())
+        self.assertEqual(table1.to_odf_element().serialize(),
+                         table2.to_odf_element().serialize())
 
 
     def test_bug_openoffice(self):
@@ -756,8 +756,8 @@ class odf_table_TestCase(TestCase):
                  (2, 2, 2, 2),
                  (None, None, None, None))
         table2 = odf_table(name=u'table', style='Standard', data=data2)
-        self.assertEqual(table1.get_odf_element().serialize(),
-                         table2.get_odf_element().serialize())
+        self.assertEqual(table1.to_odf_element().serialize(),
+                         table2.to_odf_element().serialize())
 
 
     def test_add_column(self):
@@ -777,8 +777,8 @@ class odf_table_TestCase(TestCase):
                  (1, None, None, 1, 1, 1, None),
                  (2, None, None, 2, 2, 2, None))
         table2 = odf_table(name=u'table', style='Standard', data=data2)
-        self.assertEqual(table1.get_odf_element().serialize(),
-                         table2.get_odf_element().serialize())
+        self.assertEqual(table1.to_odf_element().serialize(),
+                         table2.to_odf_element().serialize())
 
 
 
