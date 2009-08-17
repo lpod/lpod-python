@@ -6,7 +6,7 @@ from glob import glob
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
-from lpod.table import create_table_from_csv
+from lpod.table import import_from_csv
 
 # Get elements
 document = odf_new_document_from_type('spreadsheet')
@@ -15,11 +15,11 @@ body = document.get_body()
 # Delete the 3 default sheets
 body.clear()
 
-for id, csv_name in enumerate(glob('./files/*.csv')):
-    tab = create_table_from_csv(u'tab_%s' % id , csv_name)
-    body.append_element(tab)
+for id, filename in enumerate(glob('./files/*.csv')):
+    table = import_from_csv(filename, u'Table %s' % (id + 1))
+    # Table is represented as a matrix in memory,
+    # so ask to reformat it to XML
+    body.append_element(table.to_odf_element())
 
 # Save
 document.save('spreadsheet.ods', pretty=True)
-
-
