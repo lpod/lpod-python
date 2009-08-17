@@ -354,25 +354,25 @@ class TestTable(TestCase):
 
     def test_create_column(self):
         # Test create
-        column = odf_create_column('a_style')
-        expected = '<table:table-column table:style-name="a_style"/>'
+        column = odf_create_column(u'A Style')
+        expected = '<table:table-column table:style-name="A Style"/>'
         self.assertEqual(column.serialize(), expected)
 
 
     def test_create_table1(self):
         # Test 1
-        table = odf_create_table(u'a_table', style='a_style')
+        table = odf_create_table(u'a_table', style='A Style')
         expected = ('<table:table table:name="a_table" '
-                    'table:style-name="a_style"/>')
+                    'table:style-name="A Style"/>')
         self.assertEqual(table.serialize(), expected)
 
 
     def test_create_table2(self):
         # Test 2
         table = odf_create_table(u'a_table', width=1, height=2,
-                                 style='a_style')
+                                 style='A Style')
         expected = ('<table:table table:name="a_table" '
-                    'table:style-name="a_style">'
+                    'table:style-name="A Style">'
                     '<table:table-row>'
                       '<table:table-cell office:value-type="string" '
                         'office:string-value="">'
@@ -390,7 +390,7 @@ class TestTable(TestCase):
 
 
     def test_insert_table(self):
-        table = odf_create_table(u"New Table", style='a_style')
+        table = odf_create_table(u"New Table", style='A Style')
         column = odf_create_column(style='a_column_style')
         row = odf_create_row()
         cell = odf_create_cell(u"")
@@ -399,7 +399,7 @@ class TestTable(TestCase):
         row.insert_element(cell, LAST_CHILD)
         table.insert_element(row, LAST_CHILD)
         expected = ('<table:table table:name="New Table" '
-                      'table:style-name="a_style">'
+                      'table:style-name="A Style">'
                       '<table:table-column '
                         'table:style-name="a_column_style"/>'
                       '<table:table-row>'
@@ -416,7 +416,7 @@ class TestTable(TestCase):
         content = self.content
         clone = content.clone()
 
-        table = odf_create_table(u"New Table", style='a_style')
+        table = odf_create_table(u"New Table", style='A Style')
         body = clone.get_body()
         body.insert_element(table, LAST_CHILD)
 
@@ -429,7 +429,7 @@ class TestTable(TestCase):
         content = self.content
         clone = content.clone()
 
-        table = odf_create_table(u"New Table", style='a_style')
+        table = odf_create_table(u"New Table", style='A Style')
         body = clone.get_body()
         body.insert_element(table, LAST_CHILD)
 
@@ -577,9 +577,9 @@ class odf_table_TestCase(TestCase):
         table = odf_table(odf_element=odf_element)
         # Set the first line to : 0 1 2 3 4 5 6
         for i in xrange(7):
-            cell = odf_create_cell(value=i, style=u'a_style')
+            cell = odf_create_cell(value=i, style=u'A Style')
             table.set_cell((i, 0), cell)
-        coordinates = table.get_cell_list(style=ur'style')
+        coordinates = table.get_cell_list(style=ur'Style')
         expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
         self.assertEqual(coordinates, expected)
 
@@ -618,14 +618,14 @@ class odf_table_TestCase(TestCase):
         table = odf_table(odf_element=odf_element)
         # Set the styles
         cell = table.get_cell((0, 1))
-        cell.set_attribute('table:style-name', u'a_style')
+        cell.set_attribute('table:style-name', u'A Style')
         cell = table.get_cell((6, 1))
-        cell.set_attribute('table:style-name', u'a_style')
+        cell.set_attribute('table:style-name', u'A Style')
         cell = table.get_cell((0, 2))
-        cell.set_attribute('table:style-name', u'a_style')
+        cell.set_attribute('table:style-name', u'A Style')
         cell = table.get_cell((6, 2))
-        cell.set_attribute('table:style-name', u'a_style')
-        coordinates = table.get_row_list(style=ur'style')
+        cell.set_attribute('table:style-name', u'A Style')
+        coordinates = table.get_row_list(style=ur'Style')
         expected = [1, 2]
         self.assertEqual(coordinates, expected)
 
@@ -659,14 +659,14 @@ class odf_table_TestCase(TestCase):
         table = odf_table(odf_element=odf_element)
         # Set the styles
         cell = table.get_cell((0, 0))
-        cell.set_attribute('table:style-name', u'a_style')
+        cell.set_attribute('table:style-name', u'A Style')
         cell = table.get_cell((0, 1))
-        cell.set_attribute('table:style-name', u'a_style')
+        cell.set_attribute('table:style-name', u'A Style')
         cell = table.get_cell((6, 2))
-        cell.set_attribute('table:style-name', u'a_style')
+        cell.set_attribute('table:style-name', u'A Style')
         cell = table.get_cell((6, 3))
-        cell.set_attribute('table:style-name', u'a_style')
-        coordinates = table.get_column_list(style=ur'style')
+        cell.set_attribute('table:style-name', u'A Style')
+        coordinates = table.get_column_list(style=ur'[sS]tyle')
         expected = [0, 6]
         self.assertEqual(coordinates, expected)
 
