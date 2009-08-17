@@ -5,6 +5,9 @@
 from xmlpart import register_element_class, odf_create_element, odf_element
 
 
+# XXX these are specific styles but the name is generic.
+
+
 def odf_create_style(name, family, area=None, **kw):
     """Create a style element with the given name, related to the given
     family.
