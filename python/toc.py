@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
-
 # Import from lpod
 from xmlpart import register_element_class, odf_element
 
@@ -26,5 +25,5 @@ class odf_toc(odf_element):
         return u''.join(result)
 
 
-register_element_class('text:table-of-content', odf_toc)
 
+register_element_class('text:table-of-content', odf_toc)
