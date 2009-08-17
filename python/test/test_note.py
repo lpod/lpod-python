@@ -127,9 +127,9 @@ class TestAnnotation(TestCase):
         annotations = content.get_annotation_list()
         self.assertEqual(len(annotations), 1)
         annotation = annotations[0]
-        creator = annotation.get_creator()
+        creator = annotation.get_annotation_creator()
         self.assertEqual(creator, u"Auteur inconnu")
-        date = annotation.get_date()
+        date = annotation.get_annotation_date()
         self.assertEqual(date, datetime(2009, 8, 3, 12, 9, 45))
         text = annotation.get_text_content()
         self.assertEqual(text, u"Sauf qu'il est commenté !")

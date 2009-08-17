@@ -236,9 +236,10 @@ class odf_content(odf_xmlpart):
         for annotation in self._get_element_list('office:annotation',
                                                  regex=regex,
                                                  context=context):
-            if creator is not None and creator != annotation.get_creator():
+            if (creator is not None
+                    and creator != annotation.get_annotation_creator()):
                 continue
-            date = annotation.get_date()
+            date = annotation.get_annotation_date()
             if start_date is not None and date < start_date:
                 continue
             if end_date is not None and date >= end_date:
