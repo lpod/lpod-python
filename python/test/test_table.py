@@ -591,13 +591,15 @@ class odf_table_TestCase(TestCase):
         # 1 |7 - - - - - -
         # 2 |- - - - - - -
         # 3 |- - - - - - -
-        # 4 |- - - - - - 7
+        # 4 |7 - - - - - 7
         data = get_example()
         odf_element = odf_create_element(data)
         table = odf_table(odf_element=odf_element)
-        # Set the first cell to the value 7
+        # Set some cells to the value 7
         cell = odf_create_cell(value=7)
         table.set_cell((0, 0), cell)
+        cell = odf_create_cell(value=7)
+        table.set_cell((0, 3), cell)
         coordinates = table.get_row_list(regex=ur'7')
         expected = [0, 3]
         self.assertEqual(coordinates, expected)
@@ -608,14 +610,18 @@ class odf_table_TestCase(TestCase):
         #   |A B C D E F G
         # --+-------------
         # 1 |- - - - - - -
-        # 2 |1 - - - - - -
-        # 3 |- - - - - - 3
+        # 2 |1 - - - - - 3
+        # 3 |1 - - - - - 3
         # 4 |- - - - - - -
         data = get_example()
         odf_element = odf_create_element(data)
         table = odf_table(odf_element=odf_element)
         # Set the styles
         cell = table.get_cell((0, 1))
+        cell.set_attribute('table:style-name', u'a_style')
+        cell = table.get_cell((6, 1))
+        cell.set_attribute('table:style-name', u'a_style')
+        cell = table.get_cell((0, 2))
         cell.set_attribute('table:style-name', u'a_style')
         cell = table.get_cell((6, 2))
         cell.set_attribute('table:style-name', u'a_style')
