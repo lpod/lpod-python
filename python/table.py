@@ -300,60 +300,53 @@ class odf_table(object):
 
         odf_element -- odf_element
         """
-
         # Attributes of table:table
         self.__table_attributes = {}
-
         # List of odf_element
         self.__columns = []
-
         # List of dict {'attributes': {}, 'cells': []}
         self.__rows = []
-
         # Load the state
-        if name is not None and style is not None and data is not None:
-            self.__load_state_from_list(name, style, data)
+        if data is not None:
+            if name is None:
+                # XXX For now accept u""
+                raise ValueError, "name is mandatory with data"
+            self.__load_state_from_list(name, data, style=style)
         elif odf_element is not None:
             self.__load_state_from_odf_element(odf_element)
         else:
-            raise ValueError, 'unexpected arguments'
+            raise ValueError, "either data or odf_element is expected"
 
 
     #
     # Private API
     #
 
-    def __load_state_from_list(self, name, style, data):
-
+    def __load_state_from_list(self, name, data, style=None):
         # 1) table attributes
         self.__table_attributes['table:name'] = name.encode('utf-8')
-        self.__table_attributes['table:style-name'] = style
-
+        if style:
+            self.__table_attributes['table:style-name'] = style
         # Nothing ??
         if len(data) == 0:
             self.__columns = []
             self.__rows = []
             return
-
         # 2) The columns
         columns_number = len(data[0])
         # XXX style=?
         self.__columns = [ odf_create_column('Standard')
                            for i in range(columns_number) ]
-
         # 3) The rows
         rows = self.__rows = []
         for row_data in data:
             cells = []
-
             # The columns number must be constant
             if len(row_data) != columns_number:
                 raise ValueError, 'the columns number must be constant'
-
             # Append
             for cell_data in row_data:
                 cells.append(odf_create_cell(cell_data))
-
             # In table
             rows.append({'attributes': {},
                          'cells': cells})
@@ -363,7 +356,6 @@ class odf_table(object):
 
         # 1) table attributes
         self.__table_attributes = odf_element.get_attributes()
-
         # 2) The columns
         columns = self.__columns = []
         for column in odf_element.get_element_list('table:table-column'):
@@ -376,22 +368,18 @@ class odf_table(object):
                     columns.append(column.clone())
             else:
                 columns.append(column)
-
         # 3) The rows
         rows = self.__rows = []
         empty_rows = []
         for row  in odf_element.get_element_list('table:table-row'):
-
             # An empty row ?
             if _is_odf_row_empty(row):
                 empty_rows.append(row)
                 continue
-
             # We must append the last empty rows
             for empty_row in empty_rows:
                 _append_odf_row(empty_row, rows)
                 empty_rows = []
-
             # And we append this new row
             _append_odf_row(row, rows)
 
@@ -399,25 +387,20 @@ class odf_table(object):
     def __get_odf_row(self, row):
         attributes = row['attributes']
         cells = row['cells']
-
         # Create the node
         odf_row = odf_create_row()
         for key, value in attributes.iteritems():
             odf_row.set_attribute(key, value)
-
         # Add the cells
         _insert_elements(cells, odf_row)
-
         return odf_row
 
 
     def __insert_rows(self, table):
         rows = self.__rows
-
         # No rows => nothing to do
         if not rows:
             return
-
         # At least a row
         current_row = self.__get_odf_row(rows[0])
         current_row_serialized = current_row.serialize()
@@ -433,12 +416,10 @@ class odf_table(object):
                     current_row.set_attribute('table:number-rows-repeated',
                                               str(repeat))
                 table.insert_element(current_row, xmlposition=LAST_CHILD)
-
                 # Current row is now this row
                 current_row = row
                 current_row_serialized = row_serialized
                 repeat = 1
-
         # Insert the last rows
         if repeat > 1:
             current_row.set_attribute('table:number-rows-repeated',
@@ -452,18 +433,14 @@ class odf_table(object):
 
     # FIXME rename to "to_odf_element()"
     def get_odf_element(self):
-
         # 1) Create the table:table
         table = odf_create_element('<table:table/>')
         for key, value in self.__table_attributes.iteritems():
             table.set_attribute(key, value)
-
         # 2) Add the columns
         _insert_elements(self.__columns, table)
-
         # 3) The rows
         self.__insert_rows(table)
-
         return table
 
 
@@ -472,7 +449,6 @@ class odf_table(object):
         for row in self.__rows:
             for cell in row['cells']:
                 value = get_value(cell, try_get_text=False)
-
                 # None ?
                 if value is None:
                     # Try with get_formated_text on the elements
@@ -482,7 +458,6 @@ class odf_table(object):
                     value = u''.join(value)
                 else:
                     value = unicode(value)
-
                 result.append(value)
                 result.append(u'\n')
             result.append(u'\n')
@@ -663,9 +638,12 @@ class odf_table(object):
 
 
 
-def import_from_csv(fileobj, name, style, delimiter=None, quotechar=None,
-                    lineterminator=None, encoding='utf-8'):
+def import_from_csv(fileobj, name, style=None, delimiter=None,
+                    quotechar=None, lineterminator=None, encoding='utf-8'):
     """Convert the CSV fileobj to a odf_table.
+
+    CSV format can be autodetected to a certain limit, but encoding is
+    important.
 
     Arguments:
 
@@ -689,11 +667,9 @@ def import_from_csv(fileobj, name, style, delimiter=None, quotechar=None,
     if type(fileobj) is str:
         fileobj = vfs.open(fileobj)
     data = fileobj.read().splitlines(True)
-
     # Sniff the dialect
     sample = ''.join(data[:10])
     dialect = Sniffer().sniff(sample)
-
     # We can overload the result
     if delimiter is not None:
         dialect.delimiter = delimiter
@@ -701,10 +677,8 @@ def import_from_csv(fileobj, name, style, delimiter=None, quotechar=None,
         dialect.quotechar = quotechar
     if lineterminator is not None:
         dialect.lineterminator = lineterminator
-
     # Make the rows
     csv = reader(data, dialect)
     rows = [ [ _get_python_value(value, encoding) for value in line]
              for line in csv ]
-
     return odf_table(name=name, style=style, data=rows)
