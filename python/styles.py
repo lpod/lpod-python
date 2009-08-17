@@ -123,9 +123,5 @@ class odf_styles(odf_xmlpart):
 
     def get_parent_style(self, name_or_element, family):
         style = self.get_style(name_or_element, family)
-        parent_name = style.get_attribute('style:parent-style-name')
+        parent_name = style.get_parent_style_name()
         return self.get_style(parent_name, family)
-
-
-    # TODO get/set_properties(name_or_element, style, family=None)
-    # same family than the style by default, or "text", "paragraph", etc.
