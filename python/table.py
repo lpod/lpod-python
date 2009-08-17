@@ -21,25 +21,25 @@ def _get_cell_coordinates(obj):
     if not isinstance(obj, (str, unicode)):
         raise ValueError, ('_get_cell_coordinates called with a bad argument '
                 'type: "%s"' % type(obj))
-    lower = obj.lower()
-    # First "x"
-    x = i = 0
-    for c in lower:
+    lowered = obj.lower()
+    # First "B"
+    column = 0
+    for i, c in enumerate(lowered):
         if not c.isalpha():
             break
         v = ord(c) - ord('a') + 1
-        x = x * 26 + v
-        i += 1
-    if x == 0:
+        column = column * 26 + v
+    if column == 0:
         raise ValueError, 'cell name "%s" is malformed' % obj
-    # And "y"
+    # Then "3"
     try:
-        y = int(lower[i:])
+        line = int(lowered[i:])
     except ValueError:
         raise ValueError, 'cell name "%s" is malformed' % obj
-    if y <= 0:
+    if line <= 0:
         raise ValueError, 'cell name "%s" is malformed' % obj
-    return x - 1, y - 1
+    # Indexes start at 0
+    return column - 1, line - 1
 
 
 
