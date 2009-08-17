@@ -7,9 +7,39 @@ from re import search
 
 # Import from lpod
 from utils import Boolean, Date, DateTime, Duration
-from utils import get_value, _get_cell_coordinates, _set_value_and_type
+from utils import get_value, _set_value_and_type
 from vfs import vfs
 from xmlpart import odf_create_element, LAST_CHILD
+
+
+
+def _get_cell_coordinates(obj):
+    # By values ?
+    if isinstance(obj, (list, tuple)):
+        return tuple(obj)
+    # Or by 'B3' notation ?
+    if not isinstance(obj, (str, unicode)):
+        raise ValueError, ('_get_cell_coordinates called with a bad argument '
+                'type: "%s"' % type(obj))
+    lower = obj.lower()
+    # First "x"
+    x = i = 0
+    for c in lower:
+        if not c.isalpha():
+            break
+        v = ord(c) - ord('a') + 1
+        x = x * 26 + v
+        i += 1
+    if x == 0:
+        raise ValueError, 'cell name "%s" is malformed' % obj
+    # And "y"
+    try:
+        y = int(lower[i:])
+    except ValueError:
+        raise ValueError, 'cell name "%s" is malformed' % obj
+    if y <= 0:
+        raise ValueError, 'cell name "%s" is malformed' % obj
+    return x - 1, y - 1
 
 
 
@@ -465,13 +495,13 @@ class odf_table(object):
 
     def get_cell(self, coordinates):
         x, y = _get_cell_coordinates(coordinates)
-        return self.__rows[y - 1]['cells'][x - 1]
+        return self.__rows[y]['cells'][x]
 
 
     def set_cell(self, coordinates, odf_cell):
         # XXX auto-adjust the table size ?
         x, y = _get_cell_coordinates(coordinates)
-        self.__rows[y - 1]['cells'][x - 1] = odf_cell
+        self.__rows[y]['cells'][x] = odf_cell
 
 
     def get_cell_list(self, regex=None, style=None):

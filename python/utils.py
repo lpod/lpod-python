@@ -109,41 +109,6 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
 
 
 
-def _get_cell_coordinates(obj):
-    # By values ?
-    if isinstance(obj, (list, tuple)):
-        return tuple(obj)
-
-    # Or by 'B3' notation ?
-    if not isinstance(obj, (str, unicode)):
-        raise ValueError, ('_get_cell_coordinates called with a bad argument '
-                'type: "%s"' % type(obj))
-
-    lower = obj.lower()
-
-    # First "x"
-    x = 0
-    for p in xrange(len(lower)):
-        c = lower[p]
-        if not c.isalpha():
-            break
-        v = ord(c) - ord('a') + 1
-        x = x * 26 + v
-    if x == 0:
-        raise ValueError, 'cell name "%s" is malformed' % obj
-
-    # And "y"
-    try:
-        y = int(lower[p:])
-    except ValueError:
-        raise ValueError, 'cell name "%s" is malformed' % obj
-    if y <= 0:
-        raise ValueError, 'cell name "%s" is malformed' % obj
-
-    return x, y
-
-
-
 class Date(object):
 
     @staticmethod

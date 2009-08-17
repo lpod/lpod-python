@@ -8,9 +8,9 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type, odf_get_document
-from lpod.table import odf_create_table, odf_create_column
 from lpod.table import odf_create_row, odf_create_cell, odf_table
-from lpod.utils import _get_cell_coordinates
+from lpod.table import odf_create_table, odf_create_column
+from lpod.table import _get_cell_coordinates
 from lpod.xmlpart import LAST_CHILD, odf_create_element
 
 
@@ -111,7 +111,7 @@ class TestGetCell(TestCase):
 
     def test_get_cell_coordinates(self):
         x, y = _get_cell_coordinates('ABC123')
-        self.assertEqual((x, y), (731, 123))
+        self.assertEqual((x, y), (730, 122))
 
 
 
