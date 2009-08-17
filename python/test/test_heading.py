@@ -13,7 +13,7 @@ from lpod.xmlpart import LAST_CHILD
 class TestHeading(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/basetext.odt')
+        self.document = document = odf_get_document('samples/base_text.odt')
         self.content = document.get_xmlpart('content')
 
 

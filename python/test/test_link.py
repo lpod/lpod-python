@@ -12,7 +12,7 @@ from lpod.link import odf_create_link
 class TestLinks(TestCase):
 
     def setUp(self):
-        document = odf_get_document('samples/basetext.odt')
+        document = odf_get_document('samples/base_text.odt')
         clone = document.clone()
 
         self.content = clone.get_xmlpart('content')

@@ -12,7 +12,7 @@ from lpod.section import odf_create_section
 class TestSection(TestCase):
 
     def setUp(self):
-        self.document = document = odf_get_document('samples/basetext.odt')
+        self.document = document = odf_get_document('samples/base_text.odt')
         self.content = document.get_xmlpart('content')
 
 
