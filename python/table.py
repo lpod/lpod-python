@@ -505,7 +505,6 @@ class odf_table(object):
 
 
     def get_cell_list(self, regex=None, style=None):
-        coordinates = []
         cells = []
         rows = self.__rows
         # Get all the cells

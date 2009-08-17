@@ -548,6 +548,13 @@ class odf_table_TestCase(TestCase):
 
 
     def test_get_cell_list_regex(self):
+        # Find these cells
+        #   |A B C D E F G
+        # --+-------------
+        # 1 |- - - - 3 3 3
+        # 2 |- - - - 3 3 3
+        # 3 |- - - - 3 3 3
+        # 4 |- - 3 - - - -
         data = get_example()
         odf_element = odf_create_element(data)
         table = odf_table(odf_element=odf_element)
@@ -558,14 +565,23 @@ class odf_table_TestCase(TestCase):
 
 
     def test_get_cell_list_style(self):
+        # Find these cells
+        #   |A B C D E F G
+        # --+-------------
+        # 1 |0 1 2 3 4 5 6
+        # 2 |- - - - - - -
+        # 3 |- - - - - - -
+        # 4 |- - - - - - -
         data = get_example()
         odf_element = odf_create_element(data)
         table = odf_table(odf_element=odf_element)
+        # Set the first line to : 0 1 2 3 4 5 6
         for i in xrange(7):
             cell = odf_create_cell(value=i, style=u'a_style')
             table.set_cell((i, 0), cell)
         expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
-        coordinates = table.get_cell_list(style=ur'a_style')
+        coordinates = table.get_cell_list(style=ur'style')
+        self.assertEqual(coordinates, expected)
 
 
     def test_get_row_list_regex(self):
