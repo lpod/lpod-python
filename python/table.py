@@ -611,13 +611,18 @@ class odf_table(object):
 
     def export_to_csv(self, target, delimiter=';', quotechar='"',
                       lineterminator='\n', encoding='utf-8'):
-        """target must support the write method
+        """Arguments:
+
+            target -- file-like or URI
         """
+        close_after = False
+        if type(target) is str:
+            target = vfs.open(target, 'w')
+            close_after = True
 
         for row in self.__rows:
             current_row = []
             for cell in row['cells']:
-
                 # Get value
                 value = get_value(cell)
                 if type(value) is unicode:
@@ -625,16 +630,15 @@ class odf_table(object):
                 if type(value) is str:
                     value = value.strip()
                 value = '' if value is None else str(value)
-
                 # Quote
                 value = value.replace(quotechar, '\\' + quotechar)
                 value = '%s%s%s' % (quotechar, value, quotechar)
-
                 # Append !
                 current_row.append(value)
+            target.write(delimiter.join(current_row) + lineterminator)
 
-            target.write(delimiter.join(current_row))
-            target.write(lineterminator)
+        if close_after:
+            target.close()
 
 
 
@@ -644,7 +648,7 @@ def import_from_csv(fileobj, name, style, delimiter=None, quotechar=None,
 
     Arguments:
 
-      fileobj -- a file object or an URI
+      fileobj -- file-like or URI
 
       name -- unicode
 
@@ -661,7 +665,7 @@ def import_from_csv(fileobj, name, style, delimiter=None, quotechar=None,
 
     # Load the data
     # XXX We load the entire file, this can be a problem with a very big file
-    if isinstance(fileobj, str):
+    if type(fileobj) is str:
         fileobj = vfs.open(fileobj)
     data = fileobj.read().splitlines(True)
 
@@ -683,4 +687,3 @@ def import_from_csv(fileobj, name, style, delimiter=None, quotechar=None,
              for line in csv ]
 
     return odf_table(name=name, style=style, data=rows)
-
