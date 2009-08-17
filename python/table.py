@@ -541,9 +541,18 @@ class odf_table(object):
     #
 
     def get_row_list(self, regex=None, style=None):
-        # TODO return list of row numbers (the 3 of (0, 3),
-        # not the letter '4' of 'A4')
-        raise NotImplementedError
+        coordinates = []
+        rows = self.__rows
+        for y, row in enumerate(rows):
+            for cell in row['cells']:
+                if cell.match(regex):
+                    coordinates.append(y)
+                    break
+                style_name = cell.get_attribute('table:style-name')
+                if style_name and search(style, style_name):
+                    coordinates.append(y)
+                    break
+        return coordinates
 
 
     # XXX Add a cells argument ??

@@ -566,6 +566,45 @@ class odf_table_TestCase(TestCase):
             table.set_cell((i, 0), cell)
         expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
         coordinates = table.get_cell_list(style=ur'a_style')
+
+
+    def test_get_row_list_regex(self):
+        # Find these rows
+        #   |A B C D E F G
+        # --+-------------
+        # 1 |7 - - - - - -
+        # 2 |- - - - - - -
+        # 3 |- - - - - - -
+        # 4 |- - - - - - 7
+        data = get_example()
+        odf_element = odf_create_element(data)
+        table = odf_table(odf_element=odf_element)
+        # Set the first cell to the value 7
+        cell = odf_create_cell(value=7)
+        table.set_cell((0, 0), cell)
+        expected = [0, 3]
+        coordinates = table.get_row_list(regex=ur'7')
+        self.assertEqual(coordinates, expected)
+
+
+    def test_get_row_list_style(self):
+        # Find these rows
+        #   |A B C D E F G
+        # --+-------------
+        # 1 |- - - - - - -
+        # 2 |1 - - - - - -
+        # 3 |- - - - - - 3
+        # 4 |- - - - - - -
+        data = get_example()
+        odf_element = odf_create_element(data)
+        table = odf_table(odf_element=odf_element)
+        # Set the styles
+        cell = table.get_cell((0, 1))
+        cell.set_attribute('table:style-name', u'a_style')
+        cell = table.get_cell((6, 2))
+        cell.set_attribute('table:style-name', u'a_style')
+        expected = [1, 2]
+        coordinates = table.get_row_list(style=ur'style')
         self.assertEqual(coordinates, expected)
 
 
