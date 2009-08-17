@@ -558,9 +558,9 @@ class odf_table_TestCase(TestCase):
         data = get_example()
         odf_element = odf_create_element(data)
         table = odf_table(odf_element=odf_element)
+        coordinates = table.get_cell_list(regex=ur'3')
         expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
                        (5, 2), (6, 2), (2, 3)]
-        coordinates = table.get_cell_list(regex=ur'3')
         self.assertEqual(coordinates, expected)
 
 
@@ -579,8 +579,8 @@ class odf_table_TestCase(TestCase):
         for i in xrange(7):
             cell = odf_create_cell(value=i, style=u'a_style')
             table.set_cell((i, 0), cell)
-        expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
         coordinates = table.get_cell_list(style=ur'style')
+        expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
         self.assertEqual(coordinates, expected)
 
 
@@ -598,8 +598,8 @@ class odf_table_TestCase(TestCase):
         # Set the first cell to the value 7
         cell = odf_create_cell(value=7)
         table.set_cell((0, 0), cell)
-        expected = [0, 3]
         coordinates = table.get_row_list(regex=ur'7')
+        expected = [0, 3]
         self.assertEqual(coordinates, expected)
 
 
@@ -619,8 +619,49 @@ class odf_table_TestCase(TestCase):
         cell.set_attribute('table:style-name', u'a_style')
         cell = table.get_cell((6, 2))
         cell.set_attribute('table:style-name', u'a_style')
-        expected = [1, 2]
         coordinates = table.get_row_list(style=ur'style')
+        expected = [1, 2]
+        self.assertEqual(coordinates, expected)
+
+
+    def test_get_column_list_regex(self):
+        # Find these columns
+        #   |A B C D E F G
+        # --+-------------
+        # 1 |- - - 2 - - -
+        # 2 |- - - 2 - - -
+        # 3 |- - - 2 - - -
+        # 4 |- 2 - - - - -
+        data = get_example()
+        odf_element = odf_create_element(data)
+        table = odf_table(odf_element=odf_element)
+        coordinates = table.get_column_list(regex=ur'2')
+        expected = [1, 3]
+        self.assertEqual(coordinates, expected)
+
+
+    def test_get_column_list_style(self):
+        # Find these columns
+        #   |A B C D E F G
+        # --+-------------
+        # 1 |1 - - - - - -
+        # 2 |1 - - - - - -
+        # 3 |- - - - - - 3
+        # 4 |- - - - - - 7
+        data = get_example()
+        odf_element = odf_create_element(data)
+        table = odf_table(odf_element=odf_element)
+        # Set the styles
+        cell = table.get_cell((0, 0))
+        cell.set_attribute('table:style-name', u'a_style')
+        cell = table.get_cell((0, 1))
+        cell.set_attribute('table:style-name', u'a_style')
+        cell = table.get_cell((6, 2))
+        cell.set_attribute('table:style-name', u'a_style')
+        cell = table.get_cell((6, 3))
+        cell.set_attribute('table:style-name', u'a_style')
+        coordinates = table.get_column_list(style=ur'style')
+        expected = [0, 6]
         self.assertEqual(coordinates, expected)
 
 

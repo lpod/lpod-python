@@ -580,9 +580,22 @@ class odf_table(object):
     #
 
     def get_column_list(self, regex=None, style=None):
-        # TODO return list of column numbers (the 0 of (0, 3),
-        # not the letter 'A' of 'A4')
-        raise NotImplementedError
+        rows = self.__rows
+        columns = self.__columns
+        row_size = len(columns)
+        column_size = len(rows)
+        coordinates = []
+        for x in xrange(row_size):
+            for y in xrange(column_size):
+                cell = rows[y]['cells'][x]
+                if cell.match(regex):
+                    coordinates.append(x)
+                    break
+                style_name = cell.get_attribute('table:style-name')
+                if style_name and search(style, style_name):
+                    coordinates.append(x)
+                    break
+        return coordinates
 
 
     # XXX Add a cells argument ??
