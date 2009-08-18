@@ -20,6 +20,7 @@ import test_note
 import test_paragraph
 import test_reference
 import test_section
+import test_shapes
 import test_span
 import test_style
 import test_styles
@@ -32,8 +33,8 @@ import test_xmlpart
 test_modules = [test_bookmark, test_container, test_content, test_document,
                 test_draw_page, test_frame, test_heading, test_image,
                 test_link, test_list, test_meta, test_note, test_paragraph,
-                test_reference, test_section, test_span, test_style,
-                test_styles, test_table, test_utils, test_variable,
+                test_reference, test_section, test_shapes, test_span,
+                test_style, test_styles, test_table, test_utils, test_variable,
                 test_xmlpart]
 
 
