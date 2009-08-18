@@ -63,7 +63,7 @@ class TestGetCell(TestCase):
 
     def setUp(self):
         self.document = document = odf_new_document_from_type('text')
-        self.content = content = document.get_xmlpart('content')
+        self.body = body = document.get_body()
 
         # Encode this table
         #   A B C D E F G
@@ -100,13 +100,7 @@ class TestGetCell(TestCase):
             row.insert_element(cell, LAST_CHILD)
         table.insert_element(row, LAST_CHILD)
 
-        body = content.get_body()
         body.insert_element(table, LAST_CHILD)
-
-
-    def tearDown(self):
-        del self.content
-        del self.document
 
 
     def test_get_cell_coordinates(self):
@@ -119,13 +113,7 @@ class TestTable(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/table.ods')
-        self.content = document.get_xmlpart('content')
-
-
-    def tearDown(self):
-        del self.content
-        del self.document
-
+        self.body = document.get_body()
 
 
     def test_create_cell_bool(self):
@@ -413,28 +401,22 @@ class TestTable(TestCase):
 
 
     def test_get_table_by_name(self):
-        content = self.content
-        clone = content.clone()
+        body = self.body.clone()
 
         table = odf_create_table(u"New Table", style='A Style')
-        body = clone.get_body()
         body.insert_element(table, LAST_CHILD)
 
         # Get OK ?
-        table = clone.get_table_by_name(u"New Table")
+        table = body.get_table_by_name(u"New Table")
         self.assertEqual(table.get_attribute('table:name'), u"New Table")
 
 
     def test_get_table_by_position(self):
-        content = self.content
-        clone = content.clone()
-
+        body = self.body.clone()
         table = odf_create_table(u"New Table", style='A Style')
-        body = clone.get_body()
         body.insert_element(table, LAST_CHILD)
-
         # Get OK ?
-        table = clone.get_table_by_position(4)
+        table = body.get_table_by_position(4)
         self.assertEqual(table.get_attribute('table:name'), u"New Table")
 
 
@@ -728,11 +710,9 @@ class odf_table_TestCase(TestCase):
 
     def test_bug_openoffice(self):
         document = odf_get_document('samples/table.ods')
-        content = document.get_xmlpart('content')
-
-        table = content.get_table_by_name(u'Feuille1')
+        body = document.get_body()
+        table = body.get_table_by_name(u'Feuille1')
         table = odf_table(odf_element=table)
-
         self.assertEqual(table.get_size(), (1024, 9))
 
 

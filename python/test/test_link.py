@@ -13,10 +13,8 @@ class TestLinks(TestCase):
 
     def setUp(self):
         document = odf_get_document('samples/base_text.odt')
-        clone = document.clone()
-
-        self.content = clone.get_xmlpart('content')
-        self.paragraph = self.content.get_paragraph_by_position(1)
+        self.body = body = document.get_body().clone()
+        self.paragraph = body.get_paragraph_by_position(1)
 
 
     def test_create_link1(self):
@@ -39,12 +37,10 @@ class TestLinks(TestCase):
     def test_get_link(self):
         link1 = odf_create_link('http://example.com/', name='link1')
         link2 = odf_create_link('http://example.com/', name='link2')
-
         paragraph = self.paragraph
         paragraph.append_element(link1)
         paragraph.append_element(link2)
-
-        element = self.content.get_link_by_name(u'link2')
+        element = self.body.get_link_by_name(u'link2')
         expected = ('<text:a xlink:href="http://example.com/" '
                       'office:name="link2"/>')
         self.assertEqual(element.serialize(), expected)
@@ -53,12 +49,10 @@ class TestLinks(TestCase):
     def test_get_link_list(self):
         link1 = odf_create_link('http://example.com/', name='link1')
         link2 = odf_create_link('http://example.com/', name='link2')
-
         paragraph = self.paragraph
         paragraph.append_element(link1)
         paragraph.append_element(link2)
-
-        element = self.content.get_link_list()[1]
+        element = self.body.get_link_list()[1]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link2"/>')
         self.assertEqual(element.serialize(), expected)
@@ -69,13 +63,11 @@ class TestLinks(TestCase):
                                 title='title1')
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
-
         paragraph = self.paragraph
         paragraph.append_element(link1)
         paragraph.append_element(link2)
-
         # name
-        element = self.content.get_link_list(name='link1')[0]
+        element = self.body.get_link_list(name='link1')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link1" office:title="title1"/>')
         self.assertEqual(element.serialize(), expected)
@@ -86,13 +78,11 @@ class TestLinks(TestCase):
                                 title='title1')
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
-
         paragraph = self.paragraph
         paragraph.append_element(link1)
         paragraph.append_element(link2)
-
         # title
-        element = self.content.get_link_list(title='title2')[0]
+        element = self.body.get_link_list(title='title2')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link2" office:title="title2"/>')
         self.assertEqual(element.serialize(), expected)
@@ -103,19 +93,17 @@ class TestLinks(TestCase):
                                 title='title1')
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
-
         paragraph = self.paragraph
         paragraph.append_element(link1)
         paragraph.append_element(link2)
-
         # href
-        elements = self.content.get_link_list(href=ur'\.com')
+        elements = self.body.get_link_list(href=ur'\.com')
         self.assertEqual(len(elements), 2)
 
 
     def test_href_from_existing_document(self):
-        content = self.content
-        links = content.get_link_list(href=ur'lpod')
+        body = self.body
+        links = body.get_link_list(href=ur'lpod')
         self.assertEqual(len(links), 1)
 
 
@@ -124,29 +112,27 @@ class TestLinks(TestCase):
                                 title='title1')
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
-
         paragraph = self.paragraph
         paragraph.append_element(link1)
         paragraph.append_element(link2)
-
         # name and title
-        element = self.content.get_link_list(name='link1', title='title1')[0]
+        element = self.body.get_link_list(name='link1', title='title1')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link1" office:title="title1"/>')
         self.assertEqual(element.serialize(), expected)
 
 
     def test_get_link_by_path(self):
-        content = self.content
-        link = content.get_link_by_path(ur'lpod')
+        body = self.body
+        link = body.get_link_by_path(ur'lpod')
         href = link.get_attribute('xlink:href')
         self.assertEqual(href, u'http://lpod-project.org/')
 
 
     def test_get_link_by_path_context(self):
-        content = self.content
-        section2 = content.get_section_by_position(2)
-        link = content.get_link_by_path(ur'\.org', context=section2)
+        body = self.body
+        section2 = body.get_section_by_position(2)
+        link = section2.get_link_by_path(ur'\.org')
         href = link.get_attribute('xlink:href')
         self.assertEqual(href, u'http://lpod-project.org/')
 
@@ -156,13 +142,11 @@ class TestLinks(TestCase):
                                 title='title1')
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
-
         paragraph = self.paragraph
         paragraph.append_element(link1)
         paragraph.append_element(link2)
-
         # Not found
-        element = self.content.get_link_list(name='link1', title='title2')
+        element = self.body.get_link_list(name='link1', title='title2')
         self.assertEqual(element, [])
 
 

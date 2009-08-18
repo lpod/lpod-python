@@ -11,8 +11,8 @@ from lxml.etree import parse, fromstring, tostring, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
-from utils import _get_abspath, convert_unicode
-from utils import _make_xpath_query
+from utils import _get_abspath, _get_element_list, _get_element
+from utils import get_value, convert_unicode
 
 
 ODF_NAMESPACES = {
@@ -385,6 +385,401 @@ class odf_element(object):
         element.remove(child.__element)
 
 
+    #
+    # Element helpers usable from any context
+    #
+
+    #
+    # Sections
+    #
+
+    def get_section_list(self, style=None, regex=None):
+        return _get_element_list(self, 'text:section', style=style,
+                                 regex=regex)
+
+
+    def get_section_by_position(self, position):
+        return _get_element(self, 'text:section', position=position)
+
+
+    def get_section_by_content(self, regex):
+        return _get_element(self, 'text:section', regex=regex)
+
+
+    #
+    # Paragraphs
+    #
+
+    def get_paragraph_list(self, style=None, regex=None):
+        return _get_element_list(self, 'text:p', style=style, regex=regex)
+
+
+    def get_paragraph_by_position(self, position):
+        return _get_element(self, 'text:p', position=position)
+
+
+    def get_paragraph_by_content(self, regex):
+        return _get_element(self, 'text:p', regex=regex)
+
+
+    #
+    # Span
+    #
+
+    def get_span_list(self, style=None, regex=None):
+        return _get_element_list(self, 'text:span', style=style, regex=regex)
+
+
+    def get_span_by_position(self, position):
+        return _get_element(self, 'text:span', position=position)
+
+
+    def get_span_by_content(self, regex):
+        return _get_element(self, 'text:span', regex=regex)
+
+
+    #
+    # Headings
+    #
+
+    def get_heading_list(self, style=None, level=None, regex=None):
+        return _get_element_list(self, 'text:h', style=style, level=level,
+                                 regex=regex)
+
+
+    def get_heading_by_position(self, position, level=None):
+        return _get_element(self, 'text:h', position=position, level=level)
+
+
+    def get_heading_by_content(self, regex, level=None):
+        return _get_element(self, 'text:h', regex=regex, level=level)
+
+
+    #
+    # Frames
+    #
+
+    def get_frame_list(self, style=None, title=None, description=None,
+                       regex=None):
+        return _get_element_list(self, 'draw:frame', draw_style=style,
+                                 svg_title=title, svg_desc=description,
+                                 regex=regex)
+
+
+    def get_frame_by_name(self, name):
+        return _get_element(self, 'draw:frame', draw_name=name)
+
+
+    def get_frame_by_position(self, position):
+        return _get_element(self, 'draw:frame', position=position)
+
+
+    def get_frame_by_content(self, regex):
+        return _get_element(self, 'draw:frame', regex=regex)
+
+
+    def get_frame_by_title(self, regex):
+        return _get_element(self, 'draw:frame', svg_title=regex)
+
+
+    def get_frame_by_description(self, regex):
+        return _get_element(self, 'draw:frame', svg_desc=regex)
+
+
+    #
+    # Images
+    #
+
+    def get_image_list(self, style=None, href=None, regex=None):
+        """Get all image elements matching the criteria. Style is the style
+        name. Set link to False to get only internal images, and True to
+        get only external images (not in the container). Href is a regex to
+        find all images with their path matching.
+
+        Arguments:
+
+            style -- str
+
+            link -- bool
+
+            href -- unicode regex
+
+        Return: list of odf_element
+        """
+        return _get_element_list(self, 'draw:image', style=style, href=href,
+                                 regex=regex)
+
+
+    def get_image_by_name(self, name):
+        # The frame is holding the name
+        frame = _get_element(self, 'draw:frame', draw_name=name)
+        if frame is None:
+            return None
+        return frame.get_element('draw:image')
+
+
+    def get_image_by_position(self, position):
+        return _get_element(self, 'draw:image', position=position)
+
+
+    def get_image_by_path(self, regex):
+        return _get_element(self, 'draw:image', href=regex)
+
+
+    def get_image_by_content(self, regex):
+        return _get_element(self, 'draw:image', regex=regex)
+
+
+    #
+    # Tables
+    #
+
+    def get_table_list(self, style=None, regex=None):
+        return _get_element_list(self, 'table:table', style=style,
+                                 regex=regex)
+
+
+    def get_table_by_name(self, name):
+        return _get_element(self, 'table:table', table_name=name)
+
+
+    def get_table_by_position(self, position):
+        return _get_element(self, 'table:table', position=position)
+
+
+    def get_table_by_content(self, regex):
+        return _get_element(self, 'table:table', regex=regex)
+
+
+    #
+    # Notes
+    #
+
+    def get_note_list(self, note_class=None, regex=None):
+        """Return the list of all note element, optionally the ones of the
+        given class or that match the given regex.
+
+        Arguments:
+
+            note_class -- 'footnote' or 'endnote'
+
+            regex -- unicode
+
+        Return: list of odf_element
+        """
+        return _get_element_list(self, 'text:note', note_class=note_class,
+                                 regex=regex)
+
+
+    def get_note_by_id(self, note_id):
+        return _get_element(self, 'text:note', text_id=note_id)
+
+
+    def get_note_by_content(self, regex):
+        return _get_element(self, 'text:note', regex=regex)
+
+
+    #
+    # Annotations
+    #
+
+    def get_annotation_list(self, creator=None, start_date=None,
+                            end_date=None, regex=None):
+        """XXX end date is not included (as expected in Python).
+        """
+        annotations = []
+        for annotation in _get_element_list(self, 'office:annotation',
+                                            regex=regex):
+            if (creator is not None
+                    and creator != annotation.get_annotation_creator()):
+                continue
+            date = annotation.get_annotation_date()
+            if start_date is not None and date < start_date:
+                continue
+            if end_date is not None and date >= end_date:
+                continue
+            annotations.append(annotation)
+        return annotations
+
+
+    def get_annotation(self, creator=None, start_date=None, end_date=None,
+                       regex=None):
+        annotations = self.get_annotation_list(creator=creator,
+                                               start_date=start_date,
+                                               end_date=end_date,
+                                               regex=regex)
+        if annotations:
+            return annotations[0]
+        return None
+
+
+    #
+    # Variables
+    #
+
+    def get_variable_decls(self):
+        variable_decls = self.get_element('//text:variable-decls')
+        if variable_decls is None:
+            from document import odf_create_variable_decls
+
+            # Variable only in a "text" document ?
+            body = self.get_body()
+            body.insert_element(odf_create_variable_decls(), FIRST_CHILD)
+            variable_decls = body.get_element('//text:variable-decls')
+
+        return variable_decls
+
+
+    def get_variable_list(self):
+        return _get_element_list(self, 'text:variable-decl')
+
+
+    def get_variable_decl(self, name):
+        return _get_element(self, 'text:variable-decl', text_name=name)
+
+
+    def get_variable_sets(self, name):
+        return _get_element_list(self, 'text:variable-set', text_name=name)
+
+
+    def get_variable_value(self, name, value_type=None):
+        variable_sets = self.get_variable_sets(name)
+        # Nothing ?
+        if not variable_sets:
+            return None
+        # Get the last value
+        return get_value(variable_sets[-1], value_type)
+
+
+    #
+    # User fields
+    #
+
+    def get_user_field_decls(self):
+        user_field_decls = self.get_element('//text:user-field-decls')
+        if user_field_decls is None:
+            from document import odf_create_user_field_decls
+            body = self.get_body()
+            body.insert_element(odf_create_user_field_decls(), FIRST_CHILD)
+            user_field_decls = body.get_element('//text:user-field-decls')
+
+        return user_field_decls
+
+
+    def get_user_field_list(self):
+        return _get_element_list(self, 'text:user-field-decl')
+
+
+    def get_user_field_decl(self, name):
+        return _get_element(self, 'text:user-field-decl', text_name=name)
+
+
+    def get_user_field_value(self, name, value_type=None):
+        user_field_decl = self.get_user_field_decl(name)
+        # Nothing ?
+        if user_field_decl is None:
+            return None
+        return get_value(user_field_decl, value_type)
+
+
+    #
+    # Draw Pages
+    #
+    def get_draw_page_list(self, style=None, regex=None):
+        return _get_element_list(self, 'draw:page', draw_style=style,
+                                 regex=regex)
+
+
+    def get_draw_page_by_name(self, name):
+        return _get_element(self, 'draw:page', draw_name=name)
+
+
+    def get_draw_page_by_position(self, position):
+        return _get_element(self, 'draw:page', position=position)
+
+
+    def get_draw_page_by_content(self, regex):
+        return _get_element(self, 'draw:page', regex=regex)
+
+
+    #
+    # Links
+    #
+
+    def get_link_list(self, name=None, title=None, href=None, regex=None):
+        return _get_element_list(self, 'text:a', office_name=name,
+                                 office_title=title, href=href, regex=regex)
+
+
+    def get_link_by_name(self, name):
+        return _get_element(self, 'text:a', office_name=name)
+
+
+    def get_link_by_path(self, regex):
+        return _get_element(self, 'text:a', href=regex)
+
+
+    def get_link_by_content(self, regex):
+        return _get_element(self, 'text:a', regex=regex)
+
+
+    #
+    # Bookmarks
+    #
+
+    def get_bookmark_list(self):
+        return _get_element_list(self, 'text:bookmark')
+
+
+    def get_bookmark_by_name(self, name):
+        return _get_element(self, 'text:bookmark', text_name=name)
+
+
+    def get_bookmark_start_list(self):
+        return _get_element_list(self, 'text:bookmark-start')
+
+
+    def get_bookmark_start_by_name(self, name):
+        return _get_element(self, 'text:bookmark-start', text_name=name)
+
+
+    def get_bookmark_end_list(self):
+        return _get_element_list(self, 'text:bookmark-end')
+
+
+    def get_bookmark_end_by_name(self, name):
+        return _get_element(self, 'text:bookmark-end', text_name=name)
+
+
+    #
+    # Reference marks
+    #
+
+    def get_reference_mark_list(self):
+        return _get_element_list(self, 'text:reference-mark')
+
+
+    def get_reference_mark_by_name(self, name):
+        return _get_element(self, 'text:reference-mark', text_name=name)
+
+
+    def get_reference_mark_start_list(self):
+        return _get_element_list(self, 'text:reference-mark-start')
+
+
+    def get_reference_mark_start_by_name(self, name):
+        return _get_element(self, 'text:reference-mark-start',
+                            text_name=name)
+
+
+    def get_reference_mark_end_list(self):
+        return _get_element_list(self, 'text:reference-mark-end')
+
+
+    def get_reference_mark_end_by_name(self, name):
+        return _get_element(self, 'text:reference-mark-end', text_name=name)
+
+
 
 class odf_xmlpart(object):
     """Representation of an XML part.
@@ -405,76 +800,6 @@ class odf_xmlpart(object):
             part = container.get_part(self.part_name)
             self.__tree = parse(StringIO(part))
         return self.__tree
-
-
-    #
-    # Non-public yet useful helpers
-    #
-
-    def _get_element_list(self, element_name, style=None, family=None,
-                          draw_name=None, draw_style=None, table_name=None,
-                          note_class=None, style_name=None, text_id=None,
-                          text_name=None, office_name=None,
-                          office_title=None, level=None, href=None,
-                          svg_title=None, svg_desc=None,
-                          position=None, regex=None, context=None):
-        query = _make_xpath_query(element_name, style=style, family=family,
-                                  draw_name=draw_name,
-                                  draw_style=draw_style,
-                                  table_name=table_name,
-                                  style_name=style_name,
-                                  note_class=note_class, text_id=text_id,
-                                  text_name=text_name, office_name=office_name,
-                                  office_title=office_title,
-                                  level=level, position=position,
-                                  context=context)
-        if context is None:
-            elements = self.get_element_list(query)
-        else:
-            elements = context.get_element_list(query)
-        # Filter the elements with the regex
-        if regex is not None:
-            elements = [element for element in elements
-                                if element.match(regex)]
-        if href is not None:
-            filtered = []
-            for element in elements:
-                href_attr = element.get_attribute('xlink:href')
-                if search(href, href_attr) is not None:
-                    filtered.append(element)
-            elements = filtered
-        for variable, childname in [(svg_title, 'svg:title'),
-                                    (svg_desc, 'svg:desc')]:
-            if variable:
-                filtered = []
-                for element in elements:
-                    child = element.get_element(childname)
-                    if child and child.match(variable):
-                        filtered.append(element)
-                elements = filtered
-        return elements
-
-
-    def _get_element(self, element_name, style=None, family=None,
-                     draw_name=None, table_name=None, style_name=None,
-                     text_id=None, text_name=None, office_name=None,
-                     office_title=None, level=None, href=None,
-                     svg_title=None, svg_desc=None, position=None,
-                     regex=None, context=None):
-        result = self._get_element_list(element_name, style=style,
-                                        family=family, draw_name=draw_name,
-                                        table_name=table_name,
-                                        style_name=style_name,
-                                        text_id=text_id, text_name=text_name,
-                                        office_name=office_name,
-                                        office_title=office_title,
-                                        level=level, href=href,
-                                        svg_title=svg_title,
-                                        svg_desc=svg_desc, position=position,
-                                        regex=regex, context=context)
-        if result:
-            return result[0]
-        return None
 
 
     #

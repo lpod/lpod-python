@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from os import getcwd
 from os.path import splitdrive, join, sep
+from re import search
 from sys import _getframe, modules
 
 
@@ -65,7 +66,7 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
                       draw_style=None, table_name=None, style_name=None,
                       note_class=None, text_id=None, text_name=None,
                       office_name=None, office_title=None, level=None,
-                      position=None, context=None, **kw):
+                      position=None, **kw):
     query = ['descendant::']
     query.append(element_name)
     attributes = kw
@@ -106,6 +107,71 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
         query = u'({query})[{position}]'.format(query=query,
                                                 position=str(position))
     return query
+
+
+
+#
+# Non-public yet useful helpers
+#
+
+def _get_element_list(context, element_name, style=None, family=None,
+                      draw_name=None, draw_style=None, table_name=None,
+                      note_class=None, style_name=None, text_id=None,
+                      text_name=None, office_name=None,
+                      office_title=None, level=None, href=None,
+                      svg_title=None, svg_desc=None,
+                      position=None, regex=None):
+    query = _make_xpath_query(element_name, style=style, family=family,
+                              draw_name=draw_name,
+                              draw_style=draw_style,
+                              table_name=table_name,
+                              style_name=style_name,
+                              note_class=note_class, text_id=text_id,
+                              text_name=text_name, office_name=office_name,
+                              office_title=office_title,
+                              level=level, position=position)
+    elements = context.get_element_list(query)
+    # Filter the elements with the regex
+    if regex is not None:
+        elements = [element for element in elements
+                            if element.match(regex)]
+    if href is not None:
+        filtered = []
+        for element in elements:
+            href_attr = element.get_attribute('xlink:href')
+            if search(href, href_attr) is not None:
+                filtered.append(element)
+        elements = filtered
+    for variable, childname in [(svg_title, 'svg:title'),
+                                (svg_desc, 'svg:desc')]:
+        if variable:
+            filtered = []
+            for element in elements:
+                child = element.get_element(childname)
+                if child and child.match(variable):
+                    filtered.append(element)
+            elements = filtered
+    return elements
+
+
+def _get_element(context, element_name, style=None, family=None,
+                 draw_name=None, table_name=None, style_name=None,
+                 text_id=None, text_name=None, office_name=None,
+                 office_title=None, level=None, href=None,
+                 svg_title=None, svg_desc=None, position=None,
+                 regex=None):
+    result = _get_element_list(context, element_name, style=style,
+                               family=family, draw_name=draw_name,
+                               table_name=table_name, style_name=style_name,
+                               text_id=text_id, text_name=text_name,
+                               office_name=office_name,
+                               office_title=office_title, level=level,
+                               href=href, svg_title=svg_title,
+                               svg_desc=svg_desc, position=position,
+                               regex=regex)
+    if result:
+        return result[0]
+    return None
 
 
 

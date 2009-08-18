@@ -18,11 +18,6 @@ class TestStyle(TestCase):
         self.content = document.get_xmlpart('content')
 
 
-    def tearDown(self):
-        del self.content
-        del self.document
-
-
     def test_create_style(self):
         style = odf_create_style('style1', 'paragraph')
         expected = ('<style:style style:name="style1" '
@@ -49,20 +44,18 @@ class TestStyle(TestCase):
 
 
     def test_insert_style(self):
-        content = self.content
-        clone = content.clone()
+        content = self.content.clone()
         style = odf_create_style('style1', 'paragraph', area='text',
                 **{'fo:color': '#0000ff',
                    'fo:background-color': '#ff0000'})
-        auto_styles = clone.get_category_context('automatic')
+        auto_styles = content.get_automatic_styles()
         auto_styles.append_element(style)
-
         expected = ('<style:style style:name="style1" '
                                  'style:family="paragraph">'
                       '<style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>'
                     '</style:style>')
-        get1 = clone.get_style(u'style1', 'paragraph')
+        get1 = content.get_style(u'style1', 'paragraph')
         self.assertEqual(get1.serialize(), expected)
 
 

@@ -15,13 +15,8 @@ class TestImage(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/frame_image.odp')
-        self.content = document.get_xmlpart('content')
+        self.body = document.get_body()
         self.path = 'Pictures/10000000000001D40000003C8B3889D9.png'
-
-
-    def tearDown(self):
-        del self.content
-        del self.document
 
 
     def test_create_image(self):
@@ -31,43 +26,43 @@ class TestImage(TestCase):
 
 
     def test_get_image_list(self):
-        content = self.content
-        result = content.get_image_list()
+        body = self.body
+        result = body.get_image_list()
         self.assertEqual(len(result), 1)
         element = result[0]
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
     def test_get_image_by_name(self):
-        content = self.content
-        element = content.get_image_by_name(u"Logo")
+        body = self.body
+        element = body.get_image_by_name(u"Logo")
         # Searched by frame but got the inner image with no name
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
     def test_get_image_by_position(self):
-        content = self.content
-        element = content.get_image_by_position(1)
+        body = self.body
+        element = body.get_image_by_position(1)
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
     def test_get_image_by_path(self):
-        content = self.content
-        element = content.get_image_by_path('.png')
+        body = self.body
+        element = body.get_image_by_path('.png')
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
     def test_insert_image(self):
-        clone = self.content.clone()
+        body = self.body.clone()
         path = 'a/path'
         image = odf_create_image(path)
         frame = odf_create_frame(u"Image Frame", size=('0cm', '0cm'),
                                  style='Graphics')
         frame.insert_element(image, LAST_CHILD)
-        clone.get_frame_by_position(1).insert_element(frame, NEXT_SIBLING)
-        element = clone.get_image_by_name(u"Image Frame")
+        body.get_frame_by_position(1).insert_element(frame, NEXT_SIBLING)
+        element = body.get_image_by_name(u"Image Frame")
         self.assertEqual(element.get_attribute('xlink:href'), path)
-        element = clone.get_image_by_position(2)
+        element = body.get_image_by_position(2)
         self.assertEqual(element.get_attribute('xlink:href'), path)
 
 

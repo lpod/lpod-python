@@ -2,8 +2,9 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
+from lpod.style import odf_style
 from lpod.utils import _make_xpath_query
-from lpod.xmlpart import odf_element, odf_xmlpart
+from lpod.xmlpart import odf_xmlpart
 
 
 # TODO Read from a shipped file
@@ -86,13 +87,12 @@ class odf_styles(odf_xmlpart):
             return self.get_element('//office:styles')
         elif category == 'automatic':
             return self.get_element('//office:automatic-styles')
-        elif category == 'master':
-            return self.get_element('//office:master-styles')
-        raise ValueError, ('category must be None, "named", "automatic" '
-                           'or "master"')
+        raise ValueError, "unknown category"
 
 
     def get_style_list(self, family=None, category=None):
+        if category is not None:
+            raise NotImplementedError
         query = _make_xpath_query('style:style', family=family)
         context = self.get_category_context(category)
         if context is None:
@@ -102,26 +102,46 @@ class odf_styles(odf_xmlpart):
 
 
     def get_style(self, name_or_element, family, category=None,
-                  retrieve_by='name'):
+                  display_name=False):
+        """Return the style uniquely identified by the name/family pair. If
+        the argument is already a style object, it will return it.
+
+        The category is for searching a named or automatic style or both (only
+        for paragraph, text, etc. styles).
+
+        If the name is not the internal name but the name you gave in the
+        desktop application, set display_name to True.
+
+        Arguments:
+
+            name_or_element -- unicode or odf_style
+
+            family -- 'font-face', 'paragraph', 'text',
+
+            category -- 'named', 'automatic' or None
+
+            display_name -- bool
+
+        Return: odf_style or None if not found
+        """
+        if display_name is True:
+            raise NotImplementedError
+        if family not in ('paragraph', 'text', 'page-layout'):
+            raise NotImplementedError
         if type(name_or_element) is unicode:
             if family == 'page-layout':
                 query = _make_xpath_query('style:page-layout',
                                           style_name=name_or_element)
+            # TODO there are more
             else:
                 query = _make_xpath_query('style:style',
-                                          style_name=name_or_element)
+                                          style_name=name_or_element,
+                                          family=family)
             context = self.get_category_context(category)
             if context is None:
                 return self.get_element(query)
             else:
                 return context.get_element(query)
-        elif isinstance(name_or_element, odf_element):
-            if not name_or_element.is_style():
-                raise ValueError, "element is not a style element"
+        elif isinstance(name_or_element, odf_style):
+            return name_or_element
         raise TypeError, "style name or element expected"
-
-
-    def get_parent_style(self, name_or_element, family):
-        style = self.get_style(name_or_element, family)
-        parent_name = style.get_parent_style_name()
-        return self.get_style(parent_name, family)

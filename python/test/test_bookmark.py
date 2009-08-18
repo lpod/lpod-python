@@ -14,9 +14,8 @@ from lpod.utils import convert_unicode
 class BookmarkTest(TestCase):
 
     def setUp(self):
-        clone = odf_get_document('samples/bookmark.odt').clone()
-        self.content = clone.get_xmlpart('content')
-        self.body = clone.get_body()
+        document = odf_get_document('samples/bookmark.odt')
+        self.body = document.get_body()
 
 
     def test_create_bookmark(self):
@@ -41,18 +40,18 @@ class BookmarkTest(TestCase):
 
 
     def test_get_bookmark(self):
+        body = self.body
         bookmark = odf_create_bookmark(u'你好 Zoé')
-        self.body.append_element(bookmark)
-
-        get = self.content.get_bookmark_by_name(u'你好 Zoé')
+        body.append_element(bookmark)
+        get = body.get_bookmark_by_name(u'你好 Zoé')
         expected = ('<text:bookmark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_bookmark_list(self):
-        content = self.content
-        result = self.content.get_bookmark_list()
+        body = self.body
+        result = self.body.get_bookmark_list()
         self.assertEqual(len(result), 1)
         element = result[0]
         expected = '<text:bookmark text:name="Rep&#232;re de texte"/>'
@@ -60,10 +59,10 @@ class BookmarkTest(TestCase):
 
 
     def test_get_bookmark_start(self):
+        body = self.body
         bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
-        self.body.append_element(bookmark_start)
-
-        get = self.content.get_bookmark_start_by_name(u'你好 Zoé')
+        body.append_element(bookmark_start)
+        get = body.get_bookmark_start_by_name(u'你好 Zoé')
         expected = ('<text:bookmark-start text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
@@ -72,28 +71,27 @@ class BookmarkTest(TestCase):
     def test_get_bookmark_start_list(self):
         bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
         self.body.append_element(bookmark_start)
-
-        get = self.content.get_bookmark_start_list()[0]
+        get = self.body.get_bookmark_start_list()[0]
         expected = ('<text:bookmark-start text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_bookmark_end(self):
+        body = self.body
         bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
-        self.body.append_element(bookmark_end)
-
-        get = self.content.get_bookmark_end_by_name(u'你好 Zoé')
+        body.append_element(bookmark_end)
+        get = body.get_bookmark_end_by_name(u'你好 Zoé')
         expected = ('<text:bookmark-end text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
     def test_get_bookmark_end_list(self):
+        body = self.body
         bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
-        self.body.append_element(bookmark_end)
-
-        get = self.content.get_bookmark_end_list()[0]
+        body.append_element(bookmark_end)
+        get = body.get_bookmark_end_list()[0]
         expected = ('<text:bookmark-end text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)

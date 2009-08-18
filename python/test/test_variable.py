@@ -70,8 +70,8 @@ class TestVariables(TestCase):
 
     def test_get_variable_decl(self):
         clone = self.document.clone()
-        content = clone.get_xmlpart('content')
-        variable_decl = content.get_variable_decl(u"Variabilité")
+        body = clone.get_body()
+        variable_decl = body.get_variable_decl(u"Variabilité")
         expected = ('<text:variable-decl office:value-type="float" '
                       'text:name="%s"/>' % convert_unicode(u"Variabilité"))
         self.assertEqual(variable_decl.serialize(), expected)
@@ -79,8 +79,8 @@ class TestVariables(TestCase):
 
     def test_get_variable_set(self):
         clone = self.document.clone()
-        content = clone.get_xmlpart('content')
-        variable_sets = content.get_variable_sets(u"Variabilité")
+        body = clone.get_body()
+        variable_sets = body.get_variable_sets(u"Variabilité")
         self.assertEqual(len(variable_sets), 1)
         expected = ('<text:variable-set text:name="%s" '
                       'office:value-type="float" office:value="123" '
@@ -91,8 +91,8 @@ class TestVariables(TestCase):
 
     def test_get_variable_get(self):
         clone = self.document.clone()
-        content = clone.get_xmlpart('content')
-        value = content.get_variable_value(u"Variabilité")
+        body = clone.get_body()
+        value = body.get_variable_value(u"Variabilité")
         self.assertEqual(value, 123)
 
 
@@ -122,8 +122,8 @@ class TestUserFields(TestCase):
 
     def test_get_user_field_decl(self):
         clone = self.document.clone()
-        content = clone.get_xmlpart('content')
-        user_field_decl = content.get_user_field_decl(u"Champêtre")
+        body = clone.get_body()
+        user_field_decl = body.get_user_field_decl(u"Champêtre")
         expected = ('<text:user-field-decl office:value-type="float" '
                       'office:value="1" text:name="%s"/>' %
                       convert_unicode(u"Champêtre"))
@@ -132,8 +132,8 @@ class TestUserFields(TestCase):
 
     def test_get_user_field_get(self):
         clone = self.document.clone()
-        content = clone.get_xmlpart('content')
-        value = content.get_user_field_value(u"Champêtre")
+        body = clone.get_body()
+        value = body.get_user_field_value(u"Champêtre")
         self.assertEqual(value, True)
 
 

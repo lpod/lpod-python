@@ -13,12 +13,7 @@ class TestSection(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/base_text.odt')
-        self.content = document.get_xmlpart('content')
-
-
-    def tearDown(self):
-        del self.content
-        del self.document
+        self.body = document.get_body()
 
 
     def test_create_simple_section(self):
@@ -42,8 +37,8 @@ class TestSection(TestCase):
 
 
     def test_get_section_list(self):
-        content = self.content
-        sections = content.get_section_list()
+        body = self.body
+        sections = body.get_section_list()
         self.assertEqual(len(sections), 2)
         second = sections[1]
         name = second.get_attribute('text:name')
@@ -51,8 +46,8 @@ class TestSection(TestCase):
 
 
     def test_get_section_list_style(self):
-        content = self.content
-        sections = content.get_section_list(style='Sect1')
+        body = self.body
+        sections = body.get_section_list(style='Sect1')
         self.assertEqual(len(sections), 2)
         section = sections[0]
         name = section.get_attribute('text:name')
@@ -60,8 +55,8 @@ class TestSection(TestCase):
 
 
     def test_get_section(self):
-        content = self.content
-        section = content.get_section_by_position(2)
+        body = self.body
+        section = body.get_section_by_position(2)
         name = section.get_attribute('text:name')
         self.assertEqual(name, "Section2")
 

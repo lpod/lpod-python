@@ -13,12 +13,7 @@ class TestDrawPage(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/example.odp')
-        self.content = document.get_xmlpart('content')
-
-
-    def tearDown(self):
-        del self.content
-        del self.document
+        self.body = document.get_body()
 
 
     def test_create_simple_page(self):
@@ -40,42 +35,42 @@ class TestDrawPage(TestCase):
 
 
     def test_get_draw_page_list(self):
-        content = self.content
-        result = content.get_draw_page_list()
+        body = self.body
+        result = body.get_draw_page_list()
         self.assertEqual(len(result), 2)
 
 
     def test_get_draw_page_list_style(self):
-        content = self.content.clone()
-        result = content.get_draw_page_list(style='dp1')
+        body = self.body.clone()
+        result = body.get_draw_page_list(style='dp1')
         self.assertEqual(len(result), 2)
-        result = content.get_draw_page_list(style='dp2')
+        result = body.get_draw_page_list(style='dp2')
         self.assertEqual(len(result), 0)
 
 
     def test_odf_draw_page(self):
-        content = self.content
-        draw_page = content.get_draw_page_by_name(u"Titre")
+        body = self.body
+        draw_page = body.get_draw_page_by_name(u"Titre")
         self.assert_(isinstance(draw_page, odf_draw_page))
 
 
     def test_get_draw_page_by_name(self):
-        content = self.content.clone()
-        good = content.get_draw_page_by_name(u"Titre")
+        body = self.body.clone()
+        good = body.get_draw_page_by_name(u"Titre")
         self.assertNotEqual(good, None)
-        bad = content.get_draw_page_by_name(u"Conclusion")
+        bad = body.get_draw_page_by_name(u"Conclusion")
         self.assertEqual(bad, None)
 
 
     def test_get_page_name(self):
-        content = self.content
-        page = content.get_draw_page_by_position(1)
+        body = self.body
+        page = body.get_draw_page_by_position(1)
         self.assertEqual(page.get_page_name(), u"Titre")
 
 
     def test_set_page_name(self):
-        content = self.content.clone()
-        page = content.get_draw_page_by_position(1)
+        body = self.body.clone()
+        page = body.get_draw_page_by_position(1)
         name = u"Intitulé"
         self.assertNotEqual(page.get_page_name(), name)
         page.set_page_name(u"Intitulé")
