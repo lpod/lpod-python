@@ -359,7 +359,8 @@ Styles
    user of a typical office application) or 'automatic', according a boolean
    'common' option, whose default value is true. A common style may have a
    secondary unique name which is its 'display name', which can be set through
-   an additional option.
+   an additional option. With the exception of this optional property, and a
+   few other ones, there is no difference between automatic and common styles.
    
    Of course, a style is really in use when one or more content objects
    explicitly reference it through its style property.
@@ -381,7 +382,58 @@ Styles
    
    - Text family
    
-      [TBC]
+      A text style (i.e. a style whose family is 'text', whatever its optional
+      class) is a style which directly apply to characters (whatever the layout
+      of the containing paragraph). So, it can bear any property directly
+      related to the font and its representation. The most used properties are
+      the font name, the font size, the font style (ex: normal, oblique, etc),
+      the text color, the text background color (which may differ from the
+      common background color of the paragraph).
+      
+      The example hereafter creates a text style, so called "My Blue Text",
+      using Times New Roman, 14-sized navy blue bold italic characters with
+      a yellow background::
+      
+         s = odf_create_style('My Blue Text',
+                              family='text',
+                              font='Times New Roman',
+                              size='14pt',
+                              weight='bold',
+                              style='italic',
+                              color='#000080',
+                              background-color='#ffff00'
+                              )
+      
+      The lpOD level 1 API allows the applications to set any property without
+      ODF compliance checking. The compliant property set for text styles is
+      described in the section 15.4 of the OASIS 1.1 ODF specification. Beware,
+      some of them are not supported by any ODF text processor or viewer.
+      
+      The API allows the user to set any attribute using its official name
+      according to the ODF specification (§15.4). For example, the properties
+      which control the character name and size are respectively
+      "fo:font-name" and "fo:font-size". However, the API allows the use of
+      mnemonic shortcuts for a few, frequently required properties, namely:
+      
+         - font: font name;
+         - size: font size (absolute with unit or percentage with '%');
+         - weight: font weight, which may be 'normal', 'bold', or one of the
+         official nine numeric values from '100' to '900' (§15.4.32);
+         - style: to specify whether to use normal or italic font face; the
+         legal values are 'normal', 'italic' and 'oblique';
+         - color: the color of the characters (i.e. foreground color), provided
+         as a RGB hexadecimal string with a leading '#';
+         - background-color: the color of the text background, provided in the
+         same format as the foreground color;
+         - underline: to specify if and how text is underlined; possible values
+         are 'solid' (for a continuous line), 'dotted', 'dash', 'long-dash',
+         'dot-dash', 'dot-dot-dash', 'wave', and 'none';
+         - display: to specify if the text should by displayed or hidden;
+         possible values are 'true' (meaning visible) 'none' (meaning hidden)
+         or 'condition' (meaning that the text is to be visible or hidden
+         according to a condition defined elsewhere).
+         
+         [TBC]
    
    - Paragraph family
    
