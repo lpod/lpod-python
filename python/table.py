@@ -7,10 +7,9 @@ from re import search
 
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
+from element import odf_create_element, LAST_CHILD
 from utils import get_value, _set_value_and_type
 from vfs import vfs
-from xmlpart import odf_create_element, LAST_CHILD
-
 
 
 def _get_cell_coordinates(obj):

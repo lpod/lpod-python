@@ -6,9 +6,9 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
+from lpod.element import LAST_CHILD
 from lpod.style import odf_create_style
 from lpod.styles import hex2rgb, rgb2hex
-from lpod.xmlpart import LAST_CHILD
 
 
 class Hex2RgbTestCase(TestCase):

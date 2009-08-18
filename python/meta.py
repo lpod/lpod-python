@@ -7,8 +7,8 @@ from decimal import Decimal
 from datatype import DateTime, Duration, Boolean, Date
 
 # Import from lpod
-from lpod.xmlpart import LAST_CHILD, odf_create_element, odf_xmlpart
-
+from element import LAST_CHILD, odf_create_element
+from xmlpart import odf_xmlpart
 
 
 class odf_meta(odf_xmlpart):

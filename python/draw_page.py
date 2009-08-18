@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from xmlpart import register_element_class, odf_element, odf_create_element
+from element import register_element_class, odf_element, odf_create_element
 
 
 def odf_create_draw_page(name, page_id=None, master_page=None,

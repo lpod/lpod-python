@@ -7,7 +7,7 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.document import odf_get_document
 from lpod.paragraph import odf_create_paragraph, odf_paragraph
-from lpod.xmlpart import LAST_CHILD
+from lpod.element import LAST_CHILD
 
 
 class TestParagraph(TestCase):

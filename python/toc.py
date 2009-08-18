@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from xmlpart import register_element_class, odf_element
+from element import register_element_class, odf_element
 
 
 class odf_toc(odf_element):

@@ -6,14 +6,14 @@ from itools.csv import CSVFile
 from itools.handlers import get_handler, Image
 
 # Import from lpod
-from lpod.xmlpart import FIRST_CHILD
+from lpod import __version__, __installation_path__
 from lpod.document import odf_new_document_from_type
 from lpod.document import odf_create_paragraph, odf_create_heading
 from lpod.document import odf_create_frame, odf_create_image
 from lpod.document import odf_create_cell, odf_create_row
 from lpod.document import odf_create_column, odf_create_table
+from lpod.element import FIRST_CHILD
 from lpod.vfs import vfs
-from lpod import __version__, __installation_path__
 
 
 # Hello messages

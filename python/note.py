@@ -7,7 +7,7 @@ from types import FunctionType
 
 # Import from lpod
 from datatype import DateTime
-from xmlpart import odf_create_element, odf_element, register_element_class
+from element import odf_create_element, odf_element, register_element_class
 
 
 def odf_create_note(note_class='footnote', note_id=None, citation=None,

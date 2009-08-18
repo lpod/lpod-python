@@ -3,7 +3,7 @@
 
 # Import from lpod
 from image import odf_create_image
-from xmlpart import odf_create_element, odf_element, register_element_class
+from element import odf_create_element, odf_element, register_element_class
 
 
 def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',

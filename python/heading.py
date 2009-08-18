@@ -3,7 +3,7 @@
 
 # Import from lpod
 from paragraph import odf_paragraph
-from xmlpart import register_element_class, odf_create_element
+from element import register_element_class, odf_create_element
 
 
 def odf_create_heading(level, text=None, restart_numbering=False,

@@ -3,7 +3,7 @@
 
 # Import from lpod
 from note import odf_create_note, odf_create_annotation
-from xmlpart import register_element_class, odf_element, odf_create_element
+from element import register_element_class, odf_element, odf_create_element
 
 
 def _get_formated_text(element, context, with_text=True):

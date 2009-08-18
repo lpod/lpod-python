@@ -2,8 +2,8 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
+from element import register_element_class, odf_create_element, odf_element
 from paragraph import odf_create_paragraph
-from xmlpart import register_element_class, odf_create_element, odf_element
 
 
 # XXX these are specific styles but the name is generic.

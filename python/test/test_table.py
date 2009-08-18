@@ -8,10 +8,10 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.element import LAST_CHILD, odf_create_element
 from lpod.table import odf_create_row, odf_create_cell, odf_table
 from lpod.table import odf_create_table, odf_create_column
 from lpod.table import _get_cell_coordinates
-from lpod.xmlpart import LAST_CHILD, odf_create_element
 
 
 

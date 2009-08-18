@@ -4,7 +4,7 @@
 # Import from the Standard Library
 
 # Import from lpod
-from xmlpart import odf_create_element
+from element import odf_create_element
 
 
 def odf_create_section(style=None):

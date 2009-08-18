@@ -12,7 +12,6 @@ from sys import executable
 from release import get_release, get_git_files
 
 
-
 # Make the version.txt file
 release = get_release()
 open('version.txt', 'w').write(release)

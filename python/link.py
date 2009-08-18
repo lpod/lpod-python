@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from xmlpart import odf_create_element
+from element import odf_create_element
 
 
 def odf_create_link(href, name=None, title=None, target_frame=None,

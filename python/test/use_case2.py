@@ -22,9 +22,9 @@ from lpod.document import odf_create_user_field_decl, odf_create_user_field_get
 from lpod.document import odf_create_page_number, odf_create_page_count
 from lpod.document import odf_create_date, odf_create_time
 from lpod.document import odf_create_chapter, odf_create_filename
+from lpod.element import LAST_CHILD
 from lpod.table import odf_table
 from lpod.styles import rgb2hex
-from lpod.xmlpart import LAST_CHILD
 from lpod import __version__, __installation_path__
 
 

@@ -2,8 +2,8 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from xmlpart import register_element_class, odf_element, odf_create_element
-from xmlpart import PREV_SIBLING, NEXT_SIBLING
+from element import register_element_class, odf_element, odf_create_element
+from element import PREV_SIBLING, NEXT_SIBLING
 
 
 def get_parent_item(element):

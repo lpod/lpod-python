@@ -4,9 +4,6 @@
 # Import from the Standard Library
 from unittest import TestCase, main
 
-# Import from lpod
-from lpod.document import odf_get_document
-
 
 class ContentTestCase(TestCase):
     # TODO test "get_body"

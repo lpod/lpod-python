@@ -14,9 +14,10 @@ __installation_path__ = _get_abspath('')
 
 # Register element classes
 import draw_page
+import frame
 import heading
 import list
+import note
 import paragraph
 import style
-import frame
 import toc

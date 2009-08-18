@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from xmlpart import register_element_class, odf_element, odf_create_element
+from element import odf_create_element
 
 
 def _odf_create_shape(type, style=None, text_style=None, shape_id=None,

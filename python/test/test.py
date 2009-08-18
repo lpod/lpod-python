@@ -11,6 +11,7 @@ import test_content
 import test_document
 import test_datatype
 import test_draw_page
+import test_element
 import test_frame
 import test_heading
 import test_image
@@ -37,6 +38,7 @@ test_modules = [test_bookmark,
                 test_document,
                 test_datatype,
                 test_draw_page,
+                test_element,
                 test_frame,
                 test_heading,
                 test_image,

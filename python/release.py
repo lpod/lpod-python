@@ -9,7 +9,6 @@ from datetime import datetime
 from os.path import basename
 
 
-
 def _run_command(command):
     popen = Popen(command, stdout=PIPE, stderr=PIPE)
     stdoutdata, stderrdata = popen.communicate()

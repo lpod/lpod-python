@@ -10,6 +10,7 @@ from cStringIO import StringIO
 from utils import _get_abspath
 from vfs import vfs, WRITE
 
+
 # Types and their default template
 ODF_TYPES = {
         'text': 'templates/text.ott',
