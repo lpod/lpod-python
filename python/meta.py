@@ -4,7 +4,7 @@
 # Import from the Standard Library
 from datetime import timedelta, date, datetime
 from decimal import Decimal
-from utils import DateTime, Duration, Boolean, Date
+from datatype import DateTime, Duration, Boolean, Date
 
 # Import from lpod
 from lpod.xmlpart import LAST_CHILD, odf_create_element, odf_xmlpart

@@ -6,7 +6,7 @@ from csv import reader, Sniffer
 from re import search
 
 # Import from lpod
-from utils import Boolean, Date, DateTime, Duration
+from datatype import Boolean, Date, DateTime, Duration
 from utils import get_value, _set_value_and_type
 from vfs import vfs
 from xmlpart import odf_create_element, LAST_CHILD

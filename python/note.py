@@ -6,7 +6,7 @@ from datetime import datetime
 from types import FunctionType
 
 # Import from lpod
-from utils import DateTime
+from datatype import DateTime
 from xmlpart import odf_create_element, odf_element, register_element_class
 
 

@@ -2,8 +2,8 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from utils import Date, DateTime, _set_value_and_type
-from utils import Duration
+from datatype import Date, DateTime, Duration
+from utils import _set_value_and_type
 from xmlpart import odf_create_element
 
 

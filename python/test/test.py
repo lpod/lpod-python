@@ -9,6 +9,7 @@ import test_bookmark
 import test_container
 import test_content
 import test_document
+import test_datatype
 import test_draw_page
 import test_frame
 import test_heading
@@ -30,11 +31,29 @@ import test_variable
 import test_xmlpart
 
 
-test_modules = [test_bookmark, test_container, test_content, test_document,
-                test_draw_page, test_frame, test_heading, test_image,
-                test_link, test_list, test_meta, test_note, test_paragraph,
-                test_reference, test_section, test_shapes, test_span,
-                test_style, test_styles, test_table, test_utils, test_variable,
+test_modules = [test_bookmark,
+                test_container,
+                test_content,
+                test_document,
+                test_datatype,
+                test_draw_page,
+                test_frame,
+                test_heading,
+                test_image,
+                test_link,
+                test_list,
+                test_meta,
+                test_note,
+                test_paragraph,
+                test_reference,
+                test_section,
+                test_shapes,
+                test_span,
+                test_style,
+                test_styles,
+                test_table,
+                test_utils,
+                test_variable,
                 test_xmlpart]
 
 

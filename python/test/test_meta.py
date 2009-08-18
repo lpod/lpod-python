@@ -8,7 +8,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.utils import DateTime, Duration
+from lpod.datatype import DateTime, Duration
 
 
 class TestMetadata(TestCase):
