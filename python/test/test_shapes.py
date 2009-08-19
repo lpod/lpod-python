@@ -107,12 +107,18 @@ class TestShapes(TestCase):
         self.assertEqual(len(lines), 1)
 
 
-    def test_get_draw_line_list_style(self):
-        # XXX Fail until draw:style-name is supported
+    def test_get_draw_line_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(1)
-        lines = page.get_draw_line_list(style=ur'gr2')
+        lines = page.get_draw_line_list(draw_style=ur'gr2')
         self.assertEqual(len(lines), 1)
+
+
+    def test_get_draw_line_list_draw_text_style(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        lines = page.get_draw_line_list(draw_text_style=ur'P1')
+        self.assertEqual(len(lines), 2)
 
 
     def test_get_draw_line_by_content(self):
@@ -155,11 +161,17 @@ class TestShapes(TestCase):
         self.assertEqual(len(rectangles), 1)
 
 
-    def test_get_draw_rectangle_list_style(self):
-        # XXX Fail until draw:style-name is supported
+    def test_get_draw_rectangle_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(1)
-        rectangles = page.get_draw_rectangle_list(style=ur'gr1')
+        rectangles = page.get_draw_rectangle_list(draw_style=ur'gr1')
+        self.assertEqual(len(rectangles), 1)
+
+
+    def test_get_draw_rectangle_list_draw_text_style(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        rectangles = page.get_draw_rectangle_list(draw_text_style=ur'P1')
         self.assertEqual(len(rectangles), 1)
 
 
@@ -204,11 +216,17 @@ class TestShapes(TestCase):
         self.assertEqual(len(ellipses), 1)
 
 
-    def test_get_draw_ellipse_list_style(self):
-        # XXX Fail until draw:style-name is supported
+    def test_get_draw_ellipse_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(1)
-        ellipses = page.get_draw_ellipse_list(style=ur'gr2')
+        ellipses = page.get_draw_ellipse_list(draw_style=ur'gr1')
+        self.assertEqual(len(ellipses), 1)
+
+
+    def test_get_draw_ellipse_list_draw_text_style(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        ellipses = page.get_draw_ellipse_list(draw_text_style=ur'P1')
         self.assertEqual(len(ellipses), 1)
 
 
@@ -253,11 +271,17 @@ class TestShapes(TestCase):
         self.assertEqual(len(connectors), 1)
 
 
-    def test_get_draw_connector_list_style(self):
-        # XXX Fail until draw:style-name is supported
+    def test_get_draw_connector_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(1)
-        connectors = page.get_draw_connector_list(style=ur'gr4')
+        connectors = page.get_draw_connector_list(draw_style=ur'gr4')
+        self.assertEqual(len(connectors), 1)
+
+
+    def test_get_draw_connector_list_draw_text_style(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        connectors = page.get_draw_connector_list(draw_text_style=ur'P1')
         self.assertEqual(len(connectors), 1)
 
 

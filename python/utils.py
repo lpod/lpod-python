@@ -57,10 +57,10 @@ def _get_abspath(local_path):
 
 
 def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
-                      draw_style=None, table_name=None, style_name=None,
-                      note_class=None, text_id=None, text_name=None,
-                      office_name=None, office_title=None, level=None,
-                      position=None, **kw):
+                      draw_style=None, draw_text_style=None, table_name=None,
+                      style_name=None, note_class=None, text_id=None,
+                      text_name=None, office_name=None, office_title=None,
+                      level=None, position=None, **kw):
     query = ['descendant::']
     query.append(element_name)
     attributes = kw
@@ -72,6 +72,8 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
         attributes['draw:name'] = draw_name
     if draw_style:
         attributes['draw:style-name'] = draw_style
+    if draw_text_style:
+        attributes['draw:text-style-name'] = draw_text_style
     if table_name:
         attributes['table:name'] = table_name
     if style_name:
@@ -109,15 +111,15 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
 #
 
 def _get_element_list(context, element_name, style=None, family=None,
-                      draw_name=None, draw_style=None, table_name=None,
-                      note_class=None, style_name=None, text_id=None,
-                      text_name=None, office_name=None,
-                      office_title=None, level=None, href=None,
-                      svg_title=None, svg_desc=None,
-                      position=None, regex=None):
+                      draw_name=None, draw_style=None, draw_text_style=None,
+                      table_name=None, note_class=None, style_name=None,
+                      text_id=None, text_name=None, office_name=None,
+                      office_title=None, level=None, href=None, svg_title=None,
+                      svg_desc=None, position=None, regex=None):
     query = _make_xpath_query(element_name, style=style, family=family,
                               draw_name=draw_name,
                               draw_style=draw_style,
+                              draw_text_style=draw_text_style,
                               table_name=table_name,
                               style_name=style_name,
                               note_class=note_class, text_id=text_id,

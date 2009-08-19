@@ -813,8 +813,9 @@ class odf_element(object):
     # Lines
     #
 
-    def get_draw_line_list(self, style=None, regex=None):
-        return _get_element_list(self, 'draw:line', regex=regex, style=style)
+    def get_draw_line_list(self, draw_style=None, draw_text_style=None, regex=None):
+        return _get_element_list(self, 'draw:line', draw_style=draw_style,
+                                 draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_line_by_content(self, regex):
@@ -831,8 +832,10 @@ class odf_element(object):
     # Rectangles
     #
 
-    def get_draw_rectangle_list(self, style=None, regex=None):
-        return _get_element_list(self, 'draw:rect', regex=regex, style=style)
+    def get_draw_rectangle_list(self, draw_style=None, draw_text_style=None,
+                                regex=None):
+        return _get_element_list(self, 'draw:rect', draw_style=draw_style,
+                                 draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_rectangle_by_content(self, regex):
@@ -849,9 +852,10 @@ class odf_element(object):
     # Ellipse
     #
 
-    def get_draw_ellipse_list(self, style=None, regex=None):
-        return _get_element_list(self, 'draw:ellipse', regex=regex,
-                                 style=style)
+    def get_draw_ellipse_list(self, draw_style=None, draw_text_style=None,
+                              regex=None):
+        return _get_element_list(self, 'draw:ellipse', draw_style=draw_style,
+                                 draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_ellipse_by_content(self, regex):
@@ -868,9 +872,10 @@ class odf_element(object):
     # Connectors
     #
 
-    def get_draw_connector_list(self, style=None, regex=None):
-        return _get_element_list(self, 'draw:connector', regex=regex,
-                                      style=style)
+    def get_draw_connector_list(self, draw_style=None, draw_text_style=None,
+                                regex=None):
+        return _get_element_list(self, 'draw:connector', draw_style=draw_style,
+                                 draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_connector_by_content(self, regex):
