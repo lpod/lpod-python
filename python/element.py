@@ -803,3 +803,67 @@ class odf_element(object):
 
     def get_reference_mark_end_by_name(self, name):
         return _get_element(self, 'text:reference-mark-end', text_name=name)
+
+
+    #
+    # Shapes
+    #
+
+    def get_draw_line_list(self, style=None, regex=None):
+        return _get_element_list(self, 'draw:line', regex=regex, style=style)
+
+
+    def get_draw_line_by_content(self, regex):
+        return _get_element(self, 'draw:line', regex=regex)
+
+
+    def get_draw_rectangle_list(self, style=None, regex=None):
+        return _get_element_list(self, 'draw:rect', regex=regex, style=style)
+
+
+    def get_draw_rectangle_by_content(self, regex):
+        return _get_element(self, 'draw:rect', regex=regex)
+
+
+    def get_draw_rectangle_by_id(self, id):
+        rectangles = self.get_rectangle_list()
+        return [rectangle for rectangle in rectangles
+                          if rectangle.get_attribute('draw:id') == id]
+
+
+    def get_draw_ellipse_list(self, style=None, regex=None):
+        return _get_element_list(self, 'draw:ellipse', regex=regex,
+                                 style=style)
+
+
+    def get_draw_ellipse_by_content(self, regex):
+        return _get_element(self, 'draw:ellipse', regex=regex)
+
+
+    def get_draw_ellipse_by_id(self, id):
+        ellipses = self.get_ellipse_list()
+        return [ellipse for ellipse in ellipses
+                        if ellipse.get_attribute('draw:id') == id]
+
+
+    def get_draw_connector_list(self, style=None, regex=None):
+        return _get_element_list(self, 'draw:connector', regex=regex,
+                                      style=style)
+
+
+    def get_draw_connector_by_content(self, regex):
+        return _get_element(self, 'draw:connector', regex=regex)
+
+
+    def get_draw_orphans_connectors(self):
+        """Return a list of connectors, which havn't any shape connected to
+        them.
+        """
+        connectors = []
+        for connector in self.get_draw_connector_list():
+            start_shape = connector.get_attribute('draw:start-shape')
+            end_shape = connector.get_attribute('draw:end-shape')
+            if start_shape is None and end_shape is None:
+                connectors.append(connector)
+        return connectors
+
