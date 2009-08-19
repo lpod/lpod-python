@@ -94,8 +94,6 @@ class odf_paragraph(odf_element):
                 note_element.set_note_body(body)
         note_element.check_validity()
         if type(after) is unicode:
-            if not self.match(after):
-                raise ValueError, "text not found"
             self._insert_after(note_element, after)
         elif isinstance(after, odf_element):
             after.insert_element(note_element, FIRST_CHILD)
@@ -103,23 +101,27 @@ class odf_paragraph(odf_element):
             self.insert_element(note_element, FIRST_CHILD)
 
 
-    def insert_annotation(self, annotation_element=None,
-                          text_or_element=None, creator=None, date=None):
+    def insert_annotation(self, annotation_element=None, after=None,
+                          body=None, creator=None, date=None):
         if annotation_element is None:
-            annotation_element = odf_create_annotation(text_or_element,
+            annotation_element = odf_create_annotation(body,
                                                        creator=creator,
                                                        date=date)
         else:
             # XXX clone or modify the argument?
-            if text_or_element:
-                annotation_element.set_annotation_body(text_or_element)
+            if body:
+                annotation_element.set_annotation_body(body)
             if creator:
                 annotation_element.set_annotation_creator(creator)
             if date:
                 annotation_element.set_annotation_date(date)
         annotation_element.check_validity()
-        # TODO choose where to insert
-        self.append_element(annotation_element)
+        if type(after) is unicode:
+            self._insert_after(annotation_element, after)
+        elif isinstance(after, odf_element):
+            after.insert_element(annotation_element, FIRST_CHILD)
+        else:
+            self.insert_element(annotation_element, FIRST_CHILD)
 
 
 

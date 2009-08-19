@@ -597,6 +597,9 @@ class odf_element(object):
         return _get_element(self, 'text:note', text_id=note_id)
 
 
+    # TODO maybe get_note_by_class?
+
+
     def get_note_by_content(self, regex):
         return _get_element(self, 'text:note', regex=regex)
 

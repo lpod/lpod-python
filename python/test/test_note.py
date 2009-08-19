@@ -11,7 +11,6 @@ from lpod.element import odf_create_element
 from lpod.list import odf_create_list
 from lpod.note import odf_create_note, odf_create_annotation
 from lpod.paragraph import odf_create_paragraph
-from lpod.utils import convert_unicode
 
 
 class TestNote(TestCase):
@@ -49,7 +48,7 @@ class TestNote(TestCase):
 
     def test_get_note(self):
         body = self.body
-        note = body.get_note_by_id('ftn0')
+        note = body.get_note_by_id('ftn1')
         self.assertEqual(note.get_name(), 'text:note')
 
 
@@ -86,7 +85,7 @@ class TestNote(TestCase):
                         '</text:note-body>'
                       '</text:note>'
                     'graphe</text:p>')
-        self.assertEqual(paragraph.serialize(), convert_unicode(expected))
+        self.assertEqual(paragraph.serialize(), expected)
 
 
     def test_insert_note_inside_span(self):
@@ -104,7 +103,7 @@ class TestNote(TestCase):
                         '</text:note-body>'
                       '</text:note>'
                     '</text:span>graphe</text:p>')
-        self.assertEqual(paragraph.serialize(), convert_unicode(expected))
+        self.assertEqual(paragraph.serialize(), expected)
 
 
     def test_insert_note_after_span(self):
@@ -122,7 +121,7 @@ class TestNote(TestCase):
                         '</text:note-body>'
                       '</text:note>'
                     '.</text:p>')
-        self.assertEqual(paragraph.serialize(), convert_unicode(expected))
+        self.assertEqual(paragraph.serialize(), expected)
 
 
     def test_get_formated_text(self):
@@ -269,18 +268,20 @@ class TestAnnotation(TestCase):
 
 
     def test_insert_annotation(self):
-        body = self.body.clone()
-        creator = u"Plato"
         text = u"It's like you're in a cave."
-        annotation = odf_create_annotation(text, creator=creator)
-        paragraph = body.get_paragraph_by_position(1)
-        paragraph.insert_annotation(annotation, after=u"Un")
-        annotations = body.get_annotation_list()
-        self.assertEqual(len(annotations), 2)
-        first_annotation = annotations[0]
-        print "annotation", paragraph.serialize()
-        raise NotImplementedError
-        self.assertEqual(first_annotation.get_text_content(), text)
+        creator = u"Plato"
+        date = datetime(2009, 8, 19)
+        annotation = odf_create_annotation(text, creator=creator, date=date)
+        paragraph = odf_create_paragraph(u"Un paragraphe")
+        paragraph.insert_annotation(annotation, after=u"para")
+        expected = ('<text:p>Un para'
+                      '<office:annotation>'
+                        '<text:p>It\'s like you\'re in a cave.</text:p>'
+                        '<dc:creator>Plato</dc:creator>'
+                        '<dc:date>2009-08-19T00:00:00</dc:date>'
+                      '</office:annotation>'
+                    'graphe</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
 
 
 
