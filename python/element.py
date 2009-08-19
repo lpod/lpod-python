@@ -137,29 +137,55 @@ class odf_element(object):
         return '%s "%s"' % (object.__str__(self), self.get_name())
 
 
-    # TODO wrap_text must a private function
+    def _insert_after(self, element, text):
+        """Insert the given element after the text snippet. Typically for
+        inserting a footnote after a word.
+
+        Example: '<p>toto<span>titi</span>tata</p>'
+        We are in the context of a paragraph, we know it contains "titi", and
+        we want to insert the footnote after it without having to know
+        it is in a span.
+        """
+        current = self.__element
+        element = element.__element
+        for result in current.xpath('descendant::text()'):
+            if text in result:
+                index = result.index(text) + len(text)
+                before = result[:index]
+                after = result[index:]
+                container = result.getparent()
+                if result.is_text:
+                    container.text = before
+                    container.insert(0, element)
+                    element.tail = after
+                else:
+                    container.tail = before
+                    parent = container.getparent()
+                    index = parent.index(container)
+                    parent.insert(index + 1, element)
+                    element.tail = after
+                return
+        raise ValueError, "text not found"
+
+
+    # TODO rewrite specifically for span and a, and make private
     def wrap_text(self, element, offset=0, length=0):
         current = self.__element
         element = element.__element
-
         total = 0
-        for text in current.xpath('text()'):
+        for text in current.xpath('descendant::text()'):
             total += len(text)
             if offset < total:
                 left = text[:-(total - offset)]
                 right = text[-(total - offset):]
                 center, right = right[:length], right[length:]
-
                 element.tail = right
                 if center:
                     element.text = center
-
                 if text.is_tail:
                     owner = text.getparent()
-
                     # Set text
                     owner.tail = left
-
                     # Insert element
                     index = current.index(owner)
                     current.insert(index + 1, element)
@@ -167,14 +193,12 @@ class odf_element(object):
                 else:
                     # Set text
                     current.text = left
-
                     # Insert element
                     current.insert(0, element)
                     return
         else:
             # offset is too big => insert at the end
             current.append(element)
-            return
 
 
     def get_name(self):
@@ -259,10 +283,9 @@ class odf_element(object):
 
     def match(self, pattern):
         """ True if the text of the odf_element match one or more times the
-            pattern.
+        unicode pattern.
         """
-        # Lead to a failure if the pattern should be an unicode but it is a
-        # string
+        # Fail properly if the pattern is an non-ascii bytestring
         pattern = unicode(pattern)
         text = self.get_text()
         return search(pattern, text) is not None

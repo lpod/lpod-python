@@ -7,10 +7,11 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.element import LAST_CHILD
-from lpod.note import odf_create_note, odf_create_annotation
+from lpod.element import odf_create_element
 from lpod.list import odf_create_list
+from lpod.note import odf_create_note, odf_create_annotation
 from lpod.paragraph import odf_create_paragraph
+from lpod.utils import convert_unicode
 
 
 class TestNote(TestCase):
@@ -72,11 +73,56 @@ class TestNote(TestCase):
 
 
     def test_insert_note(self):
-        body = self.body.clone()
-        note = odf_create_note(note_id='note1', citation=u'1',
-                               body=u'a footnote')
-        paragraph = body.get_paragraph_by_position(1)
-        paragraph.insert_element(note, LAST_CHILD)
+        note = odf_create_note(note_id='note1', citation=u"1",
+                               body=u"élément pertubateur")
+        paragraph = odf_create_paragraph(u"Un paragraphe")
+        paragraph.insert_note(note, after=u"para")
+        expected = ('<text:p>Un para'
+                      '<text:note text:note-class="footnote" '
+                        'text:id="note1">'
+                        '<text:note-citation>1</text:note-citation>'
+                        '<text:note-body>'
+                          '<text:p>&#233;l&#233;ment pertubateur</text:p>'
+                        '</text:note-body>'
+                      '</text:note>'
+                    'graphe</text:p>')
+        self.assertEqual(paragraph.serialize(), convert_unicode(expected))
+
+
+    def test_insert_note_inside_span(self):
+        note = odf_create_note(note_id='note1', citation=u"1",
+                               body=u"élément pertubateur")
+        data = "<text:p>Un <text:span>para</text:span>graphe</text:p>"
+        paragraph = odf_create_element(data)
+        paragraph.insert_note(note, after=u"para")
+        expected = ('<text:p>Un <text:span>para'
+                      '<text:note text:note-class="footnote" '
+                        'text:id="note1">'
+                        '<text:note-citation>1</text:note-citation>'
+                        '<text:note-body>'
+                          '<text:p>&#233;l&#233;ment pertubateur</text:p>'
+                        '</text:note-body>'
+                      '</text:note>'
+                    '</text:span>graphe</text:p>')
+        self.assertEqual(paragraph.serialize(), convert_unicode(expected))
+
+
+    def test_insert_note_after_span(self):
+        note = odf_create_note(note_id='note1', citation=u"1",
+                               body=u"élément pertubateur")
+        data = "<text:p>Un <text:span>para</text:span>graphe.</text:p>"
+        paragraph = odf_create_element(data)
+        paragraph.insert_note(note, after=u"graphe")
+        expected = ('<text:p>Un <text:span>para</text:span>graphe'
+                      '<text:note text:note-class="footnote" '
+                        'text:id="note1">'
+                        '<text:note-citation>1</text:note-citation>'
+                        '<text:note-body>'
+                          '<text:p>&#233;l&#233;ment pertubateur</text:p>'
+                        '</text:note-body>'
+                      '</text:note>'
+                    '.</text:p>')
+        self.assertEqual(paragraph.serialize(), convert_unicode(expected))
 
 
     def test_get_formated_text(self):
@@ -227,11 +273,13 @@ class TestAnnotation(TestCase):
         creator = u"Plato"
         text = u"It's like you're in a cave."
         annotation = odf_create_annotation(text, creator=creator)
-        context = body.get_paragraph_by_position(1)
-        context.wrap_text(annotation, offset=27)
+        paragraph = body.get_paragraph_by_position(1)
+        paragraph.insert_annotation(annotation, after=u"Un")
         annotations = body.get_annotation_list()
         self.assertEqual(len(annotations), 2)
         first_annotation = annotations[0]
+        print "annotation", paragraph.serialize()
+        raise NotImplementedError
         self.assertEqual(first_annotation.get_text_content(), text)
 
 

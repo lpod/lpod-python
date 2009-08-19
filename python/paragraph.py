@@ -4,6 +4,7 @@
 # Import from lpod
 from note import odf_create_note, odf_create_annotation
 from element import register_element_class, odf_element, odf_create_element
+from element import FIRST_CHILD
 
 
 def _get_formated_text(element, context, with_text=True):
@@ -74,8 +75,9 @@ class odf_paragraph(odf_element):
         return u''.join(result)
 
 
-    def insert_note(self, note_element=None, note_class='footnote',
-                    note_id=None, citation=None, body=None, *args, **kw):
+    def insert_note(self, note_element=None, after=None,
+                    note_class='footnote', note_id=None, citation=None,
+                    body=None, *args, **kw):
         if note_element is None:
             note_element = odf_create_note(note_class=note_class,
                                            note_id=note_id,
@@ -91,8 +93,14 @@ class odf_paragraph(odf_element):
             if body:
                 note_element.set_note_body(body)
         note_element.check_validity()
-        # TODO choose where to insert
-        self.append_element(note_element)
+        if type(after) is unicode:
+            if not self.match(after):
+                raise ValueError, "text not found"
+            self._insert_after(note_element, after)
+        elif isinstance(after, odf_element):
+            after.insert_element(note_element, FIRST_CHILD)
+        else:
+            self.insert_element(note_element, FIRST_CHILD)
 
 
     def insert_annotation(self, annotation_element=None,

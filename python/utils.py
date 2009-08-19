@@ -321,6 +321,8 @@ def set_value(element, value):
 
 
 def convert_unicode(text):
+    """Mostly used to compare lxml serialization to what is expected.
+    """
     result = []
     for c in text:
         code = ord(c)
