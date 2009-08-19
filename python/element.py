@@ -806,7 +806,11 @@ class odf_element(object):
 
 
     #
-    # Shapes
+    # Shapes elements
+    #
+
+    #
+    # Lines
     #
 
     def get_draw_line_list(self, style=None, regex=None):
@@ -817,6 +821,16 @@ class odf_element(object):
         return _get_element(self, 'draw:line', regex=regex)
 
 
+    def get_draw_line_by_id(self, id):
+        lines = self.get_draw_line_list()
+        lines = [line for line in lines
+                      if line.get_attribute('draw:id') == id]
+        return lines[0] if lines else None
+
+    #
+    # Rectangles
+    #
+
     def get_draw_rectangle_list(self, style=None, regex=None):
         return _get_element_list(self, 'draw:rect', regex=regex, style=style)
 
@@ -826,10 +840,14 @@ class odf_element(object):
 
 
     def get_draw_rectangle_by_id(self, id):
-        rectangles = self.get_rectangle_list()
-        return [rectangle for rectangle in rectangles
-                          if rectangle.get_attribute('draw:id') == id]
+        rectangles = self.get_draw_rectangle_list()
+        rectangles = [rectangle for rectangle in rectangles
+                                if rectangle.get_attribute('draw:id') == id]
+        return rectangles[0] if rectangle else None
 
+    #
+    # Ellipse
+    #
 
     def get_draw_ellipse_list(self, style=None, regex=None):
         return _get_element_list(self, 'draw:ellipse', regex=regex,
@@ -841,10 +859,14 @@ class odf_element(object):
 
 
     def get_draw_ellipse_by_id(self, id):
-        ellipses = self.get_ellipse_list()
-        return [ellipse for ellipse in ellipses
-                        if ellipse.get_attribute('draw:id') == id]
+        ellipses = self.get_draw_ellipse_list()
+        ellipses = [ellipse for ellipse in ellipses
+                            if ellipse.get_attribute('draw:id') == id]
+        return ellipses[0] if ellipse else None
 
+    #
+    # Connectors
+    #
 
     def get_draw_connector_list(self, style=None, regex=None):
         return _get_element_list(self, 'draw:connector', regex=regex,
@@ -853,6 +875,13 @@ class odf_element(object):
 
     def get_draw_connector_by_content(self, regex):
         return _get_element(self, 'draw:connector', regex=regex)
+
+
+    def get_draw_connector_by_id(self, id):
+        connectors = self.get_draw_connector_list()
+        connectors = [connector for connector in connectors
+                                if connector.get_attribute('draw:id') == id]
+        return connectors[0] if connector else None
 
 
     def get_draw_orphans_connectors(self):

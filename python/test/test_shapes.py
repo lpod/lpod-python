@@ -127,6 +127,16 @@ class TestShapes(TestCase):
                     '    </draw:line>\n')
         self.assertEqual(line.serialize(pretty=True), expected)
 
+
+    def test_get_draw_line_by_id(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        line = odf_create_line(shape_id=u'an id')
+        page.append_element(line)
+        line = page.get_draw_line_by_id(ur'an id')
+        expected = '<draw:line draw:id="an id"/>\n'
+        self.assertEqual(line.serialize(pretty=True), expected)
+
     #
     # Rectangles
     #
@@ -165,6 +175,17 @@ class TestShapes(TestCase):
                     '    </draw:rect>\n')
         self.assertEqual(rectangle.serialize(pretty=True), expected)
 
+
+    def test_get_draw_rectangle_by_id(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        rectangle = odf_create_rectangle(shape_id=u'an id')
+        page.append_element(rectangle)
+        rectangle = page.get_draw_rectangle_by_id(ur'an id')
+        expected = ('<draw:rect draw:id="an id" svg:width="1cm" '
+                    'svg:height="1cm"/>\n')
+        self.assertEqual(rectangle.serialize(pretty=True), expected)
+
     #
     # Ellipses
     #
@@ -201,6 +222,17 @@ class TestShapes(TestCase):
                     'svg:x="13.5cm" svg:y="5cm">\n'
                     '     <text:p text:style-name="P1">Cercle</text:p>\n'
                     '    </draw:ellipse>\n')
+        self.assertEqual(ellipse.serialize(pretty=True), expected)
+
+
+    def test_get_draw_ellipse_by_id(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        ellipse = odf_create_ellipse(shape_id=u'an id')
+        page.append_element(ellipse)
+        ellipse = page.get_draw_ellipse_by_id(ur'an id')
+        expected = ('<draw:ellipse draw:id="an id" svg:width="1cm" '
+                    'svg:height="1cm"/>\n')
         self.assertEqual(ellipse.serialize(pretty=True), expected)
 
     #
@@ -242,6 +274,16 @@ class TestShapes(TestCase):
                     'svg:d="m11000 8000h1250v1001h3250v-501">\n'
                     '     <text:p text:style-name="P1">Connecteur</text:p>\n'
                     '    </draw:connector>\n')
+        self.assertEqual(connector.serialize(pretty=True), expected)
+
+
+    def test_get_draw_connector_by_id(self):
+        body = self.content.get_body()
+        page = body.get_draw_page_by_position(1)
+        connector = odf_create_connector(shape_id=u'an id')
+        page.append_element(connector)
+        connector = page.get_draw_connector_by_id(ur'an id')
+        expected = '<draw:connector draw:id="an id"/>\n'
         self.assertEqual(connector.serialize(pretty=True), expected)
 
 

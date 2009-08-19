@@ -17,7 +17,7 @@ def _odf_create_shape(type, style=None, text_style=None, shape_id=None,
 
         text_style -- unicode
 
-        shape_id -- str
+        shape_id -- unicode
 
         layer -- str
 
@@ -36,8 +36,8 @@ def _odf_create_shape(type, style=None, text_style=None, shape_id=None,
 
 
 
-def odf_create_line(style=None, text_style=None, layer=None, p1=None,
-                    p2=None):
+def odf_create_line(style=None, text_style=None, shape_id=None, layer=None,
+                    p1=None, p2=None):
     """Create a line shape.
 
     Arguments:
@@ -46,19 +46,19 @@ def odf_create_line(style=None, text_style=None, layer=None, p1=None,
 
         text_style -- unicode
 
-        shape_id -- str
+        shape_id -- unicode
 
         layer -- str
 
-        p1 -- tuple of coordinates
+        p1 -- (str, str)
 
-        p2 -- tuple of coordinates
+        p2 -- (str, str)
 
     Return: odf_element
     """
     type = '<draw:line/>'
     element = _odf_create_shape(type, style=style, text_style=text_style,
-                                layer=layer)
+                                shape_id=shape_id, layer=layer)
     if p1:
         element.set_attribute('svg:x1', p1[0])
         element.set_attribute('svg:y1', p1[1])
@@ -79,13 +79,13 @@ def odf_create_rectangle(style=None, text_style=None, shape_id=None,
 
         text_style -- unicode
 
-        shape_id -- str
+        shape_id -- unicode
 
         layer -- str
 
-        dimensions -- tuple of str
+        size -- (str, str)
 
-        origin -- tuple of str
+        position -- (str, str)
 
     Return: odf_element
     """
@@ -111,7 +111,7 @@ def odf_create_ellipse(style=None, text_style=None, shape_id=None,
 
         text_style -- unicode
 
-        shape_id -- str
+        shape_id -- unicode
 
         layer -- str
 
@@ -133,9 +133,9 @@ def odf_create_ellipse(style=None, text_style=None, shape_id=None,
 
 
 
-def odf_create_connector(style=None, text_style=None, layer=None,
-                         connected_shapes=None, glue_points=None, p1=None,
-                         p2=None):
+def odf_create_connector(style=None, text_style=None, shape_id=None,
+                         layer=None, connected_shapes=None, glue_points=None,
+                         p1=None, p2=None):
     """Create a ellipse shape.
 
     Arguments:
@@ -143,6 +143,8 @@ def odf_create_connector(style=None, text_style=None, layer=None,
         style -- unicode
 
         text_style -- unicode
+
+        shape_id -- unicode
 
         layer -- str
 
@@ -158,7 +160,7 @@ def odf_create_connector(style=None, text_style=None, layer=None,
     """
     type = '<draw:connector/>'
     element = _odf_create_shape(type, style=style, text_style=text_style,
-                                layer=layer)
+                                shape_id=shape_id, layer=layer)
     if connected_shapes:
         start_shape_id = connected_shapes[0].get_attribute('draw:id')
         end_shape_id = connected_shapes[1].get_attribute('draw:id')
