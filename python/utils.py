@@ -13,15 +13,6 @@ from sys import _getframe, modules
 from datatype import Boolean, Date, DateTime, Duration
 
 
-DATE_FORMAT = '%Y-%m-%d'
-
-
-DATETIME_FORMAT = DATE_FORMAT + 'T%H:%M:%S'
-
-
-DURATION_FORMAT = 'PT%02dH%02dM%02dS'
-
-
 CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
               'time')
 
