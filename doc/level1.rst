@@ -349,7 +349,10 @@ Styles
    
    Any style is created through a common odf_create_style() function with the
    name and the family as its mandatory arguments. Additional arguments can
-   be required according to the family.
+   be required according to the family. An optional 'parent' argument, whose
+   value is the name of another common style of the same family (existing or
+   to be created), can be provided, knowing that a style inherits (but can
+   override) all the properties of its parent at the display time.
    
    The odf_create_style() function creates a free element, not included in a
    document. This element (or a clone of it) is available to be attached later
@@ -390,11 +393,15 @@ Styles
       the text color, the text background color (which may differ from the
       common background color of the paragraph).
       
+      A text style can apply to one or more text spans; see the "Text spans"
+      section.
+      
       The example hereafter creates a text style, so called "My Blue Text",
       using Times New Roman, 14-sized navy blue bold italic characters with
       a yellow background::
       
-         s = odf_create_style('My Blue Text',
+         s = odf_create_style('MyBlueText',
+                              display-name='My Blue Text',
                               family='text',
                               font='Times New Roman',
                               size='14pt',
@@ -432,12 +439,93 @@ Styles
          possible values are 'true' (meaning visible) 'none' (meaning hidden)
          or 'condition' (meaning that the text is to be visible or hidden
          according to a condition defined elsewhere).
-         
-         [TBC]
    
    - Paragraph family
    
-      [TBC]
+      A paragraph style apply to paragraphs at large, i.e. to ODF paragraphs
+      and headings, which are the common text containers. It controls the
+      layout of both the text content and the container, so its definition
+      is made of two distinct parts, the "text" part and the "paragraph" part.
+      
+      The text part of a paragraph style definition may have exactly the same
+      properties as a regular text style. The rules are defined by the §15.4
+      of the OASIS 1.1 ODF specification, and the API provides the same
+      property shortcuts as for a text style creation.
+      
+      The creation of a full-featured paragraph style takes two steps. The
+      first one is a regular odf_create_style() instruction, with a mandatory
+      unique name and 'paragraph' as the value of the 'family' mandatory
+      named parameter, and any number of named paragraph properties. The second
+      (optional) step consists of appending a 'text' part to the new paragraph
+      style; it can be accomplished, at the user's choice, either by copying
+      a previously defined text style, or by explicitly defining new text
+      properties, through the text_properties() method, belonging to the style
+      class.
+      
+      The text properties of a paragraph style are default text properties;
+      they may be overriden by text styles if one or more styled text spans are
+      defined inside the paragraphs.
+      
+      Assuming that a "MyBlueText" text style has been defined according to
+      the text style creation example above, the following sequence creates
+      a new paragraph style whose text part is a clone of "MyBlueText", and
+      whose paragraph part features are the text justification, a first line
+      5mm indent, a black, continuous, half-millimiter border line with a
+      bottom-right, one millimeter grey shadow::
+   
+         ps = odf_create_style('YellowBorderedShadowed',
+                                 display-name='Strange Boxed Paragraph',
+                                 family='paragraph',
+                                 parent='Standard',
+                                 align='justify',
+                                 indent='5mm',
+                                 border='0.5mm solid #000000',
+                                 shadow='#808080 1mm 1mm'
+                                 )
+         ts = document.get_style('MyBlueText', family='text')
+         ps.text_properties(ts)
+         
+      Note that "MyBlueText" is reused by copy, not by reference; so the new
+      paragraph style will not be affected if "MyBlueText" is changed or
+      deleted later.
+      
+      The API allows the user to set any attribute using its official name
+      according to the ODF specification related to the paragraph formatting
+      properties (§15.5). However, the API allows the use of mnemonic shortcuts
+      for a few, frequently required properties, namely:
+      
+         - align: text alignment, whose legal values are 'start', 'end',
+         'left', 'right', 'center', or 'justify';
+         - align-last: to specify how to align the last line of a justified
+         paragraph, legal values are 'start', 'end', 'center';
+         - indent: to specify the size of the first line indent, if any;
+         - widows: to specify the minimum number of lines allowed at the top
+         of a page to avoid paragraph widows;
+         - orphans: to specify the minimum number of lines required at the
+         bottom of a page to avoid paragraph orphans;
+         - together: to control whether the lines of a paragraph should be kept
+         together on the same page or column, possible values being 'always'
+         or 'auto';
+         - margin: to control all the margins of the paragraph;
+         - margin-xxx (where xxx is 'left', 'right', 'top' or 'bottom'):
+         to control the margins of the paragraph separately;
+         - border: a 3-part string to specify the thickness, the line style and
+         the line color (according to the XSL/FO grammar);
+         - border-xxx (where xxx is 'left', 'right', 'top' or 'bottom'):
+         the same as 'border' but to specify a particular border for one side;
+         - shadow: a 3-part string to specify the color and the size of the
+         shadow.
+         - background-color: the hexadecimal color code of the background, with
+         a leading '#', or the word 'transparent';
+         - padding: the space around the paragraph;
+         - padding-xxx (where xxx is 'left', 'right', 'top' or 'bottom'): to
+         specify the space around the paragraph side by side;
+         - keep-with-next: to specify whether or not to keep the paragraph and
+         the next paragraph together on a page or in a column, possible values
+         are 'always' or 'auto';
+         - page-break-xxx (where xxx is 'before' or 'after'): to specify if
+         a page or column break must be inserted before or after any paragraph
+         using the style, legal values are 'page', 'column', 'auto'.
 
 - List styles
 
