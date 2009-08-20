@@ -131,14 +131,14 @@ Styles instropection cli
 Create a ods from multiples csv files
 =======================================
 
-- create a ods from multiples csv files::
+- create an ods from multiples csv files::
 
    # Import from the Standard Library
    from glob import glob
 
    # Import from lpod
    from lpod.document import odf_new_document_from_type
-   from lpod.table import create_table_from_csv
+   from lpod.table import import_from_csv
 
    # Get elements
    document = odf_new_document_from_type('spreadsheet')
@@ -147,9 +147,11 @@ Create a ods from multiples csv files
    # Delete the 3 default sheets
    body.clear()
 
-   for id, csv_name in enumerate(glob('./files/*.csv')):
-       tab = create_table_from_csv(u'tab_%s' % id , csv_name)
-       body.append_element(tab)
+   for id, filename in enumerate(glob('./files/*.csv')):
+       table = import_from_csv(filename, u'Table %s' % (id + 1))
+       # Table is represented as a matrix in memory,
+       # so ask to reformat it to XML
+       body.append_element(table.to_odf_element())
 
    # Save
    document.save('spreadsheet.ods', pretty=True)
@@ -161,78 +163,113 @@ Slide Show with ODP
 - Create a presentation with slides::
 
    # Import from lpod
-   from lpod.document import odf_create_drawpage
-   from lpod.document import odf_create_textframe, odf_create_imageframe
+   from lpod.document import odf_new_document_from_type
+   from lpod.paragraph import odf_create_paragraph
+   from lpod.frame import odf_create_text_frame, odf_create_image_frame
+   from lpod.draw_page import odf_create_draw_page
 
    # Creation of the document
    document = odf_new_document_from_type('presentation')
-   body = document.get_body()
+   content = document.get_xmlpart('content')
+   body = content.get_body()
 
-   # DrawPage 1
-   page = odf_create_drawpage('page1')
+Work on pages and add textframes
+---------------------------------
+::
 
-   # Add a frame with a draw_text_box
-   text_element = odf_create_heading(1, text=u'First Slide')
+   # The document already contains a page
+   page = content.get_draw_page_by_position(1)
 
-   draw_textframe1 = odf_create_textframe(text_elment,
-                                          ('5cm', '100mm'), #(width_size, height_size)
-                                          position=('1cm', '2cm'))
+   # Add a frame with a text box
+   text_element = odf_create_paragraph(u'First Slide')
+   draw_textframe1 = odf_create_text_frame(text_element,
+                                           size=('5cm', '100mm'),
+                                           position=('3.5cm', '30.6mm'))
    page.append_element(draw_textframe1)
+
+   # If first arg is text a paragraph is created
+   draw_textframe2 = odf_create_text_frame(u"Noël",
+                                           size=('5cm', '100mm'),
+                                           position=('20cm', '14cm'))
+
+Save::
+
+   page.append_element(draw_textframe2)
+   document.save('presentation.odp', pretty=True)
+
+
+Add images frames
+------------------
+
+Add an image frame from a file name::
+
+   local_uri = document.add_file(u'images/zoé.jpg')
+   draw_imageframe1 = odf_create_image_frame(local_uri,
+                                             size=('6cm', '24.2mm'),
+                                             position=('1cm', '10cm'))
+   page.append_element(draw_imageframe1)
+
+Add an image frame from a file descriptor::
+
+   PPC = 72 * 2.54
+
+   # helper function
+   def get_thumbnail_file(filename):
+       """ From a filename return a filedescriptor and an image size tuple"""
+       from PIL import Image
+       from cStringIO import StringIO
+
+       im = Image.open(filename)
+       im.thumbnail((300, 400), Image.ANTIALIAS)
+       filedescriptor = StringIO()
+       im.save(filedescriptor, 'JPEG', quality=80)
+       filedescriptor.seek(0)
+       return filedescriptor, (im.size[0] / PPC), (im.size[1] / PPC)
+
+   # use
+   filedescriptor, width, height = get_thumbnail_file(u'images/zoé.jpg')
+   local_uri = document.add_file(filedescriptor)
+   draw_imageframe2 = odf_create_image_frame(local_uri,
+                                             size=('%scm' % width,
+                                                   '%scm' % height),
+                                             position=('12cm', '2cm'))
+Save::
+
+   page.append_element(draw_imageframe2)
 
    # Add the page to the body
    body.append_element(page)
 
-   # Save
-   document.save('presentation.odp', pretty=True)
 
-- If first arg is text a paragraph is created::
+Get a new page, page2 copy of page1::
 
-   draw_textframe2 = odf_create_textframe(u"Noël", size=('3cm', '1cm'),
-                                          position=('1cm', '3cm'))
-   page.append_element(draw_textframe2)
-
-
-- Add a slide with image
-
-  - Add an image frame from a file name::
-
-     local_uri = document.addfile('images/zoé.jpg')
-     draw_imageframe1 = odf_create_imageframe(local_uri, ('5cm', '100mm'), link=1,
-                                              position=('1cm', '0cm'))
-     page.append_element(draw_imageframe1)
-
-  - Add an image frame from a file descriptor::
-
-     def get_thumbnail_file(filename):
-         """ helper function """
-
-         from PIL import Image
-         from cStringIO import StringIO
-
-         im = Image.open(filename)
-         im.thumbnail((300, 400), Image.ANTIALIAS)
-         filedescriptor = StringIO()
-         im.save(filedescriptor, 'JPEG', quality=80)
-         im.close()
-         filedescriptor.seek(0)
-         return filedescriptor
-
-     filedescriptor = get_thumbnail_file(u'images/zoé.jpg')
-     document.addfile(filedescriptor)
-
-     draw_imageframe2 = odf_create_imageframe(filedescriptor, ('5cm', '100mm'), link=1,
-                                              position=('1cm', '0cm'))
-
-     page.append_element(draw_imageframe2)
-
-- Clone a slide and change it, we get a new page, page2 copy of page1::
-
-   ### Warning check if page name are unique
    page2 = page.clone()
+   page2.set_page_name(u'Page 2')
+   paragraph = content.get_paragraph_by_content(u'First', context=page2)
+   paragraph.set_text(u'Second Slide')
 
-   el = page2.get_heading_by_content(u'First')
-   el.set_text(u'Second Slide')
+
+Build a new page from scratch::
+
+   page3 = odf_create_draw_page(u"Page 3")
+   frame = content.get_frame_by_content(u"Second").clone()
+   frame.set_size(('10cm', '100mm'))
+   frame.set_position(('100mm', '10cm'))
+
+   # A shortcut to hit embedded paragraph
+   frame.set_text_content(u"Third Slide")
+
+   page3.append_element(frame)
+   body.append_element(page3)
+
+Slide transition
+----------------
+::
+
+   page2.add_transition('fade')
    body.append_element(page2)
 
-- Slide transition
+- Save::
+
+   document.save('presentation.odp', pretty=True)
 

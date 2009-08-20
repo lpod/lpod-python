@@ -3,9 +3,9 @@
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
-from lpod.draw_page import odf_create_draw_page
-from lpod.frame import odf_create_text_frame, odf_create_image_frame
 from lpod.paragraph import odf_create_paragraph
+from lpod.frame import odf_create_text_frame, odf_create_image_frame
+from lpod.draw_page import odf_create_draw_page
 
 PPC = 72 * 2.54
 
@@ -23,12 +23,14 @@ def get_thumbnail_file(filename):
     return filedescriptor, (im.size[0] / PPC), (im.size[1] / PPC)
 
 
-
 # Creation of the document
 document = odf_new_document_from_type('presentation')
 content = document.get_xmlpart('content')
 body = content.get_body()
 
+#
+# Work on pages and add textframes
+#
 # The document already contains a page
 page = content.get_draw_page_by_position(1)
 
@@ -45,6 +47,9 @@ draw_textframe2 = odf_create_text_frame(u"Noël",
                                         position=('20cm', '14cm'))
 page.append_element(draw_textframe2)
 
+#
+# Add images frames
+#
 # Add an image frame from a file name
 local_uri = document.add_file(u'images/zoé.jpg')
 draw_imageframe1 = odf_create_image_frame(local_uri,
@@ -64,14 +69,23 @@ page.append_element(draw_imageframe2)
 # Add the page to the body
 body.append_element(page)
 
+#
 # Get a new page, page2 copy of page1
+#
 page2 = page.clone()
 page2.set_page_name(u'Page 2')
 paragraph = content.get_paragraph_by_content(u'First', context=page2)
 paragraph.set_text(u'Second Slide')
+
+#
+# Add transition for page2
+#
+page2.add_transition('fade')
 body.append_element(page2)
 
+#
 # Build a new page from scratch
+#
 page3 = odf_create_draw_page(u"Page 3")
 frame = content.get_frame_by_content(u"Second").clone()
 frame.set_size(('10cm', '100mm'))
