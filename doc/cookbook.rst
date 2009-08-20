@@ -31,15 +31,15 @@ Basic text
    # Import from lpod
    from lpod.document import odf_create_list, odf_create_list_item
    my_list = odf_create_list([u'chocolat', u'café'])
-   
+
    item = odf_create_list_item(u'Du thé')
    item.append_element(odf_create_list([u'thé vert', u'thé rouge']))
    my_list.append_item(item)
-   
-   # insert item by position 
+
+   # insert item by position
    my_list.insert_item(u'Chicoré', position=1)
-   
-   # insert item by relativ position 
+
+   # insert item by relativ position
    the = my_list.get_item_by_content(u'thé')
    my_list.insert_item(u'Chicoré', before=the)
    my_list.insert_item(u'Chicoré', after=the)
@@ -48,12 +48,16 @@ Basic text
 
 - And footnote::
 
-   # Footnote
+   # Footnote with odf_create_footnote and insert_note
    paragraph = odf_create_paragraph(text=u'A paragraph with a footnote '
                                          u'about references in it.')
-   note = u'Author, A. (2007). "How to cite references", New York: McGraw-Hill.'
 
-   paragraph.add_footnote(u'1', id='note1', place='references', body=note)
+   note = odf_create_footnote(note_id='note1', citation=u"1",
+                              body=u'Author, A. (2007). "How to cite references", '
+                                   u'New York: McGraw-Hill.')
+
+   paragraph.insert_note(note, after=u"graphe")
+
    body.append_element(paragraph)
 
 Pages
