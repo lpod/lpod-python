@@ -2,6 +2,8 @@
 Cookbook
 #########
 
+.. contents::
+
 Basic text
 =============
 
@@ -233,6 +235,7 @@ Add an image frame from a file descriptor::
                                              size=('%scm' % width,
                                                    '%scm' % height),
                                              position=('12cm', '2cm'))
+
 Save::
 
    page.append_element(draw_imageframe2)
