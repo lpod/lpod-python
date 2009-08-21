@@ -423,23 +423,30 @@ Styles
       mnemonic shortcuts for a few, frequently required properties, namely:
       
          - font: font name;
+
          - size: font size (absolute with unit or percentage with '%');
+
          - weight: font weight, which may be 'normal', 'bold', or one of the
          official nine numeric values from '100' to '900' (§15.4.32);
+
          - style: to specify whether to use normal or italic font face; the
          legal values are 'normal', 'italic' and 'oblique';
+
          - color: the color of the characters (i.e. foreground color), provided
          as a RGB hexadecimal string with a leading '#';
+
          - background-color: the color of the text background, provided in the
          same format as the foreground color;
+
          - underline: to specify if and how text is underlined; possible values
          are 'solid' (for a continuous line), 'dotted', 'dash', 'long-dash',
          'dot-dash', 'dot-dot-dash', 'wave', and 'none';
+
          - display: to specify if the text should by displayed or hidden;
          possible values are 'true' (meaning visible) 'none' (meaning hidden)
          or 'condition' (meaning that the text is to be visible or hidden
          according to a condition defined elsewhere).
-   
+
    - Paragraph family
    
       A paragraph style apply to paragraphs at large, i.e. to ODF paragraphs
@@ -496,33 +503,48 @@ Styles
       
          - align: text alignment, whose legal values are 'start', 'end',
          'left', 'right', 'center', or 'justify';
+
          - align-last: to specify how to align the last line of a justified
          paragraph, legal values are 'start', 'end', 'center';
+
          - indent: to specify the size of the first line indent, if any;
+
          - widows: to specify the minimum number of lines allowed at the top
          of a page to avoid paragraph widows;
+
          - orphans: to specify the minimum number of lines required at the
          bottom of a page to avoid paragraph orphans;
+
          - together: to control whether the lines of a paragraph should be kept
          together on the same page or column, possible values being 'always'
          or 'auto';
+
          - margin: to control all the margins of the paragraph;
+
          - margin-xxx (where xxx is 'left', 'right', 'top' or 'bottom'):
          to control the margins of the paragraph separately;
+
          - border: a 3-part string to specify the thickness, the line style and
          the line color (according to the XSL/FO grammar);
+
          - border-xxx (where xxx is 'left', 'right', 'top' or 'bottom'):
          the same as 'border' but to specify a particular border for one side;
+
          - shadow: a 3-part string to specify the color and the size of the
-         shadow.
+         shadow;
+
          - background-color: the hexadecimal color code of the background, with
          a leading '#', or the word 'transparent';
+
          - padding: the space around the paragraph;
+
          - padding-xxx (where xxx is 'left', 'right', 'top' or 'bottom'): to
          specify the space around the paragraph side by side;
+
          - keep-with-next: to specify whether or not to keep the paragraph and
          the next paragraph together on a page or in a column, possible values
          are 'always' or 'auto';
+
          - page-break-xxx (where xxx is 'before' or 'after'): to specify if
          a page or column break must be inserted before or after any paragraph
          using the style, legal values are 'page', 'column', 'auto'.
