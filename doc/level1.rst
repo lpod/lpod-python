@@ -457,7 +457,10 @@ Styles
       The text part of a paragraph style definition may have exactly the same
       properties as a regular text style. The rules are defined by the §15.4
       of the OASIS 1.1 ODF specification, and the API provides the same
-      property shortcuts as for a text style creation.
+      property shortcuts as for a text style creation. Practically, this text
+      part defines the default text style that apply to the text content of the
+      paragraph; any property in this part may be overriden as soon as one or
+      more text spans with explicit styles are defined inside the paragraphs.
       
       The creation of a full-featured paragraph style takes two steps. The
       first one is a regular odf_create_style() instruction, with a mandatory
@@ -468,10 +471,6 @@ Styles
       a previously defined text style, or by explicitly defining new text
       properties, through the text_properties() method, belonging to the style
       class.
-      
-      The text properties of a paragraph style are default text properties;
-      they may be overriden by text styles if one or more styled text spans are
-      defined inside the paragraphs.
       
       Assuming that a "MyBlueText" text style has been defined according to
       the text style creation example above, the following sequence creates
@@ -563,8 +562,9 @@ Styles
    ment is the style name, which should be unique as a list style name in the
    document. An optional display name argument is allowed; if provided, the
    display name should be unique as well. Once created, a list style can be
-   inserted in a document through the generic insert_style() method. 
-   
+   inserted in a document through the generic insert_style() method.
+
+   [TBC]
 
 - Outline style
 
@@ -632,7 +632,23 @@ Styles
    
 - Graphic styles TODO
 
-- Data formatting TODO
+- Numeric data formatting styles
+
+   Numeric styles in general are formatting styles that apply to computable
+   values, generally stored in fields or table cells. The covered data types
+   are number, currency, percentage, boolean, date and time. [TBC]
+
+   - Number style [TBC]
+   
+   - Currency style [TBC]
+   
+   - Percentage style [TBC]
+   
+   - Boolean style [TBC]
+   
+   - Date style [TBC]
+   
+   - Time style [TBC]
 
 - Page styles TODO
 
