@@ -902,3 +902,17 @@ class odf_element(object):
                 connectors.append(connector)
         return connectors
 
+    #
+    # Tracked changes
+    #
+
+    def get_changes_ids(self):
+        """Return a list of ids that refers to a change region in the tracked
+        changes list.
+        """
+        # Insertion changes
+        xpath_query = 'descendant::text:change-start/@text:change-id'
+        # Deletion changes
+        xpath_query += ' | descendant::text:change/@text:change-id'
+        return self.xpath(xpath_query)
+

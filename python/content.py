@@ -55,3 +55,10 @@ class odf_content(odf_xmlpart):
         elif isinstance(name_or_element, odf_style):
             return name_or_element
         raise TypeError, "style name or element expected"
+
+
+    def get_tracked_changes(self):
+        """Return the tracked-changes part in the text body.
+        """
+        return self.get_element('//text:tracked-changes')
+

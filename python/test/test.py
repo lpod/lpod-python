@@ -8,8 +8,8 @@ from unittest import TestLoader, TestSuite, TextTestRunner
 import test_bookmark
 import test_container
 import test_content
-import test_document
 import test_datatype
+import test_document
 import test_draw_page
 import test_element
 import test_frame
@@ -27,6 +27,7 @@ import test_span
 import test_style
 import test_styles
 import test_table
+import test_tracked_changes
 import test_utils
 import test_variable
 import test_xmlpart
@@ -35,8 +36,8 @@ import test_xmlpart
 test_modules = [test_bookmark,
                 test_container,
                 test_content,
-                test_document,
                 test_datatype,
+                test_document,
                 test_draw_page,
                 test_element,
                 test_frame,
@@ -54,6 +55,7 @@ test_modules = [test_bookmark,
                 test_style,
                 test_styles,
                 test_table,
+                test_tracked_changes,
                 test_utils,
                 test_variable,
                 test_xmlpart]
