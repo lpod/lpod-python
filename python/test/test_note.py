@@ -58,7 +58,6 @@ class TestNote(TestCase):
         self.assertEqual(len(notes), 2)
 
 
-
     def test_get_note_list_footnote(self):
         body = self.body
         notes = body.get_note_list(note_class='footnote')
@@ -69,6 +68,48 @@ class TestNote(TestCase):
         body = self.body
         notes = body.get_note_list(note_class='endnote')
         self.assertEqual(len(notes), 1)
+
+
+    def test_get_note_by_id(self):
+        body = self.body
+        note = body.get_note_by_id('ftn1')
+        expected = ('<text:note text:id="ftn1" text:note-class="footnote">\n'
+                    '  <text:note-citation>1</text:note-citation>\n'
+                    '  <text:note-body>\n'
+                    '      <text:p text:style-name="Footnote">'
+                    'C\'est-&#224;-dire l\'&#233;l&#233;ment '
+                    '&#171;&#160;text:p&#160;&#187;.</text:p>'
+                    '</text:note-body>\n'
+                    '</text:note>\n')
+        self.assertEqual(note.serialize(pretty=True), expected)
+
+
+    def test_get_note_by_class_footnote(self):
+        body = self.body
+        footnotes = body.get_note_by_class('footnote')
+        footnote = footnotes[0]
+        expected = ('<text:note text:id="ftn1" text:note-class="footnote">\n'
+                    '  <text:note-citation>1</text:note-citation>\n'
+                    '  <text:note-body>\n'
+                    '      <text:p text:style-name="Footnote">'
+                    'C\'est-&#224;-dire l\'&#233;l&#233;ment '
+                    '&#171;&#160;text:p&#160;&#187;.</text:p>'
+                    '</text:note-body>\n'
+                    '</text:note>\n')
+        self.assertEqual(footnote.serialize(pretty=True), expected)
+
+
+    def test_get_note_by_class_endnote(self):
+        body = self.body
+        endnotes = body.get_note_by_class('endnote')
+        endnote = endnotes[0]
+        expected = ('<text:note text:id="ftn2" text:note-class="endnote">\n'
+                    '  <text:note-citation>i</text:note-citation>\n'
+                    '  <text:note-body>\n'
+                    '      <text:p text:style-name="Endnote">Les apparences '
+                    'sont trompeuses !</text:p></text:note-body>\n'
+                    '</text:note>\n')
+        self.assertEqual(endnote.serialize(pretty=True), expected)
 
 
     def test_insert_note(self):

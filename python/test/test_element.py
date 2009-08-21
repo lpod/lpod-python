@@ -107,6 +107,7 @@ class ElementAttributeTestCase(TestCase):
         self.assertEqual(text, "Text_20_body")
 
 
+    # XXX The same than test_get_attribute?
     def test_get_attribute_none(self):
         element = self.paragraph_element
         dummy = element.get_attribute('and_now_for_sth_completely_different')
