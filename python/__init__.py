@@ -21,3 +21,4 @@ import note
 import paragraph
 import style
 import toc
+import tracked_changes
