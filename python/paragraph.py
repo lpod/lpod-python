@@ -112,9 +112,9 @@ class odf_paragraph(odf_element):
             if body:
                 annotation_element.set_annotation_body(body)
             if creator:
-                annotation_element.set_annotation_creator(creator)
+                annotation_element.set_dc_creator(creator)
             if date:
-                annotation_element.set_annotation_date(date)
+                annotation_element.set_dc_date(date)
         annotation_element.check_validity()
         if type(after) is unicode:
             self._insert_after(annotation_element, after)

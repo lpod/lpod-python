@@ -6,7 +6,6 @@ from datetime import datetime
 from types import FunctionType
 
 # Import from lpod
-from datatype import DateTime
 from element import odf_create_element, odf_element, register_element_class
 
 
@@ -61,10 +60,10 @@ def odf_create_annotation(text_or_element=None, creator=None, date=None):
     element = odf_create_element('<office:annotation/>')
     element.set_annotation_body(text_or_element)
     if creator:
-        element.set_annotation_creator(creator)
+        element.set_dc_creator(creator)
     if date is None:
         date = datetime.now()
-    element.set_annotation_date(date)
+    element.set_dc_date(date)
     return element
 
 
@@ -153,44 +152,13 @@ class odf_annotation(odf_element):
     # Shortcuts expected to be reusable over several elements
     #
 
-    def get_annotation_creator(self):
-        dc_creator = self.get_element('dc:creator')
-        if dc_creator is None:
-            return None
-        return dc_creator.get_text()
-
-
-    def set_annotation_creator(self, creator):
-        dc_creator = self.get_element('dc:creator')
-        if dc_creator is None:
-            dc_creator = odf_create_element('<dc:creator/>')
-            self.append_element(dc_creator)
-        dc_creator.set_text(creator)
-
-
-    def get_annotation_date(self):
-        dc_date = self.get_element('dc:date')
-        if dc_date is None:
-            return None
-        date = dc_date.get_text()
-        return DateTime.decode(date)
-
-
-    def set_annotation_date(self, date):
-        dc_date = self.get_element('dc:date')
-        if dc_date is None:
-            dc_date = odf_create_element('<dc:date/>')
-            self.append_element(dc_date)
-        dc_date.set_text(DateTime.encode(date))
-
-
     def check_validity(self):
         if not self.get_annotation_body():
             raise ValueError, "annotation must have a body"
-        if not self.get_annotation_creator():
+        if not self.get_dc_creator():
             raise ValueError, "annotation must have a creator"
-        if not self.get_annotation_date():
-            self.set_annotation_date(datetime.now())
+        if not self.get_dc_date():
+            self.set_dc_date(datetime.now())
 
 
 

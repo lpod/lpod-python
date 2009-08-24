@@ -2,7 +2,6 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from datatype import DateTime
 from element import register_element_class, odf_element
 
 
@@ -14,17 +13,14 @@ class odf_tracked_changes(odf_element):
         if creator is not None:
             filter = []
             for region in changed_regions:
-                xpath_query = '*/office:change-info/dc:creator'
-                dc_creator = region.get_element(xpath_query)
-                if creator == dc_creator.get_text():
+                if creator == region.get_dc_creator():
                     filter.append(region)
             changed_regions = filter
         # Filer by date
         if date is not None:
             filter = []
             for region in changed_regions:
-                dc_date = region.get_element('*/office:change-info/dc:date')
-                if DateTime.encode(date) == dc_date.get_text():
+                if date == region.get_dc_date():
                     filter.append(region)
             changed_regions = filter
         # Filter by regex

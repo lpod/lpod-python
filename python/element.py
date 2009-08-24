@@ -10,6 +10,7 @@ from lxml.etree import fromstring, tostring, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
+from datatype import DateTime
 from utils import _get_abspath, _get_element_list, _get_element
 from utils import get_value, convert_unicode
 
@@ -412,6 +413,40 @@ class odf_element(object):
     #
 
     #
+    # Dublin core
+    #
+
+    def get_dc_creator(self):
+        dc_creator = self.get_element('descendant::dc:creator')
+        if dc_creator is None:
+            return None
+        return dc_creator.get_text()
+
+
+    def set_dc_creator(self, creator):
+        dc_creator = self.get_element('descendant::dc:creator')
+        if dc_creator is None:
+            dc_creator = odf_create_element('<dc:creator/>')
+            self.append_element(dc_creator)
+        dc_creator.set_text(creator)
+
+
+    def get_dc_date(self):
+        dc_date = self.get_element('descendant::dc:date')
+        if dc_date is None:
+            return None
+        date = dc_date.get_text()
+        return DateTime.decode(date)
+
+
+    def set_dc_date(self, date):
+        dc_date = self.get_element('descendant::dc:date')
+        if dc_date is None:
+            dc_date = odf_create_element('<dc:date/>')
+            self.append_element(dc_date)
+        dc_date.set_text(DateTime.encode(date))
+
+    #
     # Sections
     #
 
@@ -617,9 +652,9 @@ class odf_element(object):
         for annotation in _get_element_list(self, 'office:annotation',
                                             regex=regex):
             if (creator is not None
-                    and creator != annotation.get_annotation_creator()):
+                    and creator != annotation.get_dc_creator()):
                 continue
-            date = annotation.get_annotation_date()
+            date = annotation.get_dc_date()
             if start_date is not None and date < start_date:
                 continue
             if end_date is not None and date >= end_date:
