@@ -517,11 +517,11 @@ class odf_table(object):
         rows = self.__rows
         for y, row in enumerate(rows):
             for cell in row['cells']:
-                if cell.match(regex):
+                if regex and cell.match(regex):
                     coordinates.append(y)
                     break
                 style_name = cell.get_attribute('table:style-name')
-                if style_name and search(style, style_name):
+                if style and style_name and search(style, style_name):
                     coordinates.append(y)
                     break
         return coordinates
@@ -561,11 +561,11 @@ class odf_table(object):
         for x in xrange(row_size):
             for y in xrange(column_size):
                 cell = rows[y]['cells'][x]
-                if cell.match(regex):
+                if regex and cell.match(regex):
                     coordinates.append(x)
                     break
                 style_name = cell.get_attribute('table:style-name')
-                if style_name and search(style, style_name):
+                if style and style_name and search(style, style_name):
                     coordinates.append(x)
                     break
         return coordinates
