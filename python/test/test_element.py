@@ -3,6 +3,7 @@
 
 # Import from the Standard Library
 from unittest import TestCase, main
+from re import compile
 
 # Import from lpod
 from lpod.container import odf_get_container
@@ -320,42 +321,42 @@ class RegexTestCase(TestCase):
 
 
     def test_match_paragraph(self):
-        """ Match text in a paragraph
+        """Match text in a paragraph.
         """
         match = self.paragraph.match(u'ère')
         return self.assertTrue(match)
 
 
     def test_match_span(self):
-        """ Match text in a span from the span
+        """Match text in a span from the span.
         """
         match = self.span.match(u'moust')
         return self.assertTrue(match)
 
 
     def test_match_inner_span(self):
-        """ Match text in a span from the parent paragraph
+        """Match text in a span from the parent paragraph.
         """
         match = self.paragraph.match(u'roug')
         return self.assertTrue(match)
 
 
     def test_simple_regex(self):
-        """ Match a simple regex
+        """Match a simple regex.
         """
         match = self.paragraph.match(u'che roug')
         return self.assertTrue(match)
 
 
     def test_intermediate_regex(self):
-        """ Match an intermediate regex
+        """Match an intermediate regex.
         """
         match = self.paragraph.match(u'moustache (blanche|rouge)')
         return self.assertTrue(match)
 
 
     def test_complex_regex(self):
-        """ Match a complex regex
+        """Match a complex regex.
         """
         # The (?<=...) part is pointless as we don't try to get groups from
         # a MatchObject. However, it's a valid regex expression.
@@ -363,8 +364,16 @@ class RegexTestCase(TestCase):
         return self.assertTrue(match)
 
 
+    def test_compiled_regex(self):
+        """Match with a compiled pattern.
+        """
+        pattern = compile(ur'moustache')
+        match = self.paragraph.match(pattern)
+        return self.assertTrue(match)
+
+
     def test_failing_match(self):
-        """ Test a regex that doesn't match
+        """Test a regex that doesn't match.
         """
         match = self.paragraph.match(u'Le Père moustache')
         return self.assertFalse(match)

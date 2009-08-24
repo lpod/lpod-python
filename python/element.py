@@ -286,8 +286,9 @@ class odf_element(object):
         """ True if the text of the odf_element match one or more times the
         unicode pattern.
         """
-        # Fail properly if the pattern is an non-ascii bytestring
-        pattern = unicode(pattern)
+        if isinstance(pattern, str):
+            # Fail properly if the pattern is an non-ascii bytestring
+            pattern = unicode(pattern)
         text = self.get_text()
         return search(pattern, text) is not None
 
