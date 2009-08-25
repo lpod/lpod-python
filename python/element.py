@@ -122,6 +122,12 @@ def odf_create_element(element_data):
 
 
 
+# TODO remove some day
+def _debug_element(native_element):
+    return repr(odf_element(native_element).serialize(pretty=True))
+
+
+
 class odf_element(object):
     """Representation of an XML element.
     Abstraction of the XML library behind.
@@ -138,68 +144,143 @@ class odf_element(object):
         return '%s "%s"' % (object.__str__(self), self.get_name())
 
 
-    def _insert_after(self, element, text):
+    def _insert_after(self, element, after):
         """Insert the given element after the text snippet. Typically for
         inserting a footnote after a word.
 
         Example: '<p>toto<span>titi</span>tata</p>'
+
         We are in the context of a paragraph, we know it contains "titi", and
-        we want to insert the footnote after it without having to know
-        it is in a span.
+        we want to insert the footnote after it without having to know it is
+        in a span.
         """
         current = self.__element
         element = element.__element
-        for result in current.xpath('descendant::text()'):
-            if text in result:
-                index = result.index(text) + len(text)
-                before = result[:index]
-                after = result[index:]
-                container = result.getparent()
-                if result.is_text:
-                    container.text = before
-                    container.insert(0, element)
-                    element.tail = after
-                else:
-                    container.tail = before
-                    parent = container.getparent()
-                    index = parent.index(container)
-                    parent.insert(index + 1, element)
-                    element.tail = after
-                return
+        for text in current.xpath('descendant::text()'):
+            if not after in text:
+                continue
+            index = text.index(after) + len(after)
+            text_before = text[:index]
+            text_after = text[index:]
+            container = text.getparent()
+            if text.is_text:
+                container.text = text_before
+                element.tail = text_after
+                container.insert(0, element)
+            else:
+                container.tail = text_before
+                element.tail = text_after
+                parent = container.getparent()
+                index = parent.index(container)
+                parent.insert(index + 1, element)
+            return
         raise ValueError, "text not found"
 
 
-    # TODO rewrite specifically for span and a, and make private
-    def wrap_text(self, element, offset=0, length=0):
+    def _insert_between(self, element, from_, to):
+        """Insert the given empty element to wrap the text beginning with
+        "from_" and ending with "to".
+
+        Example 1: '<p>toto tata titi</p>
+
+        We want to insert a link around "tata".
+
+        Result 1: '<p>toto <a>tata</a> titi</p>
+
+        Example 2: '<p><span>toto</span> tata titi</p>
+
+        We want to insert a link around "tata".
+
+        Result 2: '<p><span>toto</span> <a>tata</a> titi</p>
+
+        Example 3: '<p>toto <span> tata </span> titi</p>'
+
+        We want to insert a link from "tata" to "titi" included.
+
+        Result 3: '<p>toto <span> </span>'
+                  '<a><span>tata </span> titi</a></p>'
+
+        Example 4: '<p>toto <span>tata titi</span> tutu</p>'
+
+        We want to insert a link from "titi" to "tutu"
+
+        Result 4: '<p>toto <span>tata </span><a><span>titi</span></a>'
+                  '<a> tutu</a></p>'
+
+        Example 5: '<p>toto <span>tata titi</span> '
+                   '<span>tutu tyty</span></p>'
+
+        We want to insert a link from "titi" to "tutu"
+
+        Result 5: '<p>toto <span>tata </span><a><span>titi</span><a> '
+                  '<a> <span>tutu</span></a><span> tyty</span></p>'
+        """
         current = self.__element
-        element = element.__element
-        total = 0
+        wrapper = element.__element
+        end_element = deepcopy(wrapper)
         for text in current.xpath('descendant::text()'):
-            total += len(text)
-            if offset < total:
-                left = text[:-(total - offset)]
-                right = text[-(total - offset):]
-                center, right = right[:length], right[length:]
-                element.tail = right
-                if center:
-                    element.text = center
-                if text.is_tail:
-                    owner = text.getparent()
-                    # Set text
-                    owner.tail = left
-                    # Insert element
-                    index = current.index(owner)
-                    current.insert(index + 1, element)
-                    return
+            if not from_ in text:
+                continue
+            from_index = text.index(from_)
+            text_before = text[:from_index]
+            text_after = text[from_index:]
+            from_container = text.getparent()
+            # Include from_index to match a single word
+            to_index = text.find(to, from_index)
+            if to_index >= 0:
+                # Simple case: "from" and "to" in the same element
+                to_end = to_index + len(to)
+                if text.is_text:
+                    from_container.text = text_before
+                    wrapper.text = text[to_index:to_end]
+                    wrapper.tail = text[to_end:]
+                    from_container.insert(0, wrapper)
                 else:
-                    # Set text
-                    current.text = left
-                    # Insert element
-                    current.insert(0, element)
-                    return
+                    from_container.tail = text_before
+                    wrapper.text = text[to_index:to_end]
+                    wrapper.tail = text[to_end:]
+                    parent = from_container.getparent()
+                    index = parent.index(from_container)
+                    parent.insert(index + 1, wrapper)
+                return
+            else:
+                # Exit to the second part where we search for the end text
+                break
         else:
-            # offset is too big => insert at the end
-            current.append(element)
+            raise "start text not found"
+        # The container is split in two
+        container2 = deepcopy(from_container)
+        if text.is_text:
+            from_container.text = text_before
+            from_container.tail = None
+            container2.text = text_after
+            from_container.tail = None
+        else:
+            from_container.tail = text_before
+            container2.tail = text_after
+        # Stack the copy into the surrounding element
+        wrapper.append(container2)
+        parent = from_container.getparent()
+        index = parent.index(from_container)
+        parent.insert(index + 1, wrapper)
+        for text in wrapper.xpath('descendant::text()'):
+            if not to in text:
+                continue
+            to_end = text.index(to) + len(to)
+            text_before = text[:to_end]
+            text_after = text[to_end:]
+            container_to = text.getparent()
+            if text.is_text:
+                container_to.text = text_before
+                container_to.tail = text_after
+            else:
+                container_to.tail = text_before
+                next = container_to.getnext()
+                if next is None:
+                    next = container_to.getparent()
+                next.tail = text_after
+            return
+        raise ValueError, "end text not found"
 
 
     def get_name(self):

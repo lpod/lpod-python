@@ -2,9 +2,10 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from note import odf_create_note, odf_create_annotation
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD
+from link import odf_create_link
+from note import odf_create_note, odf_create_annotation
 
 
 def _get_formated_text(element, context, with_text=True):
@@ -122,6 +123,12 @@ class odf_paragraph(odf_element):
             after.insert_element(annotation_element, FIRST_CHILD)
         else:
             self.insert_element(annotation_element, FIRST_CHILD)
+
+
+    def insert_link(self, uri_or_element, from_, to):
+        if isinstance(uri_or_element, (str, unicode)):
+            uri_or_element = odf_create_link(uri_or_element)
+        self._insert_between(uri_or_element, from_, to)
 
 
 

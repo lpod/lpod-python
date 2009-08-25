@@ -204,30 +204,6 @@ class ElementTextTestCase(TestCase):
         element.set_text_content
 
 
-    def test_wrap_text_offset(self):
-        paragraph = self.paragraph_element.clone()
-        text = paragraph.get_text()
-        offset = text.index("first")
-        annotation = odf_create_element('<office:annotation/>')
-        paragraph.wrap_text(annotation, offset)
-        expected = ('<text:p text:style-name="Text_20_body">This is the '
-                      '<office:annotation/>first paragraph.</text:p>')
-        self.assertEqual(paragraph.serialize(), expected)
-
-
-    def test_wrap_text_offset_length(self):
-        paragraph = self.paragraph_element.clone()
-        text = paragraph.get_text()
-        offset = text.index(u"first")
-        length = len(u"first")
-        span = odf_create_element('<text:span text:style-name="T1"/>')
-        paragraph.wrap_text(span, offset, length)
-        expected = ('<text:p text:style-name="Text_20_body">This is the '
-                      '<text:span text:style-name="T1">first</text:span> '
-                      'paragraph.</text:p>')
-        self.assertEqual(paragraph.serialize(), expected)
-
-
 
 class ElementTraverseTestCase(TestCase):
 

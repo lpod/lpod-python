@@ -6,6 +6,7 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
+from lpod.element import odf_create_element
 from lpod.link import odf_create_link
 
 
@@ -148,6 +149,70 @@ class TestLinks(TestCase):
         # Not found
         element = self.body.get_link_list(name='link1', title='title2')
         self.assertEqual(element, [])
+
+
+
+class TestInsertLink(TestCase):
+
+    def test_insert_link_simple(self):
+        paragraph = odf_create_element('<text:p>toto tata titi</text:p>')
+        paragraph.insert_link("http://", from_=u"tata", to=u"tata")
+        expected = ('<text:p>toto '
+                      '<text:a xlink:href="http://">tata</text:a> '
+                      'titi</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_insert_link_medium(self):
+        paragraph = odf_create_element('<text:p><text:span>toto</text:span> '
+                                         'tata titi</text:p>')
+        paragraph.insert_link("http://", from_=u"tata", to=u"tata")
+        expected = ('<text:p><text:span>toto</text:span> '
+                      '<text:a xlink:href="http://">tata</text:a> '
+                      'titi</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_insert_link_complex(self):
+        paragraph = odf_create_element('<text:p>toto '
+                                         '<text:span> tata </text:span> '
+                                         'titi</text:p>')
+        paragraph.insert_link("http://", from_=u"tata", to=u"titi")
+        expected = ('<text:p>toto <text:span> </text:span>'
+                      '<text:a xlink:href="http://">'
+                        '<text:span>tata </text:span> titi'
+                      '</text:a>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_insert_link_horrible(self):
+        paragraph = odf_create_element('<text:p>toto '
+                                         '<text:span>tata titi</text:span>'
+                                         ' tutu </text:p>')
+        paragraph.insert_link("http://", from_=u"titi", to=u"tutu")
+        expected = ('<text:p>toto <text:span>tata </text:span>'
+                      '<text:a xlink:href="http://">'
+                        '<text:span>titi</text:span> tutu'
+                      '</text:a> '
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_insert_link_hideous(self):
+        paragraph = odf_create_element('<text:p>toto '
+                                         '<text:span>tata titi</text:span>'
+                                         ' <text:span>tutu tyty</text:span>'
+                                         '</text:p>')
+        paragraph.insert_link("http://", from_=u"titi", to=u"tutu")
+        expected = ('<text:p>toto <text:span>tata </text:span>'
+                      '<text:a xlink:href="http://">'
+                        '<text:span>titi</text:span> '
+                        '<text:span>tutu</text:span>'
+                      '</text:a>'
+                      '<text:span> tyty</text:span>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
 
 
 
