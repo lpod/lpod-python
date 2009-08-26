@@ -17,7 +17,7 @@ class odf_content(odf_xmlpart):
     # Styles found in context.xml
     #
 
-    def get_automatic_styles(self):
+    def get_automatic_styles_context(self):
         return self.get_element('//office:automatic-styles')
 
 
@@ -46,10 +46,8 @@ class odf_content(odf_xmlpart):
         """
         if display_name is True:
             raise NotImplementedError
-        if family not in (None, 'paragraph', 'text'):
-            raise NotImplementedError
         if type(name_or_element) is unicode:
-            context = self.get_automatic_styles()
+            context = self.get_automatic_styles_context()
             return _get_element(context, 'style:style',
                                 style_name=name_or_element, family=family)
         elif isinstance(name_or_element, odf_style):
