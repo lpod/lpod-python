@@ -2,8 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from lpod.style import odf_style
-from lpod.utils import _make_xpath_query
+from lpod.utils import _get_element_list
 from lpod.xmlpart import odf_xmlpart
 
 
@@ -80,29 +79,51 @@ def rgb2hex(color):
 
 class odf_styles(odf_xmlpart):
 
-    def get_category_context(self, category):
+    def _get_style_container_name(self, category):
         if category is None:
             return None
-        elif category == 'named':
-            return self.get_element('//office:styles')
-        elif category == 'automatic':
-            return self.get_element('//office:automatic-styles')
-        raise ValueError, "unknown category"
+        mapping = {'automatic': 'office:automatic-styles',
+                   'default': 'office:styles',
+                   'master': 'office:master-styles',
+                   'named': 'office:styles'}
+        if category not in mapping:
+            raise ValueError, 'unknown category'
+        return mapping[category]
 
 
-    def get_style_list(self, family=None, category=None):
-        if category is not None:
-            raise NotImplementedError
-        query = _make_xpath_query('style:style', family=family)
-        context = self.get_category_context(category)
-        if context is None:
-            return self.get_element_list(query)
-        else:
-            return context.get_element_list(query)
+    def _get_style_element_name(self, category):
+        if category is None:
+            return None
+        mapping = {'automatic': '*',
+                   'default': 'style:default-style',
+                   'master': '*',
+                   'named': 'style:style'}
+        if category not in mapping:
+            raise ValueError, 'unknown category'
+        return mapping[category]
 
 
-    def get_style(self, name_or_element, family, category=None,
-                  display_name=False):
+    def get_category_context(self, category):
+        container_name = self._get_style_container_name(category)
+        return self.get_element(container_name)
+
+
+    def get_style_list(self, style_name=None, family=None, category=None,
+                       display_name=None):
+        if category is None:
+            category = ['automatic', 'default', 'master', 'named']
+        styles = []
+        for type in category:
+            context = self.get_category_context(type)
+            child_to_search = self._get_style_element_name(type)
+            styles.extend(_get_element_list(context, child_to_search,
+                                            style_name=style_name,
+                                            family=family))
+        return styles
+
+
+    def get_style(self, style_name=None, family=None, category=None,
+                       display_name=None):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 
@@ -114,34 +135,19 @@ class odf_styles(odf_xmlpart):
 
         Arguments:
 
-            name_or_element -- unicode or odf_style
+            style_name -- unicode
 
             family -- 'font-face', 'paragraph', 'text',
 
-            category -- 'named', 'automatic' or None
+            category -- list which values are one of 'automatic', 'default',
+                        'master' and 'named'
 
-            display_name -- bool
+            display_name -- unicode
 
         Return: odf_style or None if not found
         """
-        if display_name is True:
-            raise NotImplementedError
-        if family not in ('paragraph', 'text', 'page-layout'):
-            raise NotImplementedError
-        if type(name_or_element) is unicode:
-            if family == 'page-layout':
-                query = _make_xpath_query('style:page-layout',
-                                          style_name=name_or_element)
-            # TODO there are more
-            else:
-                query = _make_xpath_query('style:style',
-                                          style_name=name_or_element,
-                                          family=family)
-            context = self.get_category_context(category)
-            if context is None:
-                return self.get_element(query)
-            else:
-                return context.get_element(query)
-        elif isinstance(name_or_element, odf_style):
-            return name_or_element
-        raise TypeError, "style name or element expected"
+        styles = self.get_style_list(style_name=style_name, family=family,
+                                     category=category,
+                                     display_name=display_name)
+        return styles[0] if styles else None
+

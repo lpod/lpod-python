@@ -112,19 +112,19 @@ class TestStyle(TestCase):
         style_list = styles.get_style_list()
         # XXX default style, outline style, page layout and master page are
         # not counted
-        self.assertEqual(len(style_list), 9)
+        self.assertEqual(len(style_list), 15)
 
 
     def test_get_style_list_family(self):
         styles = self.styles
         style_list = styles.get_style_list(family='paragraph')
         # XXX default style is not counted
-        self.assertEqual(len(style_list), 9)
+        self.assertEqual(len(style_list), 10)
 
 
     def test_get_style_automatic(self):
         styles = self.styles
-        style = styles.get_style(u'Mpm1', 'page-layout')
+        style = styles.get_style(u'Mpm1', category=['automatic'])
         # XXX page layout is not found
         self.assertNotEqual(style, None)
 
@@ -145,12 +145,12 @@ class TestStyle(TestCase):
         context.insert_element(style, LAST_CHILD)
 
         expected = ('<style:style style:name="style1" '
-                                 'style:family="paragraph">'
-                      '<style:text-properties fo:color="#0000ff" '
-                                             'fo:background-color="#ff0000"/>'
-                    '</style:style>')
-        get1 = clone.get_style(u'style1', 'paragraph')
-        self.assertEqual(get1.serialize(), expected)
+                                  'style:family="paragraph">\n'
+                    '  <style:text-properties fo:color="#0000ff" '
+                                             'fo:background-color="#ff0000"/>\n'
+                    '</style:style>\n')
+        get1 = clone.get_style(style_name=u'style1', family='paragraph')
+        self.assertEqual(get1.serialize(pretty=True), expected)
 
 
 
