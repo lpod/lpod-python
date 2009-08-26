@@ -21,9 +21,23 @@ class odf_content(odf_xmlpart):
         return self.get_element('//office:automatic-styles')
 
 
+    # The following two seem useless but they match styles API
+
+    def _get_category_context(self, category):
+        if category is None:
+            return None
+        if category == 'automatic':
+            return self.get_automatic_styles_context()
+        raise ValueError, "unknown category: " + category
+
+
+    def _get_category_name(self, category):
+        if category is None or category == 'automatic':
+            return 'style:style'
+        raise ValueError, "unknown category: " + category
+
+
     def get_style_list(self, family=None):
-        if family not in (None, 'paragraph', 'text'):
-            raise NotImplementedError
         return _get_element_list(self, 'style:style', family=family)
 
 
