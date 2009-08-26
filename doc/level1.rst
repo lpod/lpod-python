@@ -35,7 +35,10 @@ elements; they can be inserted later at the right place. Other elements, whose
 definition doesn't make sens out of a specific context, are directly created in
 place.
 
-Any element is able to be serialized and exported as an XML, UTF8-encoded string. Symmetrically, an element can be created from an application- provided XML string. As a consequence, lpOD-based applications can remotely transmit or receive any kind of ODF content.
+Any element is able to be serialized and exported as an XML, UTF8-encoded 
+string. Symmetrically, an element can be created from an application- provided
+XML string. As a consequence, lpOD-based applications can remotely transmit or
+receive any kind of ODF content.
 
 The level 1 API is not validating, so the user is responsible of the ODF
 compliance (the API doesn't automatically prevent the applications from
@@ -358,6 +361,15 @@ Styles
    document. This element (or a clone of it) is available to be attached later
    to a document through a generic, document-based insert_style() method.
    
+   While a style is identified by name and family, it owns one or more sets of
+   properties. A style property is a particular layout or formatting behaviour.
+   The API provides a generic properties() method which allows the user to get
+   or set these properties. However, some styles have more than one property
+   set. As an example, a paragraph style owns so-called "paragraph properties"
+   and/or "text properties" (see below). In such a situation, additional methods
+   whose name is xxx_properties(), where xxx depends on the style family and the
+   property set, are provided when needed.
+
    A style can be inserted as either 'common' (or named and visible for the
    user of a typical office application) or 'automatic', according a boolean
    'common' option, whose default value is true. A common style may have a
@@ -400,7 +412,7 @@ Styles
       using Times New Roman, 14-sized navy blue bold italic characters with
       a yellow background::
       
-         s = odf_create_style('MyBlueText',
+         s = odf_create_style('MyColoredText',
                               display-name='My Blue Text',
                               family='text',
                               font='Times New Roman',
@@ -410,6 +422,21 @@ Styles
                               color='#000080',
                               background-color='#ffff00'
                               )
+
+      This new style could be retrieved and changed later using get_style()
+      then the properties() method of the style object. For example, the
+      following code modifies an existing text style definition so the font
+      size is increased to 16pt and the color turns green::
+      
+         s = document.get_style('MyColoredText')
+         s.properties(size='16pt', color='#00ff00')
+      
+      The properties() method may be used in order to delete a property, without
+      replacement; to do so, the target property must be provided with a null
+      value.
+      
+      Note that properties() can't change any identifying attribute such as
+      name, family or display name.
       
       The lpOD level 1 API allows the applications to set any property without
       ODF compliance checking. The compliant property set for text styles is
@@ -551,20 +578,78 @@ Styles
 - List styles
 
    A list style is a set of styles that control the formatting properties of
-   the list items a every hierachical level. As a consequence, a list style
-   is a named container including a particular style definition for each level.
+   the list items at every hierachical level. As a consequence, a list style
+   is a named container including a particular style definition for each level;
+   in other words a list style is a set of list level styles.
    
    The API allows the user to create a list style (if not previously existing
    in the document), and to create, retrieve and update it for any level.
    
    A new list style, available for later insertion in a document, is created
-   through the odf_create_list_style() function. The only one mandatory
-   ment is the style name, which should be unique as a list style name in the
-   document. An optional display name argument is allowed; if provided, the
-   display name should be unique as well. Once created, a list style can be
-   inserted in a document through the generic insert_style() method.
+   through the odf_create_style() function. The only mandatory arguments are
+   the style name (which should be unique as a list style name in the document)
+   and the family, which is "list". An optional display name argument is
+   allowed (if the style list is about to be used as a common style); if
+   provided, the display name should be unique as well. Once created, a list
+   style can be inserted in a document through the generic insert_style()
+   method.
+   
+   An existing list style object provides a list_level_style() method, allowing
+   the applications to set or change the list style properties for a given
+   level. This method requires at least two named aruments, namely the "level"
+   and the "type". The level is a positive (non zero) integer value that
+   identifies the hierarchical position. While the type indicates what kind
+   of item mark is should be selected for the level; the possible types are
+   "number", "bullet" or "image".
+   
+   If the "bullet" type is selected, the affected items will be displayed after
+   a special character (the "bullet"), which must be provided as a "character"
+   named argument, whose value is an UTF-8 character.
+   
+   If the "image" type is selected, the URI of an image resource must be
+   provided; the affected items will be displayed after a graphical mark whose
+   content is an external image.
+   
+   A "number" list level type means that any affected list item will be marked
+   with a leading computed number such as "1", "i", "(a)", or any auto-
+   incremented value, whose formatting will be controlled according to other
+   list level style properties (or to the default behaviour of the viewer for
+   ordered lists). With the "number" type, its possible to provide "prefix"
+   and/or "suffix" options, which provide strings to be displayed before and
+   after the number. Other optional parameters are:
+   
+      - style: the text style to use to format the number;
+      
+      - display-levels: the number of levels whose numbers are displayed at the
+      current level (ex: if display-levels is 3, so the displayed number could
+      be something like "1.1.1");
+      
+      - format: the number format (typically "1" for a simple number display),
+      knowing that if this parameter is null the number is not visible;
+      
+      - start-value: the first number of a list item of the current level.
+   
+   The following example shows the way to create a new list style then
+   to set some properties for levels 1 to 3, each one with a different type::
 
-   [TBC]
+      ls = odf_create_style('ListStyle1', family='list')
+      ls.list_level_style(level=1, type='number', prefix=' ', suffix='. ')
+      ls.list_level_style(level=2, type='bullet', character='-')
+      ls.list_level_style(level=3, type='image', uri='bullet.jpg')
+
+   The list_level_style() method returns an ODF style object, which represents
+   the list level style definition, and which could be processed later through
+   any element- or style-oriented function. So the generic properties() method
+   may be used later in order to set any particular property for any list level
+   style. Possible properties are described in section §14.10 of the ODF
+   specification.
+   
+   Every list level style definition in a list style is optional; so it's not
+   necessary to define styles for levels that will not be used in the target
+   document. The list_level_style() method may be used with an already defined
+   level; in such a situation, the old level style is replaced by the new one.
+   So it's easy to clone an existing list style then modify it for one or more
+   levels.
 
 - Outline style
 
@@ -604,11 +689,16 @@ Styles
    attributes are supported, namely:
    
       - 'prefix': a string that should be displayed before the heading number;
+      
       - 'suffix': a string that should be displayed before the heading number;
+      
       - 'format': the number display format (ex: '1', 'A');
+      
       - 'display levels': the number of levels whose numbers are displayed at
       the current level;
+      
       - 'start value': the first number of a heading at this level;
+      
       - 'style': the name of the style to use to format the number (that is a
       regular text style).
    
