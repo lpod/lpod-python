@@ -6,7 +6,6 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.element import LAST_CHILD
 from lpod.style import odf_create_style
 from lpod.styles import hex2rgb, rgb2hex
 
@@ -110,22 +109,18 @@ class TestStyle(TestCase):
     def test_get_style_list(self):
         styles = self.styles
         style_list = styles.get_style_list()
-        # XXX default style, outline style, page layout and master page are
-        # not counted
         self.assertEqual(len(style_list), 15)
 
 
     def test_get_style_list_family(self):
         styles = self.styles
         style_list = styles.get_style_list(family='paragraph')
-        # XXX default style is not counted
-        self.assertEqual(len(style_list), 10)
+        self.assertEqual(len(style_list), 14)
 
 
     def test_get_style_automatic(self):
         styles = self.styles
-        style = styles.get_style(u'Mpm1', category=['automatic'])
-        # XXX page layout is not found
+        style = styles.get_style(u'Mpm1', 'page-layout')
         self.assertNotEqual(style, None)
 
 
@@ -136,20 +131,19 @@ class TestStyle(TestCase):
 
 
     def test_insert_style(self):
-        styles = self.styles
-        clone = styles.clone()
+        styles = self.styles.clone()
         style = odf_create_style(u'style1', 'paragraph', area='text',
                                  **{'fo:color': '#0000ff',
                                     'fo:background-color': '#ff0000'})
-        context = clone.get_category_context('named')
-        context.insert_element(style, LAST_CHILD)
+        context = styles.get_element('//office:styles')
+        context.append_element(style)
 
         expected = ('<style:style style:name="style1" '
                                   'style:family="paragraph">\n'
                     '  <style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>\n'
                     '</style:style>\n')
-        get1 = clone.get_style(style_name=u'style1', family='paragraph')
+        get1 = styles.get_style(u'style1', 'paragraph')
         self.assertEqual(get1.serialize(pretty=True), expected)
 
 

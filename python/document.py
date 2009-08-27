@@ -176,46 +176,44 @@ class odf_document(object):
     # Styles over several parts
     #
 
-    def get_style_list(self, family=None, category=None):
+    def get_style_list(self, family=None, automatic=False):
         styles = self.get_xmlpart('styles')
-        if category is None or category == 'automatic':
+        if automatic:
             content = self.get_xmlpart('content')
-            return (styles.get_style_list(family=family, category=category)
+            return (styles.get_style_list(family=family, automatic=True)
                     + content.get_style_list(family=family))
-        return styles.get_style_list(family=family, category=category)
+        return styles.get_style_list(family=family)
 
 
-    def get_style(self, name, family, category=None, display_name=False):
-        """Get the automatic or named style identified by its name+family.
-        Search for style of the named or automatic category, or both by
-        default.
+    def get_style(self, name_or_element, family, display_name=False):
+        """Return the style uniquely identified by the name/family pair. If
+        the argument is already a style object, it will return it.
+
+        If the name is None, the default style is fetched.
 
         If the name is not the internal name but the name you gave in a
         desktop application, set display_name to True.
 
         Arguments:
 
-            name -- unicode
+            name -- unicode or odf_element or None
 
-            family -- 'font-face', 'paragraph', 'text'
+            family -- 'paragraph', 'text',  'graphic', 'table', 'list',
+                      'number', 'page-layout', 'master-page'
 
             display_name -- bool
 
         Returns: odf_style or None if not found.
         """
-        if category == 'named':
-            # Named styles only in styles.xml
-            styles = self.get_xmlpart('styles')
-            return styles.get_style(name, family, category=category,
-                                    display_name=display_name)
         # 1. content.xml
         content = self.get_xmlpart('content')
-        element = content.get_style(name, family, display_name=display_name)
+        element = content.get_style(name_or_element, family,
+                                    display_name=display_name)
         if element is not None:
             return element
         # 2. styles.xml
         styles = self.get_xmlpart('styles')
-        return styles.get_style(name, family, category=category,
+        return styles.get_style(name_or_element, family,
                                 display_name=display_name)
 
 

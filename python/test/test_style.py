@@ -48,7 +48,7 @@ class TestStyle(TestCase):
         style = odf_create_style('style1', 'paragraph', area='text',
                 **{'fo:color': '#0000ff',
                    'fo:background-color': '#ff0000'})
-        auto_styles = content.get_automatic_styles()
+        auto_styles = content.get_element('//office:automatic-styles')
         auto_styles.append_element(style)
         expected = ('<style:style style:name="style1" '
                                  'style:family="paragraph">'

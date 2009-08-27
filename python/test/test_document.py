@@ -125,13 +125,13 @@ class TestStyle(TestCase):
     def test_get_style_list(self):
         document = self.document
         styles = document.get_style_list()
-        self.assertEqual(len(styles), 12)
+        self.assertEqual(len(styles), 15)
 
 
     def test_get_style_list_family(self):
         document = self.document
         styles = document.get_style_list(family='paragraph')
-        self.assertEqual(len(styles), 10)
+        self.assertEqual(len(styles), 14)
 
 
     def test_get_style_automatic(self):

@@ -3,7 +3,7 @@
 
 # Import from lpod
 from style import odf_style
-from utils import _get_element_list, _get_element
+from utils import _make_xpath_query
 from xmlpart import odf_xmlpart
 
 
@@ -13,33 +13,36 @@ class odf_content(odf_xmlpart):
         return self.get_element('//office:body/*[1]')
 
 
-    #
-    # Styles found in context.xml
-    #
+    # The following two seem useless but they match styles API
 
-    def get_automatic_styles_context(self):
+    def _get_style_context(self, name, family):
+        if name is False:
+            # Treat the case for get_style_list where the name is undefined
+            return self.get_element('//office:automatic-styles')
+        if family not in ('paragraph', 'text'):
+            raise ValueError, "unknown automatic family: " + family
         return self.get_element('//office:automatic-styles')
 
 
-    # The following two seem useless but they match styles API
-
-    def _get_category_context(self, category):
-        if category is None:
-            return None
-        if category == 'automatic':
-            return self.get_automatic_styles_context()
-        raise ValueError, "unknown category: " + category
-
-
-    def _get_category_name(self, category):
-        if category is None or category == 'automatic':
-            return 'style:style'
-        raise ValueError, "unknown category: " + category
+    def _get_style_tagname(self, name, family):
+        if name is False:
+            # Treat the case for get_style_list where the name is undefined
+            if family is None:
+                # All of them
+                all = ['style:style']
+                return ('|'.join(all), None)
+        mapping = {'paragraph': ('style:style', family),
+                   'text': ('style:style', family)}
+        if family not in mapping:
+            raise ValueError, "unknown family: " + family
+        return mapping[family]
 
 
     def get_style_list(self, family=None):
-        return _get_element_list(self, 'descendant::style:style',
-                                 family=family)
+        tagname, famattr = self._get_style_tagname(False, family)
+        query = _make_xpath_query(tagname, family=famattr)
+        context = self._get_style_context(False, family)
+        return context.get_element_list(query)
 
 
     def get_style(self, name_or_element, family, display_name=False):
@@ -53,7 +56,8 @@ class odf_content(odf_xmlpart):
 
             name_or_element -- unicode or odf_style
 
-            family -- 'font-face', 'paragraph', 'text', etc. TODO
+            family -- 'paragraph', 'text', 'graphic', 'table', 'list',
+                      'number'
 
             display_name -- bool
 
@@ -61,10 +65,14 @@ class odf_content(odf_xmlpart):
         """
         if display_name is True:
             raise NotImplementedError
-        if type(name_or_element) is unicode:
-            context = self.get_automatic_styles_context()
-            return _get_element(context, 'style:style',
-                                style_name=name_or_element, family=family)
+        if type(name_or_element) is unicode or name_or_element is None:
+            tagname, famattr = self._get_style_tagname(name_or_element,
+                                                       family)
+            # famattr became None if no "style:family" attribute
+            query = _make_xpath_query(tagname, style_name=name_or_element,
+                                      family=famattr)
+            context = self._get_style_context(name_or_element, family)
+            return context.get_element(query)
         elif isinstance(name_or_element, odf_style):
             return name_or_element
         raise TypeError, "style name or element expected"
@@ -74,4 +82,3 @@ class odf_content(odf_xmlpart):
         """Return the tracked-changes part in the text body.
         """
         return self.get_element('//text:tracked-changes')
-
