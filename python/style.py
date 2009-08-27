@@ -6,9 +6,6 @@ from element import register_element_class, odf_create_element, odf_element
 from paragraph import odf_create_paragraph
 
 
-# XXX these are specific styles but the name is generic.
-
-
 def odf_create_style(name, family, area=None, **kw):
     """Create a style element with the given name, related to the given
     family.
@@ -19,8 +16,9 @@ def odf_create_style(name, family, area=None, **kw):
 
         family -- 'paragraph', 'text', 'section', 'table', 'tablecolumn',
                   'table-row', 'table-cell', 'table-page', 'chart',
-                  'default', 'drawing-page', 'graphic', 'presentation',
-                  'control' or 'ruby'
+                  'drawing-page', 'graphic', 'presentation',
+                  'control', 'ruby', 'list', 'number', 'page-layout' or
+                  'master-page'
 
         area -- the "<area>-properties" where to store properties,
                 identical to the family by default
