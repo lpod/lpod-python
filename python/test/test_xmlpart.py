@@ -52,6 +52,9 @@ class XmlPartTestCase(TestCase):
         content_part = odf_xmlpart('content', container)
         # differences with lxml
         serialized = content_part.serialize().replace("'", "&apos;")
+        # XXX OOo is adding two carriage returns behind the XML declaration
+        serialized = serialized.replace('<?xml version="1.0" encoding="UTF-8"?>\n',
+                                        '<?xml version="1.0" encoding="UTF-8"?>\n\n')
         self.assertEqual(content_bytes, serialized)
 
 

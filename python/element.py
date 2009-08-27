@@ -780,7 +780,7 @@ class odf_element(object):
 
 
     def get_variable_list(self):
-        return _get_element_list(self, 'text:variable-decl')
+        return _get_element_list(self, 'descendant::text:variable-decl')
 
 
     def get_variable_decl(self, name):

@@ -90,8 +90,8 @@ class TestVariables(TestCase):
 
 
     def test_get_variable_get(self):
-        clone = self.document.clone()
-        body = clone.get_body()
+        document = self.document.clone()
+        body = document.get_body()
         value = body.get_variable_value(u"Variabilité")
         self.assertEqual(value, 123)
 
