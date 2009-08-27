@@ -2,7 +2,7 @@
 Level 1 coverage
 #################
 
-.. contents:: 
+.. contents::
 
 Common features
 ===============
@@ -27,17 +27,18 @@ Every ODF element comes with methods that directly return its parent, next
 sibling, previous sibling, and the list of its children. These methods (which
 are provided by the underlying XML API) are available whatever the element type.
 
-Any element provides a delete and a copy method. The deletion removes the
-element itself and all its children. The copy creates a new instance of the
+Any element provides a ``clone`` method, which creates a new instance of the
 element with all its children; this instance is free and can be inserted later
-in any place in the same document or in another document.
+in any place in the same document or in another document. An element may be
+removed through a ``delete`` method from its parent element; the deletion
+removes the element itself and all its children.
 
 Some elements are created without any predefined attachment, i.e. as a free
 elements; they can be inserted later at the right place. Other elements, whose
 definition doesn't make sens out of a specific context, are directly created in
 place.
 
-Any element is able to be serialized and exported as an XML, UTF8-encoded 
+Any element is able to be serialized and exported as an XML, UTF8-encoded
 string. Symmetrically, an element can be created from an application- provided
 XML string. As a consequence, lpOD-based applications can remotely transmit or
 receive any kind of ODF content.
@@ -113,13 +114,13 @@ heading-specific methods are provided.
 
 Heading level
 ~~~~~~~~~~~~~
-A heading owns a special property which indicates its hierarchical level in the document. A "level" property can be set at creation time or later and changed at any time. A heading without a level attribute is assumed to be at level 1, which is the top level. The level may be any positive integer value (while the ODF spec doesn't set an explicit limit, we don't
-recommend levels beyond 10).
+A heading owns a special property which indicates its hierarchical level in the document. A "level" property can be set at creation time or later and changed at any time. A heading without a level attribute is assumed to be at level 1, which is the top level. The level may be any positive integer value (while the ODF spec doesn't set an explicit limit, we don't recommend levels beyond 10).
 
 Heading numbering
 ~~~~~~~~~~~~~~~~~~
 Whatever the visibility of the numbers, all the headings of a given level are
-potentially numbered. By default, the numbering is related to the whole document starting to 1. However, optional properties allow the user to change this behaviour.
+potentially numbered. By default, the numbering is related to the whole document
+starting to 1. However, optional properties allow the user to change this behaviour.
 
 An arbitrary, explicit numbering value can be set, so the automatic numbering
 restarts from this value from the target heading element and apply to the
@@ -188,7 +189,8 @@ of the bookmark. In the following example, the first line returns the parent of
 a given bookmark (whatever the kind of element), while the second one returns
 the paragraph (or heading) where the bookmark is located::
 
-  context.get_bookmark("BM1").parent context.get_paragraph_by_bookmark("BM1")
+  context.get_bookmark("BM1").parent
+  context.get_paragraph_by_bookmark("BM1")
 
 Another method allows the user to get the offset of a given bookmark in the host ODF element. Beware: this offset is related to the text of the parent element (which could be a text span).
 
@@ -260,7 +262,7 @@ additional arguments providing the identifier and the citation mark (if not
 previously set), and the citation mark, i.e. the symbol which will be displayed
 in the document body as a reference to the note. Remember that the note citation
 is not an identifier; it's a designed to be displayed according to a
-context-related logic, while the identifier is unique for the whole document. 
+context-related logic, while the identifier is unique for the whole document.
 
 Regarding the identifier, the user can provide either an explicit value, or an
 function that is supposed to return an automatically generated unique value. If
@@ -294,8 +296,6 @@ Structured containers
 
   .. figure:: figures/lpod_list.*
      :align: center
-
-
 
 - Data pilot (pivot) tables [todo]
 - Sections
@@ -333,35 +333,40 @@ XML tag of the style element itself.
 In order to hide the complexity of the ODF data structure, the level 1 API
 allows the user to handle any style as a high level odf_style object.
 
-Any style is created through a common odf_create_style() function with the
-name and the family as its mandatory arguments. Additional arguments can
-be required according to the family. An optional 'parent' argument, whose
-value is the name of another common style of the same family (existing or
-to be created), can be provided, knowing that a style inherits (but can
-override) all the properties of its parent at the display time.
+Any style is created through a common ``odf_create_style()`` function with the
+name as its mandatory first arguments and the family as a mandatory named
+parameter.
 
-The odf_create_style() function creates a free element, not included in a
+Additional arguments can be required according to the family. An optional
+``parent`` argument, whose value is the name of another common style of
+the same family (existing or to be created), can be provided, knowing that a
+style inherits (but can override) all the properties of its parent at the
+display time.
+
+The style name may be a null value or an empty string
+
+The ``odf_create_style()`` function creates a free element, not included in a
 document. This element (or a clone of it) is available to be attached later
-to a document through a generic, document-based insert_style() method.
+to a document through a generic, document-based ``insert_style()`` method.
 
 While a style is identified by name and family, it owns one or more sets of
 properties. A style property is a particular layout or formatting behaviour.
-The API provides a generic set_properties() method which allows the user to
-set these properties, while get_properties() returns the existing properties
-as an array.
+The API provides a generic ``set_properties()`` method which allows the user to
+set these properties, while ``get_properties()`` returns the existing properties
+as an associative array.
 
 However, some styles have more than one property set.
 
 As an example, a paragraph style owns so-called "paragraph properties"
 and/or "text properties" (see below). In such a situation, an additional
-"area" parameter, whose value identifies the particular property set, with
-set_properties(). Of course, the same "area" parameter applies to
+``area`` parameter, whose value identifies the particular property set, with
+set_properties(). Of course, the same ``area`` parameter applies to
 get_properties().
 
-A style can be inserted as either 'common' (or named and visible for the
-user of a typical office application) or 'automatic', according a boolean
-'common' option, whose default value is true. A common style may have a
-secondary unique name which is its 'display name', which can be set through
+A style can be inserted as either *common* (or named and visible for the
+user of a typical office application) or *automatic*, according to a boolean
+``common`` option, whose default value is ``true``. A common style may have a
+secondary unique name which is its *display name*, which can be set through
 an additional option. With the exception of this optional property, and a
 few other ones, there is no difference between automatic and common styles.
 
@@ -383,90 +388,83 @@ Text styles
  allows the user to handle two families of text styles, so called 'text'
  and 'paragraph'. For any style in the text or paragraph families, the 'text'
  class is recommended.
- 
+
 Text family
-~~~~~~~~~~~~
- 
-    A text style (i.e. a style whose family is 'text', whatever its optional
-    class) is a style which directly apply to characters (whatever the layout
-    of the containing paragraph). So, it can bear any property directly
-    related to the font and its representation. The most used properties are
-    the font name, the font size, the font style (ex: normal, oblique, etc),
-    the text color, the text background color (which may differ from the
-    common background color of the paragraph).
-    
-    A text style can apply to one or more text spans; see the "Text spans"
-    section.
-    
-    The example hereafter creates a text style, so called "My Blue Text",
-    using Times New Roman, 14-sized navy blue bold italic characters with
-    a yellow background::
-    
-       s = odf_create_style('MyColoredText',
-                            display-name='My Blue Text',
-                            family='text',
-                            font='Times New Roman',
-                            size='14pt',
-                            weight='bold',
-                            style='italic',
-                            color='#000080',
-                            background-color='#ffff00'
-                            )
+~~~~~~~~~~~
 
-    This new style could be retrieved and changed later using get_style()
-    then the set_properties() method of the style object. For example, the
-    following code modifies an existing text style definition so the font
-    size is increased to 16pt and the color turns green::
-    
-       s = document.get_style('MyColoredText')
-       s.set_properties(size='16pt', color='#00ff00')
-    
-    The set_properties() method may be used in order to delete a property,
-    without replacement; to do so, the target property must be provided with
-    a null value.
-    
-    Note that set_properties() can't change any identifying attribute such as
-    name, family or display name.
-    
-    The lpOD level 1 API allows the applications to set any property without
-    ODF compliance checking. The compliant property set for text styles is
-    described in the section 15.4 of the OASIS 1.1 ODF specification. Beware,
-    some of them are not supported by any ODF text processor or viewer.
-    
-    The API allows the user to set any attribute using its official name
-    according to the ODF specification (§15.4). For example, the properties
-    which control the character name and size are respectively
-    "fo:font-name" and "fo:font-size". However, the API allows the use of
-    mnemonic shortcuts for a few, frequently required properties, namely:
-    
-       - font: font name;
+A text style (i.e. a style whose family is ``text``, whatever its optional
+class) is a style which directly apply to characters (whatever the layout
+of the containing paragraph). So, it can bear any property directly
+related to the font and its representation. The most used properties are
+the font name, the font size, the font style (ex: normal, oblique, etc),
+the text color, the text background color (which may differ from the
+common background color of the paragraph).
 
-       - size: font size (absolute with unit or percentage with '%');
+A text style can apply to one or more text spans; see the "Text spans"
+section.
 
-       - weight: font weight, which may be 'normal', 'bold', or one of the
-       official nine numeric values from '100' to '900' (§15.4.32);
+The example hereafter creates a text style, so called "My Blue Text",
+using Times New Roman, 14-sized navy blue bold italic characters with
+a yellow background::
 
-       - style: to specify whether to use normal or italic font face; the
-       legal values are 'normal', 'italic' and 'oblique';
+   s = odf_create_style('MyColoredText',
+                        display-name='My Blue Text',
+                        family='text',
+                        font='Times New Roman',
+                        size='14pt',
+                        weight='bold',
+                        style='italic',
+                        color='#000080',
+                        background-color='#ffff00'
+                        )
 
-         - color: the color of the characters (i.e. foreground color), provided
-         as a RGB hexadecimal string with a leading '#';
+This new style could be retrieved and changed later using get_style()
+then the set_properties() method of the style object. For example, the
+following code modifies an existing text style definition so the font
+size is increased to 16pt and the color turns green::
 
-         - background-color: the color of the text background, provided in the
-         same format as the foreground color;
+   s = document.get_style('MyColoredText')
+   s.set_properties(size='16pt', color='#00ff00')
 
-         - underline: to specify if and how text is underlined; possible values
-         are 'solid' (for a continuous line), 'dotted', 'dash', 'long-dash',
-         'dot-dash', 'dot-dot-dash', 'wave', and 'none';
+The ``set_properties()`` method may be used in order to delete a property,
+without replacement; to do so, the target property must be provided with
+a null value.
 
-         - display: to specify if the text should by displayed or hidden;
-         possible values are 'true' (meaning visible) 'none' (meaning hidden)
-         or 'condition' (meaning that the text is to be visible or hidden
-         according to a condition defined elsewhere).
+Note that ``set_properties()`` can't change any identifying attribute such
+as name, family or display name.
+
+The lpOD level 1 API allows the applications to set any property without
+ODF compliance checking. The compliant property set for text styles is
+described in the section 15.4 of the OASIS 1.1 ODF specification. Beware,
+some of them are not supported by any ODF text processor or viewer.
+
+The API allows the user to set any attribute using its official name
+according to the ODF specification (§15.4). For example, the properties
+which control the character name and size are respectively
+"fo:font-name" and "fo:font-size". However, the API allows the use of
+mnemonic shortcuts for a few, frequently required properties, namely:
+
+- font: font name;
+- size: font size (absolute with unit or percentage with '%');
+- weight: font weight, which may be 'normal', 'bold', or one of the
+  official nine numeric values from '100' to '900' (§15.4.32);
+- style: to specify whether to use normal or italic font face; the
+  legal values are 'normal', 'italic' and 'oblique';
+- color: the color of the characters (i.e. foreground color), provided
+  as a RGB hexadecimal string with a leading '#';
+- background-color: the color of the text background, provided in the
+  same format as the foreground color;
+- underline: to specify if and how text is underlined; possible values
+  are ``solid`` (for a continuous line), ``dotted``, ``dash``,
+  ``long-dash``, ``dot-dash``, ``dot-dot-dash``, ``wave``, and ``none``;
+- display: to specify if the text should by displayed or hidden;
+  possible values are ``true`` (meaning visible) ``none`` (meaning hidden)
+  or ``condition`` (meaning that the text is to be visible or hidden
+  according to a condition defined elsewhere).
 
 Paragraph family
 ~~~~~~~~~~~~~~~~~~~~~~~
-   
+
 A paragraph style apply to paragraphs at large, i.e. to ODF paragraphs and
 headings, which are the common text containers. It controls the layout of both
 the text content and the container, so its definition is made of two distinct
@@ -507,7 +505,7 @@ shadow::
                            )
    ts = document.get_style('MyBlueText', family='text')
    ps.set_properties(area='text', ts)
-   
+
 Note that "MyBlueText" is reused by copy, not by reference; so the new paragraph
 style will not be affected if "MyBlueText" is changed or deleted later.
 
@@ -516,37 +514,22 @@ to the ODF specification related to the paragraph formatting properties (§15.5)
 However, the API allows the use of mnemonic shortcuts for a few, frequently
 required properties, namely:
 
-- align: text alignment, whose legal values are ``start``, ``end``, ``left``, ``right``, ``center``, or ``justify``;
-
-- align-last: to specify how to align the last line of a justified paragraph, legal values are ``start``, ``end``, ``center``;
-
-- indent: to specify the size of the first line indent, if any;
-
-- widows: to specify the minimum number of lines allowed at the top of a page to avoid paragraph widows;
-
-- orphans: to specify the minimum number of lines required at the bottom of a page to avoid paragraph orphans;
-
-- together: to control whether the lines of a paragraph should be kept together on the same page or column, possible values being ``always`` or ``auto``;
-
-- margin: to control all the margins of the paragraph;
-
-- margin-xxx (where xxx is ``left``, ``right``, ``top`` or ``bottom``): to control the margins of the paragraph separately;
-
-- border: a 3-part string to specify the thickness, the line style and the line color (according to the XSL/FO grammar);
-
-- border-xxx (where xxx is ``left``, ``right``, ``top`` or ``bottom``): the same as ``border`` but to specify a particular border for one side;
-
-- shadow: a 3-part string to specify the color and the size of the shadow;
-
-- background-color: the hexadecimal color code of the background, with a leading ``#``, or the word ``transparent``;
-
-- padding: the space around the paragraph;
-
-- padding-xxx (where xxx is ``left``, ``right``, ``top`` or ``bottom``): to specify the space around the paragraph side by side;
-
-- keep-with-next: to specify whether or not to keep the paragraph and the next paragraph together on a page or in a column, possible values are ``always`` or ``auto``;
-
-- page-break-xxx (where xxx is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
+- ``align``: text alignment, whose legal values are ``start``, ``end``, ``left``, ``right``, ``center``, or ``justify``;
+- ``align-last``: to specify how to align the last line of a justified paragraph, legal values are ``start``, ``end``, ``center``;
+- ``indent``: to specify the size of the first line indent, if any;
+- ``widows``: to specify the minimum number of lines allowed at the top of a page to avoid paragraph widows;
+- ``orphans``: to specify the minimum number of lines required at the bottom of a page to avoid paragraph orphans;
+- ``together``: to control whether the lines of a paragraph should be kept together on the same page or column, possible values being ``always`` or ``auto``;
+- ``margin``: to control all the margins of the paragraph;
+- ``margin-xxx`` (where xxx is ``left``, ``right``, ``top`` or ``bottom``): to control the margins of the paragraph separately;
+- ``border``: a 3-part string to specify the thickness, the line style and the line color (according to the XSL/FO grammar);
+- ``border-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): the same as ``border`` but to specify a particular border for one side;
+- ``shadow``: a 3-part string to specify the color and the size of the shadow;
+- ``background-color``: the hexadecimal color code of the background, with a leading ``#``, or the word ``transparent``;
+- ``padding``: the space around the paragraph;
+- ``padding-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): to specify the space around the paragraph side by side;
+- ``keep-with-next``: to specify whether or not to keep the paragraph and the next paragraph together on a page or in a column, possible values are ``always`` or ``auto``;
+- ``page-break-xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
 
 List styles
 ------------
@@ -573,7 +556,7 @@ given level. This method requires the level number as its first argument,
 then a "type" named parameter. The level is a positive (non zero) integer
 value that identifies the hierarchical position. The type indicates what kind
 of item mark is should be selected for the level; the possible types are
-"number", "bullet" or "image".
+``number``, ``bullet`` or ``image``.
 
 If the "bullet" type is selected, the affected items will be displayed after
 a special character (the "bullet"), which must be provided as a "character"
@@ -591,16 +574,13 @@ ordered lists). With the "number" type, its possible to provide "prefix"
 and/or "suffix" options, which provide strings to be displayed before and
 after the number. Other optional parameters are:
 
-- style: the text style to use to format the number;
-
-- display-levels: the number of levels whose numbers are displayed at the
-current level (ex: if display-levels is 3, so the displayed number could
-be something like "1.1.1");
-
-- format: the number format (typically "1" for a simple number display),
-knowing that if this parameter is null the number is not visible;
-
-- start-value: the first number of a list item of the current level.
+- ``style``: the text style to use to format the number;
+- ``display-levels``: the number of levels whose numbers are displayed at the
+  current level (ex: if display-levels is 3, so the displayed number could
+  be something like "1.1.1");
+- ``format``: the number format (typically "1" for a simple number display),
+  knowing that if this parameter is null the number is not visible;
+- ``start-value``: the first number of a list item of the current level.
 
 The following example shows the way to create a new list style then
 to set some properties for levels 1 to 3, each one with a different type::
@@ -612,7 +592,7 @@ to set some properties for levels 1 to 3, each one with a different type::
 
 The set_level_style() method returns an ODF element, representing the list level
 style definition, and which could be processed later through any element- or
-style-oriented function. 
+style-oriented function.
 
 An individual list level style may be reloaded through the get_level_style(),
 with the level number as its only one argument; it returns a regular ODF element
@@ -625,8 +605,9 @@ including the get_level_style() method) must be provided as a special "clone"
 parameter to set_level_style(). The following example reuses the level 3 style
 of "ListStyle1" to define or change the level 5 style of "ListStyle2"::
 
-   ls1 = document.get_style('ListStyle1', family='list') source =
-   ls1.get_level_style(3) ls2 = document.get_style('ListStyle2', family='list')
+   ls1 = document.get_style('ListStyle1', family='list')
+   source = ls1.get_level_style(3)
+   ls2 = document.get_style('ListStyle2', family='list')
    ls2.set_level_style(5, clone=source)
 
 The object returned by set_level_style() or get_level_style() is similar to an
@@ -693,7 +674,7 @@ argument and one or more attribute/value pairs, as in the following example::
 
    os = document.get_outline_style()
    os.set_level_style(1, start=5, prefix='(', suffix=')', format='A')
-   
+
 According to the example above, the default numbering scheme for level 1
 headings will be (A), (B), (C), and so on.
 
@@ -709,27 +690,28 @@ Graphic styles [todo]
 
 Numeric data formatting styles
 --------------------------------
+
 Numeric styles in general are formatting styles that apply to computable values,
 generally stored in fields or table cells. The covered data types are number,
 currency, percentage, boolean, date and time. [tbc]
 
-Number style [tbc]
+Number style [todo]
 -------------------
-Currency style [tbc]
+Currency style [todo]
 -------------------
-Percentage style [tbc]
+Percentage style [todo]
 -------------------
-Boolean style [tbc]
+Boolean style [todo]
 -------------------
-Date style [tbc]
+Date style [todo]
 -------------------
-Time style [tbc]
+Time style [todo]
 -------------------
 Page styles [todo]
 -------------------
 
-.. figure:: figures/lpod_page_style.*
-   :align: center
+   .. figure:: figures/lpod_page_style.*
+      :align: center
 
 Metadata
 ========
