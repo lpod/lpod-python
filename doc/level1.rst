@@ -370,11 +370,10 @@ Styles
    However, some styles have more than one property set.
    
    As an example, a paragraph style owns so-called "paragraph properties"
-   and/or "text properties" (see below). In such a situation, additional methods
-   whose name is set_xxx_properties(), where xxx depends on the style family and
-   the property set, are provided when needed. For each get_xxx_properties(),
-   there is a symmetrical get_xxx_properties() method to read the existing
-   properties.
+   and/or "text properties" (see below). In such a situation, an additional
+   "area" parameter, whose value identifies the particular property set, with
+   set_properties(). Of course, the same "area" parameter applies to
+   get_properties().
 
    A style can be inserted as either 'common' (or named and visible for the
    user of a typical office application) or 'automatic', according a boolean
@@ -502,8 +501,8 @@ Styles
       (optional) step consists of appending a 'text' part to the new paragraph
       style; it can be accomplished, at the user's choice, either by copying
       a previously defined text style, or by explicitly defining new text
-      properties, through the set_text_properties() method, belonging to the
-      style class.
+      properties, through the set_properties() method (provided the style class)
+      with the "area" option set to "text".
       
       Assuming that a "MyBlueText" text style has been defined according to
       the text style creation example above, the following sequence creates
@@ -522,7 +521,7 @@ Styles
                                  shadow='#808080 1mm 1mm'
                                  )
          ts = document.get_style('MyBlueText', family='text')
-         ps.set_text_properties(ts)
+         ps.set_properties(area='text', ts)
          
       Note that "MyBlueText" is reused by copy, not by reference; so the new
       paragraph style will not be affected if "MyBlueText" is changed or
