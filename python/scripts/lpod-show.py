@@ -118,7 +118,7 @@ if  __name__ == '__main__':
         text = document.get_formated_text()
 
         if opts.stdout:
-            print text
+            stdout.write(text.encode('utf-8'))
         else:
             target = get_target_directory(opts.dirname, container_url)
             text_file = target.open('text.txt', 'w')
