@@ -54,8 +54,7 @@ context or its text content (if defined). For example::
 
 The two lines above retrieve an element among the children of a given 'context'
 element. The first one selects the child element at the given ``p`` position.
-The given position is an integer; the first position is zero; negative positions
-are counted back from the last (-1 is the last position).
+The given position is an integer; the first position is zero; negative positions are counted back from the last (-1 is the last position).
 The second instruction retrieves the first element whose text content matches a
 given ``regex`` regular expression. Knowing that the regexp could be matched by
 more than one element, the same method is available in a list context.
@@ -120,9 +119,7 @@ recommend levels beyond 10).
 Heading numbering
 ~~~~~~~~~~~~~~~~~~
 Whatever the visibility of the numbers, all the headings of a given level are
-potentially numbered. By default, the numbering is related to the whole document
-starting to 1. However, optional properties allow the user to change this
-behaviour.
+potentially numbered. By default, the numbering is related to the whole document starting to 1. However, optional properties allow the user to change this behaviour.
 
 An arbitrary, explicit numbering value can be set, so the automatic numbering
 restarts from this value from the target heading element and apply to the
@@ -138,8 +135,7 @@ by applications that support dynamic numbering in text documents.
 
 Text spans
 ----------
-A text span, in the lpOD scope, is a delimited area included in a paragraph or a
-heading. There are several kinds of text spans.
+A text span, in the lpOD scope, is a delimited area included in a paragraph or a heading. There are several kinds of text spans.
 
 - Styling spans A text span can be defined in order to apply a special style to
   a part of the content of a paragraph/heading. As a consequence, it's
@@ -170,20 +166,15 @@ A position bookmark is a location mark somewhere in a text container, which is
 identified by a unique name, but without any content.
 
 A bookmark is created "in place", in a given element at a given position.  The
-name and the target element are mandatory arguments. By default, the bookmark is
-put before the first character of the content.
+name and the target element are mandatory arguments. By default, the bookmark is put before the first character of the content.
 
-The position can be explicitly provided by the user. Alternatively, the user can
-provide a regular expression, so the bookmark is set before the first substring
-that matches the expression::
+The position can be explicitly provided by the user. Alternatively, the user can provide a regular expression, so the bookmark is set before the first substring that matches the expression::
 
   document.create_bookmark("BM1", paragraph, text="xyz")
   document.create_bookmark("BM2", paragraph, position=4)
 
 The first instruction above sets a bookmark before the first substring matching
-the given expression (here ``xyz``), which is processed as a regular expression.
-The second instruction sets a bookmark in the same paragraph at a given
-(zero-based), so before the 5th character.
+the given expression (here ``xyz``), which is processed as a regular expression. The second instruction sets a bookmark in the same paragraph at a given (zero-based), so before the 5th character.
 
 In order to put a bookmark according to a regex that could be matched more than
 once in the same paragraph, it's possible to combine the position and text
@@ -199,9 +190,7 @@ the paragraph (or heading) where the bookmark is located::
 
   context.get_bookmark("BM1").parent context.get_paragraph_by_bookmark("BM1")
 
-Another method allows the user to get the offset of a given bookmark in the host
-ODF element. Beware: this offset is related to the text of the parent element
-(which could be a text span).
+Another method allows the user to get the offset of a given bookmark in the host ODF element. Beware: this offset is related to the text of the parent element (which could be a text span).
 
 Range bookmarks
 ----------------
@@ -230,8 +219,10 @@ end point is later removed.
 
 Tables of content [todo]
 =======================
+
 Indices [todo]
 =======================
+
 Notes
 =======================
 Generally speaking, a note is an object whose main function is to allow the user
