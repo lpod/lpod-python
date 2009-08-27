@@ -16,6 +16,45 @@ from xmlpart import odf_xmlpart
 from vfs import vfs
 
 
+underline_lvl = ['=', '-', ':', '`', "'", '"', '~', '^', '_', '*', '+']
+
+
+def _show_style(element, level=0):
+    output = []
+    attributes = element.get_attributes()
+    children = element.get_children()
+    # Don't show the empty elements
+    if not attributes and not children:
+        return None
+    tag_name = element.get_name()
+    output.append(tag_name)
+    # Underline and Overline the name
+    underline = underline_lvl[level] * len(tag_name)
+    underline = underline if level < len(underline_lvl) else '\n'
+    output.append(underline)
+    # Add a separation between name and attributes
+    output[-1] += '\n'
+    attrs = []
+    # Attributes
+    for key, value in attributes.iteritems():
+        attrs.append(u'%s: %s' % (key, value))
+    if attrs:
+        attrs.sort()
+        # Add a separation between attributes and children
+        attrs[-1] += '\n'
+        output.extend(attrs)
+    # Children
+    # Sort children according to their names
+    children = [(child.get_name(), child) for child in children]
+    children.sort()
+    children = [child for name, child in children]
+    for child in children:
+        child_output = _show_style(child, level + 1)
+        if child_output:
+            output.append(child_output)
+    return '\n'.join(output)
+
+
 class odf_document(object):
     """Abstraction of the ODF document.
     """
@@ -213,6 +252,23 @@ class odf_document(object):
         styles = self.get_xmlpart('styles')
         return styles.get_style(family, name_or_element,
                                 display_name=display_name)
+
+
+    def show_styles(self, family=None):
+        if family is None:
+            family = ['paragraph', 'text',  'graphic', 'table', 'list',
+                      'number', 'page-layout', 'master-page']
+        output = []
+        family.sort()
+        for family_type in family:
+            # Overline and underline the family
+            underline = '#' * len(family_type)
+            output.append(underline)
+            output.append(family_type)
+            output.append(underline + '\n')
+            for style in self.get_style_list(family=family_type):
+                output.append(_show_style(style))
+        return u'\n'.join(output)
 
 
 

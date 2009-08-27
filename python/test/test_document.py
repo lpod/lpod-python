@@ -171,6 +171,54 @@ class TestStyle(TestCase):
         self.assertNotEqual(style, None)
 
 
+    def test_show_styles(self):
+        document = self.document
+        graphic = document.show_styles(['graphic'])
+        expected = ('#######\n'
+                    'graphic\n'
+                    '#######\n'
+                    '\n'
+                    'style:default-style\n'
+                    '===================\n'
+                    '\n'
+                    'style:family: graphic\n'
+                    '\n'
+                    'style:graphic-properties\n'
+                    '------------------------\n'
+                    '\n'
+                    'draw:end-line-spacing-horizontal: 0.283cm\n'
+                    'draw:end-line-spacing-vertical: 0.283cm\n'
+                    'draw:shadow-offset-x: 0.3cm\n'
+                    'draw:shadow-offset-y: 0.3cm\n'
+                    'draw:start-line-spacing-horizontal: 0.283cm\n'
+                    'draw:start-line-spacing-vertical: 0.283cm\n'
+                    'style:flow-with-text: false\n'
+                    '\n'
+                    'style:paragraph-properties\n'
+                    '--------------------------\n'
+                    '\n'
+                    'style:font-independent-line-spacing: false\n'
+                    'style:line-break: strict\n'
+                    'style:text-autospace: ideograph-alpha\n'
+                    'style:writing-mode: lr-tb\n'
+                    '\n'
+                    'style:text-properties\n'
+                    '---------------------\n'
+                    '\n'
+                    'fo:country: FR\n'
+                    'fo:font-size: 12pt\n'
+                    'fo:language: fr\n'
+                    'style:country-asian: none\n'
+                    'style:country-complex: none\n'
+                    'style:font-size-asian: 12pt\n'
+                    'style:font-size-complex: 12pt\n'
+                    'style:language-asian: zxx\n'
+                    'style:language-complex: zxx\n'
+                    'style:letter-kerning: true\n'
+                    'style:use-window-font-color: true\n')
+        self.assertEqual(graphic, expected)
+
+
 
 if __name__ == '__main__':
     main()
