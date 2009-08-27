@@ -135,16 +135,15 @@ class odf_styles(odf_xmlpart):
         return context.get_element_list(query)
 
 
-    def get_style(self, name_or_element, family=None, category=None,
+    def get_style(self, name_or_element, family, automatic=False,
                   display_name=False):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 
-        The category is for searching different types of styles, or all by
-        default.
+        If the name is None, the default style is fetched.
 
-        Default, named and automatic styles have a family that pair with the
-        name to form an unique identifier.
+        For fetching an automatic style instead of a named style, set
+        automatic to True.
 
         If the name is not the internal name but the name you gave in the
         desktop application, set display_name to True.
@@ -153,10 +152,10 @@ class odf_styles(odf_xmlpart):
 
             name_or_element -- unicode or odf_style
 
-            family -- 'paragraph', 'text'...
+            family -- 'paragraph', 'text',  'graphic', 'page-layout',
+                      'page-master', 'list', 'number'
 
-            category -- 'default', 'named', 'automatic', 'page-layout',
-                        'master'
+            automatic -- bool
 
             display_name -- bool
 

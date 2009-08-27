@@ -188,14 +188,6 @@ class odf_master_page(odf_style):
         self.set_attribute('style:page-layout-name', name)
 
 
-    def get_header(self):
-        """Get the element that contains the header contents.
-
-        If None, no header was set.
-        """
-        return self.get_element('style:header')
-
-
     def __set_header_or_footer(self, text_or_element, name='header',
                                style=u"Header"):
         if name == 'header':
@@ -221,6 +213,14 @@ class odf_master_page(odf_style):
                 header_or_footer.append_element(paragraph)
             elif isinstance(item, odf_element):
                 header_or_footer.append_element(item)
+
+
+    def get_header(self):
+        """Get the element that contains the header contents.
+
+        If None, no header was set.
+        """
+        return self.get_element('style:header')
 
 
     def set_header(self, text_or_element):
