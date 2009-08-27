@@ -104,7 +104,7 @@ In addition, it's possible to select the paragraphs that use a given style.
    and/or line breaks ("\n").
 
 Headings
------------
+---------
 All the features that apply to paragraphs, as described above, apply to headings
 as well.
 
@@ -220,7 +220,7 @@ several elements gets corrupt if the element containing its start point or its
 end point is later removed.
 
 Tables of content [todo]
-=======================
+========================
 
 Indices [todo]
 =======================
@@ -248,21 +248,22 @@ a note class is either 'footnote' or 'endnote'.
 These notes are created as free elements, so they can be inserted later in place
 (and replicated for reuse in several locations one or more documents). As a
 consequence, creation and insertion are done through two distinct functions,
-i.e. odf_create_note() and insert_note(), the second one being a context-related
-method.
+i.e. ``odf_create_note()`` and ``insert_note()``, the second one being a
+context-related method.
 
 While the identifier and the class are mandatory as soon as a note is inserted
 in a document, these parameter are not required at the creation time. They can
 be provided (or changed) through the insert_note() method.
 
-The insert_note() method allows the user to insert the note in the same way as a
-position bookmark (see above). As a consequence, its first arguments are the
-same as those of the create bookmark method.  However, insert_note() requires
-additional arguments providing the identifier and the citation mark (if not
-previously set), and the citation mark, i.e. the symbol which will be displayed
-in the document body as a reference to the note. Remember that the note citation
-is not an identifier; it's a designed to be displayed according to a
-context-related logic, while the identifier is unique for the whole document.
+The ``insert_note()`` method allows the user to insert the note in the same way
+as a position bookmark (see above). As a consequence, its first arguments are
+the same as those of the create bookmark method.  However, ``insert_note()``
+requires additional arguments providing the identifier and the citation mark
+(if not previously set), and the citation mark, i.e. the symbol which will be
+displayed in the document body as a reference to the note. Remember that the
+note citation is not an identifier; it's a designed to be displayed according
+to a context-related logic, while the identifier is unique for the whole
+document.
 
 Regarding the identifier, the user can provide either an explicit value, or an
 function that is supposed to return an automatically generated unique value. If
@@ -286,7 +287,7 @@ Annotation creation
 Annotations don't have identifiers and are directly linked to a given offset in a given text container.
 
 Change tracking [todo]
---------------------
+----------------------
 
 Structured containers
 =====================
@@ -294,14 +295,14 @@ Structured containers
 - Tables
 - Lists
 
-  .. figure:: figures/lpod_list.*
+  .. figure:: figures/lpod_list.png
      :align: center
 
 - Data pilot (pivot) tables [todo]
 - Sections
 - Draw pages
 
-  .. figure:: figures/lpod_drawpage.*
+  .. figure:: figures/lpod_drawpage.png
      :align: center
 
 
@@ -326,28 +327,65 @@ Styles
 A style controls the formatting and/or layout properties of a family of
 content objects. It's identified by its own name and its family.
 In the lpOD API, the family has a larger acception than in the OpenDocument
-specification. In the ODF specification, the family is indicated sometimes
+specification. In the underlying XML, the family is indicated sometimes
 by the value of an explicit 'style:family' attribute, and sometimes by the
 XML tag of the style element itself.
 
 In order to hide the complexity of the ODF data structure, the level 1 API
-allows the user to handle any style as a high level odf_style object.
+allows the user to handle any style as a high level *odf_style* object.
+
+Common features
+---------------
 
 Any style is created through a common ``odf_create_style()`` function with the
 name as its mandatory first arguments and the family as a mandatory named
-parameter.
+parameter. So, the minimal style creation instruction looks like::
+
+   s = odf_create_style('NewStyle', family='text')
+
+The example above creates a text style without any property.
 
 Additional arguments can be required according to the family. An optional
 ``parent`` argument, whose value is the name of another common style of
 the same family (existing or to be created), can be provided, knowing that a
-style inherits (but can override) all the properties of its parent at the
-display time.
+style inherits (but can override) all the properties of its parent.
 
-The style name may be a null value or an empty string
+The style name may be a null value or an empty string. An effective unique name
+is required as soon as the style is attached to a document, unless it's inserted
+as a *default style*. As long as a style is used as a default style, its name and
+display name are meaningless and ignored.
 
 The ``odf_create_style()`` function creates a free element, not included in a
 document. This element (or a clone of it) is available to be attached later
 to a document through a generic, document-based ``insert_style()`` method.
+
+The ``insert_style()`` method requires a style object as its only one mandatory
+argument. An optional boolean parameter whose name is ``default`` is allowed;
+if provided and set to ``true``, this parameter means that the style is inserted
+as a *default style*. A default style is a style that automatically apply to
+content elements whose style is not explicitly specified. A document can contain
+at most one default style for a style family, so any attachment of a default
+style replaces any existing default style of the same family.
+
+An existing style may be retrieved in a document using the ``get_style()``
+document-based method; this method requires a name and a named ``family``
+parameter. An optional ``default`` boolean named parameter is allowed; if it's
+provided and set to ``true``, the name is ignored (it may be a empty string or
+a null), and the returned object is the default style of the document for the
+given family.
+
+The following example extracts a paragraph style, so-called "MyParagraph", from
+a document and attaches a clone of this style as a default style of another
+document; the old default paragraph style of the target document (if any) is
+automatically replaced::
+
+   ps = doc1.get_style('MyParagraph', family='paragraph').clone
+   doc2.insert_style(ps, default=true)
+
+Caution: All styles can't be used as default styles. Default styles are allowed
+for the following families: ``paragraph``, ``text``, ``section``, ``table``,
+``table-column``, ``table-row``, ``table-cell``, ``table-page``, ``chart``,
+``drawing-page``, ``graphic``, ``presentation``, ``control`` and ``ruby``.
 
 While a style is identified by name and family, it owns one or more sets of
 properties. A style property is a particular layout or formatting behaviour.
@@ -360,8 +398,8 @@ However, some styles have more than one property set.
 As an example, a paragraph style owns so-called "paragraph properties"
 and/or "text properties" (see below). In such a situation, an additional
 ``area`` parameter, whose value identifies the particular property set, with
-set_properties(). Of course, the same ``area`` parameter applies to
-get_properties().
+``set_properties()``. Of course, the same ``area`` parameter applies to
+``get_properties()``.
 
 A style can be inserted as either *common* (or named and visible for the
 user of a typical office application) or *automatic*, according to a boolean
@@ -383,11 +421,11 @@ level 0 element deletion method.
 Text styles
 ------------
 
- A text style can be defined either to control the layout of a text container,
- i.e. a paragraph, or to control a text range inside a paragraph. So the API
- allows the user to handle two families of text styles, so called 'text'
- and 'paragraph'. For any style in the text or paragraph families, the 'text'
- class is recommended.
+A text style can be defined either to control the layout of a text container,
+i.e. a paragraph, or to control a text range inside a paragraph. So the API
+allows the user to handle two families of text styles, so called *text*
+and *paragraph*. For any style in the text or paragraph families, the *text*
+class is recommended.
 
 Text family
 ~~~~~~~~~~~
@@ -418,8 +456,8 @@ a yellow background::
                         background-color='#ffff00'
                         )
 
-This new style could be retrieved and changed later using get_style()
-then the set_properties() method of the style object. For example, the
+This new style could be retrieved and changed later using ``get_style()``
+then the ``set_properties()`` method of the style object. For example, the
 following code modifies an existing text style definition so the font
 size is increased to 16pt and the color turns green::
 
@@ -479,13 +517,13 @@ may be overriden as soon as one or more text spans with explicit styles are
 defined inside the paragraphs.
 
 The creation of a full-featured paragraph style takes two steps. The first one
-is a regular odf_create_style() instruction, with a mandatory unique name and
-'paragraph' as the value of the 'family' mandatory named parameter, and any
+is a regular ``odf_create_style()`` instruction, with a mandatory unique name
+and 'paragraph' as the value of the 'family' mandatory named parameter, and any
 number of named paragraph properties. The second (optional) step consists of
 appending a 'text' part to the new paragraph style; it can be accomplished, at
 the user's choice, either by copying a previously defined text style, or by
-explicitly defining new text properties, through the set_properties() method
-(provided the style class) with the "area" option set to "text".
+explicitly defining new text properties, through the ``set_properties()`` method
+(provided the style class) with the ``area`` option set to ``text``.
 
 Assuming that a "MyBlueText" text style has been defined according to the text
 style creation example above, the following sequence creates a new paragraph
@@ -494,7 +532,7 @@ features are the text justification, a first line 5mm indent, a black,
 continuous, half-millimiter border line with a bottom-right, one millimeter grey
 shadow::
 
-   ps = odf_create_style('YellowBorderedShadowed',
+   ps = odf_create_style('BorderedShadowed',
                            display-name='Strange Boxed Paragraph',
                            family='paragraph',
                            parent='Standard',
@@ -542,12 +580,12 @@ The API allows the user to create a list style (if not previously existing
 in the document), and to create, retrieve and update it for any level.
 
 A new list style, available for later insertion in a document, is created
-through the odf_create_style() function. The only mandatory arguments are
+through the ``odf_create_style()`` function. The only mandatory arguments are
 the style name (which should be unique as a list style name in the document)
-and the family, which is "list". An optional display name argument is
+and the family, which is ``list``. An optional display name argument is
 allowed (if the style list is about to be used as a common style); if
 provided, the display name should be unique as well. Once created, a list
-style can be inserted in a document through the generic insert_style()
+style can be inserted in a document through the generic ``insert_style()``
 method.
 
 An existing list style object provides a set_level_style() method,
@@ -698,11 +736,11 @@ currency, percentage, boolean, date and time. [tbc]
 Number style [todo]
 -------------------
 Currency style [todo]
--------------------
+---------------------
 Percentage style [todo]
--------------------
+-----------------------
 Boolean style [todo]
--------------------
+--------------------
 Date style [todo]
 -------------------
 Time style [todo]
@@ -710,7 +748,7 @@ Time style [todo]
 Page styles [todo]
 -------------------
 
-   .. figure:: figures/lpod_page_style.*
+   .. figure:: figures/lpod_page_style.png
       :align: center
 
 Metadata
