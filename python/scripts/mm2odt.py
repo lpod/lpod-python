@@ -95,6 +95,8 @@ if  __name__ == '__main__':
     # Save the document
     document.save(odt_file_url, pretty=True)
     # Feed back to the user
-    message = "`%s' created from `%s' by lpOD\n"
-    stdout.write(message % (odt_file_url, mm_file_url))
+    message = u"`%s' created from `%s' by lpOD\n"
+    message = message % (odt_file_url, mm_file_url)
+    stdout.write(message.encode('utf-8'))
+    stdout.flush()
 
