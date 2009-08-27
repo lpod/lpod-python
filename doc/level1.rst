@@ -334,26 +334,31 @@ XML tag of the style element itself.
 In order to hide the complexity of the ODF data structure, the level 1 API
 allows the user to handle any style as a high level *odf_style* object.
 
-Common features
----------------
+Common style features
+----------------------
 
 Any style is created through a common ``odf_create_style()`` function with the
-name as its mandatory first arguments and the family as a mandatory named
-parameter. So, the minimal style creation instruction looks like::
+the family as its mandatory first argument. A name, that is the identifier of
+the style in the given family, is generally required. So, a typical style
+creation instruction looks like::
 
-   s = odf_create_style('NewStyle', family='text')
+   s = odf_create_style('text', 'MyTextStyleName')
 
-The example above creates a text style without any property.
+The example above creates a named text style without any property. The
+properties are optionally passed as named parameters.
 
 Additional arguments can be required according to the family. An optional
 ``parent`` argument, whose value is the name of another common style of
 the same family (existing or to be created), can be provided, knowing that a
-style inherits (but can override) all the properties of its parent.
+style inherits (but can override) all the properties of its parent. A
+``display-name`` additional parameter may be provided; if set, this parameter
+designates a visible name that may differ from the internal name.
 
-The style name may be a null value or an empty string. An effective unique name
-is required as soon as the style is attached to a document, unless it's inserted
-as a *default style*. As long as a style is used as a default style, its name and
-display name are meaningless and ignored.
+An effective  style name, unique for the family, is required as soon as the
+style is attached to a document, unless it's inserted as a *default style*.
+When a style is used as a default style, its name and display name are
+meaningless and ignored. The family and the name constitute the absolute
+identifier of a style in a document.
 
 The ``odf_create_style()`` function creates a free element, not included in a
 document. This element (or a clone of it) is available to be attached later
@@ -367,25 +372,23 @@ content elements whose style is not explicitly specified. A document can contain
 at most one default style for a style family, so any attachment of a default
 style replaces any existing default style of the same family.
 
+All styles can't be used as default styles. Default styles are allowed
+for the following families: ``paragraph``, ``text``, ``section``, ``table``,
+``table-column``, ``table-row``, ``table-cell``, ``table-page``, ``chart``,
+``drawing-page``, ``graphic``, ``presentation``, ``control`` and ``ruby``.
+
 An existing style may be retrieved in a document using the ``get_style()``
-document-based method; this method requires a name and a named ``family``
-parameter. An optional ``default`` boolean named parameter is allowed; if it's
-provided and set to ``true``, the name is ignored (it may be a empty string or
-a null), and the returned object is the default style of the document for the
-given family.
+document-based method. This method requires a family as its first argument and
+allows a style name as a second, optional argument. If the name is missing,
+this method tries to retrieve the default style for the given family, if any.
 
 The following example extracts a paragraph style, so-called "MyParagraph", from
 a document and attaches a clone of this style as a default style of another
 document; the old default paragraph style of the target document (if any) is
 automatically replaced::
 
-   ps = doc1.get_style('MyParagraph', family='paragraph').clone
+   ps = doc1.get_style('paragraph', 'MyParagraphStyle').clone()
    doc2.insert_style(ps, default=true)
-
-Caution: All styles can't be used as default styles. Default styles are allowed
-for the following families: ``paragraph``, ``text``, ``section``, ``table``,
-``table-column``, ``table-row``, ``table-cell``, ``table-page``, ``chart``,
-``drawing-page``, ``graphic``, ``presentation``, ``control`` and ``ruby``.
 
 While a style is identified by name and family, it owns one or more sets of
 properties. A style property is a particular layout or formatting behaviour.
@@ -403,8 +406,8 @@ and/or "text properties" (see below). In such a situation, an additional
 
 A style can be inserted as either *common* (or named and visible for the
 user of a typical office application) or *automatic*, according to a boolean
-``common`` option, whose default value is ``true``. A common style may have a
-secondary unique name which is its *display name*, which can be set through
+``automatic`` option, whose default value is ``false``. A common style may have
+a secondary unique name which is its *display name*, which can be set through
 an additional option. With the exception of this optional property, and a
 few other ones, there is no difference between automatic and common styles.
 
@@ -439,15 +442,16 @@ the text color, the text background color (which may differ from the
 common background color of the paragraph).
 
 A text style can apply to one or more text spans; see the "Text spans"
-section.
+section. It can be used as the default text style of a document. In addition,
+an existing text style may be reused to set the text properties of a paragraph
+style (see below).
 
-The example hereafter creates a text style, so called "My Blue Text",
+The example hereafter creates a text style, so called "My Colored Text",
 using Times New Roman, 14-sized navy blue bold italic characters with
 a yellow background::
 
-   s = odf_create_style('MyColoredText',
-                        display-name='My Blue Text',
-                        family='text',
+   s = odf_create_style('text', 'MyColoredText',
+                        display-name='My Colored Text',
                         font='Times New Roman',
                         size='14pt',
                         weight='bold',
@@ -461,7 +465,7 @@ then the ``set_properties()`` method of the style object. For example, the
 following code modifies an existing text style definition so the font
 size is increased to 16pt and the color turns green::
 
-   s = document.get_style('MyColoredText')
+   s = document.get_style('text', 'MyColoredText')
    s.set_properties(size='16pt', color='#00ff00')
 
 The ``set_properties()`` method may be used in order to delete a property,
@@ -473,7 +477,7 @@ as name, family or display name.
 
 The lpOD level 1 API allows the applications to set any property without
 ODF compliance checking. The compliant property set for text styles is
-described in the section 15.4 of the OASIS 1.1 ODF specification. Beware,
+described in the section §15.4 of the OASIS ODF specification. Beware,
 some of them are not supported by any ODF text processor or viewer.
 
 The API allows the user to set any attribute using its official name
@@ -482,31 +486,31 @@ which control the character name and size are respectively
 "fo:font-name" and "fo:font-size". However, the API allows the use of
 mnemonic shortcuts for a few, frequently required properties, namely:
 
-- font: font name;
-- size: font size (absolute with unit or percentage with '%');
-- weight: font weight, which may be 'normal', 'bold', or one of the
+- ``font``: font name;
+- ``size``: font size (absolute with unit or percentage with '%');
+- ``weight``: font weight, which may be 'normal', 'bold', or one of the
   official nine numeric values from '100' to '900' (§15.4.32);
-- style: to specify whether to use normal or italic font face; the
-  legal values are 'normal', 'italic' and 'oblique';
-- color: the color of the characters (i.e. foreground color), provided
-  as a RGB hexadecimal string with a leading '#';
-- background-color: the color of the text background, provided in the
+- ``style``: to specify whether to use normal or italic font face; the
+  legal values are ``normal``, ``italic`` and ``oblique``;
+- ``color``: the color of the characters (i.e. foreground color), provided
+  as a RGB, 6-digit hexadecimal string with a leading '#';
+- ``background-color``: the color of the text background, provided in the
   same format as the foreground color;
-- underline: to specify if and how text is underlined; possible values
+- ``underline``: to specify if and how text is underlined; possible values
   are ``solid`` (for a continuous line), ``dotted``, ``dash``,
   ``long-dash``, ``dot-dash``, ``dot-dot-dash``, ``wave``, and ``none``;
-- display: to specify if the text should by displayed or hidden;
+- ``display``: to specify if the text should by displayed or hidden;
   possible values are ``true`` (meaning visible) ``none`` (meaning hidden)
   or ``condition`` (meaning that the text is to be visible or hidden
   according to a condition defined elsewhere).
 
 Paragraph family
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 A paragraph style apply to paragraphs at large, i.e. to ODF paragraphs and
 headings, which are the common text containers. It controls the layout of both
 the text content and the container, so its definition is made of two distinct
-parts, the "text" part and the "paragraph" part.
+parts, the *text* part and the *paragraph* part.
 
 The text part of a paragraph style definition may have exactly the same
 properties as a regular text style. The rules are defined by the §15.4 of the
@@ -517,35 +521,35 @@ may be overriden as soon as one or more text spans with explicit styles are
 defined inside the paragraphs.
 
 The creation of a full-featured paragraph style takes two steps. The first one
-is a regular ``odf_create_style()`` instruction, with a mandatory unique name
-and 'paragraph' as the value of the 'family' mandatory named parameter, and any
-number of named paragraph properties. The second (optional) step consists of
-appending a 'text' part to the new paragraph style; it can be accomplished, at
-the user's choice, either by copying a previously defined text style, or by
-explicitly defining new text properties, through the ``set_properties()`` method
-(provided the style class) with the ``area`` option set to ``text``.
+is a regular ``odf_create_style()`` instruction, with ``paragraph`` as the value
+of the family mandatory argument, a name parameter (unless the user just wants
+to create a default style) and any number of named paragraph properties. The
+second (optional) step consists of appending a *text* part to the new paragraph
+style; it can be accomplished, at the user's choice, either by cloning a
+previously defined text style, or by explicitly defining new text properties,
+through the ``set_properties()`` method with the ``area`` option set to
+``text``.
 
 Assuming that a "MyBlueText" text style has been defined according to the text
 style creation example above, the following sequence creates a new paragraph
 style whose text part is a clone of "MyBlueText", and whose paragraph part
 features are the text justification, a first line 5mm indent, a black,
 continuous, half-millimiter border line with a bottom-right, one millimeter grey
-shadow::
+shadow, with other possible properties inherited from a "Standard" style::
 
-   ps = odf_create_style('BorderedShadowed',
+   ps = odf_create_style('paragraph', 'BorderedShadowed',
                            display-name='Strange Boxed Paragraph',
-                           family='paragraph',
                            parent='Standard',
                            align='justify',
                            indent='5mm',
                            border='0.5mm solid #000000',
                            shadow='#808080 1mm 1mm'
                            )
-   ts = document.get_style('MyBlueText', family='text')
+   ts = document.get_style('text', 'MyColoredtext')
    ps.set_properties(area='text', ts)
 
-Note that "MyBlueText" is reused by copy, not by reference; so the new paragraph
-style will not be affected if "MyBlueText" is changed or deleted later.
+Note that "MyColoredText" is reused by copy, not by reference; so the new paragraph
+style will not be affected if "MyColoredText" is changed or deleted later.
 
 The API allows the user to set any attribute using its official name according
 to the ODF specification related to the paragraph formatting properties (§15.5).
@@ -571,6 +575,7 @@ required properties, namely:
 
 List styles
 ------------
+
 A list style is a set of styles that control the formatting properties of
 the list items at every hierachical level. As a consequence, a list style
 is a named container including a particular style definition for each level;
@@ -580,36 +585,36 @@ The API allows the user to create a list style (if not previously existing
 in the document), and to create, retrieve and update it for any level.
 
 A new list style, available for later insertion in a document, is created
-through the ``odf_create_style()`` function. The only mandatory arguments are
-the style name (which should be unique as a list style name in the document)
-and the family, which is ``list``. An optional display name argument is
-allowed (if the style list is about to be used as a common style); if
-provided, the display name should be unique as well. Once created, a list
-style can be inserted in a document through the generic ``insert_style()``
-method.
+through the ``odf_create_style()`` function. The only mandatory argument is
+the style family, which is ``list``. However, a name is generally required as
+the second argument, knowing that a style list can't presently be used as a
+default style; an error is raised at any attempt to attach a nameless list
+style using ``insert_style()``. An optional display name argument is allowed
+(if the style list is about to be used as a common style); if  provided, the
+display name should be unique as well.
 
 An existing list style object provides a set_level_style() method,
 allowing the applications to set or change the list style properties for a
 given level. This method requires the level number as its first argument,
-then a "type" named parameter. The level is a positive (non zero) integer
+then a ``type`` named parameter. The level is a positive (non zero) integer
 value that identifies the hierarchical position. The type indicates what kind
 of item mark is should be selected for the level; the possible types are
 ``number``, ``bullet`` or ``image``.
 
-If the "bullet" type is selected, the affected items will be displayed after
+If the ``bullet`` type is selected, the affected items will be displayed after
 a special character (the "bullet"), which must be provided as a "character"
 named argument, whose value is an UTF-8 character.
 
-If the "image" type is selected, the URI of an image resource must be
+If the ``image`` type is selected, the URI of an image resource must be
 provided; the affected items will be displayed after a graphical mark whose
 content is an external image.
 
-A "number" list level type means that any affected list item will be marked
+A ``number`` list level type means that any affected list item will be marked
 with a leading computed number such as "1", "i", "(a)", or any auto-
 incremented value, whose formatting will be controlled according to other
 list level style properties (or to the default behaviour of the viewer for
-ordered lists). With the "number" type, its possible to provide "prefix"
-and/or "suffix" options, which provide strings to be displayed before and
+ordered lists). With the ``number`` type, its possible to provide ``prefix``
+and/or ``suffix`` options, which provide strings to be displayed before and
 after the number. Other optional parameters are:
 
 - ``style``: the text style to use to format the number;
@@ -623,74 +628,74 @@ after the number. Other optional parameters are:
 The following example shows the way to create a new list style then
 to set some properties for levels 1 to 3, each one with a different type::
 
-   ls = odf_create_style('ListStyle1', family='list')
+   ls = odf_create_style('list', 'ListStyle1')
    ls.set_level_style(1, type='number', prefix=' ', suffix='. ')
    ls.set_level_style(2, type='bullet', character='-')
    ls.set_level_style(3, type='image', uri='bullet.jpg')
 
-The set_level_style() method returns an ODF element, representing the list level
-style definition, and which could be processed later through any element- or
-style-oriented function.
+The ``set_level_style()`` method returns an ODF element, representing the list
+level style definition, and which could be processed later through any element-
+or style-oriented function.
 
-An individual list level style may be reloaded through the get_level_style(),
+An individual list level style may be reloaded through ``get_level_style()``,
 with the level number as its only one argument; it returns a regular ODF element
-(or null if the given level is not defined for the calling list style).
+(or *null* if the given level is not defined for the calling list style).
 
 It's possible to reuse an existing list level style definition at another level
 in the same list style, or at any level in another list style, or in another
 document. To do so, the existing level style (previously extracted by any mean,
-including the get_level_style() method) must be provided as a special "clone"
-parameter to set_level_style(). The following example reuses the level 3 style
-of "ListStyle1" to define or change the level 5 style of "ListStyle2"::
+including the ``get_level_style()`` method) must be provided as a special
+``clone`` parameter to set_level_style(). The following example reuses the
+level 3 style of "ListStyle1" to define or change the level 5 style of
+"ListStyle2"::
 
-   ls1 = document.get_style('ListStyle1', family='list')
+   ls1 = document.get_style('list', 'ListStyle1')
    source = ls1.get_level_style(3)
-   ls2 = document.get_style('ListStyle2', family='list')
+   ls2 = document.get_style('list', 'ListStyle2')
    ls2.set_level_style(5, clone=source)
 
-The object returned by set_level_style() or get_level_style() is similar to an
-ODF style object, without the name and the family. So the generic
-set_properties() method may be used later in order to set any particular
+The object returned by ``set_level_style()`` or ``get_level_style()`` is
+similar to an ODF style object, without the name and the family. So the generic
+``set_properties()`` method may be used later in order to set any particular
 property for any list level style. Possible properties are described in section
 §14.10 of the ODF specification.
 
 Every list level style definition in a list style is optional; so it's not
 necessary to define styles for levels that will not be used in the target
-document. The set_level_style() method may be used with an already defined
+document. The ``set_level_style()`` method may be used with an already defined
 level; in such a situation, the old level style is replaced by the new one. So
 it's easy to clone an existing list style then modify it for one or more levels.
 
 Outline style
 --------------
 
-According to the ODF 1.1 specification, "the outline style is a list style that
+According to the ODF specification, "*the outline style is a list style that
 is applied to all headings within a text document where the heading's paragraph
-style does not define a list style to use itself". In other words, it's a list
+style does not define a list style to use itself*".
+
+Practically, the outline style is a particular list style which controls the
+layout of a particular hierarchical list. In other words, it's a list
 of default styles for headings according to their respective hierarchical
 levels.
 
-The outline style should define a style for each heading level in use in the
-document.
+The outline style, like any list style, should define a style for each level
+in use in the document.
 
 The API allows the user to initialize the outline style (if not previously
 existing in the document), and to create, retrieve and update it for any level.
 
-A get_outline_style() method allows the user to get access to the outline style
-structure. This returned object bears the other outline style related methods.
-If the outline style is not initialized yet, get_outline_style() returns a null
-value. If needed, the outline style can be initialized through
-odf_create_outline_style() followed by insert_style().  Of course, it's possible
-to replace the creation method by cloning the outline style of another document
-or a style database. The creation method doesn't require any argument and its
-only purpose is to create an empty structure available for later outline level
-style definitions.
+The ``get_style()`` method allows the user to get access to the outline
+style structure; to do so, ``outline`` must be provided in place of the family
+argument. The returned object is a nameless list style; it may be
+cloned in order to be reused as the outline style for another document, or as
+an ordinary list style (provided that it's later named). If the outline style
+is not initialized yet, ``get_outline_style()`` returns a null value.
 
-From the outline style object, the user can get or set any outline level style,
-identified by its hierarchical level. As an example, the following code
-retrieves the default style for the level 4 headings::
-
-   os = document.get_outline_style()
-   l4style = os.get_level_style(4)
+If needed, the outline style can be created through ``odf_create_style()``
+with ``outline`` as the style family and without name, then attached using
+``insert_style()``. The style for each individual level may be set, retreived
+and changed at any time using the object-based ``set_level_style()`` and
+``get_level_style()`` methods.
 
 The API allows the user to set style attributes for any level, knowing that a
 level is identified by a positive integer starting from 1. With the current
@@ -700,28 +705,33 @@ supported, namely:
 - ``prefix``: a string that should be displayed before the heading number;
 - ``suffix``: a string that should be displayed before the heading number;
 - ``format``: the number display format (ex: ``1``, ``A``);
-- ``display levels``: the number of levels whose numbers are displayed at
+- ``display-levels``: the number of levels whose numbers are displayed at
   the current level;
-- ``start value``: the first number of a heading at this level;
+- ``start-value``: the first number of a heading at this level;
 - ``style``: the name of the style to use to format the number (that is a
   regular text style).
 
-These attributes (or some of them) can be set or changed through a common
-outline style based method set_level_style(), taking a level number at its first
-argument and one or more attribute/value pairs, as in the following example::
+As an example, the following code retrieves the default style for the level 4
+headings::
 
-   os = document.get_outline_style()
-   os.set_level_style(1, start=5, prefix='(', suffix=')', format='A')
+   os = document.get_style('outline')
+   head4 = os.get_level_style(4)
+
+The next example sets some properties for any level 1 heading, namely a
+numbering starting from 5 and the use of capital letters between parentheses
+as numbers::
+
+   os = document.get_style('outline')
+   os.set_level_style(1, start-value=5, prefix='(', suffix=')', format='A')
 
 According to the example above, the default numbering scheme for level 1
-headings will be (A), (B), (C), and so on.
+headings will be (E), (F), (G), and so on.
 
 Attributes and properties which are not explicitly supported through predefined
 parameter names in the present version of the API could always be set through
 the element-oriented methods of the level 0 API, knowing that get_level_style()
 returns a regular element.
 
-[See: http://dita.xml.org/wiki/research-document-structure-in-odf]
 
 Graphic styles [todo]
 ---------------------
