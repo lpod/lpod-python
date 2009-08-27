@@ -12,9 +12,6 @@ or delete any attribute or sub-element in a previously retrieved element.
 Regarding an attribute, the same method is used in order to create or update,
 while an element creation require an explicit method.
 
-For any method that require more than 2 arguments, all the arguments but the
-first one are named.
-
 The calling object is either the document, or the context element.
 
 Common element-specific methods
@@ -744,17 +741,18 @@ generally stored in fields or table cells. The covered data types are number,
 currency, percentage, boolean, date and time. [tbc]
 
 Number style [todo]
--------------------
+~~~~~~~~~~~~~~~~~~~
 Currency style [todo]
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 Percentage style [todo]
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 Boolean style [todo]
---------------------
+~~~~~~~~~~~~~~~~~~~~
 Date style [todo]
--------------------
+~~~~~~~~~~~~~~~~~
 Time style [todo]
--------------------
+~~~~~~~~~~~~~~~~~
+
 Page styles [todo]
 -------------------
 
