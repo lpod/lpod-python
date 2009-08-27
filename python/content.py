@@ -38,7 +38,8 @@ class odf_content(odf_xmlpart):
 
 
     def get_style_list(self, family=None):
-        return _get_element_list(self, 'style:style', family=family)
+        return _get_element_list(self, 'descendant::style:style',
+                                 family=family)
 
 
     def get_style(self, name_or_element, family, display_name=False):

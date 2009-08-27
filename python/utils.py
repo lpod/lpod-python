@@ -61,8 +61,7 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
                       style_name=None, note_class=None, text_id=None,
                       text_name=None, office_name=None, office_title=None,
                       level=None, position=None, **kw):
-    query = ['descendant::']
-    query.append(element_name)
+    query = [element_name]
     attributes = kw
     if style:
         attributes['text:style-name'] = style

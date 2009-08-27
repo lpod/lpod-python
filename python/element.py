@@ -550,15 +550,16 @@ class odf_element(object):
     #
 
     def get_paragraph_list(self, style=None, regex=None):
-        return _get_element_list(self, 'text:p', style=style, regex=regex)
+        return _get_element_list(self, 'descendant::text:p', style=style,
+                                 regex=regex)
 
 
     def get_paragraph_by_position(self, position):
-        return _get_element(self, 'text:p', position=position)
+        return _get_element(self, 'descendant::text:p', position=position)
 
 
     def get_paragraph_by_content(self, regex):
-        return _get_element(self, 'text:p', regex=regex)
+        return _get_element(self, 'descendant::text:p', regex=regex)
 
 
     #
@@ -566,11 +567,12 @@ class odf_element(object):
     #
 
     def get_span_list(self, style=None, regex=None):
-        return _get_element_list(self, 'text:span', style=style, regex=regex)
+        return _get_element_list(self, 'descendant::text:span', style=style,
+                                 regex=regex)
 
 
     def get_span_by_position(self, position):
-        return _get_element(self, 'text:span', position=position)
+        return _get_element(self, 'descendant::text:span', position=position)
 
 
     def get_span_by_content(self, regex):
@@ -582,12 +584,13 @@ class odf_element(object):
     #
 
     def get_heading_list(self, style=None, level=None, regex=None):
-        return _get_element_list(self, 'text:h', style=style, level=level,
-                                 regex=regex)
+        return _get_element_list(self, 'descendant::text:h', style=style,
+                                 level=level, regex=regex)
 
 
     def get_heading_by_position(self, position, level=None):
-        return _get_element(self, 'text:h', position=position, level=level)
+        return _get_element(self, 'descendant::text:h', position=position,
+                            level=level)
 
 
     def get_heading_by_content(self, regex, level=None):
@@ -600,17 +603,17 @@ class odf_element(object):
 
     def get_frame_list(self, style=None, title=None, description=None,
                        regex=None):
-        return _get_element_list(self, 'draw:frame', draw_style=style,
-                                 svg_title=title, svg_desc=description,
-                                 regex=regex)
+        return _get_element_list(self, 'descendant::draw:frame',
+                                 draw_style=style, svg_title=title,
+                                 svg_desc=description, regex=regex)
 
 
     def get_frame_by_name(self, name):
-        return _get_element(self, 'draw:frame', draw_name=name)
+        return _get_element(self, 'descendant::draw:frame', draw_name=name)
 
 
     def get_frame_by_position(self, position):
-        return _get_element(self, 'draw:frame', position=position)
+        return _get_element(self, 'descendant::draw:frame', position=position)
 
 
     def get_frame_by_content(self, regex):
@@ -622,7 +625,7 @@ class odf_element(object):
 
 
     def get_frame_by_description(self, regex):
-        return _get_element(self, 'draw:frame', svg_desc=regex)
+        return _get_element(self, 'descendant::draw:frame', svg_desc=regex)
 
 
     #
@@ -645,24 +648,24 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'draw:image', style=style, href=href,
-                                 regex=regex)
+        return _get_element_list(self, 'descendant::draw:image', style=style,
+                                 href=href, regex=regex)
 
 
     def get_image_by_name(self, name):
         # The frame is holding the name
-        frame = _get_element(self, 'draw:frame', draw_name=name)
+        frame = _get_element(self, 'descendant::draw:frame', draw_name=name)
         if frame is None:
             return None
         return frame.get_element('draw:image')
 
 
     def get_image_by_position(self, position):
-        return _get_element(self, 'draw:image', position=position)
+        return _get_element(self, 'descendant::draw:image', position=position)
 
 
     def get_image_by_path(self, regex):
-        return _get_element(self, 'draw:image', href=regex)
+        return _get_element(self, 'descendant::draw:image', href=regex)
 
 
     def get_image_by_content(self, regex):
@@ -706,16 +709,18 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'text:note', note_class=note_class,
+        return _get_element_list(self, 'descendant::text:note',
+                                 note_class=note_class,
                                  regex=regex)
 
 
     def get_note_by_id(self, note_id):
-        return _get_element(self, 'text:note', text_id=note_id)
+        return _get_element(self, 'descendant::text:note', text_id=note_id)
 
 
     def get_note_by_class(self, note_class):
-        return _get_element_list(self, 'text:note', note_class=note_class)
+        return _get_element_list(self, 'descendant::text:note',
+                                 note_class=note_class)
 
 
     def get_note_by_content(self, regex):
@@ -731,7 +736,8 @@ class odf_element(object):
         """XXX end date is not included (as expected in Python).
         """
         annotations = []
-        for annotation in _get_element_list(self, 'office:annotation',
+        for annotation in _get_element_list(self,
+                                            'descendant::office:annotation',
                                             regex=regex):
             if (creator is not None
                     and creator != annotation.get_dc_creator()):
@@ -778,11 +784,13 @@ class odf_element(object):
 
 
     def get_variable_decl(self, name):
-        return _get_element(self, 'text:variable-decl', text_name=name)
+        return _get_element(self, 'descendant::text:variable-decl',
+                            text_name=name)
 
 
     def get_variable_sets(self, name):
-        return _get_element_list(self, 'text:variable-set', text_name=name)
+        return _get_element_list(self, 'descendant::text:variable-set',
+                                 text_name=name)
 
 
     def get_variable_value(self, name, value_type=None):
@@ -814,7 +822,8 @@ class odf_element(object):
 
 
     def get_user_field_decl(self, name):
-        return _get_element(self, 'text:user-field-decl', text_name=name)
+        return _get_element(self, 'descendant::text:user-field-decl',
+                            text_name=name)
 
 
     def get_user_field_value(self, name, value_type=None):
@@ -850,16 +859,16 @@ class odf_element(object):
     #
 
     def get_link_list(self, name=None, title=None, href=None, regex=None):
-        return _get_element_list(self, 'text:a', office_name=name,
+        return _get_element_list(self, 'descendant::text:a', office_name=name,
                                  office_title=title, href=href, regex=regex)
 
 
     def get_link_by_name(self, name):
-        return _get_element(self, 'text:a', office_name=name)
+        return _get_element(self, 'descendant::text:a', office_name=name)
 
 
     def get_link_by_path(self, regex):
-        return _get_element(self, 'text:a', href=regex)
+        return _get_element(self, 'descendant::text:a', href=regex)
 
 
     def get_link_by_content(self, regex):
@@ -871,7 +880,7 @@ class odf_element(object):
     #
 
     def get_bookmark_list(self):
-        return _get_element_list(self, 'text:bookmark')
+        return _get_element_list(self, 'descendant::text:bookmark')
 
 
     def get_bookmark_by_name(self, name):
@@ -907,7 +916,7 @@ class odf_element(object):
 
 
     def get_reference_mark_start_list(self):
-        return _get_element_list(self, 'text:reference-mark-start')
+        return _get_element_list(self, 'descendant::text:reference-mark-start')
 
 
     def get_reference_mark_start_by_name(self, name):
@@ -916,7 +925,7 @@ class odf_element(object):
 
 
     def get_reference_mark_end_list(self):
-        return _get_element_list(self, 'text:reference-mark-end')
+        return _get_element_list(self, 'descendant::text:reference-mark-end')
 
 
     def get_reference_mark_end_by_name(self, name):
