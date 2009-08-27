@@ -363,12 +363,18 @@ Styles
    
    While a style is identified by name and family, it owns one or more sets of
    properties. A style property is a particular layout or formatting behaviour.
-   The API provides a generic properties() method which allows the user to get
-   or set these properties. However, some styles have more than one property
-   set. As an example, a paragraph style owns so-called "paragraph properties"
+   The API provides a generic set_properties() method which allows the user to
+   set these properties, while get_properties() returns the existing properties
+   as an array.
+   
+   However, some styles have more than one property set.
+   
+   As an example, a paragraph style owns so-called "paragraph properties"
    and/or "text properties" (see below). In such a situation, additional methods
-   whose name is xxx_properties(), where xxx depends on the style family and the
-   property set, are provided when needed.
+   whose name is set_xxx_properties(), where xxx depends on the style family and
+   the property set, are provided when needed. For each get_xxx_properties(),
+   there is a symmetrical get_xxx_properties() method to read the existing
+   properties.
 
    A style can be inserted as either 'common' (or named and visible for the
    user of a typical office application) or 'automatic', according a boolean
@@ -424,18 +430,18 @@ Styles
                               )
 
       This new style could be retrieved and changed later using get_style()
-      then the properties() method of the style object. For example, the
+      then the set_properties() method of the style object. For example, the
       following code modifies an existing text style definition so the font
       size is increased to 16pt and the color turns green::
       
          s = document.get_style('MyColoredText')
-         s.properties(size='16pt', color='#00ff00')
+         s.set_properties(size='16pt', color='#00ff00')
       
-      The properties() method may be used in order to delete a property, without
-      replacement; to do so, the target property must be provided with a null
-      value.
+      The set_properties() method may be used in order to delete a property,
+      without replacement; to do so, the target property must be provided with
+      a null value.
       
-      Note that properties() can't change any identifying attribute such as
+      Note that set_properties() can't change any identifying attribute such as
       name, family or display name.
       
       The lpOD level 1 API allows the applications to set any property without
@@ -496,8 +502,8 @@ Styles
       (optional) step consists of appending a 'text' part to the new paragraph
       style; it can be accomplished, at the user's choice, either by copying
       a previously defined text style, or by explicitly defining new text
-      properties, through the text_properties() method, belonging to the style
-      class.
+      properties, through the set_text_properties() method, belonging to the
+      style class.
       
       Assuming that a "MyBlueText" text style has been defined according to
       the text style creation example above, the following sequence creates
@@ -516,7 +522,7 @@ Styles
                                  shadow='#808080 1mm 1mm'
                                  )
          ts = document.get_style('MyBlueText', family='text')
-         ps.text_properties(ts)
+         ps.set_text_properties(ts)
          
       Note that "MyBlueText" is reused by copy, not by reference; so the new
       paragraph style will not be affected if "MyBlueText" is changed or
@@ -594,11 +600,11 @@ Styles
    style can be inserted in a document through the generic insert_style()
    method.
    
-   An existing list style object provides a list_level_style() method, allowing
-   the applications to set or change the list style properties for a given
-   level. This method requires at least two named aruments, namely the "level"
-   and the "type". The level is a positive (non zero) integer value that
-   identifies the hierarchical position. While the type indicates what kind
+   An existing list style object provides a set_level_style() method,
+   allowing the applications to set or change the list style properties for a
+   given level. This method requires the level number as its first argument,
+   then a "type" named parameter. The level is a positive (non zero) integer
+   value that identifies the hierarchical position. The type indicates what kind
    of item mark is should be selected for the level; the possible types are
    "number", "bullet" or "image".
    
@@ -633,23 +639,44 @@ Styles
    to set some properties for levels 1 to 3, each one with a different type::
 
       ls = odf_create_style('ListStyle1', family='list')
-      ls.list_level_style(level=1, type='number', prefix=' ', suffix='. ')
-      ls.list_level_style(level=2, type='bullet', character='-')
-      ls.list_level_style(level=3, type='image', uri='bullet.jpg')
+      ls.set_level_style(1, type='number', prefix=' ', suffix='. ')
+      ls.set_level_style(2, type='bullet', character='-')
+      ls.set_level_style(3, type='image', uri='bullet.jpg')
 
-   The list_level_style() method returns an ODF style object, which represents
+   The set_level_style() method returns an ODF element, representing
    the list level style definition, and which could be processed later through
-   any element- or style-oriented function. So the generic properties() method
-   may be used later in order to set any particular property for any list level
-   style. Possible properties are described in section §14.10 of the ODF
-   specification.
+   any element- or style-oriented function. 
+   
+   An individual list level style may be reloaded through the get_level_style(),
+   with the level number as its only one argument; it returns a regular ODF
+   element (or null if the given level is not defined for the calling list
+   style).
+   
+   It's possible to reuse an existing list level style definition at another
+   level in the same list style, or at any level in another list style, or
+   in another document. To do so, the existing level style (previously
+   extracted by any mean, including the get_level_style() method) must be
+   provided as a special "clone" parameter to set_level_style(). The following
+   example reuses the level 3 style of "ListStyle1" to define or change the
+   level 5 style of "ListStyle2"::
+   
+      ls1 = document.get_style('ListStyle1', family='list')
+      source = ls1.get_level_style(3)
+      ls2 = document.get_style('ListStyle2', family='list')
+      ls2.set_level_style(5, clone=source)
+
+   The object returned by set_level_style() or get_level_style() is similar to
+   an ODF style object, without the name and the family. So the generic
+   set_properties() method may be used later in order to set any particular
+   property for any list level style. Possible properties are described in
+   section §14.10 of the ODF specification.
    
    Every list level style definition in a list style is optional; so it's not
    necessary to define styles for levels that will not be used in the target
-   document. The list_level_style() method may be used with an already defined
-   level; in such a situation, the old level style is replaced by the new one.
-   So it's easy to clone an existing list style then modify it for one or more
-   levels.
+   document. The set_level_style() method may be used with an already
+   defined level; in such a situation, the old level style is replaced by the
+   new one. So it's easy to clone an existing list style then modify it for one
+   or more levels.
 
 - Outline style
 
