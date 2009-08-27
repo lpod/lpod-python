@@ -35,7 +35,32 @@ translations = {
     'style:page-layout-properties': u'Page layout properties',
     'style:footnote-sep': u'Footnote separation',
     'office:master-styles': u'Master page styles',
-    'style:master-page': u'Master page'}
+    'style:master-page': u'Master page',
+    'style:drawing-page-properties': u'Drawing page properties',
+    'draw:layer-set': u'Layer set',
+    'draw:layer': u'Layer',
+    'text:list-style': u'List style',
+    'text:list-level-style-bullet': u'List level style of bullet',
+    'style:handout-master': u'Handout master',
+    'draw:page-thumbnail': u'Page thumbnail',
+    'draw:frame': u'Frame',
+    'draw:image': u'Image',
+    'presentation:notes': u'Notes',
+    'draw:text-box': u'Text box',
+    'text:p': u'Paragraph',
+    'text:span': u'Span',
+    'style:footer-style': u'Footer style',
+    'style:header-footer-properties': u'Header and footer properties',
+    'style:header-style': u'Header style',
+    'style:footer': u'Footer',
+    'text:h': u'Heading',
+    'style:header': u'Header',
+    'style:table-cell-properties': u'Cell properties',
+    'style:footer-left': u'Footer left',
+    'style:header-left': u'Header left',
+    'style:region-left': u'Region left',
+    'style:region-right': u'Region right',
+    'text:date': u'Date'}
 
 underline_lvl = ['#', '=', '-', ':', '`', "'", '"', '~', '^', '_', '*', '+']
 
@@ -49,7 +74,7 @@ def make_style_structure(style_element, child_to_search=None):
     if child_to_search is not None:
         children = style_element.get_element_list(child_to_search)
         # Rebuild the name to have a pertinent translation
-        name = '%s/%s' % (name, child_to_search)
+        name = u'%s/%s' % (name, child_to_search)
     # Default behaviour
     else:
         children = style_element.get_children()
@@ -66,7 +91,7 @@ def structure_to_str(structure, level=0, overline=False):
         # Don't show the empty elements
         if not sub_struct and not attributes:
             return None
-        name = translations[name]
+        name = translations.get(name, name)
         # Underline and Overline the name
         if level < len(underline_lvl):
             underline = underline_lvl[level] * len(name)
@@ -79,7 +104,7 @@ def structure_to_str(structure, level=0, overline=False):
         attrs = []
         # Attributes
         for key, value in attributes.iteritems():
-            attrs.append('%s: %s' % (key, value))
+            attrs.append(u'%s: %s' % (key, value))
         if attrs:
             attrs.sort()
             # Add a separation between attributes and children
@@ -111,9 +136,9 @@ def lpod_show(odf_file_url, style_types):
         # Make the structure
         style_structure = make_style_structure(style, name)
         # Transform the structure to a multiline string
-        output = '%s\n' % structure_to_str([style_structure], overline=True)
+        output = u'%s\n' % structure_to_str([style_structure], overline=True)
         # Print the styles
-        stdout.write(output)
+        stdout.write(output.encode('utf-8'))
         stdout.flush()
 
 
@@ -139,6 +164,8 @@ if  __name__ == '__main__':
     # Get the ODF file url
     odf_file_url = args[0]
 
+    if opts.show is None:
+        opts.show = 'all'
     # Expand all
     style_types = opts.show.replace('all', 'default, named, automatic, master')
     # Transform the comma separated list into a true list object
