@@ -180,14 +180,6 @@ class odf_master_page(odf_style):
 
     XXX to verify
     """
-    def get_page_layout_name(self):
-        return self.get_attribute('style:page-layout-name')
-
-
-    def set_page_layout_name(self, name):
-        self.set_attribute('style:page-layout-name', name)
-
-
     def __set_header_or_footer(self, text_or_element, name='header',
                                style=u"Header"):
         if name == 'header':
@@ -213,6 +205,18 @@ class odf_master_page(odf_style):
                 header_or_footer.append_element(paragraph)
             elif isinstance(item, odf_element):
                 header_or_footer.append_element(item)
+
+
+    #
+    # Public API
+    #
+
+    def get_page_layout_name(self):
+        return self.get_attribute('style:page-layout-name')
+
+
+    def set_page_layout_name(self, name):
+        self.set_attribute('style:page-layout-name', name)
 
 
     def get_header(self):
