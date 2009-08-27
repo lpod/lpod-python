@@ -115,7 +115,7 @@ class TestStyle(TestCase):
     def test_get_style_list_family(self):
         styles = self.styles
         style_list = styles.get_style_list(family='paragraph')
-        self.assertEqual(len(style_list), 14)
+        self.assertEqual(len(style_list), 10)
 
 
     def test_get_style_automatic(self):

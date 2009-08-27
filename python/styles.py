@@ -108,7 +108,7 @@ class odf_styles(odf_xmlpart):
             # Treat the case for get_style_list where the name is undefined
             all = ['style:default-style', 'style:style',
                    'style:page-layout', 'style:master-page']
-            return ('//' + '|//'.join(all), family)
+            return ('(//%s)' % '|//'.join(all), family)
         mapping = {'paragraph': ('style:style', family),
                    'text': ('style:style', family),
                    'graphic': ('style:style', family),

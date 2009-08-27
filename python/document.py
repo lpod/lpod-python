@@ -177,12 +177,10 @@ class odf_document(object):
     #
 
     def get_style_list(self, family=None, automatic=False):
+        content = self.get_xmlpart('content')
         styles = self.get_xmlpart('styles')
-        if automatic:
-            content = self.get_xmlpart('content')
-            return (styles.get_style_list(family=family, automatic=True)
-                    + content.get_style_list(family=family))
-        return styles.get_style_list(family=family)
+        return (content.get_style_list(family=family)
+                + styles.get_style_list(family=family, automatic=automatic))
 
 
     def get_style(self, name_or_element, family, display_name=False):

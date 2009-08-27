@@ -6,19 +6,20 @@ from element import register_element_class, odf_create_element, odf_element
 from paragraph import odf_create_paragraph
 
 
-def odf_create_style(name, family, area=None, **kw):
-    """Create a style element with the given name, related to the given
-    family.
+def odf_create_style(family, name=None, area=None, **kw):
+    """Create a style of the given family. The name is not mandatory at this
+    point but will become required when inserting in a document as a common
+    style.
 
     Arguments:
-
-        name -- unicode
 
         family -- 'paragraph', 'text', 'section', 'table', 'tablecolumn',
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'drawing-page', 'graphic', 'presentation',
                   'control', 'ruby', 'list', 'number', 'page-layout' or
                   'master-page'
+
+        name -- unicode or None
 
         area -- the "<area>-properties" where to store properties,
                 identical to the family by default
@@ -27,7 +28,8 @@ def odf_create_style(name, family, area=None, **kw):
 
     Return: odf_element
     """
-    data = u'<style:style style:name="%s" style:family="%s"/>'
+    raise NotImplementedError
+    data = u'<style:style/>'
     element = odf_create_element(data % (name, family))
     if kw:
         if area is None:

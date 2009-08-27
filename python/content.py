@@ -27,10 +27,8 @@ class odf_content(odf_xmlpart):
     def _get_style_tagname(self, name, family):
         if name is False:
             # Treat the case for get_style_list where the name is undefined
-            if family is None:
-                # All of them
-                all = ['style:style']
-                return ('|'.join(all), None)
+            all = ['style:style']
+            return ('(//%s)' % '|//'.join(all), family)
         mapping = {'paragraph': ('style:style', family),
                    'text': ('style:style', family)}
         if family not in mapping:
