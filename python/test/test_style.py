@@ -18,10 +18,34 @@ class TestStyle(TestCase):
         self.content = document.get_xmlpart('content')
 
 
-    def test_create_style(self):
+    def test_create_style_paragraph(self):
         style = odf_create_style('paragraph', 'style1')
         expected = ('<style:style style:name="style1" '
                       'style:family="paragraph"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_text(self):
+        style = odf_create_style('text')
+        expected = ('<style:style style:family="text"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_graphic(self):
+        style = odf_create_style('graphic')
+        expected = ('<style:style style:family="graphic"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_page_layout(self):
+        style = odf_create_style('page-layout')
+        expected = ('<style:page-layout/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_master_page(self):
+        style = odf_create_style('master-page')
+        expected = ('<style:master-page/>')
         self.assertEqual(style.serialize(), expected)
 
 
