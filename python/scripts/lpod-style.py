@@ -111,8 +111,6 @@ if  __name__ == '__main__':
     if len(args) < 1:
         oparser.print_help()
         exit(1)
-    # Get the ODF file url
-    odf_file_url = args[0]
 
     if opts.show is None or opts.show == 'all':
         families = style_families
@@ -123,5 +121,6 @@ if  __name__ == '__main__':
     for family in families:
         if family not in style_families:
             oparser.error('Unknown %s family' % family)
-    lpod_show(odf_file_url, families)
+    for odf_file_url in args:
+        lpod_show(odf_file_url, families)
 
