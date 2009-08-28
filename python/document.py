@@ -19,7 +19,7 @@ from vfs import vfs
 underline_lvl = ['=', '-', ':', '`', "'", '"', '~', '^', '_', '*', '+']
 
 
-def _show_style(element, level=0):
+def _show_styles(element, level=0):
     output = []
     attributes = element.get_attributes()
     children = element.get_children()
@@ -49,7 +49,7 @@ def _show_style(element, level=0):
     children.sort()
     children = [child for name, child in children]
     for child in children:
-        child_output = _show_style(child, level + 1)
+        child_output = _show_styles(child, level + 1)
         if child_output:
             output.append(child_output)
     return '\n'.join(output)
@@ -267,7 +267,7 @@ class odf_document(object):
             output.append(family_type)
             output.append(underline + '\n')
             for style in self.get_style_list(family=family_type):
-                output.append(_show_style(style))
+                output.append(_show_styles(style))
         return u'\n'.join(output)
 
 
