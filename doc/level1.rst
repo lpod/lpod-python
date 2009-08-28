@@ -756,6 +756,34 @@ Time style [todo]
 Page styles [todo]
 -------------------
 
+A page style definition, so-called *master page*, is "*a template for pages in
+a document*". It directly defines the static content "*that is displayed on all
+pages*" that use it (such as headers and footers). In addition, a
+*master page* is associated to a *page layout*, defined as a separate object
+that describes "*the physical properties or geometry of a page, for example,
+page size, margins, header height, and footer height*". The same *page layout*
+may be used through several *page masters*.
+
+A page style, as defined here, mainly applies to *text documents*. In such
+documents, the pages are not statically defined; they are dynamically generated
+by the viewing/printing applications according to their content (which changes
+each time a piece of content is inserted, deleted or moved. As a consequence,
+a *master page* is not used in the same way as, say, a paragraph style or a
+list style, because there is no persistent text page object which could
+directly contain a reference to a page style. A master page is essentially
+referred to through page breaks. For example, each time a forced page break is
+inserted, it's possible to specify the *master page* of the following page. In
+addition, any *master page* may own a property that tells what should be the
+*master page* to use after the current page (for example, a "Right page" style
+may de defined in order to ensure that any page using it will be followed by
+a page that will use a "Left page" style and vice-versa).
+
+*Master page* objects apply to presentation and drawing documents, that use
+statically defined draw pages, so the page style logic strongly differs.
+Regarding spreadsheet documents, where each page is practically a table, the
+*master page* logic doesn't apply at all. As a consequence, the present section
+describes the page styling API for *text documents only*.
+
    .. figure:: figures/lpod_page_style.png
       :align: center
 
