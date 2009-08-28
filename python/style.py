@@ -4,6 +4,7 @@
 # Import from lpod
 from element import register_element_class, odf_create_element, odf_element
 from paragraph import odf_create_paragraph
+from utils import _get_style_tagname
 
 
 def odf_create_style(family, name=None, area=None, **kw):
@@ -28,9 +29,12 @@ def odf_create_style(family, name=None, area=None, **kw):
 
     Return: odf_element
     """
-    raise NotImplementedError
-    data = u'<style:style/>'
-    element = odf_create_element(data % (name, family))
+    tagname, famattr = _get_style_tagname(family)
+    element = odf_create_element('<%s/>' % tagname)
+    if name:
+        element.set_style_name(name)
+    if famattr:
+        element.set_attribute('style:family', famattr)
     if kw:
         if area is None:
             area = family

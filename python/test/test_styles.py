@@ -100,7 +100,7 @@ class TestStyle(TestCase):
 
 
     def test_create_style(self):
-        style = odf_create_style('style1', 'paragraph')
+        style = odf_create_style('paragraph', 'style1')
         expected = ('<style:style style:name="style1" '
                       'style:family="paragraph"/>')
         self.assertEqual(style.serialize(), expected)
@@ -132,7 +132,7 @@ class TestStyle(TestCase):
 
     def test_insert_style(self):
         styles = self.styles.clone()
-        style = odf_create_style(u'style1', 'paragraph', area='text',
+        style = odf_create_style('paragraph', u'style1', area='text',
                                  **{'fo:color': '#0000ff',
                                     'fo:background-color': '#ff0000'})
         context = styles.get_element('//office:styles')

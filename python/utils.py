@@ -105,6 +105,21 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
 
 
 
+def _get_style_tagname(family):
+               # These are listed exhaustively for keeping count of
+               # implemented style types
+    mapping = {'paragraph': ('style:style', family),
+               'text': ('style:style', family),
+               'graphic': ('style:style', family),
+               # False families
+               'page-layout': ('style:page-layout', None),
+               'master-page': ('style:master-page', None)}
+    if family not in mapping:
+        raise ValueError, "unknown family: " + family
+    return mapping[family]
+
+
+
 #
 # Non-public yet useful helpers
 #

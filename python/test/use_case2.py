@@ -71,7 +71,7 @@ heading = odf_create_heading(1, text=u'Congratulations !')
 body.insert_element(heading, LAST_CHILD)
 
 # The style
-style = odf_create_style('style1', 'paragraph')
+style = odf_create_style('paragraph', 'style1')
 style.set_attribute('style:parent-style-name', 'Standard')
 properties = odf_create_style_text_properties()
 properties.set_attribute('fo:color', rgb2hex('blue'))
@@ -123,7 +123,7 @@ body.insert_element(paragraph, LAST_CHILD)
 # A paragraph with a highlighted word
 
 # The style
-style = odf_create_style('style2', 'text')
+style = odf_create_style('text', 'style2')
 style.set_attribute('style:parent-style-name', 'Standard')
 properties = odf_create_style_text_properties()
 properties.set_attribute('fo:background-color', rgb2hex('yellow'))

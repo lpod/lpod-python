@@ -3,7 +3,7 @@
 
 # Import from lpod
 from style import odf_style
-from utils import _make_xpath_query
+from utils import _make_xpath_query, _get_style_tagname
 from xmlpart import odf_xmlpart
 
 
@@ -101,7 +101,7 @@ class odf_styles(odf_xmlpart):
         return self.get_element(mapping[family])
 
 
-    def _get_style_tagname(self, name, family, automatic=False):
+    def _get_style_tagname(self, family, name):
         if name is None:
             return ('style:default-style', family)
         elif name is False:
@@ -109,18 +109,11 @@ class odf_styles(odf_xmlpart):
             all = ['style:default-style', 'style:style',
                    'style:page-layout', 'style:master-page']
             return ('(//%s)' % '|//'.join(all), family)
-        mapping = {'paragraph': ('style:style', family),
-                   'text': ('style:style', family),
-                   'graphic': ('style:style', family),
-                   'page-layout': ('style:page-layout', None),
-                   'master-page': ('style:master-page', None)}
-        if family not in mapping:
-            raise ValueError, "unknown family: " + family
-        return mapping[family]
+        return _get_style_tagname(family)
 
 
     def get_style_list(self, family=None, automatic=False):
-        tagname, famattr = self._get_style_tagname(False, family, automatic)
+        tagname, famattr = self._get_style_tagname(family, False)
         query = _make_xpath_query(tagname, family=famattr)
         context = self._get_style_context(False, family, automatic)
         return context.get_element_list(query)
@@ -149,8 +142,8 @@ class odf_styles(odf_xmlpart):
         if display_name is True:
             raise NotImplementedError
         if type(name_or_element) is unicode or name_or_element is None:
-            tagname, famattr = self._get_style_tagname(name_or_element,
-                                                       family)
+            tagname, famattr = self._get_style_tagname(family,
+                                                       name_or_element)
             # famattr became None if no "style:family" attribute
             query = _make_xpath_query(tagname, style_name=name_or_element,
                                       family=famattr)
