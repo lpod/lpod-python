@@ -112,10 +112,11 @@ class DocumentTestCase(TestCase):
         self.assertEqual(container.uri, None)
 
 
+
 class TestStyle(TestCase):
 
     def setUp(self):
-        self.document = odf_get_document('samples/example.odt')
+        self.document = odf_get_document('../templates/lpod_styles.odt')
 
 
     def tearDown(self):
@@ -125,13 +126,37 @@ class TestStyle(TestCase):
     def test_get_style_list(self):
         document = self.document
         styles = document.get_style_list()
-        self.assertEqual(len(styles), 18)
+        self.assertEqual(len(styles), 57)
 
 
-    def test_get_style_list_family(self):
+    def test_get_style_list_family_paragraph(self):
         document = self.document
         styles = document.get_style_list(family='paragraph')
-        self.assertEqual(len(styles), 11)
+        self.assertEqual(len(styles), 33)
+
+
+    def test_get_style_list_family_text(self):
+        document = self.document
+        styles = document.get_style_list(family='text')
+        self.assertEqual(len(styles), 4)
+
+
+    def test_get_style_list_family_graphic(self):
+        document = self.document
+        styles = document.get_style_list(family='graphic')
+        self.assertEqual(len(styles), 1)
+
+
+    def test_get_style_list_family_page_layout(self):
+        document = self.document
+        styles = document.get_style_list(family='page-layout')
+        self.assertEqual(len(styles), 2)
+
+
+    def test_get_style_list_family_master_page(self):
+        document = self.document
+        styles = document.get_style_list(family='master-page')
+        self.assertEqual(len(styles), 2)
 
 
     def test_get_style_automatic(self):
