@@ -183,7 +183,7 @@ class odf_document(object):
                 + styles.get_style_list(family=family, automatic=automatic))
 
 
-    def get_style(self, name_or_element, family, display_name=False):
+    def get_style(self, family, name_or_element, display_name=False):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 
@@ -205,13 +205,13 @@ class odf_document(object):
         """
         # 1. content.xml
         content = self.get_xmlpart('content')
-        element = content.get_style(name_or_element, family,
+        element = content.get_style(family, name_or_element,
                                     display_name=display_name)
         if element is not None:
             return element
         # 2. styles.xml
         styles = self.get_xmlpart('styles')
-        return styles.get_style(name_or_element, family,
+        return styles.get_style(family, name_or_element,
                                 display_name=display_name)
 
 

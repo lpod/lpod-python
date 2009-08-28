@@ -39,7 +39,7 @@ class odf_content(odf_xmlpart):
         return context.get_element_list(query)
 
 
-    def get_style(self, name_or_element, family, display_name=False):
+    def get_style(self, family, name_or_element, display_name=False):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 

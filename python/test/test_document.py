@@ -136,13 +136,13 @@ class TestStyle(TestCase):
 
     def test_get_style_automatic(self):
         document = self.document
-        style = document.get_style(u'P1', 'paragraph')
+        style = document.get_style('paragraph', u'P1')
         self.assertNotEqual(style, None)
 
 
     def test_get_style_named(self):
         document = self.document
-        style = document.get_style(u'Heading_20_1', 'paragraph')
+        style = document.get_style('paragraph', u'Heading_20_1')
         self.assertNotEqual(style, None)
 
 

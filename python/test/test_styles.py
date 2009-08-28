@@ -126,13 +126,13 @@ class TestStyle(TestCase):
 
     def test_get_style_automatic(self):
         styles = self.styles
-        style = styles.get_style(u'Mpm1', 'page-layout')
+        style = styles.get_style('page-layout', u'Mpm1')
         self.assertNotEqual(style, None)
 
 
     def test_get_style_named(self):
         styles = self.styles
-        style = styles.get_style(u'Heading_20_1', 'paragraph')
+        style = styles.get_style('paragraph', u'Heading_20_1')
         self.assertNotEqual(style, None)
 
 
@@ -149,7 +149,7 @@ class TestStyle(TestCase):
                     '  <style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>\n'
                     '</style:style>\n')
-        get1 = styles.get_style(u'style1', 'paragraph')
+        get1 = styles.get_style('paragraph', u'style1')
         self.assertEqual(get1.serialize(pretty=True), expected)
 
 

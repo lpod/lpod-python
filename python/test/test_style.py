@@ -39,7 +39,7 @@ class TestStyle(TestCase):
 
     def test_get_style_automatic(self):
         content = self.content
-        style = content.get_style(u'P1', 'paragraph')
+        style = content.get_style('paragraph', u'P1')
         self.assertNotEqual(style, None)
 
 
@@ -55,7 +55,7 @@ class TestStyle(TestCase):
                       '<style:text-properties fo:color="#0000ff" '
                                              'fo:background-color="#ff0000"/>'
                     '</style:style>')
-        get1 = content.get_style(u'style1', 'paragraph')
+        get1 = content.get_style('paragraph', u'style1')
         self.assertEqual(get1.serialize(), expected)
 
 
