@@ -74,11 +74,19 @@ and owns the following ones.
 
 Creation and attachment
 ~~~~~~~~~~~~~~~~~~~~~~~
-A paragraph can be created with a given style and a given text content.  The
+A paragraph can be created with a given style and a given text content. The
 default content is an empty string. There is not default style; a paragraph can
 be created without explicit style, as long as the default paragraph style of the
 document is convenient for the application. The style and the text content can
 be set or changed later.
+
+A paragraph is created (as a free element) using the ``odf_create_paragraph()``
+function, with a ``text`` and a ``style`` optional parameters. It may be
+attached later through the standard ``append_element()`` or
+``insert_element()`` method::
+
+   p = odf_create_paragraph(text='My first paragraph', style='TextBody')
+   document.append_element(p)
 
 Retrieval
 ~~~~~~~~~
@@ -107,7 +115,12 @@ as well.
 
 However, a heading is a special paragraph which owns additional properties
 related to its hierarchical level and its numbering. As an consequence, some
-heading-specific methods are provided.
+heading-specific methods are provided, and the constructor function is
+``odf_create_heading()``.
+
+In addition, the layout of the headings depends partly on the paragraph style
+that individually apply to each one, and partly on the outline style of the
+document (see the "Outline style" section in the present document).
 
 Heading level
 ~~~~~~~~~~~~~
@@ -349,7 +362,16 @@ Additional arguments can be required according to the family. An optional
 the same family (existing or to be created), can be provided, knowing that a
 style inherits (but can override) all the properties of its parent. A
 ``display-name`` additional parameter may be provided; if set, this parameter
-designates a visible name that may differ from the internal name.
+designates a visible name that may differ from the internal name. It's
+possible to copy (instead of inherit) all the properties of an existing style
+of the same family, through a ``clone`` option, knowing that ``clone`` and
+``parent`` are mutually exclusive options. The code example below produces two
+text styles whose properties are the same as "MyTextStyleName", but the first
+one will be affected by later changes of the base style while the second one
+is independant::
+
+   odf_create_style('text', 'NewStyle1', parent='MyTextStyleName')
+   odf_create_style('text', 'NewStyle2', clone='MyTextStyleName')
 
 An effective  style name, unique for the family, is required as soon as the
 style is attached to a document, unless it's inserted as a *default style*.
@@ -779,13 +801,69 @@ may de defined in order to ensure that any page using it will be followed by
 a page that will use a "Left page" style and vice-versa).
 
 *Master page* objects apply to presentation and drawing documents, that use
-statically defined draw pages, so the page style logic strongly differs.
-Regarding spreadsheet documents, where each page is practically a table, the
-*master page* logic doesn't apply at all. As a consequence, the present section
-describes the page styling API for *text documents only*.
+statically defined draw pages, so the page style logic strongly differs, so
+the *master page* object is not the exactly same for any document class.
+The present section describes the page styling API for *text documents only*.
 
    .. figure:: figures/lpod_page_style.png
       :align: center
+
+Master pages
+~~~~~~~~~~~~~
+
+A master page is created and retrieved the same way as other styles.
+
+To create a master page through the generic ``odf_create_style()`` function,
+the family argument is ``master page`` and it's followed by an arbitrary name.
+A master page may, like other styles, have a display name distinct from its
+name. In addition, a full master page definition allows the following named
+parameters:
+
+- ``page layout``: the unique name of a *page layout*, existing or to be defined
+  in the same document;
+- ``next``: the master page to apply to the following page, as soon as the
+  current page is entirely filled, knowing that the current master page is used
+  for the next page by default.
+
+A unique name is required at insert time; ``insert_style()`` raises an error at
+any attempt to attach a nameless master page to a document. On the other hand,
+``insert_style()`` can attach a master page without layout name, but the
+visible result is not predictable and depends on the default page layout of
+the printing application.
+
+The ``parent`` parameter is not allowed in master page creation, as long as
+there is no explicit inheritance mechanism in the ODF specification for this
+kind of styles. However an existing master page definition is always reusable
+using the ``clone`` option.
+
+Page headers and footers
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Page headers and footers are optional components of master pages; they are just
+containers for almost any kind of document content elements (such as regular
+paragraphs, tables, images and so on). They are created "in place" using special
+master page methods, namely ``set_header()`` and ``set_footer()``. Each of
+these methods returns an ODF element that can be used later as a context to
+append content elements. The following example creates a page style with a
+header and a footer, each one containing a single paragraph::
+
+   mp = odf_create_style('master page', 'MyNewPageStyle')
+   h = mp.set_header()
+   h.append_element(odf_create_paragraph(text='Header text', style='Standard')
+   f = mp.set_footer()
+   f.append_element(odf_create_paragraph(text='Footer text', style='Standard')
+
+It's possible to call ``set_header()`` and ``set_footer()`` with one or more
+existing ODF elements as arguments, so the given elements are directly
+put in the header or footer.
+
+Every ``set_header()`` or ``set_footer()`` removes and replaces any previously
+existing header/footer. It's always possible to retrieve the header or the
+footer using ``get_header()`` or ``get_footer()``, and to remove them using
+``delete_header()`` and ``delete_footer()``.
+
+Page layouts
+~~~~~~~~~~~~~
 
 Metadata
 ========
