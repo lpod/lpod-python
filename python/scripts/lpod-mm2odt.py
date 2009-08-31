@@ -12,10 +12,10 @@ from lxml.etree import parse
 
 # Import from lpod
 from lpod import __version__
+from lpod.toc import odf_create_toc
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
 from lpod.vfs import vfs
-
 
 
 def check_for_overwrite(odt_file_url):
@@ -23,10 +23,8 @@ def check_for_overwrite(odt_file_url):
         message = 'The file "%s" exists, can i overwrite it? [y/N]'
         stdout.write(message % odt_file_url)
         stdout.flush()
-
         line = stdin.readline()
         line = line.strip().lower()
-
         if line != 'y':
             stdout.write('Operation aborted\n')
             stdout.flush()
@@ -54,43 +52,47 @@ def make_document(structure, body):
 
 
 if  __name__ == '__main__':
-
     # Options initialisation
     usage = '%prog <file>'
     description = 'Transform a mind-map file to an OpenDocument Text file.'
-    oparser = OptionParser(usage, version=__version__, description=description)
+    oparser = OptionParser(usage, version=__version__,
+                           description=description)
     help = 'place output in the specified file.'
     oparser.add_option('-o', '--output', dest='output', metavar='<output>',
                        action='store', help=help)
+
     # Parse options
     opts, args = oparser.parse_args()
-
     if len(args) < 1:
         oparser.print_help()
         exit(1)
 
-    # Get the 2 urls
+    # Get the 2 URLs
     mm_file_url = args[0]
     odt_file_url = opts.output
-    # Default value for the url of the odt file.
+    # Default value for the URL of the ODT file.
     if not odt_file_url:
         mm_basename = basename(mm_file_url)
         odt_file_url = '%s.odt' % splitext(mm_basename)[0]
     # Check if the file already exists
     check_for_overwrite(odt_file_url)
 
-
-    # Open the xml file
+    # Open the XML file
     mm = parse(open(mm_file_url))
     # Get the first node of the mind map
     first_node = mm.xpath('/map/node')[0]
     # Make the structure
     mm_structure = make_mm_structure(first_node, 0)
 
-    # Create a new odt document
+    # Create a new ODT document
     document = odf_new_document_from_type('text')
+    body = document.get_body()
+    # Remove the default paragraph
+    body.clear()
+    # Begin with a TOC
+    body.append_element(odf_create_toc())
     # Make the document from the structure
-    make_document([mm_structure], document.get_body())
+    make_document([mm_structure], body)
 
     # Save the document
     document.save(odt_file_url, pretty=True)
@@ -99,4 +101,3 @@ if  __name__ == '__main__':
     message = message % (odt_file_url, mm_file_url)
     stdout.write(message.encode('utf-8'))
     stdout.flush()
-
