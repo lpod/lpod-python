@@ -222,7 +222,7 @@ class odf_document(object):
                 + styles.get_style_list(family=family, automatic=automatic))
 
 
-    def get_style(self, family, name_or_element, display_name=False):
+    def get_style(self, family, name_or_element=None, display_name=False):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 
@@ -244,13 +244,13 @@ class odf_document(object):
         """
         # 1. content.xml
         content = self.get_xmlpart('content')
-        element = content.get_style(family, name_or_element,
+        element = content.get_style(family, name_or_element=name_or_element,
                                     display_name=display_name)
         if element is not None:
             return element
         # 2. styles.xml
         styles = self.get_xmlpart('styles')
-        return styles.get_style(family, name_or_element,
+        return styles.get_style(family, name_or_element=name_or_element,
                                 display_name=display_name)
 
 
@@ -269,6 +269,48 @@ class odf_document(object):
             for style in self.get_style_list(family=family_type):
                 output.append(_show_styles(style))
         return u'\n'.join(output)
+
+
+    def merge_styles_from(self, document):
+        """Copy all the styles of a document into ourself.
+
+        Styles with the same type and name will be replaced, so only unique
+        styles will be preserved.
+        """
+        styles = self.get_xmlpart('styles')
+        content = self.get_xmlpart('content')
+        for style in document.get_style_list():
+            tagname = style.get_name()
+            family = style.get_style_family()
+            if family is None:
+                mapping = {'style:page-layout': 'page-layout',
+                           'style:master-page': 'master-page'}
+                family = mapping.get(tagname)
+            stylename = style.get_style_name()
+            container = style.get_parent()
+            container_name = container.get_name()
+            partname = container.get_parent().get_name()
+            if partname == "office:document-styles":
+                part = styles
+            elif partname == "office:document-content":
+                part = content
+            else:
+                raise NotImplementedError, partname
+            if container_name in ("office:styles",
+                                  "office:automatic-styles"):
+                dest = part.get_element('//%s' % container_name)
+                if tagname in ("style:default-style", "style:style",
+                               "style:style", "style:page-layout",
+                               "style:master-page"):
+                    duplicate = part.get_style(family, stylename)
+                    if duplicate is not None:
+                        duplicate.get_parent().delete(duplicate)
+                    dest.append_element(style)
+                    continue
+                else:
+                    raise NotImplementedError, tagname
+            else:
+                raise NotImplementedError, container_name
 
 
 
