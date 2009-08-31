@@ -54,7 +54,7 @@ class odf_toc(odf_element):
         if source is None:
             source = odf_create_element('<text:table-of-content-source/>')
             self.insert_element(source, FIRST_CHILD)
-        source.set_attribute('text:outline-level', level)
+        source.set_attribute('text:outline-level', str(int(level)))
 
 
 
