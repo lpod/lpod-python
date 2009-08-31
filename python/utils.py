@@ -111,6 +111,11 @@ def _get_style_tagname(family):
     mapping = {'paragraph': ('style:style', family),
                'text': ('style:style', family),
                'graphic': ('style:style', family),
+               'table': ('style:style', family),
+               'table-column': ('style:style', family),
+               'table-row': ('style:style', family),
+               'table-cell': ('style:style', family),
+               'section': ('style:style', family),
                # False families
                'page-layout': ('style:page-layout', None),
                'master-page': ('style:master-page', None)}

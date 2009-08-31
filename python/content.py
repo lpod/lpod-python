@@ -16,11 +16,6 @@ class odf_content(odf_xmlpart):
     # The following two seem useless but they match styles API
 
     def _get_style_context(self, name, family):
-        if name is False:
-            # Treat the case for get_style_list where the name is undefined
-            return self.get_element('//office:automatic-styles')
-        if family not in ('paragraph', 'text'):
-            raise ValueError, "unknown automatic family: " + family
         return self.get_element('//office:automatic-styles')
 
 
@@ -31,6 +26,10 @@ class odf_content(odf_xmlpart):
             return ('(//%s)' % '|//'.join(all), family)
         return _get_style_tagname(family)
 
+
+    #
+    # Public API
+    #
 
     def get_style_list(self, family=None):
         tagname, famattr = self._get_style_tagname(family, False)

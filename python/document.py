@@ -290,27 +290,28 @@ class odf_document(object):
             container = style.get_parent()
             container_name = container.get_name()
             partname = container.get_parent().get_name()
+            # The destination part
             if partname == "office:document-styles":
                 part = styles
             elif partname == "office:document-content":
                 part = content
             else:
                 raise NotImplementedError, partname
-            if container_name in ("office:styles",
-                                  "office:automatic-styles"):
-                dest = part.get_element('//%s' % container_name)
-                if tagname in ("style:default-style", "style:style",
+            # Implemented containers
+            if container_name not in ("office:styles",
+                                      "office:automatic-styles",
+                                      "office:master-styles"):
+                raise NotImplementedError, container_name
+            dest = part.get_element('//%s' % container_name)
+            # Implemented style types
+            if tagname not in ("style:default-style", "style:style",
                                "style:style", "style:page-layout",
                                "style:master-page"):
-                    duplicate = part.get_style(family, stylename)
-                    if duplicate is not None:
-                        duplicate.get_parent().delete(duplicate)
-                    dest.append_element(style)
-                    continue
-                else:
-                    raise NotImplementedError, tagname
-            else:
-                raise NotImplementedError, container_name
+                raise NotImplementedError, tagname
+            duplicate = part.get_style(family, stylename)
+            if duplicate is not None:
+                duplicate.get_parent().delete(duplicate)
+            dest.append_element(style)
 
 
 
