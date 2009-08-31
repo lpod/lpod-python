@@ -78,7 +78,7 @@ style_families = ['paragraph', 'text',  'graphic', 'page-layout',
 
 
 
-def lpod_show(odf_file_url, families):
+def show(odf_file_url, families):
     """Show the different types of styles of a document and their properties.
     """
     families.sort()
@@ -93,34 +93,54 @@ def lpod_show(odf_file_url, families):
 
 
 
+def merge(source_url, dest_url):
+    source = odf_get_document(source_url)
+    dest = odf_get_document(dest_url)
+    dest.merge_styles_from(source)
+    dest.save(pretty=True)
+    print "Done (0 error, 0 warning)."
+
+
+
 if  __name__ == '__main__':
 
     # Options initialisation
     usage = '%prog <file>'
     description = 'A command line interface to manipulate styles of ' \
                   'OpenDocument files.'
-    oparser = OptionParser(usage, version=__version__, description=description)
+    oparser = OptionParser(usage, version=__version__,
+                           description=description)
     # --show
     help = ('show the styles of a document. The value is a comma separated '
             'list. Authorized values are automatic, default, master, named '
             'and all.')
-    oparser.add_option('--show', dest='show', action='store',
-                       metavar='<style list>', help=help)
+    oparser.add_option('-s', '--show', dest='show', action='store',
+                       default='', metavar='<style list>', help=help)
+    # --merge
+    help = ('Copy styles from FILE to <file>. Any style with the same name '
+            'will be replaced.')
+    oparser.add_option('-m', '--merge-styles-from', dest='merge',
+                       action='store', metavar='FILE', help=help)
     # Parse options
     opts, args = oparser.parse_args()
-    if len(args) < 1:
+    if len(args) != 1:
         oparser.print_help()
         exit(1)
+    odf_file_url = args[0]
 
-    if opts.show is None or opts.show == 'all':
-        families = style_families
+    if opts.show:
+        if opts.show in ('', 'all'):
+            families = style_families
+        else:
+            # Transform the comma separated list into a true list object
+            families = [family.strip() for family in opts.show.split(',')]
+        # Check if the style family is known
+        for family in families:
+            if family not in style_families:
+                oparser.error('Unknown %s family' % family)
+        show(odf_file_url, families)
+    elif opts.merge:
+        merge(opts.merge, odf_file_url)
     else:
-        # Transform the comma separated list into a true list object
-        families = [family.strip() for family in opts.show.split(',')]
-    # Check if the style family is known
-    for family in families:
-        if family not in style_families:
-            oparser.error('Unknown %s family' % family)
-    for odf_file_url in args:
-        lpod_show(odf_file_url, families)
-
+        oparser.print_help()
+        exit(1)
