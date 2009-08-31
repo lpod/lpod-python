@@ -45,10 +45,15 @@ compliance (the API doesn't automatically prevent the applications from
 inserting an element at the wrong place).
 
 Any element can be retrieved according to its sequential position in a given
-context or its text content (if defined). For example::
+context or its text content (if defined), through methods like
+``get_xxx_by_position()`` and ``get_xxx_by_content()`` where "xxx" is the
+element type (i.e. "paragraph", "heading", etc). For example::
 
   element = context.get_xxx_by_position(p)
   element = context.get_xxx_by_content(regex)
+
+It's possible to get the list of elements of a known type in the context, using
+``get_xxx_list()``.
 
 The two lines above retrieve an element among the children of a given 'context'
 element. The first one selects the child element at the given ``p`` position.
@@ -90,23 +95,27 @@ attached later through the standard ``append_element()`` or
 
 Retrieval
 ~~~~~~~~~
-Like any element, a paragraph can be retrieved in a given context according to
-its sequential position or its text content.
+Like any element, a paragraph can be retrieved in a given context using
+``get_paragraph_by_position()`` or ``get_paragraph_by_content()``, and
+``get_paragraph_list()`` returns all the paragraphs in the context.
 
-In addition, it's possible to select the paragraphs that use a given style.
+In addition, ``get_paragraphs_by_style()`` returns the paragraphs which use
+a given style only.
 
-- Text processing
-   The traditional string editing methods (i.e. regex-based search & replace
-   functions) are available against the text content of a paragraph.
+Text processing
+~~~~~~~~~~~~~~~
+The traditional string editing methods (i.e. regex-based search & replace
+functions) are available against the text content of a paragraph.
 
-- Multiple spaces and intra-paragraph breaks
-   According to the ODF specification, a sequence of multiple spaces is regarded
-   as a single space, so multiple spaces must be represented by an appropriate
-   ODF element. In the same way, tabulation marks and line breaks can't be
-   directly included in the text content, and must be replaced by appropriate
-   ODF elements. This API transparently does the job: it allows the user to put
-   in a paragraph a text strings containing multiple spaces, tab stops ("\t")
-   and/or line breaks ("\n").
+Multiple spaces and intra-paragraph breaks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+According to the ODF specification, a sequence of multiple spaces is regarded
+as a single space, so multiple spaces must be represented by an appropriate
+ODF element. In the same way, tabulation marks and line breaks can't be
+directly included in the text content, and must be replaced by appropriate
+ODF elements. This API transparently does the job: it allows the user to put
+in a paragraph a text strings containing multiple spaces, tab stops ("\t")
+and/or line breaks ("\n").
 
 Headings
 ---------
@@ -116,7 +125,23 @@ as well.
 However, a heading is a special paragraph which owns additional properties
 related to its hierarchical level and its numbering. As an consequence, some
 heading-specific methods are provided, and the constructor function is
-``odf_create_heading()``.
+``odf_create_heading()``. The ``text`` and ``style`` parameters are allowed
+like with ``odf_create_paragraph()``. In addition, this constructor gets more
+optional parameters:
+
+- ``level`` which indicates the hierarchical level of the heading (default 1,
+  i.e. the top level);
+
+- ``restart-numbering``, a boolean which, if true, indicates that the numbering
+  should be restarted at the current heading (default false);
+
+- ``start-value`` to restart the heading numbering of the current level at a
+  given value;
+
+- ``suppress-numbering``, a boolean which, if true, indicates that the heading
+  must not be numbered (default false).
+
+See below for explanations about level and numbering.
 
 In addition, the layout of the headings depends partly on the paragraph style
 that individually apply to each one, and partly on the outline style of the
@@ -146,27 +171,63 @@ by applications that support dynamic numbering in text documents.
 
 Text spans
 ----------
-A text span, in the lpOD scope, is a delimited area included in a paragraph or a heading. There are several kinds of text spans.
+A text span, in the lpOD scope, is a delimited area included in a paragraph or
+a heading. There are several kinds of text spans.
 
-- Styling spans A text span can be defined in order to apply a special style to
+- Style spans: a text span can be defined in order to apply a special style to
   a part of the content of a paragraph/heading. As a consequence, it's
   associated to a text style.
-- Hyperlinks A hyperlink can be defined in order to associate a part of the
+- Hyperlinks: a hyperlink can be defined in order to associate a part of the
   content of a paragraph/heading to the URI of an external resource.
 
 Unlike paragraphs and headings, spans are created "in place", i.e. their
-creation methods create and directly insert them in the document.
+creation methods create and directly insert them in an existing container.
 
-For styling and hyperlinking spans, the user has to provide the text container
-(i.e. the paragraph or the heading element) and a regular expression. The spans
-can apply repeatedly to every substring in the container that match the regex.
-Optionally, it's possible to set a span of a given length at a given position in
-the element; in this case, the user has to provide length and position options
-instead of a regex string.
+A style span is created through a ``set_span()`` method  from the object that
+will contain the span. This object is a paragraph, a heading or an existing
+styling span. The method must be called with a ``style`` named parameter whose
+value should be the name of any text style (common or automatic, existing or to
+be created in the same document). ``set_span()`` may uses a regular expression,
+which may match zero, one or several times to the text content of the calling
+object, so the spans can apply repeatedly to every substring that matches.
+Alternatively, ``set_span()`` may be called with given ``position`` and
+``length`` parameters, in order to apply the span once whatever the content.
+Note that ``position`` is an offset that may be a positive integer (starting
+to 0 for the 1st position), or a negative integer (starting to -1 for the last
+position) if the user prefers to count back from the end of the target. If
+the ``length`` parameter is omitted or set to 0 the span runs up to the end
+of the target content. If ``position`` is out of range, nothing is done; if
+``position`` is OK, extra length (if any) is ignored. 
 
-Text spans can be nested without limits. However, a styling or hyperlinking span
-is always entirely included in the area of its starting point (paragraph or text
-span).
+A hyperlink span is created through ``set_hyperlink()``, which waits for the
+same positioning parameters (by regex or by position and length). However,
+there is no style, and a ``uri`` parameter (whose value is any kind of URI
+that is supported by the application) is required instead. A hyperlink span
+can't contain any other span, while a style span can contain one or more spans.
+As a consequence, the only one way to provide a hyperlink soan with a text style
+consists of embed it in a style span.
+
+The objects that can directly contain text spans are paragraphs, headings and
+style spans. However, ``set_span()`` and ``set_hyperlink()`` may be called
+from any higher level containers that can contain paragraphs or headings,
+including the whole document. The span creation process may work recursively and
+repeatedly in all the paragraphs, and spans below the calling ODF element. Both
+return the list of the created span objects; a span object is an ODF element
+itself. However, it's possible to prohibit this behaviour with a boolean
+``norecurse`` parameter; if this option is set to ``true``, it prevents
+``set_span()`` or ``set_hyperlink()`` from searching and processing the children
+of the calling ODF element; of course, nothing is done when ``norecurse`` is the
+current object is not able to directly able to contain text spans.
+
+As an example, the instruction below applies the "HighLight" text style to
+every "ODF" and "OpenDocument" substring in the ``p`` context::
+
+   p.set_span('ODF|OpenDocument', style='HighLight')
+
+The following example associates an hyperlink in the last 5 characters of the
+``p`` container::
+
+   p.set_hyperlink(position=-5, length=5, uri='http://here.org')
 
 Text marks and indices
 ======================
