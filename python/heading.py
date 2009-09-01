@@ -7,7 +7,8 @@ from element import register_element_class, odf_create_element
 
 
 def odf_create_heading(level, text=None, restart_numbering=False,
-                       start_value=None, style=None):
+                       start_value=None, suppress_numbering=False,
+                       style=None):
     """Create a heading element of the given style and level, containing the
     optional given text.
 
@@ -35,6 +36,8 @@ def odf_create_heading(level, text=None, restart_numbering=False,
         element.set_attribute('text:restart-numbering', 'true')
     if start_value:
         element.set_attribute('text:start-value', start_value)
+    if suppress_numbering:
+        element.set_attribute('text:suppress-numbering', 'true')
     if style:
         element.set_attribute('text:style-name', style)
     return element
