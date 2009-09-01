@@ -125,15 +125,20 @@ def _get_style_tagname(family):
 
 
 def _expand_properties(properties):
-    mapping = {'font': 'style:font-name',
+    mapping = {# text
+               'font': 'style:font-name',
                'size': 'fo:font-size',
                'weight': 'fo:font-weight',
                'style': 'fo:font-style',
                'color': 'fo:color',
-               'background-color': 'fo:background-color',
                'background_color': 'fo:background-color',
                'underline': 'style:text-underline-style',
-               'display': 'text:display'}
+               'display': 'text:display',
+               # paragraph
+               'align': 'fo:text-align',
+               'indent': 'fo:text-indent',
+               'border': 'fo:border',
+               'shadow': 'fo:text-shadow'}
     if type(properties) is dict:
         expanded = {}
         for key, value in properties.items():
