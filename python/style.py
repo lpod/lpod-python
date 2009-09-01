@@ -4,7 +4,7 @@
 # Import from lpod
 from element import register_element_class, odf_create_element, odf_element
 from paragraph import odf_create_paragraph
-from utils import _get_style_tagname
+from utils import _get_style_tagname, _expand_properties, _merge_dicts
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
@@ -111,7 +111,7 @@ class odf_style(odf_element):
         return properties
 
 
-    def set_style_properties(self, properties=None, area=None, **kw):
+    def set_style_properties(self, properties={}, area=None, **kw):
         """Set the properties of the "area" type of this style. Properties
         are given either as a dict or as named arguments (or both). The area
         is identical to the style family by default. If the properties
@@ -127,20 +127,15 @@ class odf_style(odf_element):
         if element is None:
             element = odf_create_element('<style:%s-properties/>' % area)
             self.append_element(element)
-        if properties is not None:
-            for key, value in properties.iteritems():
-                if value is None:
-                    element.del_attribute(key)
-                else:
-                    element.set_attribute(key, value)
-        for key, value in kw.iteritems():
+        properties = _expand_properties(_merge_dicts(properties, kw))
+        for key, value in properties.iteritems():
             if value is None:
                 element.del_attribute(key)
             else:
                 element.set_attribute(key, value)
 
 
-    def del_style_properties(self, properties=None, area=None, *args):
+    def del_style_properties(self, properties=[], area=None, *args):
         """Delete the given properties, either by list argument or
         positional argument (or both). Remove only from the given area,
         identical to the style family by default.
@@ -154,10 +149,7 @@ class odf_style(odf_element):
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             raise ValueError, "properties element is inexistent"
-        if properties is not None:
-            for key in properties:
-                element.del_attribute(key)
-        for key in args:
+        for key in _expand_properties(properties):
             element.del_attribute(key)
 
 

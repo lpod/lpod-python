@@ -11,12 +11,7 @@ from lpod.style import odf_create_style, odf_style
 from lpod.xmlpart import odf_xmlpart
 
 
-class TestStyle(TestCase):
-
-    def setUp(self):
-        self.document = document = odf_get_document('samples/span_style.odt')
-        self.content = document.get_xmlpart('content')
-
+class TestCreateStyle(TestCase):
 
     def test_create_style_paragraph(self):
         style = odf_create_style('paragraph', 'style1')
@@ -99,6 +94,22 @@ class TestStyle(TestCase):
                       '<style:paragraph-properties fo:margin-top="0cm"/>'
                     '</style:style>')
         self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_properties_shorcut(self):
+        style = odf_create_style('paragraph', area='text', color='#ff0000')
+        expected = ('<style:style style:family="paragraph">'
+                      '<style:text-properties fo:color="#ff0000"/>'
+                    '</style:style>')
+        self.assertEqual(style.serialize(), expected)
+
+
+
+class TestStyle(TestCase):
+
+    def setUp(self):
+        self.document = document = odf_get_document('samples/span_style.odt')
+        self.content = document.get_xmlpart('content')
 
 
     def test_get_style_list(self):

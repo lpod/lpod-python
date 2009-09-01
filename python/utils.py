@@ -124,6 +124,40 @@ def _get_style_tagname(family):
     return mapping[family]
 
 
+def _expand_properties(properties):
+    mapping = {'font': 'style:font-name',
+               'size': 'fo:font-size',
+               'weight': 'fo:font-weight',
+               'style': 'fo:font-style',
+               'color': 'fo:color',
+               'background-color': 'fo:background-color',
+               'background_color': 'fo:background-color',
+               'underline': 'style:text-underline-style',
+               'display': 'text:display'}
+    if type(properties) is dict:
+        expanded = {}
+        for key, value in properties.items():
+            key = mapping.get(key, key)
+            expanded[key] = value
+    elif type(properties) is list:
+        expanded = []
+        for key in properties:
+            key = mapping.get(key, key)
+            expanded.append(key)
+    return expanded
+
+
+
+def _merge_dicts(d, *args, **kw):
+    """Merge two or more dictionaries into a new dictionary object.
+    """
+    new_d = d.copy()
+    for dic in args:
+        new_d.update(dic)
+    new_d.update(kw)
+    return new_d
+
+
 
 #
 # Non-public yet useful helpers
