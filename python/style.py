@@ -111,15 +111,22 @@ class odf_style(odf_element):
         return properties
 
 
-    def set_style_properties(self, properties={}, area=None, **kw):
+    def set_style_properties(self, properties={}, style=None, area=None, **kw):
         """Set the properties of the "area" type of this style. Properties
         are given either as a dict or as named arguments (or both). The area
         is identical to the style family by default. If the properties
         element is missing, it is created.
+
+        Instead of properties, you can pass a style with properties of the
+        same area. These will be copied.
+
         Arguments:
 
             properties -- dict
-            area -- str
+
+            style -- odf_style
+
+            area -- 'paragraph', 'text'...
         """
         if area is None:
             area = self.get_attribute('style:family')
@@ -127,7 +134,12 @@ class odf_style(odf_element):
         if element is None:
             element = odf_create_element('<style:%s-properties/>' % area)
             self.append_element(element)
-        properties = _expand_properties(_merge_dicts(properties, kw))
+        if properties:
+            properties = _expand_properties(_merge_dicts(properties, kw))
+        elif style is not None:
+            properties = style.get_style_properties(area=area)
+            if properties is None:
+                return
         for key, value in properties.iteritems():
             if value is None:
                 element.del_attribute(key)
