@@ -37,6 +37,36 @@ class TestStyle(TestCase):
         self.assertEqual(style.serialize(), expected)
 
 
+    def test_create_style_table(self):
+        style = odf_create_style('table')
+        expected = ('<style:style style:family="table"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_table_column(self):
+        style = odf_create_style('table-column')
+        expected = ('<style:style style:family="table-column"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_table_row(self):
+        style = odf_create_style('table-row')
+        expected = ('<style:style style:family="table-row"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_table_cell(self):
+        style = odf_create_style('table-cell')
+        expected = ('<style:style style:family="table-cell"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_section(self):
+        style = odf_create_style('section')
+        expected = ('<style:style style:family="section"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
     def test_create_style_page_layout(self):
         style = odf_create_style('page-layout')
         expected = ('<style:page-layout/>')
@@ -46,6 +76,28 @@ class TestStyle(TestCase):
     def test_create_style_master_page(self):
         style = odf_create_style('master-page')
         expected = ('<style:master-page/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_display_name(self):
+        style = odf_create_style('paragraph', display_name=u"Heading 1")
+        expected = ('<style:style style:family="paragraph" '
+                    'style:display-name="Heading 1"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_parent(self):
+        style = odf_create_style('paragraph', parent=u"Heading 1")
+        expected = ('<style:style style:family="paragraph" '
+                    'style:parent-style-name="Heading 1"/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_properties(self):
+        style = odf_create_style('paragraph', **{'fo:margin-top': "0cm"})
+        expected = ('<style:style style:family="paragraph">'
+                      '<style:paragraph-properties fo:margin-top="0cm"/>'
+                    '</style:style>')
         self.assertEqual(style.serialize(), expected)
 
 

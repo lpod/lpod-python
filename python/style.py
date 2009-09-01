@@ -7,10 +7,18 @@ from paragraph import odf_create_paragraph
 from utils import _get_style_tagname
 
 
-def odf_create_style(family, name=None, area=None, **kw):
+def odf_create_style(family, name=None, display_name=None, parent=None,
+                     area=None, **kw):
     """Create a style of the given family. The name is not mandatory at this
     point but will become required when inserting in a document as a common
     style.
+
+    The display name is the name the user sees in an office application.
+
+    The parent is the name of the style this style will inherit from.
+
+    To set properties, pass them as keyword arguments. The area properties
+    apply to is optional and defaults to the family.
 
     Arguments:
 
@@ -20,14 +28,15 @@ def odf_create_style(family, name=None, area=None, **kw):
                   'control', 'ruby', 'list', 'number', 'page-layout' or
                   'master-page'
 
-        name -- unicode or None
+        name -- unicode
 
-        area -- the "<area>-properties" where to store properties,
-                identical to the family by default
+        display_name -- unicode
 
-        kw -- properties to create on the fly
+        parent -- unicode
 
-    Return: odf_element
+        area -- str
+
+    Return: odf_style
     """
     tagname, famattr = _get_style_tagname(family)
     element = odf_create_element('<%s/>' % tagname)
@@ -35,6 +44,10 @@ def odf_create_style(family, name=None, area=None, **kw):
         element.set_style_name(name)
     if famattr:
         element.set_attribute('style:family', famattr)
+    if display_name:
+        element.set_attribute('style:display-name', display_name)
+    if parent:
+        element.set_attribute('style:parent-style-name', parent)
     if kw:
         if area is None:
             area = family
