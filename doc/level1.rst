@@ -187,17 +187,18 @@ A style span is created through a ``set_span()`` method  from the object that
 will contain the span. This object is a paragraph, a heading or an existing
 styling span. The method must be called with a ``style`` named parameter whose
 value should be the name of any text style (common or automatic, existing or to
-be created in the same document). ``set_span()`` may uses a regular expression,
-which may match zero, one or several times to the text content of the calling
-object, so the spans can apply repeatedly to every substring that matches.
-Alternatively, ``set_span()`` may be called with given ``position`` and
-``length`` parameters, in order to apply the span once whatever the content.
-Note that ``position`` is an offset that may be a positive integer (starting
-to 0 for the 1st position), or a negative integer (starting to -1 for the last
-position) if the user prefers to count back from the end of the target. If
-the ``length`` parameter is omitted or set to 0 the span runs up to the end
-of the target content. If ``position`` is out of range, nothing is done; if
-``position`` is OK, extra length (if any) is ignored. 
+be created in the same document). ``set_span()`` may uses a string or a regular
+expression, which may match zero, one or several times to the text content of
+the calling object, so the spans can apply repeatedly to every substring that
+matches. The string is provided through a ``filter`` parameter. Alternatively,
+``set_span()`` may be called with given ``position`` and ``length`` parameters,
+in order to apply the span once whatever the content. Note that ``position`` is
+an offset that may be a positive integer (starting to 0 for the 1st position),
+or a negative integer (starting to -1 for the last position) if the user prefers
+to count back from the end of the target. If the ``length`` parameter is omitted
+or set to 0 the span runs up to the end of the target content. If ``position``
+is out of range, nothing is done; if ``position`` is OK, extra length (if any)
+is ignored. 
 
 A hyperlink span is created through ``set_hyperlink()``, which waits for the
 same positioning parameters (by regex or by position and length). However,
@@ -222,12 +223,19 @@ current object is not able to directly able to contain text spans.
 As an example, the instruction below applies the "HighLight" text style to
 every "ODF" and "OpenDocument" substring in the ``p`` context::
 
-   p.set_span('ODF|OpenDocument', style='HighLight')
+   p.set_span(filter='ODF|OpenDocument', style='HighLight')
 
 The following example associates an hyperlink in the last 5 characters of the
 ``p`` container::
 
    p.set_hyperlink(position=-5, length=5, uri='http://here.org')
+
+The sequence hereafter show the way to set a style span and a hyperlink for
+the same text run. The style span is created first, then it's used as the
+context to create a hyperlink span that spreads over its whole content::
+
+   s = p.set_span('The lpOD Project', style='Outstanding')
+   s.set_hyperlink(position=0, uri='http://www.lpod-project.org')
 
 Text marks and indices
 ======================
@@ -484,6 +492,33 @@ and/or "text properties" (see below). In such a situation, an additional
 ``set_properties()``. Of course, the same ``area`` parameter applies to
 ``get_properties()``.
 
+Some styles allow the applications to specify a *background*. Such a background
+is sometimes characterized by the RGB, 3-bytes hexadecimal code of an arbitrary
+color, with a leading "#". However some styles allow the use of backround image
+instead of or in combination with a color. In order to deal with these
+possibilities, a ``set_background()`` is provided; this method (which works
+with some style objects only) is used with a ``color`` and/or an ``uri`` named
+parameters. The ``color`` value range is #000000-#ffffff, while ``uri`` should
+be set to the URI of the graphic resource. If ``uri`` is set, some additional
+optional parameters may be provided, in order to control the way the image is
+displayed in the background, namely:
+
+- ``position``: a string that specifies the horizontal and vertical positions
+  of the image, through one or two space-separated words (in any order) among
+  ``center``, ``left``, ``right``, ``top``, ``bottom`` (default: ``center``);
+- ``repeat``: specifies whether a background image is repeated or stretched,
+  whose possible values are ``no-repeat`` meaning that the image should be
+  displayed once, ``repeat`` to repeat the image in order to fill the whole
+  background, and ``stretch`` to extend the image in order to fill the
+  whole background;
+- ``opacity``: the percentage of opacity;
+- ``filter``: an application-specific filter to that is used to load and process
+  the graphic file, according to the image format.
+
+To remove the background color or image (i.e. to set the background to the
+default, that is transparent), the user just have to call ``set_background()``
+with ``color`` and ``uri`` set to null.
+
 A style can be inserted as either *common* (or named and visible for the
 user of a typical office application) or *automatic*, according to a boolean
 ``automatic`` option, whose default value is ``false``. A common style may have
@@ -537,8 +572,8 @@ a yellow background::
                         weight='bold',
                         style='italic',
                         color='#000080',
-                        background-color='#ffff00'
                         )
+   s.set_background(color='#ffff00')
 
 This new style could be retrieved and changed later using ``get_style()``
 then the ``set_properties()`` method of the style object. For example, the
@@ -574,8 +609,6 @@ mnemonic shortcuts for a few, frequently required properties, namely:
   legal values are ``normal``, ``italic`` and ``oblique``;
 - ``color``: the color of the characters (i.e. foreground color), provided
   as a RGB, 6-digit hexadecimal string with a leading '#';
-- ``background-color``: the color of the text background, provided in the
-  same format as the foreground color;
 - ``underline``: to specify if and how text is underlined; possible values
   are ``solid`` (for a continuous line), ``dotted``, ``dash``,
   ``long-dash``, ``dot-dash``, ``dot-dot-dash``, ``wave``, and ``none``;
@@ -583,6 +616,8 @@ mnemonic shortcuts for a few, frequently required properties, namely:
   possible values are ``true`` (meaning visible) ``none`` (meaning hidden)
   or ``condition`` (meaning that the text is to be visible or hidden
   according to a condition defined elsewhere).
+
+A paragraph style may have a background (color or image)
 
 Paragraph family
 ~~~~~~~~~~~~~~~~~~
@@ -647,11 +682,12 @@ required properties, namely:
 - ``border``: a 3-part string to specify the thickness, the line style and the line color (according to the XSL/FO grammar);
 - ``border-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): the same as ``border`` but to specify a particular border for one side;
 - ``shadow``: a 3-part string to specify the color and the size of the shadow;
-- ``background-color``: the hexadecimal color code of the background, with a leading ``#``, or the word ``transparent``;
 - ``padding``: the space around the paragraph;
 - ``padding-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): to specify the space around the paragraph side by side;
 - ``keep-with-next``: to specify whether or not to keep the paragraph and the next paragraph together on a page or in a column, possible values are ``always`` or ``auto``;
 - ``page-break-xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
+
+A text style may have a background color, but not a background image.
 
 List styles
 ------------
@@ -836,7 +872,7 @@ Date style [todo]
 Time style [todo]
 ~~~~~~~~~~~~~~~~~
 
-Page styles [todo]
+Page styles [tbc]
 -------------------
 
 A page style definition, so-called *master page*, is "*a template for pages in
@@ -923,8 +959,78 @@ existing header/footer. It's always possible to retrieve the header or the
 footer using ``get_header()`` or ``get_footer()``, and to remove them using
 ``delete_header()`` and ``delete_footer()``.
 
+Note that the header and footer extensions of a master page don't include any
+layout information; the style of the header and footer of a master page is
+specified through the header and footer extensions of the corresponding page
+layout.
+
 Page layouts
 ~~~~~~~~~~~~~
+
+Page layouts are generally invisible for the end users, knowing that a typical
+ODF-compliant text processor regards them as extensions of the main page styles,
+namely master pages. However, a page layout is defined through the lpOD API
+using the same logic as other style objects. It may be created using
+``odf_create_style()`` with ``page layout`` as the family argument and a
+unique name (mandatory when the object is attached to a document). The
+``display name`` optional parameter is ignored for this kind of style. On the
+other hand, a specific ``page usage`` parameter, whose legal values are
+``all``, ``left``, ``right``, ``mirrored`` (default: ``all``) allows the
+user to specify the type of pages that the page layout should generate.
+
+The list of other possible properties that may be set with page layouts through
+``odf_create_style()`` is described in section §15.2 of the ODF specification;
+some of these properties may be set using the following lpOD mnemonics:
+
+- ``height`` and ``width``: the page size values, in regular ODF-compliant
+  notation (ex: '21cm');
+- ``number format``, ``number prefix``, and ``number suffix``: the format,
+  prefix and suffix which define the default number representation for page
+  styles, which is used to display page numbers within headers and footers
+  (see the "Number styles" section in the present documentation);
+- ``paper tray``: to specify the paper tray to use when printing the document;
+  it's a proprietary information knowing that the paper tray names depend on
+  the printer model; however, this property, if defined, may be safely set to
+  ``default``, so the default tray specified in the printer configuration
+  settings will be used.
+- ``orientation``: specifies the orientation of the printed page, may be
+  ``portrait`` or ``landscape`` (default: ``portrait``);
+- ``margin-xxx`` (where xxx is ``left``, ``right``, ``top`` or ``bottom``):
+  to control the margins of the page;
+- ``border-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``):
+  a 3-part string to specify the thickness, the line style and the line color
+  (according to the XSL/FO grammar);
+- ``border``: a 3-part string to specify the thickness, the line style and the
+  line color (according to the XSL/FO grammar), for all the four borders;
+- ``footnote height``: defines the maximum amount of space on the page that a
+  footnote can occupy.
+
+Page layout objects support the ``set_background()`` method, allowing to set
+a background color or a background image.
+
+A page layout object may have a header and/or a footer extension, respectively
+set using ``set_header()`` and/or ``set_footer()``. These methods, when used
+with a page layout object, allow the applications to extend the page layout in
+order to specify layout informations that control the header and the footer of
+the master page(s) that use the page layout. Of course, the layout properties
+are not the same as the content properties. Knowing that headers and footers
+may have different margins and borders than the page body, ``set_header()`` and
+``set_footer()`` accept the same margin- and border-related named parameters
+as ``odf_create_style()`` when used to create a page layout. On the other hand,
+``set_header()`` and ``set_footer()`` return ODF elements that support the
+generic ``set_background()`` method; so it's possible to call use this method
+separately from the page layout main object and from both its header and
+footer extensions, allowing the user to set specific backgrounds in the 3 parts
+of the affected page.
+
+A page layout style may specify a columned page. A ``set_columns()`` method,
+called from a page layout object, does the job with the number of columns as
+a first mandatory argument and a ``gap`` optional name parameter that specifies
+the gap between columns. By default, all columns have the same width. It's
+possible to set extra properties in order to specify each column individually
+and to define a separator line between columns, through the low-level (lpOD 1)
+API.
+
 
 Metadata
 ========
