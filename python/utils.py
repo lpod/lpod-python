@@ -125,29 +125,39 @@ def _get_style_tagname(family):
 
 
 def _expand_properties(properties):
+    # This mapping is not exhaustive, it only contains cases where replacing
+    # '_' with '-' and adding the "fo:" prefix is not enough
     mapping = {# text
                'font': 'style:font-name',
                'size': 'fo:font-size',
                'weight': 'fo:font-weight',
                'style': 'fo:font-style',
-               'color': 'fo:color',
-               'background_color': 'fo:background-color',
                'underline': 'style:text-underline-style',
                'display': 'text:display',
                # paragraph
                'align': 'fo:text-align',
+               'align-last': 'fo:text-align-last',
                'indent': 'fo:text-indent',
-               'border': 'fo:border',
+               'together': 'fo:keep-together',
+               # TODO 'page-break-before': 'fo:page-break-before',
+               # TODO 'page-break-after': 'fo:page-break-after',
                'shadow': 'fo:text-shadow'}
+
+    def map_key(key):
+        key = mapping.get(key, key).replace('_', '-')
+        if ":" not in key:
+            key = "fo:" + key
+        return key
+
     if type(properties) is dict:
         expanded = {}
         for key, value in properties.items():
-            key = mapping.get(key, key)
+            key = map_key(key)
             expanded[key] = value
     elif type(properties) is list:
         expanded = []
         for key in properties:
-            key = mapping.get(key, key)
+            key = map_key(key)
             expanded.append(key)
     return expanded
 
