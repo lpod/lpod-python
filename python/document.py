@@ -254,6 +254,40 @@ class odf_document(object):
                                 display_name=display_name)
 
 
+    def insert_style(self, style, name=None, automatic=False, default=False):
+        """Insert the given style object in the document, as required by the
+        style family and type.
+
+        The style is expected to be a common style with a name. In case it
+        was created with no name, the given can be set on the fly.
+
+        If automatic is True, the style will be inserted as an automatic
+        style.
+
+        If default is True, the style will be inserted as a default style and
+        would replace any existing default style of the same family. Any name
+        or display name would be ignored.
+
+        Automatic and default arguments are mutually exclusive.
+
+        All styles can’t be used as default styles. Default styles are
+        allowed for the following families: paragraph, text, section, table,
+        table-column, table-row, table-cell, table-page, chart, drawing-page,
+        graphic, presentation, control and ruby.
+
+        Arguments:
+
+            style -- odf_style
+
+            name -- unicode
+
+            automatic -- bool
+
+            default -- bool
+        """
+        raise NotImplementedError
+
+
     def show_styles(self, family=None):
         if family is None:
             family = ['paragraph', 'text',  'graphic', 'table', 'list',
