@@ -125,10 +125,18 @@ class odf_paragraph(odf_element):
             self.insert_element(annotation_element, FIRST_CHILD)
 
 
-    def insert_link(self, uri_or_element, from_, to):
-        if isinstance(uri_or_element, (str, unicode)):
-            uri_or_element = odf_create_link(uri_or_element)
-        self._insert_between(uri_or_element, from_, to)
+    def insert_span(self, style, regex=None, offset=None, length=0):
+        """Apply the given style to text content matching the regex OR the
+        positional arguments.
+        """
+        raise NotImplementedError
+
+
+    def insert_link(self, uri, regex=None, offset=None, length=0):
+        """Make a link from text content matching the regex OR the positional
+        arguments.
+        """
+        raise NotImplementedError
 
 
 
