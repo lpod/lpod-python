@@ -134,13 +134,31 @@ Like any element, a paragraph can be retrieved in a given context using
 ``get_paragraph_by_position()`` or ``get_paragraph_by_content()``, and
 ``get_paragraph_list()`` returns all the paragraphs in the context.
 
-In addition, ``get_paragraphs_by_style()`` returns the paragraphs which use
-a given style only.
+The ``get_paragraph_list()`` with a ``style`` named parameter restricts the
+search in order to get the paragraphs which use a given style.
 
 Text processing
 ~~~~~~~~~~~~~~~
 The traditional string editing methods (i.e. regex-based search & replace
 functions) are available against the text content of a paragraph.
+
+``search()`` in a element-based method which takes a search string (or a
+regular expression) as argument a,d returns the position of the first substring
+matching the argument in the text content of the element. A null return value
+means no match. This method works with the direct text content of the calling
+element, not with the children, so it makes sense with paragraphs, headings and
+text spans only.
+
+``replace()`` is a context-based method. It takes two arguments, the first one
+being a search string like with ``search()``, the second one a text which will
+replace any substring matching the search string. The return value of the
+method is the total number of matches. If the second argument is an empty
+string, every matching substring is just deleted without replacement. If the
+second argument is missing, then nothing is changed, and the method just counts
+the number of matches. This method is context-based, so it recursively works on
+all the paragraphs, headers and spans below the calling element; the calling
+element may be any ODF element, including the elements that can't directly own a
+text content. It may be called at the document level.
 
 Multiple spaces and intra-paragraph breaks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -746,7 +764,7 @@ required properties, namely:
 - ``padding``: the space around the paragraph;
 - ``padding-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): to specify the space around the paragraph side by side;
 - ``keep-with-next``: to specify whether or not to keep the paragraph and the next paragraph together on a page or in a column, possible values are ``always`` or ``auto``;
-- ``page-break-xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
+- ``break-xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
 
 A pararaph style may have a background color or image.
 
