@@ -382,6 +382,15 @@ class odf_element(object):
         return search(pattern, text) is not None
 
 
+    def search(self, pattern):
+        # TODO merge with match
+        raise NotImplementedError
+
+
+    def replace(self, pattern, new):
+        raise NotImplementedError
+
+
     def get_parent(self):
         element = self.__element
         parent = element.getparent()
