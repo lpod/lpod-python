@@ -9,7 +9,7 @@ from cStringIO import StringIO
 from lxml.etree import parse, tostring
 
 # Import from lpod
-from element import make_odf_element
+from element import _make_odf_element
 
 
 class odf_xmlpart(object):
@@ -40,7 +40,7 @@ class odf_xmlpart(object):
     def get_root(self):
         if self.__root is None:
             tree = self.__get_tree()
-            self.__root = make_odf_element(tree.getroot())
+            self.__root = _make_odf_element(tree.getroot())
         return self.__root
 
 

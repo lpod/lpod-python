@@ -60,7 +60,7 @@ with open(ns_document_path, 'rb') as file:
 
 
 
-def decode_qname(qname):
+def _decode_qname(qname):
     """Turn a prefixed name to a (uri, name) pair.
     """
     if ':' in qname:
@@ -74,7 +74,7 @@ def decode_qname(qname):
 
 
 
-def uri_to_prefix(uri):
+def _uri_to_prefix(uri):
     """Find the prefix associated to the given URI.
     """
     for key, value in ODF_NAMESPACES.iteritems():
@@ -84,31 +84,39 @@ def uri_to_prefix(uri):
 
 
 
-def get_prefixed_name(tag):
+def _get_prefixed_name(tag):
     """Replace lxml "{uri}name" syntax with "prefix:name" one.
     """
     uri, name = tag.split('}', 1)
-    prefix = uri_to_prefix(uri[1:])
+    prefix = _uri_to_prefix(uri[1:])
     return '%s:%s' % (prefix, name)
 
 
 
-class_registry = {}
+#
+# Semi-Public API (used elsewhere)
+#
+
+__class_registry = {}
 
 def register_element_class(qname, cls):
     # Turn tag name into what lxml is expecting
-    tag = '{%s}%s' % decode_qname(qname)
-    if tag in class_registry:
+    tag = '{%s}%s' % _decode_qname(qname)
+    if tag in __class_registry:
         raise ValueError,  'element "%s" already registered' % qname
-    class_registry[tag] = cls
+    __class_registry[tag] = cls
 
 
 
-def make_odf_element(native_element):
-    cls = class_registry.get(native_element.tag,  odf_element)
+def _make_odf_element(native_element):
+    cls = __class_registry.get(native_element.tag,  odf_element)
     return cls(native_element)
 
 
+
+#
+# Public API
+#
 
 def odf_create_element(element_data):
     if not isinstance(element_data, (str, unicode)):
@@ -118,7 +126,7 @@ def odf_create_element(element_data):
     element_data = convert_unicode(element_data)
     data = ns_document_data.format(element=element_data)
     root = fromstring(data)
-    return make_odf_element(root[0])
+    return _make_odf_element(root[0])
 
 
 
@@ -285,13 +293,13 @@ class odf_element(object):
 
     def get_name(self):
         element = self.__element
-        return get_prefixed_name(element.tag)
+        return _get_prefixed_name(element.tag)
 
 
     def get_element_list(self, xpath_query):
         element = self.__element
         result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
-        return [make_odf_element(e) for e in result]
+        return [_make_odf_element(e) for e in result]
 
 
     def get_element(self, xpath_query):
@@ -305,14 +313,14 @@ class odf_element(object):
         attributes = {}
         element = self.__element
         for key, value in element.attrib.iteritems():
-            attributes[get_prefixed_name(key)] = value
+            attributes[_get_prefixed_name(key)] = value
         # FIXME lxml has mixed bytestring and unicode
         return attributes
 
 
     def get_attribute(self, name):
         element = self.__element
-        uri, name = decode_qname(name)
+        uri, name = _decode_qname(name)
         if uri is None:
             return element.get(name)
         value = element.get('{%s}%s' % (uri, name))
@@ -323,7 +331,7 @@ class odf_element(object):
 
     def set_attribute(self, name, value):
         element = self.__element
-        uri, name = decode_qname(name)
+        uri, name = _decode_qname(name)
         if uri is None:
             element.set(name, value)
         else:
@@ -332,7 +340,7 @@ class odf_element(object):
 
     def del_attribute(self, name):
         element = self.__element
-        uri, name = decode_qname(name)
+        uri, name = _decode_qname(name)
         if uri is None:
             del element.attrib[name]
         else:
@@ -380,7 +388,7 @@ class odf_element(object):
         if parent is None:
             # Already at root
             return None
-        return make_odf_element(parent)
+        return _make_odf_element(parent)
 
 
     def get_next_sibling(self):
@@ -388,7 +396,7 @@ class odf_element(object):
         next = element.getnext()
         if next is None:
             return None
-        return make_odf_element(next)
+        return _make_odf_element(next)
 
 
     def get_prev_sibling(self):
@@ -396,12 +404,12 @@ class odf_element(object):
         prev = element.getprevious()
         if prev is None:
             return None
-        return make_odf_element(prev)
+        return _make_odf_element(prev)
 
 
     def get_children(self):
         element = self.__element
-        return [make_odf_element(e) for e in element]
+        return [_make_odf_element(e) for e in element]
 
 
     def get_text_content(self):
@@ -463,7 +471,7 @@ class odf_element(object):
             if type(obj) in (_ElementStringResult, _ElementUnicodeResult):
                 result.append(unicode(obj))
             else:
-                result.append(make_odf_element(obj))
+                result.append(_make_odf_element(obj))
         return result
 
 
