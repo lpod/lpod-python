@@ -7,12 +7,47 @@ Level 1 coverage
 Common features
 ===============
 
-The API can create, retrieve or delete any element.  It can create, get, update
-or delete any attribute or sub-element in a previously retrieved element.
-Regarding an attribute, the same method is used in order to create or update,
-while an element creation require an explicit method.
+All the lpOD level 0 features are available through the level 1 API, so the
+applications can create, retrieve or delete any element.  They can create,
+select, update or delete any attribute or sub-element in a previously retrieved
+element.
 
-The calling object is either the document, or the context element.
+The API provides functions and methods.
+
+Functions are mainly used as object constructors, in order to create new ODF
+elements that could be later attached to a document. The name of an object
+constructor is like ``odf_create_xxx()`` where "xxx" is the object type.
+These constructors return "free" ODF elements, i.e. elements which don't belong
+yet to any document; these elements may be attached later through a document or
+context based method. However, some very specific objects may be created "in
+place", through ``set_xxx()`` element specific methods that create the objects
+and directly append them to the calling element.
+
+Once created, an object may be changed through the ``set_text()`` and
+``set_attribute()`` level 0 methods; however, the level 1 features allow the
+user to set the most used properties using a more friendly way.
+
+Some methods are document-based, other are context-based, and other are
+element-specific.
+
+A document-based method is a method that makes sense at the document level
+only. As an example, ``insert_style()`` is document-based knowing that a style
+is always defined at the document level.
+
+A context-based method is designed in order to allow the user to insert, search,
+process or delete content elements either in the whole document body, or in a
+particular branch in the content tree. For example ``insert_element()`` is
+context-based because it allows the insertion of an element in any context. Of
+course, a context is always an ODF element, but context-based methods are
+available whatever the element type (however, a context-based method can raise
+an error, for example when it's used to execute an operation that is not legal
+for the current context).
+
+An element-specific method works with specific ODF elements only, according to
+their particular role. For example ``set_header()`` is provided with ODF master
+pages, because a header is an extension of a page style element, while
+``set_background()`` is available with objects where a background definition
+makes sense (such as page layouts or paragraph styles).
 
 Common element-specific methods
 ===============================
@@ -149,13 +184,18 @@ document (see the "Outline style" section in the present document).
 
 Heading level
 ~~~~~~~~~~~~~
-A heading owns a special property which indicates its hierarchical level in the document. A "level" property can be set at creation time or later and changed at any time. A heading without a level attribute is assumed to be at level 1, which is the top level. The level may be any positive integer value (while the ODF spec doesn't set an explicit limit, we don't recommend levels beyond 10).
+A heading owns a special property which indicates its hierarchical level in the
+document. A "level" property can be set at creation time or later and changed at
+any time. A heading without a level attribute is assumed to be at level 1, which
+is the top level. The level may be any positive integer value (while the ODF
+spec doesn't set an explicit limit, we don't recommend levels beyond 10).
 
 Heading numbering
 ~~~~~~~~~~~~~~~~~~
 Whatever the visibility of the numbers, all the headings of a given level are
 potentially numbered. By default, the numbering is related to the whole document
-starting to 1. However, optional properties allow the user to change this behaviour.
+starting to 1. However, optional properties allow the user to change this
+behaviour.
 
 An arbitrary, explicit numbering value can be set, so the automatic numbering
 restarts from this value from the target heading element and apply to the
@@ -331,7 +371,7 @@ i.e. ``odf_create_note()`` and ``insert_note()``, the second one being a
 context-related method.
 
 While the identifier and the class are mandatory as soon as a note is inserted
-in a document, these parameter are not required at the creation time. They can
+in a document, these parameters are not required at the creation time. They can
 be provided (or changed) through the insert_note() method.
 
 The ``insert_note()`` method allows the user to insert the note in the same way
@@ -360,10 +400,11 @@ Note that neither the OpenDocument schema nor the lpOD level 1 API prevents the
 user from including notes into a note body; however the lpOD team doesn't
 recommend such a practice.
 
-Annotation creation
---------------------
+Annotation creation [tbc]
+-------------------------
 
-Annotations don't have identifiers and are directly linked to a given offset in a given text container.
+Annotations don't have identifiers and are directly linked to a given offset in
+a given text container.
 
 Change tracking [todo]
 ----------------------
@@ -371,15 +412,23 @@ Change tracking [todo]
 Structured containers
 =====================
 
-- Tables
-- Lists
+Tables [todo]
+-------------
+
+Lists [todo]
+------------
 
   .. figure:: figures/lpod_list.png
      :align: center
 
-- Data pilot (pivot) tables [todo]
-- Sections
-- Draw pages
+Data pilot (pivot) tables [todo]
+--------------------------------
+
+Sections [todo]
+---------------
+
+Draw pages [todo]
+-----------------
 
   .. figure:: figures/lpod_drawpage.png
      :align: center
@@ -388,17 +437,29 @@ Structured containers
 Fields and forms
 ================
 
-- Declared fields and variables
-- Text fields
+Declared fields and variables [todo]
+------------------------------------
+
+Text fields [todo]
+-------------------
 
 Graphic content
 ===============
 
-- Frames
-- Shapes [todo]
-- Images
-- Animations [todo]
-- Charts [todo]
+Frames [todo]
+-------------
+
+Shapes [todo]
+-------------
+
+Images [todo]
+-------------
+
+Animations [todo]
+-----------------
+
+Charts [todo]
+-------------
 
 Styles
 ======
@@ -617,7 +678,7 @@ mnemonic shortcuts for a few, frequently required properties, namely:
   or ``condition`` (meaning that the text is to be visible or hidden
   according to a condition defined elsewhere).
 
-A paragraph style may have a background (color or image)
+A text style may have a background color, but not a background image.
 
 Paragraph family
 ~~~~~~~~~~~~~~~~~~
@@ -687,7 +748,7 @@ required properties, namely:
 - ``keep-with-next``: to specify whether or not to keep the paragraph and the next paragraph together on a page or in a column, possible values are ``always`` or ``auto``;
 - ``page-break-xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
 
-A text style may have a background color, but not a background image.
+A pararaph style may have a background color or image.
 
 List styles
 ------------
@@ -852,12 +913,12 @@ returns a regular element.
 Graphic styles [todo]
 ---------------------
 
-Numeric data formatting styles
---------------------------------
+Numeric data formatting styles [tbc]
+------------------------------------
 
 Numeric styles in general are formatting styles that apply to computable values,
 generally stored in fields or table cells. The covered data types are number,
-currency, percentage, boolean, date and time. [tbc]
+currency, percentage, boolean, date and time.
 
 Number style [todo]
 ~~~~~~~~~~~~~~~~~~~
@@ -872,8 +933,8 @@ Date style [todo]
 Time style [todo]
 ~~~~~~~~~~~~~~~~~
 
-Page styles [tbc]
--------------------
+Page styles
+------------
 
 A page style definition, so-called *master page*, is "*a template for pages in
 a document*". It directly defines the static content "*that is displayed on all
@@ -1035,10 +1096,12 @@ API.
 Metadata
 ========
 
-- Pre-defined
-- User defined
+Pre-defined [todo]
+------------------
 
-Application settings
-====================
+User defined [todo]
+-------------------
 
-[todo]
+Application settings [todo]
+===========================
+
