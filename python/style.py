@@ -22,7 +22,7 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
     Arguments:
 
-        family -- 'paragraph', 'text', 'section', 'table', 'tablecolumn',
+        family -- 'paragraph', 'text', 'section', 'table', 'table-column',
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'drawing-page', 'graphic', 'presentation',
                   'control', 'ruby', 'list', 'number', 'page-layout' or
@@ -165,12 +165,99 @@ class odf_style(odf_element):
             element.del_attribute(key)
 
 
+    def set_background(self, color=None, uri=None, position='center',
+                       repeat=None, opacity=None, filter=None):
+        """Set the background color of a text style, or the background color
+        or image of a paragraph style or page layout.
+
+        With no argument, remove any existing background.
+
+        The position is one or two of 'center', 'left', 'right', 'top' or
+        'bottom'.
+
+        The repeat is 'no-repeat', 'repeat' or 'stretch'.
+
+        The opacity is an percentage integer (no string with the '%s' sign)
+
+        The filter is an application-specific filter name defined elsewhere.
+
+        Though this method is defined on the base style class, it will raise
+        an error if the style type is not compatible.
+
+        Arguments:
+
+            color -- '#rrggbb'
+
+            uri -- str
+
+            position -- str
+
+            repeat -- str
+
+            opacity -- int
+
+            filter -- str
+        """
+        family = self.get_style_family()
+        if family not in ('text', 'paragraph', 'page-layout', 'section',
+                          'table', 'table-row', 'table-cell', 'graphic'):
+            raise TypeError, 'no background support for this family'
+        if uri is not None and family == 'text':
+            raise TypeError, 'no background image for text styles'
+        properties = self.get_element('style:%s-properties' % family)
+        if properties is None:
+            bg_image = None
+        else:
+            bg_image = properties.get_element('style:background-image')
+        # Erasing
+        if color is None and uri is None:
+            if properties is None:
+                return
+            properties.del_attribute('fo:background-color')
+            if bg_image is not None:
+                properties.delete(bg_image)
+            return
+        # Add the properties if necessary
+        if properties is None:
+            properties = odf_create_element('<style:%s-properties/>'
+                                            % family)
+            self.append_element(properties)
+        # Add the color...
+        if color:
+            properties.set_attribute('fo:background-color', color)
+            if bg_image is not None:
+                properties.delete(bg_image)
+        # ... or the background
+        elif uri:
+            properties.set_attribute('fo:background-color', 'transparent')
+            if bg_image is None:
+                bg_image = odf_create_element('<style:background-image/>')
+                properties.append_element(bg_image)
+            bg_image.set_attribute('xlink:href',  uri)
+            if position:
+                bg_image.set_attribute('style:position', position)
+            if repeat:
+                bg_image.set_attribute('style:repeat', repeat)
+            if opacity:
+                bg_image.set_attribute('draw:opacity', str(opacity))
+            if filter:
+                bg_image.set_attribute('style:filter-name', filter)
+
+
 
 class odf_page_layout(odf_style):
     """Phyisical presentation of a page.
 
     XXX to verify
     """
+    def get_style_family(self):
+        return 'page-layout'
+
+
+    def set_style_family(self):
+        raise ValueError, 'family is read-only'
+
+
     def get_header_style(self):
         return self.get_element('style:header-style')
 
@@ -231,6 +318,14 @@ class odf_master_page(odf_style):
     #
     # Public API
     #
+
+    def get_style_family(self):
+        return 'master-page'
+
+
+    def set_style_family(self):
+        raise ValueError, 'family is read-only'
+
 
     def get_page_layout_name(self):
         return self.get_attribute('style:page-layout-name')

@@ -231,5 +231,58 @@ class StylePropertiesTestCase(TestCase):
 
 
 
+class StyleBackgroundTestCase(TestCase):
+
+    def setUp(self):
+        self.style = odf_create_style('paragraph')
+
+
+    def test_bad_family(self):
+        style = odf_create_style('master-page')
+        self.assertRaises(TypeError, style.set_background)
+
+
+    def test_color(self):
+        style = self.style.clone()
+        style.set_background(color='#abcdef')
+        expected = ('<style:style style:family="paragraph">'
+                      '<style:paragraph-properties '
+                        'fo:background-color="#abcdef"/>'
+                    '</style:style>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_image(self):
+        style = self.style.clone()
+        style.set_background(uri='Pictures/toto')
+        expected = ('<style:style style:family="paragraph">'
+                      '<style:paragraph-properties>'
+                        '<style:background-image '
+                          'xlink:href="Pictures/toto" '
+                          'style:position="center"/>'
+                      '</style:paragraph-properties>'
+                    '</style:style>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_image_full(self):
+        style = self.style.clone()
+        style.set_background(uri='Pictures/toto', position='top left',
+                             repeat='no-repeat', opacity=50,
+                             filter='myfilter')
+        expected = ('<style:style style:family="paragraph">'
+                      '<style:paragraph-properties>'
+                        '<style:background-image '
+                          'xlink:href="Pictures/toto" '
+                          'style:position="center" '
+                          'style:repeat="no-repeat" '
+                          'draw:opacity="50" '
+                          'style:filter-name="myfilter"/>'
+                      '</style:paragraph-properties>'
+                    '</style:style>')
+        self.assertEqual(style.serialize(), expected)
+
+
+
 if __name__ == '__main__':
     main()
