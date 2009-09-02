@@ -117,6 +117,7 @@ def _get_style_tagname(family):
                'table-cell': ('style:style', family),
                'section': ('style:style', family),
                # False families
+               'list': ('text:list-style', None),
                'page-layout': ('style:page-layout', None),
                'master-page': ('style:master-page', None)}
     if family not in mapping:
