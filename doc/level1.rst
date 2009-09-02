@@ -509,7 +509,7 @@ Additional arguments can be required according to the family. An optional
 ``parent`` argument, whose value is the name of another common style of
 the same family (existing or to be created), can be provided, knowing that a
 style inherits (but can override) all the properties of its parent. A
-``display-name`` additional parameter may be provided; if set, this parameter
+``display name`` additional parameter may be provided; if set, this parameter
 designates a visible name that may differ from the internal name. It's
 possible to copy (instead of inherit) all the properties of an existing style
 of the same family, through a ``clone`` option, knowing that ``clone`` and
@@ -541,8 +541,8 @@ style replaces any existing default style of the same family.
 
 All styles can't be used as default styles. Default styles are allowed
 for the following families: ``paragraph``, ``text``, ``section``, ``table``,
-``table-column``, ``table-row``, ``table-cell``, ``table-page``, ``chart``,
-``drawing-page``, ``graphic``, ``presentation``, ``control`` and ``ruby``.
+``table column``, ``table row``, ``table cell``, ``table page``, ``chart``,
+``drawing page``, ``graphic``, ``presentation``, ``control`` and ``ruby``.
 
 An existing style may be retrieved in a document using the ``get_style()``
 document-based method. This method requires a family as its first argument and
@@ -645,7 +645,7 @@ using Times New Roman, 14-sized navy blue bold italic characters with
 a yellow background::
 
    s = odf_create_style('text', 'MyColoredText',
-                        display-name='My Colored Text',
+                        'display name'='My Colored Text',
                         font='Times New Roman',
                         size='14pt',
                         weight='bold',
@@ -690,7 +690,7 @@ mnemonic shortcuts for a few, frequently required properties, namely:
   as a RGB, 6-digit hexadecimal string with a leading '#';
 - ``underline``: to specify if and how text is underlined; possible values
   are ``solid`` (for a continuous line), ``dotted``, ``dash``,
-  ``long-dash``, ``dot-dash``, ``dot-dot-dash``, ``wave``, and ``none``;
+  ``long dash``, ``dot dash``, ``dot dot dash``, ``wave``, and ``none``;
 - ``display``: to specify if the text should by displayed or hidden;
   possible values are ``true`` (meaning visible) ``none`` (meaning hidden)
   or ``condition`` (meaning that the text is to be visible or hidden
@@ -732,7 +732,7 @@ continuous, half-millimiter border line with a bottom-right, one millimeter grey
 shadow, with other possible properties inherited from a "Standard" style::
 
    ps = odf_create_style('paragraph', 'BorderedShadowed',
-                           display-name='Strange Boxed Paragraph',
+                           'display name'='Strange Boxed Paragraph',
                            parent='Standard',
                            align='justify',
                            indent='5mm',
@@ -757,14 +757,14 @@ required properties, namely:
 - ``orphans``: to specify the minimum number of lines required at the bottom of a page to avoid paragraph orphans;
 - ``together``: to control whether the lines of a paragraph should be kept together on the same page or column, possible values being ``always`` or ``auto``;
 - ``margin``: to control all the margins of the paragraph;
-- ``margin-xxx`` (where xxx is ``left``, ``right``, ``top`` or ``bottom``): to control the margins of the paragraph separately;
+- ``margin xxx`` (where xxx is ``left``, ``right``, ``top`` or ``bottom``): to control the margins of the paragraph separately;
 - ``border``: a 3-part string to specify the thickness, the line style and the line color (according to the XSL/FO grammar);
-- ``border-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): the same as ``border`` but to specify a particular border for one side;
+- ``border xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): the same as ``border`` but to specify a particular border for one side;
 - ``shadow``: a 3-part string to specify the color and the size of the shadow;
 - ``padding``: the space around the paragraph;
-- ``padding-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): to specify the space around the paragraph side by side;
-- ``keep-with-next``: to specify whether or not to keep the paragraph and the next paragraph together on a page or in a column, possible values are ``always`` or ``auto``;
-- ``break-xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
+- ``padding xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``): to specify the space around the paragraph side by side;
+- ``keep with next``: to specify whether or not to keep the paragraph and the next paragraph together on a page or in a column, possible values are ``always`` or ``auto``;
+- ``break xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page or column break must be inserted before or after any paragraph using the style, legal values are ``page``, ``column``, ``auto``.
 
 A pararaph style may have a background color or image.
 
@@ -813,12 +813,12 @@ and/or ``suffix`` options, which provide strings to be displayed before and
 after the number. Other optional parameters are:
 
 - ``style``: the text style to use to format the number;
-- ``display-levels``: the number of levels whose numbers are displayed at the
+- ``display levels``: the number of levels whose numbers are displayed at the
   current level (ex: if display-levels is 3, so the displayed number could
   be something like "1.1.1");
 - ``format``: the number format (typically "1" for a simple number display),
   knowing that if this parameter is null the number is not visible;
-- ``start-value``: the first number of a list item of the current level.
+- ``start value``: the first number of a list item of the current level.
 
 The following example shows the way to create a new list style then
 to set some properties for levels 1 to 3, each one with a different type::
@@ -900,9 +900,9 @@ supported, namely:
 - ``prefix``: a string that should be displayed before the heading number;
 - ``suffix``: a string that should be displayed before the heading number;
 - ``format``: the number display format (ex: ``1``, ``A``);
-- ``display-levels``: the number of levels whose numbers are displayed at
+- ``display levels``: the number of levels whose numbers are displayed at
   the current level;
-- ``start-value``: the first number of a heading at this level;
+- ``start value``: the first number of a heading at this level;
 - ``style``: the name of the style to use to format the number (that is a
   regular text style).
 
@@ -1074,9 +1074,9 @@ some of these properties may be set using the following lpOD mnemonics:
   settings will be used.
 - ``orientation``: specifies the orientation of the printed page, may be
   ``portrait`` or ``landscape`` (default: ``portrait``);
-- ``margin-xxx`` (where xxx is ``left``, ``right``, ``top`` or ``bottom``):
+- ``margin xxx`` (where xxx is ``left``, ``right``, ``top`` or ``bottom``):
   to control the margins of the page;
-- ``border-xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``):
+- ``border xxx`` (where ``xxx`` is ``left``, ``right``, ``top`` or ``bottom``):
   a 3-part string to specify the thickness, the line style and the line color
   (according to the XSL/FO grammar);
 - ``border``: a 3-part string to specify the thickness, the line style and the
