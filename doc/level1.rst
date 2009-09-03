@@ -1,6 +1,8 @@
-#################
-Level 1 coverage
-#################
+################################
+Level 1 Functional specification
+################################
+
+**WORKING DRAFT**
 
 .. contents::
 
@@ -26,6 +28,39 @@ and directly append them to the calling element.
 Once created, an object may be changed through the ``set_text()`` and
 ``set_attribute()`` level 0 methods; however, the level 1 features allow the
 user to set the most used properties using a more friendly way.
+
+The level 1 ``set_attribute()`` method extends the level 0 one by allowing
+the user, in some situations, to forget the ODF namespaces. Knowing that every
+ODF attribute name belong to a namespace, if ``set_attribute()`` is
+called from an ODF element with an attribute name without namespace prefix, the
+method transparently concatenates the given name to the namespace prefix of the
+calling object. ``get_attribute()`` use the same behaviour. As a consequence,
+the prefix may be safely omitted with attributes whose namespace is the same as
+the namespace of the target element. In addition, knowing that an XML attribute
+name can't contain blank spaces, these methods automatically replace every
+space by a dash. For example, assuming ``p`` is a paragraph (which belongs to
+the "text" namespace), the three instructions below (that return the style of
+the given paragraph) are equivalent::
+
+   p.get_attribute('text:style-name')
+   p.get_attribute('style-name')
+   p.get_attribute('style name')
+
+There is an exception regarding a particular attribute, which is the style name.
+When ``get_attribute()`` or ``set_attribute()`` is called with an attribute
+name without prefix and ending with "style", the namespace prefix is inserted as
+usual, but in addition a "-name" string is silently appended. Knowing that
+attributes like "xxx-style-name" are very frequently used, this feature provides
+a "xxx style" shortcut.  As a consequence, the following instruction does the
+same as each one of the previous example::
+
+  p.get_attribute('style') 
+
+A ``get_attributes()`` method is provided, that returns all the attributes of
+the calling element (with their real ODF names) and their values as a array
+of named items. The ``set_attributes()`` method allows the user to change or
+create several attributes a a time; it checks and transforms the given
+attribute names in the same way as ``set_attribute()``.
 
 Some methods are document-based, other are context-based, and other are
 element-specific.
@@ -90,9 +125,10 @@ element type (i.e. "paragraph", "heading", etc). For example::
 It's possible to get the list of elements of a known type in the context, using
 ``get_xxx_list()``.
 
-The two lines above retrieve an element among the children of a given 'context'
-element. The first one selects the child element at the given ``p`` position.
-The given position is an integer; the first position is zero; negative positions are counted back from the last (-1 is the last position).
+The two lines above retrieve an element among the children of context element.
+The first one selects the child element at the given ``p`` position.
+The given position is an integer; the first position is zero; negative positions
+are counted back from the last (-1 is the last position).
 The second instruction retrieves the first element whose text content matches a
 given ``regex`` regular expression. Knowing that the regexp could be matched by
 more than one element, the same method is available in a list context.
@@ -111,6 +147,15 @@ Paragraphs
 
 A paragraph element inherits all the basic element features introduced above,
 and owns the following ones.
+
+All the visible text content of a document is hold in paragraphs (and in
+*headings*, which are special paragraphs, cf. later in this documentation).
+A paragraph is basically a text container associated with a layout style.
+
+The text content may be directly hold as the text of the paragraph element;
+however, a paragraph can contain sub-paragraph elements so-called *spans*
+(introduced later in this documentation).
+ 
 
 Creation and attachment
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -173,7 +218,8 @@ and/or line breaks ("\n").
 Headings
 ---------
 All the features that apply to paragraphs, as described above, apply to headings
-as well.
+as well. As a consequence, a heading may be regarded as a subclass of the
+paragraph class.
 
 However, a heading is a special paragraph which owns additional properties
 related to its hierarchical level and its numbering. As an consequence, some
@@ -230,7 +276,11 @@ by applications that support dynamic numbering in text documents.
 Text spans
 ----------
 A text span, in the lpOD scope, is a delimited area included in a paragraph or
-a heading. There are several kinds of text spans.
+a heading. It's a sub-paragraph text container whose essential function is to
+associate a particular feature to a limited text run instead of a whole
+paragraph.
+
+There are several kinds of text spans.
 
 - Style spans: a text span can be defined in order to apply a special style to
   a part of the content of a paragraph/heading. As a consequence, it's
@@ -256,7 +306,13 @@ or a negative integer (starting to -1 for the last position) if the user prefers
 to count back from the end of the target. If the ``length`` parameter is omitted
 or set to 0 the span runs up to the end of the target content. If ``position``
 is out of range, nothing is done; if ``position`` is OK, extra length (if any)
-is ignored. 
+is ignored. The following instructions create two text spans with a so-called
+"HighLight" style; the first one applies the given style to any "The lpOD
+Project" substring while the second one does it once on fixed length substring
+at a given position, ``p`` being the target paragraph::
+
+   p.set_span(filter='The lpOD Project', style='HighLight')
+   p.set_span(position=3, length=5, style='HighLight')
 
 A hyperlink span is created through ``set_hyperlink()``, which waits for the
 same positioning parameters (by regex or by position and length). However,
@@ -284,15 +340,16 @@ every "ODF" and "OpenDocument" substring in the ``p`` context::
    p.set_span(filter='ODF|OpenDocument', style='HighLight')
 
 The following example associates an hyperlink in the last 5 characters of the
-``p`` container::
+``p`` container (note that the ``length`` parameter is omitted, meaning that
+the hyperlink will run up to the end)::
 
-   p.set_hyperlink(position=-5, length=5, uri='http://here.org')
+   p.set_hyperlink(position=-5, uri='http://here.org')
 
 The sequence hereafter show the way to set a style span and a hyperlink for
 the same text run. The style span is created first, then it's used as the
 context to create a hyperlink span that spreads over its whole content::
 
-   s = p.set_span('The lpOD Project', style='Outstanding')
+   s = p.set_span(filter='The lpOD Project', style='Outstanding')
    s.set_hyperlink(position=0, uri='http://www.lpod-project.org')
 
 Text marks and indices
@@ -430,8 +487,161 @@ Change tracking [todo]
 Structured containers
 =====================
 
-Tables [todo]
--------------
+Tables
+-------
+
+An ``odf_table`` object is a structured container that holds two sets
+of objects, a set of *rows* and a set of *columns*, and that is
+optionally associated with a table style.
+
+The basic information unit in a table is the *cell*. Every cell is
+contained in a row. Table columns don't contain cells; an ODF column
+holds information related to the layout of a particular column at the
+display time, not content data.
+
+A cell can directly contain one or more paragraphs. However, a cell
+may be used as a container for high level containers, including lists,
+tables, sections and frames.
+
+Every table is identified by a name (which must be unique for the
+document) and may own some optional properties.
+
+Table creation and retrieval
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A table is created using ``odf_create_table()`` with a mandatory name
+as its first argument and the following optional parameters:
+
+- ``width``, ``length``: the initial size of the new table
+  (rows then columns), knowing that it's zero-sized by default
+  (beware: because cells are contained in rows, no cell in created if
+  as long as ``width`` is less than 1);
+- ``style``: the name of a table style, already existing or to be
+  defined;
+- ``protected``: a boolean that, if true, means that the table should
+  be write-protected when the document is edited through a user-oriented,
+  interactive application (of course, such a protection doesn't prevent
+  an lpOD-based tool from modifying the table)(default is false);
+- ``protection key``: a (supposedly encrypted) string that represents
+  a password; if this parameter is set and if ``protected`` is true,
+  a end-user interactive application should ask for a password that matches
+  this string before removing the write-protection (beware, such a protection
+  is *not* a security feature);
+- ``display``: boolean, tells that the table should be visible; default is true;
+- ``print``: boolean, tells that the table should be printable; however, the
+  table is not printable if ``display`` is false, whatever the value of
+  ``print``; default is true;
+- ``print ranges``: the cell ranges to be printed, if some areas are not to
+  be printed; the value of this parameter is a space-separated list of cell
+  ranges expressed in spreadsheet-style format (ex: "E6:K12").
+
+Once created, a table may be incorporated somewhere using ``insert_element()``.
+
+A table may be retrieved in a document according to its unique name using
+the context-based ``get_table_by_name()`` with the name as argument. It may
+be selected by its sequential position in the list of the table belonging
+to the context, using ``get_table_by_position()``, with a zero-based numeric
+argument (possibly counted back from the end if the argument is negative).
+In addition, it's possible to retrieve a table according to its content,
+through ``get_table_by_content()``; this method returns the first table (in
+the order of the document) whose text content matches the given argument,
+which is regarded as a regular expression.
+
+Table object selection
+~~~~~~~~~~~~~~~~~~~~~~
+A table object provides methods that allow to retrieve any column, row or cell
+using its logical position. A position may be expressed using either zero-based
+numeric coordinates, or alphanumeric, spreadsheet-like coordinates. For example
+the top left cell should be addressed either by [0,0] or by "A1". On the other
+hand, numeric coordinates only allow the user to address an object relatively to
+the end of the table; for example, [-1,-1] designates the last cell of the last
+row whatever the table size.
+
+Table object selection methods return a null value, without error, when the
+given address is out of range.
+
+An individual cell is selected using ``get_cell()`` with either a pair of
+numeric arguments corresponding to the row then the columns, or an alphanumeric
+argument whose first character is a letter. The second argument, if provided,
+is ignored as soon as the first one begins with a letter; if only one numeric
+argument is provided, the column number is assumed to be 0.
+
+The two following instructions are equivalent and return the second cell of the
+second row in a table (assuming that ``t`` is a previously selected table)::
+
+   c = t.get_cell('B2')
+   c = t.get_cell(1, 1)
+
+``get_row()`` allows the user to select a table row as an ODF element. This
+method requires a zero-based numeric value.
+
+``get_column()`` works according to the same logic and returns a table column
+ODF element.
+
+Once selected, knowing that cells are contained in rows, a row-based
+``get_cell()`` method is provided. When called from a row object,
+``get_cell()`` requires the same parameters as the table-based ``get_column()``
+method. For example, the following sequence returns the same cell as in the
+previous example::
+
+   r = t.get_row(1)
+   c = r.get_cell(1)
+
+The API can extract rectangular ranges of cells in order to allow the
+applications to store and process them out of the document tree, through
+regular 2D tables. The range selection is defined by the coordinates of the
+top left and the bottom right cells of the target area. The selection is
+done using the table-based ``get_cells()`` method, with two possible syntaxes,
+i.e. the spreadsheet-like one and the numeric one. The first one requires an
+alphanumeric argument whose first character is a letter and that includes a
+':', while the second one requires four numeric arguments. As an example, the
+two following instructions, which are equivalent, return a bi-dimensional array
+corresponding to the cells of the ``B2:D15`` area of a table::
+
+   cells = t.get_cells("B2:D15")
+   cells = t.get_cells(1,1,14,3)
+
+Note that, after such a selection, ``cells[0,0]`` contains the "B2" cell of
+the ODF table.
+
+If ``get_cells()`` is called without argument, the selection covers the whole
+table.
+
+A row object has its own ``get_cell()`` method. The row based version of
+``get_cells()`` returns, of course, a one-column table of cell objects. When
+used without argument, it selects all the cells of the row. It may be called
+with either a pair of numeric arguments that represent the start and the end
+positions of the cell range, or an alphanumeric argument (whose the numeric
+content is ignored and should be omitted) corresponding to the start and end
+columns in conventional spreadsheet notation. The following example shows two
+ways to select the same cell range (beginning at the 2nd position and ending
+at the 26th one) in a previously selected row::
+
+   cells = r.get_cells('B:Z')
+   cells = r.get_cells(1, 25)
+
+
+Row and column customization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The objects returned by ``get_row()`` and ``get_column()`` can be customized
+using the standard ``set_attribute()`` or ``set_attributes()`` method. Possible
+attributes are:
+
+- ``style``: the name of the applicable style (which should be at display time
+  a valid row or column style);
+- ``default cell style``: the style which apply to each cell in the column or
+  row unless this cell has no defined style attribute;
+- ``visibility``: specifies the visibility of the row or column; legal values
+  are ``visible``, ``collapse`` and ``filter``.				 
+
+Table expansion [todo]
+~~~~~~~~~~~~~~~~~~~~~~
+
+Cell customization [todo]
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+[tbc]
+
 
 Lists [todo]
 ------------
