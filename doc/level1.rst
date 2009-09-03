@@ -577,6 +577,29 @@ method requires a zero-based numeric value.
 ``get_column()`` works according to the same logic and returns a table column
 ODF element.
 
+The full set of row and column objects may be selected using the table-based
+``get_row_list()`` and ``get_column_list()`` methods. By default these methods
+return repectively the full list of rows or columns. They can be restricted to
+a specified range of rows or columns. The restriction may be expressed through
+two numeric, zero-based arguments indicating the positions of the first and the
+last item of the range. Alternatively, the range may be specified using a more
+"spreadsheet-like" syntax, in only one alphanumeric argument representing the
+visible representation of the range through a GUI; this argument is the
+concatenation of the visible numbers of the starting and ending elements,
+separated by a ":", knowing that "1" is the visible number of the row zero
+while "A" is the visible number or the column zero. As a consequence, the two
+following instructions are equivalent and return a list including the rows from
+5 to 10 belonging to the table ``t``::
+
+   rows = t.get_row_list(5, 10)
+   rows = t.get_row_list('6:11')
+
+According to the same logic, each of the two instruction below returns the
+columns from 8 to 15::
+
+   cols = t.get_column_list(8, 15)
+   cols = t.get_column_list('I:P') 
+
 Once selected, knowing that cells are contained in rows, a row-based
 ``get_cell()`` method is provided. When called from a row object,
 ``get_cell()`` requires the same parameters as the table-based ``get_column()``
@@ -585,6 +608,9 @@ previous example::
 
    r = t.get_row(1)
    c = r.get_cell(1)
+
+Cell range selection
+~~~~~~~~~~~~~~~~~~~~
 
 The API can extract rectangular ranges of cells in order to allow the
 applications to store and process them out of the document tree, through
@@ -619,9 +645,16 @@ at the 26th one) in a previously selected row::
    cells = r.get_cells('B:Z')
    cells = r.get_cells(1, 25)
 
+If the user needs to select a range of cells as a list instead of a 2D array,
+the ``get_cell_list()`` method should preferred. This method requires the same
+arguments as ``get_cells()`` exists in table- and row-based versions.
+
+**Note**: The range selection feature provided by the level 1 API is a
+building block for the lpOD level 2 business-oriented cell range objects.
 
 Row and column customization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The objects returned by ``get_row()`` and ``get_column()`` can be customized
 using the standard ``set_attribute()`` or ``set_attributes()`` method. Possible
 attributes are:
@@ -636,9 +669,41 @@ attributes are:
 Table expansion [todo]
 ~~~~~~~~~~~~~~~~~~~~~~
 
+A table may be expanded vertically and horizontally, using its ``add_row()`` and
+``add_column()`` methods.
+
+``add_row()`` allows the user to insert one or more rows at a given position in
+the table. The new row is a copy of an existing one. Without argument, it's just
+appended as the last row. An optional ``before`` named parameter may be
+provided; if defined, the value of this parameter must be a row number
+(in numeric, zero-based form) in the range of the table; the new row is
+created as a clone of the row existing at the given position then inserted at
+this position, i.e. *before* the original reference row. A ``after`` parameter
+may be provided instead of ``before``; it produces a similar result, but the
+new row is inserted *after* the reference row. Note that the two following
+instructions produce the same result::
+
+   t.add_row(after=-1)
+   t.add_row()
+
+The ``add_column()`` does the same thing with columns as ``add_rows()`` for
+rows. However, because the cells belong to rows, it works according to a very
+different logic. ``add_column()`` inserts a new column object (that is a clone
+of an existing one), the it goes through all the rows and inserts a new cell
+(that is a clone of the cell located at the reference position) in each one.
+
+Of course, it's possible to use the level 0 ``insert_element()`` method in
+order to insert a row, a column or a cell externally created (or extracted from
+an other table from another document), provided that the user carefully checks
+the consistency of the resulting contruct. As an example, the following
+sequence appends a copy of the first row of ``t1``after the 5th row of ``t2``::
+
+   to_be_inserted = t1.get_row(0).clone();
+   ref_row = t2.get_row(5)
+   ref_row.insert_element(to_be_inserted, xmlposition=NEXT_SIBLING)
+
 Cell customization [todo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 [tbc]
 
