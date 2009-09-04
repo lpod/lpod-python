@@ -666,8 +666,8 @@ attributes are:
 - ``visibility``: specifies the visibility of the row or column; legal values
   are ``visible``, ``collapse`` and ``filter``.				 
 
-Table expansion [todo]
-~~~~~~~~~~~~~~~~~~~~~~
+Table expansion
+~~~~~~~~~~~~~~~
 
 A table may be expanded vertically and horizontally, using its ``add_row()`` and
 ``add_column()`` methods.
@@ -702,8 +702,47 @@ sequence appends a copy of the first row of ``t1``after the 5th row of ``t2``::
    ref_row = t2.get_row(5)
    ref_row.insert_element(to_be_inserted, xmlposition=NEXT_SIBLING)
 
-Cell customization [todo]
+Individual ell processing
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+A cell owns both a *content* and some *properties* which may be processed
+separately.
+
+The cell content is a list of one or more ODF elements. While this content is
+generally made of a single paragraph, it may contain several paragraphs and
+various other objects. The user can attach any content element to a cell using
+the standard ``insert_element()`` method. However, for the simplest (and the
+most usual) cases, it's possible to use ``set_text()``. The cell-based
+``set_text()`` method diffs from the level 0 ``set_text()``: it removes the
+previous content elements, if any, then creates a single paragraph with the
+given text as the new content. In addition, this method accepts an optional
+``style`` named parameter, allowing the user to set a paragraph style for the
+new content. To insert more content (i.e. additional paragraphs and/or other
+ODF elements), the needed objects have to be created externally and attached
+to the cell using ``insert_element()``. Alternatively, it's possible to remove
+the existing content (if any) and attach a full set of content elements in a
+single instruction using ``set_content()``; this last cell method takes a list
+of arbitrary ODF elements and appends them (in the given order) as the new
+content.
+
+The ``get_content()`` cell method returns all the content elements as a list.
+For the simplest cases, the cell-based ``get_text()`` method directly returns
+the text content as a flat string, without any structural information and
+whatever the number and the type of the content elements.
+
+The properties may be accessed using ``set_properties()`` and
+``get_properties()``.
+
+``set_properties()`` works with the following named parameters:
+
+- ``style``: the name of a cell style;
+- ``type``: the cell value type, which may be one of the ODF supported data
+   types, used when the cell have to contain a computable value (omitted with
+   text cells);
+- ``value``: the numeric computable value of the cell, used when the ``type`` is
+   ``float``, ``percentage`` or ``currency``, and whose default value is 0;
+- ``currency``: the international standard currency unit identifier (ex: EUR,
+   USD), used when the ``type`` is ``currency``;
+- [...]
 
 [tbc]
 
@@ -1210,8 +1249,8 @@ Numeric data formatting styles [tbc]
 ------------------------------------
 
 Numeric styles in general are formatting styles that apply to computable values,
-generally stored in fields or table cells. The covered data types are number,
-currency, percentage, boolean, date and time.
+generally stored in fields or table cells. The covered data types are ``float``,
+``currency``, ``percentage``, ``boolean``, ``date``, ``time``.
 
 Number style [todo]
 ~~~~~~~~~~~~~~~~~~~
