@@ -517,6 +517,7 @@ as its first argument and the following optional parameters:
   as long as ``width`` is less than 1);
 - ``style``: the name of a table style, already existing or to be
   defined;
+- ``cell style``: the style to use by default for every cell in the table;
 - ``protected``: a boolean that, if true, means that the table should
   be write-protected when the document is edited through a user-oriented,
   interactive application (of course, such a protection doesn't prevent
@@ -546,8 +547,8 @@ through ``get_table_by_content()``; this method returns the first table (in
 the order of the document) whose text content matches the given argument,
 which is regarded as a regular expression.
 
-Table object selection
-~~~~~~~~~~~~~~~~~~~~~~
+Table content retrieval
+~~~~~~~~~~~~~~~~~~~~~~~
 A table object provides methods that allow to retrieve any column, row or cell
 using its logical position. A position may be expressed using either zero-based
 numeric coordinates, or alphanumeric, spreadsheet-like coordinates. For example
@@ -558,6 +559,8 @@ row whatever the table size.
 
 Table object selection methods return a null value, without error, when the
 given address is out of range.
+
+The number of rows and columns may be got using ``get_size()``.
 
 An individual cell is selected using ``get_cell()`` with either a pair of
 numeric arguments corresponding to the row then the columns, or an alphanumeric
@@ -661,7 +664,7 @@ attributes are:
 
 - ``style``: the name of the applicable style (which should be at display time
   a valid row or column style);
-- ``default cell style``: the style which apply to each cell in the column or
+- ``cell style``: the default style which apply to each cell in the column or
   row unless this cell has no defined style attribute;
 - ``visibility``: specifies the visibility of the row or column; legal values
   are ``visible``, ``collapse`` and ``filter``.				 
@@ -673,24 +676,27 @@ A table may be expanded vertically and horizontally, using its ``add_row()`` and
 ``add_column()`` methods.
 
 ``add_row()`` allows the user to insert one or more rows at a given position in
-the table. The new row is a copy of an existing one. Without argument, it's just
-appended as the last row. An optional ``before`` named parameter may be
-provided; if defined, the value of this parameter must be a row number
-(in numeric, zero-based form) in the range of the table; the new row is
-created as a clone of the row existing at the given position then inserted at
-this position, i.e. *before* the original reference row. A ``after`` parameter
-may be provided instead of ``before``; it produces a similar result, but the
-new row is inserted *after* the reference row. Note that the two following
-instructions produce the same result::
+the table. The new rows are copies of an existing one. Without argument, a
+single row is just appended as the end. A ``number`` named parameter provides
+the number of rows to insert.
 
-   t.add_row(after=-1)
+An optional ``before`` named parameter may be provided; if defined, the value
+of this parameter must be a row number (in numeric, zero-based form) in the
+range of the table; the new rows are created as clones of the row existing at
+the given position then inserted at this position, i.e. *before* the original
+reference row. A ``after`` parameter may be provided instead of ``before``;
+it produces a similar result, but the new rows are inserted *after* the
+reference row. Note that the two following instructions produce the same
+result::
+
+   t.add_row(number=1, after=-1)
    t.add_row()
 
 The ``add_column()`` does the same thing with columns as ``add_rows()`` for
 rows. However, because the cells belong to rows, it works according to a very
-different logic. ``add_column()`` inserts a new column object (that is a clone
-of an existing one), the it goes through all the rows and inserts a new cell
-(that is a clone of the cell located at the reference position) in each one.
+different logic. ``add_column()`` inserts new column objects (clones of an
+existing column), the it goes through all the rows and inserts new cells
+(cloning the cell located at the reference position) in each one.
 
 Of course, it's possible to use the level 0 ``insert_element()`` method in
 order to insert a row, a column or a cell externally created (or extracted from
@@ -702,8 +708,66 @@ sequence appends a copy of the first row of ``t1``after the 5th row of ``t2``::
    ref_row = t2.get_row(5)
    ref_row.insert_element(to_be_inserted, xmlposition=NEXT_SIBLING)
 
-Individual ell processing
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Row and column group handling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The content expansion and content selection methods above work with the table
+body. However it's possible to manage groups of rows or columns. A group may
+be created with existing adjacent rows or columns, using ``set_row_group()``
+and ``set_column_group()`` respectively. These methods take two mandatory
+arguments, which are the numeric positions of the starting and ending elements
+of the group. In addition, an optional ``display`` named boolean parameter
+may be provided (default=true), instructing the applications about the
+visibility of the group.
+
+Both ``set_row_group()`` and ``set_column_group()`` return an object which can
+be used later as a context object for any row, column or cell retrieval or
+processing. An existing group may be retrieved according to its numeric
+position using ``get_row_group()`` or ``get_column_group()`` with the position
+as argument, or without argument to get the first (or the only one) group.
+
+A group can't bring a particular style; it's just visible or not. Once created,
+its visibility may be turned on and off by changing its ``display`` value
+through ``set_attribute()``.
+
+A row group provides a ``add_row()`` method, while a column group provides a
+``add_column()`` method. These methods work like their table-based versions,
+and they allow the user to expand the content of a particular group.
+
+A group can contain a *header* (see below).
+
+Table headers
+~~~~~~~~~~~~~
+
+One or more rows or columns in the beginning of a table may be organized as
+a *header*. Row and columns headers are created using the ``set_row_header()``
+and ``set_columns_header()`` table-based methods, and retrieved using
+``get_row_header()`` and ``get_column_header()``. A row header object brings its
+own ``add_row()`` method, which works like the table-based ``add_row()`` but
+appends the new rows in the space of the row header. The same logic applies to
+column headers which have a ``add_column()`` method.
+
+A table can't directly contain more than one row header and one column header.
+However, a column group can contain a column header, while a row group can
+contain a row header. So the header-focused methods above work with groups as
+well as with tables.
+
+A table header doesn't bring particular properties; it's just a construct
+allowing the author to designate rows and columns that should be automatically
+repeated on every page if the table doesn't fit on a single page.
+
+The ``get_xxx()`` table-based retrieval methods ignore the content of the
+headers. However, it's always possible to select a header, then to used it as
+the context object to select an object using its coordinates inside the header.
+For example, the first instruction below gets the first cell of a table body,
+while the third and third instructions select the first cell of a table header::
+
+   c1 = table.get_cell(0,0)
+   header = table.get_header()
+   c2 = header.get_cell(0,0)
+
+Individual cell property handling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A cell owns both a *content* and some *properties* which may be processed
 separately.
 
@@ -730,21 +794,25 @@ the text content as a flat string, without any structural information and
 whatever the number and the type of the content elements.
 
 The properties may be accessed using ``set_properties()`` and
-``get_properties()``.
-
-``set_properties()`` works with the following named parameters:
+``get_properties()``; ``set_properties()`` works with the following optional
+named parameters:
 
 - ``style``: the name of a cell style;
 - ``type``: the cell value type, which may be one of the ODF supported data
    types, used when the cell have to contain a computable value (omitted with
    text cells);
 - ``value``: the numeric computable value of the cell, used when the ``type`` is
-   ``float``, ``percentage`` or ``currency``, and whose default value is 0;
+   defined;
 - ``currency``: the international standard currency unit identifier (ex: EUR,
    USD), used when the ``type`` is ``currency``;
-- [...]
+- ``formula``: a calculation formula whose result is a computable value (the
+   grammar and syntax of the formula is application-specific and not ckecked
+   by the lpOD API (it's stored as flat text and not interpreted);
+- ``protected``: boolean (default false), tells the applications that the cell
+   can't be edited.
 
-[tbc]
+All the existing properties may be retrieved using the cell ``get_properties()``
+which returns a list of named parameters.
 
 
 Lists [todo]
