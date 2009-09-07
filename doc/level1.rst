@@ -231,13 +231,13 @@ optional parameters:
 - ``level`` which indicates the hierarchical level of the heading (default 1,
   i.e. the top level);
 
-- ``restart-numbering``, a boolean which, if true, indicates that the numbering
+- ``restart numbering``, a boolean which, if true, indicates that the numbering
   should be restarted at the current heading (default false);
 
-- ``start-value`` to restart the heading numbering of the current level at a
+- ``start value`` to restart the heading numbering of the current level at a
   given value;
 
-- ``suppress-numbering``, a boolean which, if true, indicates that the heading
+- ``suppress numbering``, a boolean which, if true, indicates that the heading
   must not be numbered (default false).
 
 See below for explanations about level and numbering.
@@ -257,9 +257,9 @@ spec doesn't set an explicit limit, we don't recommend levels beyond 10).
 Heading numbering
 ~~~~~~~~~~~~~~~~~~
 Whatever the visibility of the numbers, all the headings of a given level are
-potentially numbered. By default, the numbering is related to the whole document
-starting to 1. However, optional properties allow the user to change this
-behaviour.
+potentially numbered. By default, the numbering is related to the whole
+document starting to 1. However, optional properties allow the user to change
+this behaviour.
 
 An arbitrary, explicit numbering value can be set, so the automatic numbering
 restarts from this value from the target heading element and apply to the
@@ -839,14 +839,67 @@ a given cell is covered or not through the boolean ``is_covered()`` cell method.
 In addition, the span values of a covered cell are automatically set to 1, and
  ``set_span()`` is forbidden with covered cells.
 
-Note that the API doesn't support cell spans that spread across table headers
+Note that the API doesn't support cell spans that spread across table header
 or group boundaries.
 
-Lists [todo]
-------------
+Item lists
+----------
+
+A list is a structured object that contains an optional list header followed by
+any number of list items. The list header, if defined, contains one or more
+paragraphs that are displayed before the list. A list item can contain
+paragraphs, headings, or lists. Its properties are ``style``, that is an
+appropriate list style, and ``continue numbering``, a boolean value that, if
+true, means that *if the numbering style of the preceding list is the same as the current list, the number of the first list item in the current list is the number of the last item in the preceding list incremented by one* (default=false).
 
   .. figure:: figures/lpod_list.png
      :align: center
+
+A list is created using ``odf_create_list()``, then inserted using
+``insert_element()`` as usual.
+
+A list header is created "in place" with ``set_header()``, called from a list
+element; this method returns an ODF element that can be used later as a context
+to append paragraphs in the header. Alternatively, it's possible to call the
+list-based ``set_header()`` with one or more existing paragraphs as arguments,
+so these paragraphs are immediately incorporated in the new list header. Note
+that every use of ``set_header()`` replaces any existing header by a new one.
+
+Regular list items are created in place (like the optional list header) using
+``add_item()`` wich creates one or more new items and inserts them at a
+position which depends on optional parameters, according to the same kind
+of logic than the tabble-based ``add_row()`` method. Without any argument, a
+single item is appended at end of the list. An optional ``before`` named
+parameter may be provided; if defined, the value of this parameter must be a
+row number (in numeric, zero-based form) in the range of the list; the new
+items are inserted *before* the original item that existed at the given
+position. Alternatively, a ``after`` parameter may be provided instead of
+``before``; it produces a similar result, but the new items are inserted
+*after* the given position. If a additional ``number`` parameter is provided
+with a integer value, the corresponding number of identical items are
+inserted in place.
+
+By default, a new item is created empty. However, as a shortcut for the most
+common case, it's possible to directly create it with a text content. To do
+so, the text content must be provided through a ``text`` parameter; an
+optional ``style`` parameter, whose value is a regular paragraph style, may
+provided too. The new item is then created with a single paragraph as content
+(that is the most typical situation).
+
+Another optional ``start value`` parameter may be set in order to restart the
+numbering of the current list at the given value. Of course, this start value
+apply to the first inserted item if ``add_item()`` is used to create many items
+in a single call.
+
+``add_item()`` returns the newly created list of item elements. In addition,
+an existing item may be selected in the list context using ``get_item()`` with
+its numeric position. A list item is an ODF element, so any content element
+may be attached to it using ``insert_element()``.
+
+Note that, unlike headings, list items don't have an explicit level property.
+All the items in an ODF list have the same level. Knowing that a list may be
+inside an item belonging to another list, the hierarchy is represented by the
+structural list imbrication, not by item attributes.
 
 Data pilot (pivot) tables [todo]
 --------------------------------
@@ -1363,8 +1416,8 @@ Time style [todo]
 Page styles
 ------------
 
-A page style definition, so-called *master page*, is "*a template for pages in
-a document*". It directly defines the static content "*that is displayed on all
+A page style definition, so-called *master page*, is *"a template for pages in
+a document"*. It directly defines the static content "*that is displayed on all
 pages*" that use it (such as headers and footers). In addition, a
 *master page* is associated to a *page layout*, defined as a separate object
 that describes "*the physical properties or geometry of a page, for example,
