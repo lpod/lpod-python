@@ -814,6 +814,33 @@ named parameters:
 All the existing properties may be retrieved using the cell ``get_properties()``
 which returns a list of named parameters.
 
+Cell span extension
+~~~~~~~~~~~~~~~~~~~
+
+A cell may be expanded in so it covers one or more adjacent columns and/or rows.
+The cell-based ``set_span()`` method allows the user to control this expansion.
+It takes ``rows`` and ``columns`` as parameters, specifying the number of rows
+and the number of columns covered. The following example selects the "B4" cell
+then expands it over 4 columns and 3 rows::
+
+   cell = table.get_cell('B4')
+   cell.set_span(rows=3, columns=4)
+
+The existing span of a cell may be get using ``get_span()``, which returns the
+``rows`` and ``columns`` values.
+
+This method changes the previous span of the cell. The default value for each
+parameter is 1, so a ``set_span()`` without argument reduces the cell at its
+minimal span.
+
+When a cell is covered due to the span of another cell, it remains present and
+holds its content and properties. However, it's possible to know at any time if
+a given cell is covered or not through the boolean ``is_covered()`` cell method.
+In addition, the span values of a covered cell are automatically set to 1, and
+ ``set_span()`` is forbidden with covered cells.
+
+Note that the API doesn't support cell spans that spread across table headers
+or group boundaries.
 
 Lists [todo]
 ------------
