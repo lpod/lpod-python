@@ -907,12 +907,40 @@ Data pilot (pivot) tables [todo]
 Sections [todo]
 ---------------
 
-Draw pages [todo]
+Draw pages [tbc]
 -----------------
+
+Draw pages are structured containers belonging to presentation or drawing
+documents. They shouldn't appear in text or spreadsheet documents.
+
+A draw page can contain forms, drawings, frames, presentation animations, and/or
+presentation notes (§9.1.4 in the ODF specification).
 
   .. figure:: figures/lpod_drawpage.png
      :align: center
 
+A draw page is created using ``odf_create_draw_page()`` and integrated through
+``insert_element()``. Note that a draw page should be inserted at the document
+body level, knowing that it's a top level content element.
+
+A draw page may have the following parameters, to be set at creation time or
+later:
+
+- ``id``: an alphanumeric mandatory identifier, unique for the document when
+   the draw page is inserted;
+- ``name``: an optional, but unique if provided, name (which may be made visible
+   for the end-users);
+- ``style``: the name of a drawing page style (existing or to be defined);
+- ``master page``: the name of a master page whose structure is appropriate for
+   draw pages (beware, a master page defined for a text document don't always
+   fit for draw pages);
+- ``presentation page layout``: the name of a presentation page layout template
+   as defined in §14.15 of the ODF specification (if such a layout is used);
+   beware, such objects are neither similar nor related to *page layouts* as
+   described in the present specification, which are used through
+   *page masters*.
+
+[tbc]
 
 Fields and forms
 ================
@@ -1139,7 +1167,7 @@ some of them are not supported by any ODF text processor or viewer.
 The API allows the user to set any attribute using its official name
 according to the ODF specification (§15.4). For example, the properties
 which control the character name and size are respectively
-"fo:font-name" and "fo:font-size". However, the API allows the use of
+``fo:font-name`` and ``fo:font-size``. However, the API allows the use of
 mnemonic shortcuts for a few, frequently required properties, namely:
 
 - ``font``: font name;
@@ -1161,7 +1189,7 @@ mnemonic shortcuts for a few, frequently required properties, namely:
 A text style may have a background color, but not a background image.
 
 Paragraph family
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 A paragraph style apply to paragraphs at large, i.e. to ODF paragraphs and
 headings, which are the common text containers. It controls the layout of both
@@ -1186,12 +1214,13 @@ previously defined text style, or by explicitly defining new text properties,
 through the ``set_properties()`` method with the ``area`` option set to
 ``text``.
 
-Assuming that a "MyBlueText" text style has been defined according to the text
-style creation example above, the following sequence creates a new paragraph
-style whose text part is a clone of "MyBlueText", and whose paragraph part
-features are the text justification, a first line 5mm indent, a black,
-continuous, half-millimiter border line with a bottom-right, one millimeter grey
-shadow, with other possible properties inherited from a "Standard" style::
+Assuming that a "MyColoredText" text style has been defined according to the
+text style creation example above, the following sequence creates a new
+paragraph style whose text part is a clone of "MyColoredText", and whose
+paragraph part features are the text justification, a first line 5mm indent,
+a black, continuous, half-millimiter border line with a bottom-right, one
+millimeter grey shadow, with other possible properties inherited from a
+"Standard" style::
 
    ps = odf_create_style('paragraph', 'BorderedShadowed',
                            'display name'='Strange Boxed Paragraph',
@@ -1201,11 +1230,12 @@ shadow, with other possible properties inherited from a "Standard" style::
                            border='0.5mm solid #000000',
                            shadow='#808080 1mm 1mm'
                            )
-   ts = document.get_style('text', 'MyColoredtext')
-   ps.set_properties(area='text', ts)
+   ts = document.get_style('text', 'MyColoredText')
+   ps.set_properties(area='text', ts.clone())
 
-Note that "MyColoredText" is reused by copy, not by reference; so the new paragraph
-style will not be affected if "MyColoredText" is changed or deleted later.
+Note that "MyColoredText" is reused by copy, not by reference; so the new
+paragraph style will not be affected if "MyColoredText" is changed or deleted
+later.
 
 The API allows the user to set any attribute using its official name according
 to the ODF specification related to the paragraph formatting properties (§15.5).
