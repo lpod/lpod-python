@@ -6,8 +6,8 @@ Level 1 Functional specification
 
 .. contents::
 
-Common features
-===============
+Common features and conventions
+===============================
 
 All the lpOD level 0 features are available through the level 1 API, so the
 applications can create, retrieve or delete any element.  They can create,
@@ -78,14 +78,34 @@ available whatever the element type (however, a context-based method can raise
 an error, for example when it's used to execute an operation that is not legal
 for the current context).
 
+The level 1 ``insert_element()`` method supports all the features of the level 0
+version, but it accepts the additional parameters ``before`` and ``after``,
+whose value is an ODF element. The element to be inserted takes place
+immediately *after* the reference element provided through the ``after``
+parameter (if set). Alternatively, the insertion will take place *before* any
+element which is provided through the ``after`` parameter. These parameters are
+intended to hide the low level XML jargon, and they are, of course, optional and
+mutually exclusive.
+
+On the other hand, ``append_element()`` always attaches an element after the
+last child of the context element.
+
 An element-specific method works with specific ODF elements only, according to
 their particular role. For example ``set_header()`` is provided with ODF master
 pages, because a header is an extension of a page style element, while
 ``set_background()`` is available with objects where a background definition
 makes sense (such as page layouts or paragraph styles).
 
-Common element-specific methods
-===============================
+Some ODF elements own a ``set_properties()`` method, which could sound redundant
+with ``set_attributes()``. However, ``set_properties()`` may set element
+properties that imply element-specific transformations or constructs, makes some
+consistency checks, and allow the user to provide property names that aren't
+directly translated in simple attributes using the same name transformation
+rules as ``set_attributes()``. The same logic apply to ``get_properties()``,
+when defined.
+
+Common element-specific functions and methods
+=============================================
 
 Any ODF element in the level 1 API inherits all the features of the underlying
 XML element.
@@ -101,9 +121,13 @@ removed through a ``delete`` method from its parent element; the deletion
 removes the element itself and all its children.
 
 Some elements are created without any predefined attachment, i.e. as a free
-elements; they can be inserted later at the right place. Other elements, whose
+elements, by specific constructor functions whose name is like
+``odf_create_xxx()``, where ``xxx`` is the kind of element to be created.
+A free element can be inserted later at the right place. Other elements, whose
 definition doesn't make sens out of a specific context, are directly created in
-place.
+place, through context-based methods whose name is ``set_xxx()``. Beware, every
+``set_xxx()`` method creates or replaces something in the calling element, but
+some of them don't create new elements.
 
 Any element is able to be serialized and exported as an XML, UTF8-encoded
 string. Symmetrically, an element can be created from an application- provided
@@ -112,7 +136,7 @@ receive any kind of ODF content.
 
 The level 1 API is not validating, so the user is responsible of the ODF
 compliance (the API doesn't automatically prevent the applications from
-inserting an element at the wrong place).
+inserting an element at the wrong place or to set non-ODF elements).
 
 Any element can be retrieved according to its sequential position in a given
 context or its text content (if defined), through methods like
@@ -138,6 +162,12 @@ Addtional retrieval methods are available according to the element type.
 Every search method operates in context, knowing that the context could be the
 whole document as well as a particular element (section, table, etc).
 
+In the present specification, some element properties or attributes may be
+named using multiple-word designations (ex: ``display name``, ``page layout``)
+that include spaces or dashes. Knowing that such designations are not easy to
+use as variable names in every programming language, spaces and dashes should
+be replaces by underscore ("_") characters in the lpOD executable
+implementations.
 
 Basic text containers
 =====================
@@ -698,15 +728,14 @@ different logic. ``add_column()`` inserts new column objects (clones of an
 existing column), the it goes through all the rows and inserts new cells
 (cloning the cell located at the reference position) in each one.
 
-Of course, it's possible to use the level 0 ``insert_element()`` method in
-order to insert a row, a column or a cell externally created (or extracted from
-an other table from another document), provided that the user carefully checks
-the consistency of the resulting contruct. As an example, the following
-sequence appends a copy of the first row of ``t1``after the 5th row of ``t2``::
+Of course, it's possible to use ``insert_element()`` in order to insert a row,
+a column or a cell externally created (or extracted from an other table from
+another document), provided that the user carefully checks the consistency of
+the resulting contruct. As an example, the following sequence appends a copy
+of the first row of ``t1``after the 5th row of ``t2``::
 
    to_be_inserted = t1.get_row(0).clone();
-   ref_row = t2.get_row(5)
-   ref_row.insert_element(to_be_inserted, xmlposition=NEXT_SIBLING)
+   t2.insert_element(to_be_inserted, after=t2.get_row(5))
 
 Row and column group handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -837,7 +866,7 @@ When a cell is covered due to the span of another cell, it remains present and
 holds its content and properties. However, it's possible to know at any time if
 a given cell is covered or not through the boolean ``is_covered()`` cell method.
 In addition, the span values of a covered cell are automatically set to 1, and
- ``set_span()`` is forbidden with covered cells.
+``set_span()`` is forbidden with covered cells.
 
 Note that the API doesn't support cell spans that spread across table header
 or group boundaries.
@@ -907,8 +936,8 @@ Data pilot (pivot) tables [todo]
 Sections [todo]
 ---------------
 
-Draw pages [tbc]
------------------
+Draw pages
+----------
 
 Draw pages are structured containers belonging to presentation or drawing
 documents. They shouldn't appear in text or spreadsheet documents.
@@ -918,6 +947,8 @@ presentation notes (§9.1.4 in the ODF specification).
 
   .. figure:: figures/lpod_drawpage.png
      :align: center
+
+*[Unfinished diagram]*
 
 A draw page is created using ``odf_create_draw_page()`` and integrated through
 ``insert_element()``. Note that a draw page should be inserted at the document
@@ -931,16 +962,37 @@ later:
 - ``name``: an optional, but unique if provided, name (which may be made visible
    for the end-users);
 - ``style``: the name of a drawing page style (existing or to be defined);
-- ``master page``: the name of a master page whose structure is appropriate for
+- ``master``: the name of a master page whose structure is appropriate for
    draw pages (beware, a master page defined for a text document don't always
    fit for draw pages);
-- ``presentation page layout``: the name of a presentation page layout template
-   as defined in §14.15 of the ODF specification (if such a layout is used);
-   beware, such objects are neither similar nor related to *page layouts* as
-   described in the present specification, which are used through
-   *page masters*.
+- ``layout``: the name of a *presentation page layout* as defined
+   in §14.15 of the ODF specification (if such a layout is used); beware, such
+   objects are neither similar nor related to general *page layouts* as defined
+   in §14.3 (a general page layout may be used through a *master page* only,
+   and should never be directly connected to a draw page) (sorry, this confusing
+   vocabulary is not a choice of the lpOD team;-)
 
-[tbc]
+The following example creates a draw page with these usual parameters and
+integrates it as the last page of a presentation document::
+
+   dp = odf_create_draw_page(id='xyz1234',
+                           name='Introduction',
+                           style='DrawPageOneStyle',
+                           master='DrawPageOneMaster',
+                           layout='DrawPageOneLayout
+                           )
+   document.append_element(dp)
+
+All these parameters may retrieved or changed later using ``get_properties()``
+and ``set_properties()`` with draw page objects.
+
+Populating a draw page doesn't require element-specific methods, knowing that:
+
+- all the fixed parts, the layout and the background are defined by the
+   associated ``style``, ``master`` and ``layout``;
+- all the content objects are created separately and attached to the draw page
+   using the regular ``insert_element()`` or ``append_element()`` method from
+   the draw page object.
 
 Fields and forms
 ================
@@ -1487,7 +1539,7 @@ A master page may, like other styles, have a display name distinct from its
 name. In addition, a full master page definition allows the following named
 parameters:
 
-- ``page layout``: the unique name of a *page layout*, existing or to be defined
+- ``layout``: the unique name of a *page layout*, existing or to be defined
   in the same document;
 - ``next``: the master page to apply to the following page, as soon as the
   current page is entirely filled, knowing that the current master page is used
