@@ -5,6 +5,7 @@
 from element import register_element_class, odf_create_element, odf_element
 from paragraph import odf_create_paragraph
 from utils import _get_style_tagname, _expand_properties, _merge_dicts
+from utils import _get_element
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
@@ -245,6 +246,59 @@ class odf_style(odf_element):
 
 
 
+class odf_list_style(odf_style):
+    """A list style is a container for list level styles.
+    """
+    any_style = 'text:list-level-style-(number|bullet|image)',
+    def get_level_style(self, level):
+        return _get_element(self.any_style, level=level)
+
+
+    def set_level_style(self, level, type=None, format=None, prefix=None,
+            suffix=None, character=None, uri=None, display_levels=None,
+            start_value=None, style=None, clone=None):
+        level_style_name = 'text:list-level-style-%s' % type
+        was_created = False
+        if clone is not None:
+            level_style = clone.clone()
+            was_created = True
+        else:
+            level_style = self.get_level_style(level)
+            if level_style is None:
+                level_style = odf_create_element(level_style_name)
+                was_created = True
+        if level_style.get_name() != level_style_name:
+            level_style.set_name(level_style_name)
+        if type == 'number':
+            if format is None:
+                raise ValueError, "format is missing"
+            level_style.set_attribute('fo:num-format', format)
+        elif type == 'bullet':
+            if character is None:
+                raise ValueError, "bullet character is missing"
+            level_style.set_attribute('text:bullet-char', character)
+        elif type == 'image':
+            if uri is None:
+                raise ValueError, "image URI is missing"
+            level_style.set_attribute('xlink:href', uri)
+        else:
+            raise ValueError, "unknown level style type: %s" % type
+        if display_levels:
+            level_style.set_attribute('text:display-levels', display_levels)
+        if start_value:
+            level_style.set_attribute('text:start-value', start_value)
+        if style:
+            level_style.set_attribute('text:style-name', style)
+        # Commit the creation
+        if was_created:
+            level_style.set_attribute('text:level', level)
+            self.append_element(level_style)
+        return level_style
+
+
+
+
+
 class odf_page_layout(odf_style):
     """Phyisical presentation of a page.
 
@@ -383,7 +437,9 @@ class odf_master_page(odf_style):
 
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
-             'style:footer-style'):
+             'style:footer-style', 'text:list-level-style-number',
+             'text:list-level-style-bullet', 'text:list-level-style-image'):
     register_element_class(name, odf_style)
+register_element_class('text:list-style', odf_list_style)
 register_element_class('style:page-layout', odf_page_layout)
 register_element_class('style:master-page', odf_master_page)
