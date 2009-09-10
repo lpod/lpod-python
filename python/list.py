@@ -3,14 +3,8 @@
 
 # Import from lpod
 from element import register_element_class, odf_element, odf_create_element
-from element import PREV_SIBLING, NEXT_SIBLING
-
-
-def get_parent_item(element):
-    while element.get_name() != 'text:list-item':
-        element = element.get_parent()
-    return element
-
+from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
+from paragraph import odf_create_paragraph
 
 
 def odf_create_list_item(text_or_element=None):
@@ -66,16 +60,30 @@ class odf_list(odf_element):
     """Specialised element for lists.
     """
 
-    def get_item_list_by_content(self, regex):
-        paragraphs = self.get_element_list('//text:p')
-        return [get_parent_item(paragraph) for paragraph in paragraphs
-                                               if paragraph.match(regex)]
+    def get_item_list(self, regex=None):
+        items = self.get_element_list('text:list-item')
+        if regex is not None:
+            items = [item for item in items if item.match(regex)]
+        return items
+
 
     def get_item_by_content(self, regex):
         items = self.get_item_list_by_content(regex)
         if items:
             return items[0]
         return None
+
+
+    def set_header(self, text_or_element):
+        if not isinstance(text_or_element, (list, tuple)):
+            text_or_element = [text_or_element]
+        # Remove existing header
+        for element in self.get_element_list('text:p'):
+            self.delete(element)
+        for paragraph in reversed(text_or_element):
+            if type(paragraph) is unicode:
+                paragraph = odf_create_paragraph(paragraph)
+            self.insert_element(paragraph, FIRST_CHILD)
 
 
     def insert_item(self, item, position=None, before=None, after=None):
