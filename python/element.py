@@ -611,16 +611,16 @@ class odf_element(object):
 
     def get_heading_list(self, style=None, level=None, regex=None):
         return _get_element_list(self, 'descendant::text:h', style=style,
-                                 level=level, regex=regex)
+                                 outline_level=level, regex=regex)
 
 
     def get_heading_by_position(self, position, level=None):
         return _get_element(self, 'descendant::text:h', position=position,
-                            level=level)
+                            outline_level=level)
 
 
     def get_heading_by_content(self, regex, level=None):
-        return _get_element(self, 'text:h', regex=regex, level=level)
+        return _get_element(self, 'text:h', regex=regex, outline_level=level)
 
 
     #

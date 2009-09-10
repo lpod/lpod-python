@@ -60,7 +60,7 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
                       draw_style=None, draw_text_style=None, table_name=None,
                       style_name=None, note_class=None, text_id=None,
                       text_name=None, office_name=None, office_title=None,
-                      level=None, position=None, **kw):
+                      outline_level=None, level=None, position=None, **kw):
     query = [element_name]
     attributes = kw
     if style:
@@ -87,8 +87,10 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
         attributes['office:name'] = office_name
     if office_title:
         attributes['office:title'] = office_title
+    if outline_level:
+        attributes['text:outline-level'] = outline_level
     if level:
-        attributes['text:outline-level'] = level
+        attributes['text:level'] = level
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]
@@ -183,9 +185,9 @@ def _get_element_list(context, element_name, style=None, family=None,
                       draw_name=None, draw_style=None, draw_text_style=None,
                       table_name=None, note_class=None, style_name=None,
                       text_id=None, text_name=None, office_name=None,
-                      office_title=None, level=None, href=None,
-                      svg_title=None, svg_desc=None, position=None,
-                      regex=None):
+                      office_title=None, outline_level=None, level=None,
+                      href=None, svg_title=None, svg_desc=None,
+                      position=None, regex=None):
     query = _make_xpath_query(element_name, style=style, family=family,
                               draw_name=draw_name,
                               draw_style=draw_style,
@@ -195,7 +197,8 @@ def _get_element_list(context, element_name, style=None, family=None,
                               note_class=note_class, text_id=text_id,
                               text_name=text_name, office_name=office_name,
                               office_title=office_title,
-                              level=level, position=position)
+                              outline_level=outline_level, level=level,
+                              position=position)
     elements = context.get_element_list(query)
     # Filter the elements with the regex
     if regex is not None:
@@ -223,15 +226,16 @@ def _get_element_list(context, element_name, style=None, family=None,
 def _get_element(context, element_name, style=None, family=None,
                  draw_name=None, table_name=None, style_name=None,
                  text_id=None, text_name=None, office_name=None,
-                 office_title=None, level=None, href=None,
-                 svg_title=None, svg_desc=None, position=None,
+                 office_title=None, outline_level=None, level=None,
+                 href=None, svg_title=None, svg_desc=None, position=None,
                  regex=None):
     result = _get_element_list(context, element_name, style=style,
                                family=family, draw_name=draw_name,
                                table_name=table_name, style_name=style_name,
                                text_id=text_id, text_name=text_name,
                                office_name=office_name,
-                               office_title=office_title, level=level,
+                               office_title=office_title,
+                               outline_level=outline_level, level=level,
                                href=href, svg_title=svg_title,
                                svg_desc=svg_desc, position=position,
                                regex=regex)
