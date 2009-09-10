@@ -26,10 +26,10 @@ class TestShapes(TestCase):
 
 
     def test_create_line(self):
-        page = odf_create_draw_page(u'Page')
+        page = odf_create_draw_page('Page1')
         line = odf_create_line(p1=('2cm', '2cm'), p2=('1cm', '1cm'))
         page.append_element(line)
-        expected = ('<draw:page draw:name="Page">\n'
+        expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:line svg:x1="2cm" svg:y1="2cm" svg:x2="1cm" '
                     'svg:y2="1cm"/>\n'
                     '</draw:page>\n')
@@ -37,11 +37,11 @@ class TestShapes(TestCase):
 
 
     def test_create_rectangle(self):
-        page = odf_create_draw_page(u'Page')
-        rectangle = odf_create_rectangle(size=('2cm', '1cm'), position=('3cm',
-        '4cm'))
+        page = odf_create_draw_page('Page1')
+        rectangle = odf_create_rectangle(size=('2cm', '1cm'),
+                                         position=('3cm', '4cm'))
         page.append_element(rectangle)
-        expected = ('<draw:page draw:name="Page">\n'
+        expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:rect svg:width="2cm" svg:height="1cm" svg:x="3cm"'
                     ' svg:y="4cm"/>\n'
                     '</draw:page>\n')
@@ -49,7 +49,7 @@ class TestShapes(TestCase):
 
 
     def test_create_ellipse(self):
-        page = odf_create_draw_page(u'Page')
+        page = odf_create_draw_page('Page1')
         svg_attrs = {
             'svg:width': '2cm',
             'svg:height': '2cm',
@@ -58,7 +58,7 @@ class TestShapes(TestCase):
         ellipse = odf_create_ellipse(size=('2cm', '1cm'), position=('3cm',
         '4cm'))
         page.append_element(ellipse)
-        expected = ('<draw:page draw:name="Page">\n'
+        expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:ellipse svg:width="2cm" svg:height="1cm" '
                     'svg:x="3cm" svg:y="4cm"/>\n'
                     '</draw:page>\n')
@@ -66,19 +66,20 @@ class TestShapes(TestCase):
 
 
     def test_create_connector(self):
-        page = odf_create_draw_page(u'Page')
+        page = odf_create_draw_page('Page1')
         rectangle = odf_create_rectangle(size=('2cm', '1cm'),
                                          position=('3cm', '4cm'),
                                          shape_id='rectangle')
         ellipse = odf_create_ellipse(size=('2cm', '1cm'),
                                      position=('3cm', '4cm'),
                                      shape_id='ellipse')
-        connector = odf_create_connector(connected_shapes=(rectangle, ellipse),
+        connector = odf_create_connector(connected_shapes=(rectangle,
+                                                           ellipse),
                                          glue_points=(1, 2))
         page.append_element(rectangle)
         page.append_element(ellipse)
         page.append_element(connector)
-        expected = ('<draw:page draw:name="Page">\n'
+        expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:rect draw:id="rectangle" svg:width="2cm" '
                     'svg:height="1cm" svg:x="3cm" svg:y="4cm"/>\n'
                     '  <draw:ellipse draw:id="ellipse" svg:width="2cm" '

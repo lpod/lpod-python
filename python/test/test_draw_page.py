@@ -17,20 +17,19 @@ class TestDrawPage(TestCase):
 
 
     def test_create_simple_page(self):
-        element = odf_create_draw_page(u"Page de titre")
-        expected = '<draw:page draw:name="Page de titre"/>'
+        element = odf_create_draw_page('id1')
+        expected = '<draw:page draw:id="id1"/>'
         self.assertEqual(element.serialize(), expected)
 
 
     def test_create_complex_page(self):
-        element = odf_create_draw_page(u"Introduction", page_id='id1',
+        element = odf_create_draw_page('id1', name=u"Introduction",
                                        master_page='prs-novelty',
                                        page_layout='AL1T0', style='dp1')
-        expected = ('<draw:page draw:name="Introduction" '
+        expected = ('<draw:page draw:id="id1" draw:name="Introduction" '
                     'draw:style-name="dp1" '
                     'draw:master-page-name="prs-novelty" '
-                    'presentation:presentation-page-layout-name="AL1T0" '
-                    'draw:id="id1"/>')
+                    'presentation:presentation-page-layout-name="AL1T0"/>')
         self.assertEqual(element.serialize(), expected)
 
 

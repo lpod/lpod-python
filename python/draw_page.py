@@ -5,12 +5,14 @@
 from element import register_element_class, odf_element, odf_create_element
 
 
-def odf_create_draw_page(name, page_id=None, master_page=None,
+def odf_create_draw_page(page_id, name=None, master_page=None,
                          page_layout=None, style=None):
     """This element is a container for content in a drawing or presentation
     document.
 
     Arguments:
+
+        page_id -- str
 
         name -- unicode
 
@@ -18,14 +20,14 @@ def odf_create_draw_page(name, page_id=None, master_page=None,
 
         page_layout -- str
 
-        page_id -- str
-
         style -- str
 
     Return: odf_element
     """
     element = odf_create_element('<draw:page/>')
-    element.set_attribute(u'draw:name', name)
+    element.set_attribute('draw:id', page_id)
+    if name:
+        element.set_attribute(u'draw:name', name)
     if style:
         element.set_attribute('draw:style-name', style)
     if master_page:
@@ -33,8 +35,6 @@ def odf_create_draw_page(name, page_id=None, master_page=None,
     if page_layout:
         element.set_attribute('presentation:presentation-page-layout-name',
                               page_layout)
-    if page_id:
-        element.set_attribute('draw:id', page_id)
     return element
 
 
