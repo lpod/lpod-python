@@ -183,8 +183,9 @@ def _get_element_list(context, element_name, style=None, family=None,
                       draw_name=None, draw_style=None, draw_text_style=None,
                       table_name=None, note_class=None, style_name=None,
                       text_id=None, text_name=None, office_name=None,
-                      office_title=None, level=None, href=None, svg_title=None,
-                      svg_desc=None, position=None, regex=None):
+                      office_title=None, level=None, href=None,
+                      svg_title=None, svg_desc=None, position=None,
+                      regex=None):
     query = _make_xpath_query(element_name, style=style, family=family,
                               draw_name=draw_name,
                               draw_style=draw_style,

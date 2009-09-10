@@ -5,6 +5,7 @@
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
 from paragraph import odf_create_paragraph
+from utils import _get_element_list, _get_element
 
 
 def odf_create_list_item(text_or_element=None):
@@ -61,17 +62,15 @@ class odf_list(odf_element):
     """
 
     def get_item_list(self, regex=None):
-        items = self.get_element_list('text:list-item')
-        if regex is not None:
-            items = [item for item in items if item.match(regex)]
-        return items
+        return _get_element_list(self, 'text:list-item', regex=regex)
+
+
+    def get_item_by_position(self, position):
+        return _get_element(self, 'text:list-item', position=position)
 
 
     def get_item_by_content(self, regex):
-        items = self.get_item_list_by_content(regex)
-        if items:
-            return items[0]
-        return None
+        return _get_element(self, 'text:list-item', regex=regex)
 
 
     def set_header(self, text_or_element):
