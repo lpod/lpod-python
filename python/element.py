@@ -296,6 +296,15 @@ class odf_element(object):
         return _get_prefixed_name(element.tag)
 
 
+    def set_name(self, qname):
+        """XXX side effects?
+        and the wrapping class won't change
+        """
+        element = self.__element
+        tag = '{%s}%s' % _decode_qname(qname)
+        element.tag = tag
+
+
     def get_element_list(self, xpath_query):
         element = self.__element
         result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
