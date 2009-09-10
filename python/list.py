@@ -70,7 +70,12 @@ class odf_list(odf_element):
 
 
     def get_item_by_content(self, regex):
-        return _get_element(self, 'text:list-item', regex=regex)
+        query = 'descendant::text:list-item/text:p'
+        paragraphs = [p for p in self.get_element_list(query)
+                      if p.match(regex)]
+        if paragraphs:
+            return paragraphs[0].get_parent()
+        return None
 
 
     def set_header(self, text_or_element):
