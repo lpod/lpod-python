@@ -1522,12 +1522,17 @@ a page that will use a "Left page" style and vice-versa).
    .. figure:: figures/lpod_page_style.png
       :align: center
 
-*Master page* objects apply to presentation and drawing documents, too. Such
-documents use statically defined draw pages. As a consequence, the link between
-every draw page and its master page is static and specified using an explicit
-property of the draw page. On the other hand, master pages and page layouts are
-used, for the presentation and drawing documents, in combination with additional
-style objects, the *drawing page styles* and *presentation page layouts*.
+*Master page* objects (and the corresponding *page layouts*) apply to
+presentation and drawing documents, too. However, the page style model is very
+different (and much more complicated) for these documents than for text
+documents. This model uses master pages, page layouts, and two additional
+style-related objects, namely *presentation page layouts* and
+*presentation page styles*.
+
+Drawing and presentation documents use statically defined draw pages. As a
+consequence, the link between every draw page and its master page and other
+style-related objects is static and specified through explicit properties of
+the draw page.
 
 Master pages
 ~~~~~~~~~~~~~
@@ -1541,10 +1546,16 @@ name. In addition, a full master page definition allows the following named
 parameters:
 
 - ``layout``: the unique name of a *page layout*, existing or to be defined
-  in the same document;
+  in the same document (see later the lpOD specifications about the page layout
+  objects);
 - ``next``: the master page to apply to the following page, as soon as the
   current page is entirely filled, knowing that the current master page is used
   for the next page by default.
+
+As any other ODF element, a master page object inherits the generic
+``insert_element()`` and ``append_element()`` methods that allow the user to
+attach any other ODF element to it. Beware that such attachments are unchecked,
+and that the user should not integrate any kind of element in a master page.
 
 A unique name is required at insert time; ``insert_style()`` raises an error at
 any attempt to attach a nameless master page to a document. On the other hand,
@@ -1587,6 +1598,21 @@ Note that the header and footer extensions of a master page don't include any
 layout information; the style of the header and footer of a master page is
 specified through the header and footer extensions of the corresponding page
 layout.
+
+Background objects
+~~~~~~~~~~~~~~~~~~~
+
+A page master doesn't include any direct page background specification, knowing
+that the background color and/or the background image are defined by the
+*page layout* that is linked to the page master (see below).
+
+However, it's possible to attach *frames* to a master page (through
+``insert_element()`` and ``append_element()``. Frames are containers for
+various kinds of content elements, including graphical ones, so they provide a
+practical way to compose backgrounds. However, the user should check the
+compatibility with the target displaying/printing applications according to
+the document type. Simply put, frames attached to master pages are common in
+presentation documents, not in text document.
 
 Page layouts
 ~~~~~~~~~~~~~
@@ -1657,6 +1683,9 @@ API.
 
 Drawing page styles
 ~~~~~~~~~~~~~~~~~~~
+
+[todo]
+
 
 Presentation page layouts
 ~~~~~~~~~~~~~~~~~~~~~~~~~
