@@ -250,9 +250,23 @@ def odf_create_column(style=None):
 
 
 
-def odf_create_table(name, width=None, height=None, style=None):
+def odf_create_table(name, width=None, height=None, protected=False,
+                     protection_key=None, display=True, printable=True,
+                     print_ranges=None, style=None):
     """Create a table element, optionally prefilled with "width" columns and
-    "height" rows, and of the optionally given style.
+    "height" rows.
+
+    If the table is to be protected, a protection key must be provided, i.e. a
+    hash value of the password (XXX what algorithm?).
+
+    If the table must not be displayed, set "display" to False.
+
+    If the table must not be printed, set "printable" to False. The table will
+    not be printed when it is not displayed, whatever the value of this
+    argument.
+
+    Ranges of cells to print can be provided as a list of cell ranges, e.g.
+    ['E6:K12', 'P6:R12'] or directly as a raw string, e.g. "E6:K12 P6:R12".
 
     Arguments:
 
@@ -261,6 +275,16 @@ def odf_create_table(name, width=None, height=None, style=None):
         width -- int
 
         height -- int
+
+        protected -- bool
+
+        protection_key -- str
+
+        display -- bool
+
+        printable -- bool
+
+        print_ranges -- list
 
         style -- unicode
 
@@ -274,6 +298,18 @@ def odf_create_table(name, width=None, height=None, style=None):
         for i in xrange(height):
             row = odf_create_row(width)
             element.insert_element(row, LAST_CHILD)
+    if protected:
+        if protection_key is None:
+            raise ValueError, "missing protection key"
+        element.set_attribute('table:protected', 'true')
+    if not display:
+        element.set_attribute('table:display', 'false')
+    if not printable:
+        element.set_attribute('table:print', 'false')
+    if print_ranges:
+        if isinstance(print_ranges, (tuple, list)):
+            print_ranges = ' '.join(print_ranges)
+        element.set_attribute('table:print-ranges', print_ranges)
     if style:
         element.set_attribute('table:style-name', style)
     return element
