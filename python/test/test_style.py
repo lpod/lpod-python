@@ -256,7 +256,8 @@ class StyleBackgroundTestCase(TestCase):
         style = self.style.clone()
         style.set_background(uri='Pictures/toto')
         expected = ('<style:style style:family="paragraph">'
-                      '<style:paragraph-properties>'
+                      '<style:paragraph-properties '
+                        'fo:background-color="transparent">'
                         '<style:background-image '
                           'xlink:href="Pictures/toto" '
                           'style:position="center"/>'
@@ -271,10 +272,11 @@ class StyleBackgroundTestCase(TestCase):
                              repeat='no-repeat', opacity=50,
                              filter='myfilter')
         expected = ('<style:style style:family="paragraph">'
-                      '<style:paragraph-properties>'
+                      '<style:paragraph-properties '
+                        'fo:background-color="transparent">'
                         '<style:background-image '
                           'xlink:href="Pictures/toto" '
-                          'style:position="center" '
+                          'style:position="top left" '
                           'style:repeat="no-repeat" '
                           'draw:opacity="50" '
                           'style:filter-name="myfilter"/>'
