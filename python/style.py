@@ -257,8 +257,10 @@ class odf_list_style(odf_style):
     def set_level_style(self, level, type=None, format=None, prefix=None,
             suffix=None, character=None, uri=None, display_levels=None,
             start_value=None, style=None, clone=None):
+        # Expected name
         level_style_name = 'text:list-level-style-%s' % type
         was_created = False
+        # Cloning or reusing an existing element
         if clone is not None:
             level_style = clone.clone()
             was_created = True
@@ -267,8 +269,10 @@ class odf_list_style(odf_style):
             if level_style is None:
                 level_style = odf_create_element(level_style_name)
                 was_created = True
+        # Transmute if the type changed
         if level_style.get_name() != level_style_name:
             level_style.set_name(level_style_name)
+        # Set the main attribute
         if type == 'number':
             if format is None:
                 raise ValueError, "format is missing"
@@ -283,6 +287,7 @@ class odf_list_style(odf_style):
             level_style.set_attribute('xlink:href', uri)
         else:
             raise ValueError, "unknown level style type: %s" % type
+        # Set attributes
         if display_levels:
             level_style.set_attribute('text:display-levels', display_levels)
         if start_value:
@@ -294,8 +299,6 @@ class odf_list_style(odf_style):
             level_style.set_attribute('text:level', level)
             self.append_element(level_style)
         return level_style
-
-
 
 
 
