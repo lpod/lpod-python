@@ -6,7 +6,7 @@ from copy import deepcopy
 from re import search, compile
 
 # Import from lxml
-from lxml.etree import fromstring, tostring, _Element
+from lxml.etree import fromstring, tostring, Element, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
@@ -119,11 +119,14 @@ def _make_odf_element(native_element):
 #
 
 def odf_create_element(element_data):
-    if not isinstance(element_data, (str, unicode)):
-        raise TypeError, "element data is not str/unicode"
+    if type(element_data) is str:
+        pass
+    elif type(element_data) is unicode:
+        element_data = element_data.encode('utf-8')
+    else:
+        raise TypeError, "element data is not str or unicode"
     if not element_data.strip():
         raise ValueError, "element data is empty"
-    element_data = convert_unicode(element_data)
     data = ns_document_data.format(element=element_data)
     root = fromstring(data)
     return _make_odf_element(root[0])
@@ -500,8 +503,13 @@ class odf_element(object):
 
 
     def clone(self):
-        element = self.__element
-        return self.__class__(deepcopy(element))
+        clone = deepcopy(self.__element)
+        # Now the clone is its own root and lxml lost unused namespaces
+        # prefixes.
+        # Re-attach it to a root with all namespaces
+        root = Element('ROOT', nsmap=ODF_NAMESPACES)
+        root.append(clone)
+        return self.__class__(clone)
 
 
     def serialize(self, pretty=False):
