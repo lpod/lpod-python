@@ -120,6 +120,7 @@ def _get_style_tagname(family):
                'section': ('style:style', family),
                # False families
                'list': ('text:list-style', None),
+               'outline': ('text:outline-style', None),
                'page-layout': ('style:page-layout', None),
                'master-page': ('style:master-page', None)}
     if family not in mapping:

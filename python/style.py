@@ -302,6 +302,13 @@ class odf_list_style(odf_style):
 
 
 
+class odf_outline_style(odf_list_style):
+    # Seems like nothing to do
+    # Yet the document has different expectations for list and outline styles
+    pass
+
+
+
 class odf_page_layout(odf_style):
     """Phyisical presentation of a page.
 
@@ -444,5 +451,6 @@ for name in ('style:style', 'style:default-style', 'style:header-style',
              'text:list-level-style-bullet', 'text:list-level-style-image'):
     register_element_class(name, odf_style)
 register_element_class('text:list-style', odf_list_style)
+register_element_class('text:outline-style', odf_outline_style)
 register_element_class('style:page-layout', odf_page_layout)
 register_element_class('style:master-page', odf_master_page)
