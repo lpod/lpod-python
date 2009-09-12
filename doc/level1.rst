@@ -316,7 +316,8 @@ There are several kinds of text spans.
   a part of the content of a paragraph/heading. As a consequence, it's
   associated to a text style.
 - Hyperlinks: a hyperlink can be defined in order to associate a part of the
-  content of a paragraph/heading to the URI of an external resource.
+  content of a paragraph/heading to another content element in the current
+  document or to an external resource.
 
 Unlike paragraphs and headings, spans are created "in place", i.e. their
 creation methods create and directly insert them in an existing container.
@@ -346,11 +347,11 @@ at a given position, ``p`` being the target paragraph::
 
 A hyperlink span is created through ``set_hyperlink()``, which waits for the
 same positioning parameters (by regex or by position and length). However,
-there is no style, and a ``uri`` parameter (whose value is any kind of URI
-that is supported by the application) is required instead. A hyperlink span
-can't contain any other span, while a style span can contain one or more spans.
-As a consequence, the only one way to provide a hyperlink soan with a text style
-consists of embed it in a style span.
+there is no style, and a ``url`` parameter (whose value is any kind of path
+specification that is supported by the application) is required instead.
+A hyperlink span can't contain any other span, while a style span can contain
+one or more spans. As a consequence, the only one way to provide a hyperlink
+span with a text style consists of embedding it in a style span.
 
 The objects that can directly contain text spans are paragraphs, headings and
 style spans. However, ``set_span()`` and ``set_hyperlink()`` may be called
@@ -373,14 +374,14 @@ The following example associates an hyperlink in the last 5 characters of the
 ``p`` container (note that the ``length`` parameter is omitted, meaning that
 the hyperlink will run up to the end)::
 
-   p.set_hyperlink(position=-5, uri='http://here.org')
+   p.set_hyperlink(position=-5, url='http://here.org')
 
 The sequence hereafter show the way to set a style span and a hyperlink for
 the same text run. The style span is created first, then it's used as the
 context to create a hyperlink span that spreads over its whole content::
 
    s = p.set_span(filter='The lpOD Project', style='Outstanding')
-   s.set_hyperlink(position=0, uri='http://www.lpod-project.org')
+   s.set_hyperlink(position=0, url='http://www.lpod-project.org')
 
 Text marks and indices
 ======================
@@ -954,11 +955,9 @@ A draw page is created using ``odf_create_draw_page()`` and integrated through
 ``insert_element()``. Note that a draw page should be inserted at the document
 body level, knowing that it's a top level content element.
 
-A draw page may have the following parameters, to be set at creation time or
-later:
+A draw page must have an identifier (unique for the document) and may have the
+following parameters, to be set at creation time or later:
 
-- ``id``: an alphanumeric mandatory identifier, unique for the document when
-   the draw page is inserted;
 - ``name``: an optional, but unique if provided, name (which may be made visible
    for the end-users);
 - ``style``: the name of a drawing page style (existing or to be defined);
@@ -975,7 +974,7 @@ later:
 The following example creates a draw page with these usual parameters and
 integrates it as the last page of a presentation document::
 
-   dp = odf_create_draw_page(id='xyz1234',
+   dp = odf_create_draw_page('xyz1234',
                            name='Introduction',
                            style='DrawPageOneStyle',
                            master='DrawPageOneMaster',
@@ -1118,9 +1117,9 @@ is sometimes characterized by the RGB, 3-bytes hexadecimal code of an arbitrary
 color, with a leading "#". However some styles allow the use of backround image
 instead of or in combination with a color. In order to deal with these
 possibilities, a ``set_background()`` is provided; this method (which works
-with some style objects only) is used with a ``color`` and/or an ``uri`` named
-parameters. The ``color`` value range is #000000-#ffffff, while ``uri`` should
-be set to the URI of the graphic resource. If ``uri`` is set, some additional
+with some style objects only) is used with a ``color`` and/or an ``url`` named
+parameters. The ``color`` value range is #000000-#ffffff, while ``url`` should
+be set to the URL of the graphic resource. If ``url`` is set, some additional
 optional parameters may be provided, in order to control the way the image is
 displayed in the background, namely:
 
@@ -1138,7 +1137,7 @@ displayed in the background, namely:
 
 To remove the background color or image (i.e. to set the background to the
 default, that is transparent), the user just have to call ``set_background()``
-with ``color`` and ``uri`` set to null.
+with ``color`` and ``url`` set to null.
 
 A style can be inserted as either *common* (or named and visible for the
 user of a typical office application) or *automatic*, according to a boolean
@@ -1344,7 +1343,7 @@ If the ``bullet`` type is selected, the affected items will be displayed after
 a special character (the "bullet"), which must be provided as a "character"
 named argument, whose value is an UTF-8 character.
 
-If the ``image`` type is selected, the URI of an image resource must be
+If the ``image`` type is selected, the URL of an image resource must be
 provided; the affected items will be displayed after a graphical mark whose
 content is an external image.
 
@@ -1370,7 +1369,7 @@ to set some properties for levels 1 to 3, each one with a different type::
    ls = odf_create_style('list', 'ListStyle1')
    ls.set_level_style(1, type='number', prefix=' ', suffix='. ')
    ls.set_level_style(2, type='bullet', character='-')
-   ls.set_level_style(3, type='image', uri='bullet.jpg')
+   ls.set_level_style(3, type='image', url='bullet.jpg')
 
 The ``set_level_style()`` method returns an ODF element, representing the list
 level style definition, and which could be processed later through any element-
@@ -1604,10 +1603,10 @@ Background objects
 
 A page master doesn't include any direct page background specification, knowing
 that the background color and/or the background image are defined by the
-*page layout* that is linked to the page master (see below).
+*page layout* that is used by the page master (see below).
 
 However, it's possible to attach *frames* to a master page (through
-``insert_element()`` and ``append_element()``. Frames are containers for
+``insert_element()`` and ``append_element()``). Frames are containers for
 various kinds of content elements, including graphical ones, so they provide a
 practical way to compose backgrounds. However, the user should check the
 compatibility with the target displaying/printing applications according to
@@ -1684,7 +1683,37 @@ API.
 Drawing page styles
 ~~~~~~~~~~~~~~~~~~~
 
-[todo]
+A drawing page style is an optional style specification that may be used in
+presentation and drawing documents in order to set some presentation dynamic
+properties and/or a particular background.
+
+Such a style is created using ``odf_create_style()`` with ``drawing page`` as
+the family. Many style properties may be set with the constructor or later
+with ``set_properties()``; some are related to the page background while others
+regard the dynamic behaviour of the pages (transition effets, display duration).
+The first category consists of the full set of fill properties which are used
+to define drawing object fill characteristics, while the second category
+includes the full set of presentation page dynamic. These properties are
+described in the sections 15.14 and 15.36 of the ODF 1.1 specification.
+
+The attribute names and the possible values should be used as they are described
+in the ODF standard; the lpOD API doesn't presently provide non-standard
+shortcuts or mnemonics.
+
+The example below creates a drawing page style which specifies that the pages
+using it will appear with a slow cross-fade transition, then will be displayed
+during 12 seconds each; these pages will have a monochrome background filled
+with a green color::
+
+   dps = odf_create_style('drawing page', 'MyDrawPageStyle',
+                        'presentation:transition-type'='automatic',
+                        'presentation:transition-speed'='slow',
+                        'presentation:duration'='PT00H00M12S',
+                        'smil:type'='fade',
+                        'smil:subtype'='crossfade'
+                        'draw:fill'='solid',
+                        'draw:fill-color'='#00ff00'
+                        )
 
 
 Presentation page layouts
