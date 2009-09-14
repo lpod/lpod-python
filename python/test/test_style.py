@@ -62,6 +62,18 @@ class TestCreateStyle(TestCase):
         self.assertEqual(style.serialize(), expected)
 
 
+    def test_create_style_list(self):
+        style = odf_create_style('list')
+        expected = ('<text:list-style/>')
+        self.assertEqual(style.serialize(), expected)
+
+
+    def test_create_style_outline(self):
+        style = odf_create_style('outline')
+        expected = ('<text:outline-style/>')
+        self.assertEqual(style.serialize(), expected)
+
+
     def test_create_style_page_layout(self):
         style = odf_create_style('page-layout')
         expected = ('<style:page-layout/>')
