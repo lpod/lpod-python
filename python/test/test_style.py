@@ -298,5 +298,86 @@ class StyleBackgroundTestCase(TestCase):
 
 
 
+class LevelStyleTestCase(TestCase):
+
+    def setUp(self):
+        self.style = odf_create_style('list')
+
+
+    def test_get_level_style(self):
+        level_style = self.style.get_level_style(1)
+        self.assert_(level_style is None)
+
+
+    def test_set_level_style(self):
+        self.style.set_level_style(1, 'number', format='1')
+        level_style = self.style.get_level_style(1)
+        self.assert_(level_style is not None)
+
+
+    def test_set_level_style_number_missing_format(self):
+        self.assertRaises(ValueError, self.style.set_level_style, 1,
+                          'number')
+
+
+    def test_set_level_style_bullet_missing_character(self):
+        self.assertRaises(ValueError, self.style.set_level_style, 1,
+                          'bullet')
+
+
+    def test_set_level_style_image_missing_uri(self):
+        self.assertRaises(ValueError, self.style.set_level_style, 1,
+                          'image')
+
+
+    def test_set_level_style_number(self):
+        level_style = self.style.set_level_style(1, 'number', format='1')
+        self.assert_(type(level_style) is odf_style)
+        expected = ('<text:list-level-style-number '
+                      'text:level="1" fo:num-format="1"/>')
+        self.assertEqual(level_style.serialize(), expected)
+
+
+    def test_set_level_style_bullet(self):
+        level_style = self.style.set_level_style(2, 'bullet', character=u"·")
+        self.assert_(type(level_style) is odf_style)
+        expected = ('<text:list-level-style-bullet '
+                      'text:level="2" text:bullet-char="&#183;"/>')
+        self.assertEqual(level_style.serialize(), expected)
+
+
+    def test_set_level_style_image(self):
+        level_style = self.style.set_level_style(3, 'image',
+                                                 uri='bullet.png')
+        self.assert_(type(level_style) is odf_style)
+        expected = ('<text:list-level-style-image '
+                      'text:level="3" xlink:href="bullet.png"/>')
+        self.assertEqual(level_style.serialize(), expected)
+
+
+    def test_set_level_style_full(self):
+        level_style = self.style.set_level_style(3, 'number', format='1',
+                prefix=u" ", suffix=u".", display_levels=3, start_value=2,
+                style=u'MyList')
+        expected = ('<text:list-level-style-number '
+                      'text:level="3" fo:num-format="1" '
+                      'style:num-prefix=" " style:num-suffix="." '
+                      'text:display-levels="3" text:start-value="2" '
+                      'text:style-name="MyList"/>')
+        self.assertEqual(level_style.serialize(), expected)
+
+
+
+    def test_set_level_style_clone(self):
+        level_1 = self.style.set_level_style(1, 'number', format='1')
+        level_2 = self.style.set_level_style(2, display_levels=2,
+                                             clone=level_1)
+        expected = ('<text:list-level-style-number '
+                      'text:level="2" fo:num-format="1" '
+                      'text:display-levels="2"/>')
+        self.assertEqual(level_2.serialize(), expected)
+
+
+
 if __name__ == '__main__':
     main()

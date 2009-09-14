@@ -249,9 +249,13 @@ class odf_style(odf_element):
 class odf_list_style(odf_style):
     """A list style is a container for list level styles.
     """
-    any_style = 'text:list-level-style-(number|bullet|image)',
+    any_style = ('(text:list-level-style-number'
+                 '|text:list-level-style-bullet'
+                 '|text:list-level-style-image)')
+
+
     def get_level_style(self, level):
-        return _get_element(self.any_style, level=level)
+        return _get_element(self, self.any_style, level=level)
 
 
     def set_level_style(self, level, type=None, format=None, prefix=None,
@@ -263,40 +267,47 @@ class odf_list_style(odf_style):
         # Cloning or reusing an existing element
         if clone is not None:
             level_style = clone.clone()
+            level_style_name = level_style.get_name()
             was_created = True
         else:
             level_style = self.get_level_style(level)
             if level_style is None:
-                level_style = odf_create_element(level_style_name)
+                level_style = odf_create_element('<%s/>' % level_style_name)
                 was_created = True
         # Transmute if the type changed
         if level_style.get_name() != level_style_name:
             level_style.set_name(level_style_name)
+        # Set the level
+        level_style.set_attribute('text:level', str(level))
         # Set the main attribute
         if type == 'number':
-            if format is None:
+            if clone is None and format is None:
                 raise ValueError, "format is missing"
             level_style.set_attribute('fo:num-format', format)
         elif type == 'bullet':
-            if character is None:
+            if clone is None and character is None:
                 raise ValueError, "bullet character is missing"
             level_style.set_attribute('text:bullet-char', character)
         elif type == 'image':
-            if uri is None:
+            if clone is None and uri is None:
                 raise ValueError, "image URI is missing"
             level_style.set_attribute('xlink:href', uri)
-        else:
+        elif clone is None:
             raise ValueError, "unknown level style type: %s" % type
         # Set attributes
+        if prefix:
+            level_style.set_attribute('style:num-prefix', prefix)
+        if suffix:
+            level_style.set_attribute('style:num-suffix', suffix)
         if display_levels:
-            level_style.set_attribute('text:display-levels', display_levels)
+            level_style.set_attribute('text:display-levels',
+                                      str(display_levels))
         if start_value:
-            level_style.set_attribute('text:start-value', start_value)
+            level_style.set_attribute('text:start-value', str(start_value))
         if style:
             level_style.set_attribute('text:style-name', style)
         # Commit the creation
         if was_created:
-            level_style.set_attribute('text:level', level)
             self.append_element(level_style)
         return level_style
 
