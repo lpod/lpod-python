@@ -112,12 +112,13 @@ def _get_style_tagname(family):
                # implemented style types
     mapping = {'paragraph': ('style:style', family),
                'text': ('style:style', family),
-               'graphic': ('style:style', family),
+               'section': ('style:style', family),
                'table': ('style:style', family),
                'table-column': ('style:style', family),
                'table-row': ('style:style', family),
                'table-cell': ('style:style', family),
-               'section': ('style:style', family),
+               'drawing-page': ('style:style', family),
+               'graphic': ('style:style', family),
                # False families
                'list': ('text:list-style', None),
                'outline': ('text:outline-style', None),
