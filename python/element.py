@@ -12,7 +12,7 @@ from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 # Import from lpod
 from datatype import DateTime
 from utils import _get_abspath, _get_element_list, _get_element
-from utils import get_value, convert_unicode
+from utils import get_value
 
 
 ODF_NAMESPACES = {
@@ -383,24 +383,79 @@ class odf_element(object):
             element.text = text
 
 
-    def match(self, pattern):
-        """ True if the text of the odf_element match one or more times the
-        unicode pattern.
+    def search(self, pattern):
+        """Return the first position of the pattern in the text content of the
+        element, or None if not found.
+
+        Python regular expression syntax applies.
+
+        Arguments:
+
+            pattern -- unicode
+
+        Returns: int or None
         """
         if isinstance(pattern, str):
             # Fail properly if the pattern is an non-ascii bytestring
             pattern = unicode(pattern)
         text = self.get_text()
-        return search(pattern, text) is not None
+        match = search(pattern, text)
+        if match is None:
+            return None
+        return match.start()
 
 
-    def search(self, pattern):
-        # TODO merge with match
-        raise NotImplementedError
+    def match(self, pattern):
+        """return True if the pattern is found one or more times anywhere in
+        the text content of the element.
+
+        Python regular expression syntax applies.
+
+        Arguments:
+
+            pattern -- unicode
+
+        Returns: bool
+        """
+        return self.search(pattern) is not None
 
 
-    def replace(self, pattern, new):
-        raise NotImplementedError
+    def replace(self, pattern, new=None):
+        """Replace the pattern with the given text, or delete if the text is
+        an empty string, and return the number of replacements. By default,
+        only return the number of occurences of the pattern.
+
+        It cannot replace patterns found across several element, like a word
+        split into two consecutive spans.
+
+        Python regular expression syntax applies.
+
+        Arguments:
+
+            pattern -- unicode
+
+            new -- unicode
+
+        Returns: int
+        """
+        element = self.__element
+        if isinstance(pattern, str):
+            # Fail properly if the pattern is an non-ascii bytestring
+            pattern = unicode(pattern)
+        pattern = compile(pattern)
+        count = 0
+        for text in element.xpath('descendant-or-self::text()'):
+            if new is None:
+                count += len(pattern.findall(text))
+            else:
+                new_text, number = pattern.subn(new, text)
+                container = text.getparent()
+                if text.is_text:
+                    container.text = new_text
+                else:
+                    container.tail = new_text
+                count += number
+        return count
 
 
     def get_parent(self):

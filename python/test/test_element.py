@@ -282,7 +282,7 @@ class ElementTraverseTestCase(TestCase):
 
 
 
-class RegexTestCase(TestCase):
+class SearchTestCase(TestCase):
 
     def setUp(self):
         self.container = odf_get_container('samples/span_style.odt')
@@ -291,9 +291,73 @@ class RegexTestCase(TestCase):
         self.span = self.paragraph.get_element('//text:span')
 
 
-    def tearDown(self):
-        del self.content
-        del self.container
+    def test_search_paragraph(self):
+        """Search text in a paragraph.
+        """
+        pos = self.paragraph.search(u'ère')
+        return self.assertEqual(pos, 4)
+
+
+    def test_match_span(self):
+        """Search text in a span.
+        """
+        pos = self.span.search(u'moust')
+        return self.assertEqual(pos, 0)
+
+
+    def test_match_inner_span(self):
+        """Search text in a span from the parent paragraph.
+        """
+        pos = self.paragraph.search(u'roug')
+        return self.assertEqual(pos, 29)
+
+
+    def test_simple_regex(self):
+        """Search a simple regex.
+        """
+        pos = self.paragraph.search(u'che roug')
+        return self.assertEqual(pos, 25)
+
+
+    def test_intermediate_regex(self):
+        """Search an intermediate regex.
+        """
+        pos = self.paragraph.search(u'moustache (blanche|rouge)')
+        return self.assertEqual(pos, 19)
+
+
+    def test_complex_regex(self):
+        """Search a complex regex.
+        """
+        # The (?<=...) part is pointless as we don't try to get groups from
+        # a MatchObject. However, it's a valid regex expression.
+        pos = self.paragraph.search(ur'(?<=m)(ou)\w+(che) (blan\2|r\1ge)')
+        return self.assertEqual(pos, 20)
+
+
+    def test_compiled_regex(self):
+        """Search with a compiled pattern.
+        """
+        pattern = compile(ur'moustache')
+        pos = self.paragraph.search(pattern)
+        return self.assertEqual(pos, 19)
+
+
+    def test_failing_match(self):
+        """Test a regex that doesn't match.
+        """
+        pos = self.paragraph.search(u'Le Père moustache')
+        return self.assert_(pos is None)
+
+
+
+class MatchTestCase(TestCase):
+
+    def setUp(self):
+        self.container = odf_get_container('samples/span_style.odt')
+        self.content = odf_xmlpart('content', self.container)
+        self.paragraph = self.content.get_element('//text:p')
+        self.span = self.paragraph.get_element('//text:span')
 
 
     def test_match_paragraph(self):
@@ -304,7 +368,7 @@ class RegexTestCase(TestCase):
 
 
     def test_match_span(self):
-        """Match text in a span from the span.
+        """Match text in a span.
         """
         match = self.span.match(u'moust')
         return self.assertTrue(match)
@@ -354,6 +418,47 @@ class RegexTestCase(TestCase):
         match = self.paragraph.match(u'Le Père moustache')
         return self.assertFalse(match)
 
+
+
+class ReplaceTestCase(TestCase):
+
+    def setUp(self):
+        self.container = odf_get_container('samples/span_style.odt')
+        self.content = odf_xmlpart('content', self.container)
+        self.paragraph = self.content.get_element('//text:p')
+        self.span = self.paragraph.get_element('//text:span')
+
+
+    def test_count(self):
+        paragraph = self.paragraph
+        expected = paragraph.serialize()
+        count = paragraph.replace(u"ou")
+        self.assertEqual(count, 2)
+        # Ensure the orignal was not altered
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_replace(self):
+        paragraph = self.paragraph
+        clone = paragraph.clone()
+        count =  clone.replace(u"moustache", u"barbe")
+        self.assertEqual(count, 1)
+        expected = u"Le Père Noël a une barbe rouge."
+        self.assertEqual(clone.get_text(), expected)
+        # Ensure the orignal was not altered
+        self.assertNotEqual(clone.serialize(), paragraph.serialize())
+
+
+    def test_across_span(self):
+        paragraph = self.paragraph
+        count = paragraph.replace(u"moustache rouge")
+        self.assertEqual(count, 0)
+
+
+    def test_missing(self):
+        paragraph = self.paragraph
+        count = paragraph.replace(u"barbe")
+        self.assertEqual(count, 0)
 
 
 class XmlNamespaceTestCase(TestCase):
