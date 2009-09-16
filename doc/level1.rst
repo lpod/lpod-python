@@ -960,10 +960,13 @@ following parameters, to be set at creation time or later:
 
 - ``name``: an optional, but unique if provided, name (which may be made visible
    for the end-users);
+
 - ``style``: the name of a drawing page style (existing or to be defined);
+
 - ``master``: the name of a master page whose structure is appropriate for
    draw pages (beware, a master page defined for a text document don't always
    fit for draw pages);
+
 - ``layout``: the name of a *presentation page layout* as defined
    in §14.15 of the ODF specification (if such a layout is used); beware, such
    objects are neither similar nor related to general *page layouts* as defined
@@ -985,6 +988,9 @@ integrates it as the last page of a presentation document::
 All these parameters may retrieved or changed later using ``get_properties()``
 and ``set_properties()`` with draw page objects.
 
+An existing draw page may be retrieved in the document through
+``get_draw_page()`` with the identifier as argument.
+
 Populating a draw page doesn't require element-specific methods, knowing that:
 
 - all the fixed parts, the layout and the background are defined by the
@@ -1005,14 +1011,94 @@ Text fields [todo]
 Graphic content
 ===============
 
-Frames [todo]
--------------
+Frames
+------
+
+A frame is a rectangular container that may contain text boxes and images. It
+may contain other kinds of elements that are not presently covered by the lpOD
+level 1 specification.
+
+A frame is created using ``odf_create_frame()`` with the following properties:
+
+- ``name``: the optional name of the object (for the end-user);
+
+- ``id``: an arbitrary string, that is the unique identifier of the frame;
+
+- ``style``: the name of a graphic style for the frame;
+
+- ``position``, the coordinates of the frame, as a list of 2 strings
+   containing the X and Y positions (each string specifies the number
+   and the unit, ex. "1cm", "2pt"), knowing that the default values are 0;
+
+- ``size``: the size, provided either in absolute values as the position, as
+   percentages, or using the special keywords ``scale`` or ``scale-min`` (see
+   ODF §9.3 for details);
+
+- ``z index``: an optional sequence number that allows the user to assign a
+   particular order of rendering, knowing that frames are rendered by default
+   according to their sequential position in the document tree;
+
+- ``class``: an optional presentation class (see the "Class" subsection in
+   ODF §9.6.1).
+
+A frame may be inserted in place through the standard ``insert_element()``
+method, but the behavior depends on the context.
+
+In a text document, a frame may be attached at the document level, as long as
+it's anchored to a page; as an consequence, a ``page`` parameter must be
+provided with the page number.
+
+Simply put, with the exception above, a frame is anchored to the calling
+context element. The ODF elements that may insert a frame in the present
+lpOD API are *draw pages*, *paragraphs*, *tables*, and *cells*.
+
+In a presentation or drawing document, the calling element is typically a draw
+page.
+
+When ``insert_element()`` is called from a paragraph, an optional ``offset``
+parameter, specifying the position in the text where the frame will be inserted,
+may be provided (the default position is the beginning of the paragraph).
+
+An existing frame may be selected using ``get_frame()`` with the identifier.
+
+It's possible, of course, to populate a frame using ``insert_element()`` or
+``append_element()`` from the frame itself. However, the API provides frame-
+specific methods in order to directly create and incorporate the most common
+objects in a frame context, namely *text boxes* and *images*. These methods are
+respectively:
+
+- ``set_text_box()``, which requires no argument, but which may be called with
+   a list of existing ODF elements that could become a valid content for a
+   text box (paragraphs, item lists, etc); this method returns an object that
+   may be later used to insert additional content;
+
+- ``set_image()``, which creates an image element that will cover the whole
+   area of the frame (the parameters are the same as with ``odf_create_image()``
+   introduced later); alternatively, if ``set_image()`` is called with an
+   existing ODF image element as argument, this element is incoporated as is
+   without creation; ``set_image()`` returns the new (or newly inserted) ODF
+   image element.
+
+Images
+------
+
+An image element may be created out of any document with ``odf_create_image()``.
+This constructor requires only one named parameter, that is either ``url`` or
+``content``. The first one is a link to an external graphic resource, while the
+second one is the binary content of an image in BASE64 encoding.
+
+An image may be used as a text container. It's possible to incorporate text
+containers (typically paragraphs or item lists) in an image object (in order
+to display the text in the foreground). To do so, the user can use the generic
+``insert_element()`` or ``append_element()`` method from the image object,
+with the needed text container as argument.
+
+An image should be incorporated in a document through a *frame* (see above).
+
 
 Shapes [todo]
 -------------
 
-Images [todo]
--------------
 
 Animations [todo]
 -----------------
@@ -1746,8 +1832,11 @@ following parameters:
    ODF specification, namely ``title``, ``outline``, ``subtitle``, ``text``,
    ``graphic``, ``object``, ``chart``, ``table``, ``orgchart``, ``page``,
    ``notes``, ``handout``;
-- ``x``, ``y``, ``width``, ``height``: the numeric coordinates and size of the
-   placeholder, in length or percentage.
+- ``position``, the coordinates of the placeholder, as a list of 2 strings
+   containing the X and Y positions (each string specifies the number
+   and the unit, ex. "1cm", "2pt");
+- ``size``: the absolute size of the placeholder, provided in the same format
+   as the position, in length or percentage.
 
 Once created, a placeholder may be integrated with the generic
 ``insert_element()`` or  ``append_element()`` called from a presentation page
