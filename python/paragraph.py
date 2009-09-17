@@ -1,10 +1,15 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
+# Import from the Standard Library
+from re import compile, escape
+
+# XXX Import from lxml
+from lxml.etree import Element
+
 # Import from lpod
 from element import register_element_class, odf_element, odf_create_element
-from element import FIRST_CHILD
-from link import odf_create_link
+from element import FIRST_CHILD, ODF_NAMESPACES
 from note import odf_create_note, odf_create_annotation
 
 
@@ -127,9 +132,54 @@ class odf_paragraph(odf_element):
 
     def set_span(self, style, regex=None, offset=None, length=0):
         """Apply the given style to text content matching the regex OR the
-        positional arguments.
+        positional arguments offset and length.
         """
-        raise NotImplementedError
+        # XXX bad: we expose lxml
+        span_name = '{%s}span' % ODF_NAMESPACES['text']
+        span_attrib = {'{%s}name' % ODF_NAMESPACES['style']: style}
+        if offset:
+            # XXX quickly hacking the offset
+            text = self.get_text()
+            if length:
+                regex = text[offset:offset + length]
+            else:
+                regex = text[offset:]
+            regex = escape(regex)
+        if regex:
+            pattern = compile(unicode(regex))
+            element = self._odf_element__element
+            for text in element.xpath('descendant-or-self::text()'):
+                # Static information about the text node
+                container = text.getparent()
+                wrapper = container.getparent()
+                is_text = text.is_text
+                is_tail = text.is_tail
+                # Group positions are calculated and static, so apply in
+                # reverse order to preserve positions
+                for group in reversed(list(pattern.finditer(text))):
+                    start, end = group.span()
+                    # Do not use the text node as it changes at each loop
+                    if is_text:
+                        text = container.text
+                    else:
+                        text = container.tail
+                    before = text[:start]
+                    match = text[start:end]
+                    after = text[end:]
+                    span = Element(span_name, attrib=span_attrib,
+                                   nsmap=ODF_NAMESPACES)
+                    span.text = match
+                    span.tail = after
+                    if is_text:
+                        container.text = before
+                        # Insert as first child
+                        span.tail = after
+                        container.insert(0, span)
+                    else:
+                        container.tail = before
+                        # Insert as next sibling
+                        index = wrapper.index(container)
+                        wrapper.insert(index + 1, span)
 
 
     def set_link(self, url, regex=None, offset=None, length=0):
