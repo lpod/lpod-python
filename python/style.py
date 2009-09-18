@@ -9,6 +9,8 @@ from utils import _get_element
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
+                     # For master pages
+                     layout=None, next=None,
                      area=None, **kw):
     """Create a style of the given family. The name is not mandatory at this
     point but will become required when inserting in a document as a common
@@ -37,10 +39,17 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
         area -- str
 
+    Master Page Arguments:
+
+        layout -- unicode
+
+        next -- unicode
+
     Return: odf_style
     """
     tagname, famattr = _get_style_tagname(family)
     element = odf_create_element('<%s/>' % tagname)
+    # Common attributes
     if name:
         element.set_style_name(name)
     if famattr:
@@ -49,6 +58,13 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         element.set_attribute('style:display-name', display_name)
     if parent:
         element.set_attribute('style:parent-style-name', parent)
+    # Master Page
+    if family == 'master-page':
+        if layout:
+            element.set_attribute('style:page-layout-name', layout)
+        if next:
+            element.set_attribute('style:next-style-name', next)
+    # Properties
     if kw:
         if area is None:
             area = family
