@@ -107,33 +107,34 @@ class TestStyle(TestCase):
 
 
     def test_get_style_list(self):
-        styles = self.styles
-        style_list = styles.get_style_list()
+        style_list = self.styles.get_style_list()
         self.assertEqual(len(style_list), 15)
 
 
     def test_get_style_list_paragraph(self):
-        styles = self.styles
-        style_list = styles.get_style_list(family='paragraph')
+        style_list = self.styles.get_style_list(family='paragraph')
         self.assertEqual(len(style_list), 10)
 
 
     def test_get_style_list_master_page(self):
-        styles = self.styles
-        style_list = styles.get_style_list(family='master-page')
+        style_list = self.styles.get_style_list(family='master-page')
         self.assertEqual(len(style_list), 1)
 
 
     def test_get_style_automatic(self):
-        styles = self.styles
-        style = styles.get_style('page-layout', u'Mpm1')
+        style = self.styles.get_style('page-layout', u'Mpm1')
         self.assertNotEqual(style, None)
 
 
     def test_get_style_named(self):
-        styles = self.styles
-        style = styles.get_style('paragraph', u'Heading_20_1')
-        self.assertNotEqual(style, None)
+        style = self.styles.get_style('paragraph', u'Heading_20_1')
+        self.assertEqual(style.get_style_display_name(), u"Heading 1")
+
+
+    def test_get_style_display_name(self):
+        style = self.styles.get_style('paragraph', u"Text body",
+                                      display_name=True)
+        self.assertEqual(style.get_style_name(), u"Text_20_body")
 
 
     def test_insert_style(self):

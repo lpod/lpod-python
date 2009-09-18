@@ -58,9 +58,10 @@ def _get_abspath(local_path):
 
 def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
                       draw_style=None, draw_text_style=None, table_name=None,
-                      style_name=None, note_class=None, text_id=None,
-                      text_name=None, office_name=None, office_title=None,
-                      outline_level=None, level=None, position=None, **kw):
+                      style_name=None, display_name=None, note_class=None,
+                      text_id=None, text_name=None, office_name=None,
+                      office_title=None, outline_level=None, level=None,
+                      position=None, **kw):
     query = [element_name]
     attributes = kw
     if style:
@@ -77,6 +78,8 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
         attributes['table:name'] = table_name
     if style_name:
         attributes['style:name'] = style_name
+    if display_name:
+        attributes['style:display-name'] = display_name
     if note_class:
         attributes['text:note-class'] = note_class
     if text_id:
@@ -128,7 +131,7 @@ family_mapping = {'paragraph': ('style:style', 'paragraph'),
 def _get_style_tagname(family):
     if family not in family_mapping:
         raise ValueError, "unknown family: " + family
-    return mapping[family]
+    return family_mapping[family]
 
 
 def _get_style_family(name):

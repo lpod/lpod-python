@@ -146,13 +146,18 @@ class odf_styles(odf_xmlpart):
 
         Return: odf_style or None if not found
         """
-        if display_name is True:
-            raise NotImplementedError
         if type(name_or_element) is unicode or name_or_element is None:
+            if display_name is True:
+                style_name = None
+                display_name = name_or_element
+            else:
+                style_name = name_or_element
+                display_name = None
             tagname, famattr = self._get_style_tagname(family,
                                                        name_or_element)
             # famattr became None if no "style:family" attribute
-            query = _make_xpath_query(tagname, style_name=name_or_element,
+            query = _make_xpath_query(tagname, style_name=style_name,
+                                      display_name=display_name,
                                       family=famattr)
             context = self._get_style_context(name_or_element, family)
             return context.get_element(query)

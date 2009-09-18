@@ -84,6 +84,10 @@ class odf_style(odf_element):
         self.set_attribute('style:name', name)
 
 
+    def get_style_display_name(self):
+        return self.get_attribute('style:display-name')
+
+
     def get_style_family(self):
         return self.get_attribute('style:family')
 
