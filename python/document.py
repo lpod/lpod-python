@@ -12,6 +12,7 @@ from container import odf_new_container_from_template
 from content import odf_content
 from meta import odf_meta
 from styles import odf_styles
+from utils import _get_style_family
 from xmlpart import odf_xmlpart
 from vfs import vfs
 
@@ -317,9 +318,7 @@ class odf_document(object):
             tagname = style.get_name()
             family = style.get_style_family()
             if family is None:
-                mapping = {'style:page-layout': 'page-layout',
-                           'style:master-page': 'master-page'}
-                family = mapping.get(tagname)
+                family = _get_style_family(tagname)
             stylename = style.get_style_name()
             container = style.get_parent()
             container_name = container.get_name()

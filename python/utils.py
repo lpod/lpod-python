@@ -107,26 +107,35 @@ def _make_xpath_query(element_name, style=None, family=None, draw_name=None,
 
 
 
+# These are listed exhaustively for keeping count of
+# implemented style types
+family_mapping = {'paragraph': ('style:style', 'paragraph'),
+                  'text': ('style:style', 'text'),
+                  'section': ('style:style', 'section'),
+                  'table': ('style:style', 'table'),
+                  'table-column': ('style:style', 'table-column'),
+                  'table-row': ('style:style', 'table-row'),
+                  'table-cell': ('style:style', 'table-cell'),
+                  'drawing-page': ('style:style', 'drawing-page'),
+                  'graphic': ('style:style', 'graphic'),
+                  # False families
+                  'list': ('text:list-style', None),
+                  'outline': ('text:outline-style', None),
+                  'page-layout': ('style:page-layout', None),
+                  'master-page': ('style:master-page', None)}
+
+
 def _get_style_tagname(family):
-               # These are listed exhaustively for keeping count of
-               # implemented style types
-    mapping = {'paragraph': ('style:style', family),
-               'text': ('style:style', family),
-               'section': ('style:style', family),
-               'table': ('style:style', family),
-               'table-column': ('style:style', family),
-               'table-row': ('style:style', family),
-               'table-cell': ('style:style', family),
-               'drawing-page': ('style:style', family),
-               'graphic': ('style:style', family),
-               # False families
-               'list': ('text:list-style', None),
-               'outline': ('text:outline-style', None),
-               'page-layout': ('style:page-layout', None),
-               'master-page': ('style:master-page', None)}
-    if family not in mapping:
+    if family not in family_mapping:
         raise ValueError, "unknown family: " + family
     return mapping[family]
+
+
+def _get_style_family(name):
+    for family, (tagname, famattr) in family_mapping.iteritems():
+        if tagname == name:
+            return family
+    return None
 
 
 def _expand_properties(properties):
