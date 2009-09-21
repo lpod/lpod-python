@@ -16,6 +16,9 @@ element.
 
 The API provides functions and methods.
 
+Object creation
+---------------
+
 Functions are mainly used as object constructors, in order to create new ODF
 elements that could be later attached to a document. The name of an object
 constructor is like ``odf_create_xxx()`` where "xxx" is the object type.
@@ -28,6 +31,9 @@ and directly append them to the calling element.
 Once created, an object may be changed through the ``set_text()`` and
 ``set_attribute()`` level 0 methods; however, the level 1 features allow the
 user to set the most used properties using a more friendly way.
+
+Object property handling
+------------------------
 
 The level 1 ``set_attribute()`` method extends the level 0 one by allowing
 the user, in some situations, to forget the ODF namespaces. Knowing that every
@@ -62,6 +68,24 @@ of named items. The ``set_attributes()`` method allows the user to change or
 create several attributes a a time; it checks and transforms the given
 attribute names in the same way as ``set_attribute()``.
 
+Some ODF elements own a ``set_properties()`` method, which could sound redundant
+with ``set_attributes()``. However, ``set_properties()`` may set element
+properties that imply element-specific transformations or constructs, makes some
+consistency checks, and allow the user to provide property names that aren't
+directly translated in simple attributes using the same name transformation
+rules as ``set_attributes()``. The same logic apply to ``get_properties()``,
+when defined.
+
+In the present specification, some element properties or attributes may be
+named using multiple-word designations (ex: ``display name``, ``page layout``)
+that include spaces or dashes. Knowing that such designations are not easy to
+use as variable names in every programming language, spaces and dashes should
+be replaces by underscore ("_") characters in the lpOD executable
+implementations.
+
+Method scopes
+-------------
+
 Some methods are document-based, other are context-based, and other are
 element-specific.
 
@@ -95,14 +119,6 @@ their particular role. For example ``set_header()`` is provided with ODF master
 pages, because a header is an extension of a page style element, while
 ``set_background()`` is available with objects where a background definition
 makes sense (such as page layouts or paragraph styles).
-
-Some ODF elements own a ``set_properties()`` method, which could sound redundant
-with ``set_attributes()``. However, ``set_properties()`` may set element
-properties that imply element-specific transformations or constructs, makes some
-consistency checks, and allow the user to provide property names that aren't
-directly translated in simple attributes using the same name transformation
-rules as ``set_attributes()``. The same logic apply to ``get_properties()``,
-when defined.
 
 Common element-specific functions and methods
 =============================================
@@ -162,12 +178,6 @@ Addtional retrieval methods are available according to the element type.
 Every search method operates in context, knowing that the context could be the
 whole document as well as a particular element (section, table, etc).
 
-In the present specification, some element properties or attributes may be
-named using multiple-word designations (ex: ``display name``, ``page layout``)
-that include spaces or dashes. Knowing that such designations are not easy to
-use as variable names in every programming language, spaces and dashes should
-be replaces by underscore ("_") characters in the lpOD executable
-implementations.
 
 Basic text containers
 =====================
@@ -1032,7 +1042,8 @@ A frame is created using ``odf_create_frame()`` with the following properties:
 
 - ``size``: the size, provided either in absolute values as the position, as
    percentages, or using the special keywords ``scale`` or ``scale-min`` (see
-   ODF §9.3 for details);
+   ODF §9.3 for details); both absolute and relative values may be provided as
+   a string, separated by a space, if needed;
 
 - ``z index``: an optional sequence number that allows the user to assign a
    particular order of rendering, knowing that frames are rendered by default
@@ -1224,6 +1235,17 @@ displayed in the background, namely:
 To remove the background color or image (i.e. to set the background to the
 default, that is transparent), the user just have to call ``set_background()``
 with ``color`` and ``url`` set to null.
+
+A style that apply in some way to a rectangular area (ex: shape, frame,
+paragraph) other than a page may have visible borders and a shadow. Borders are
+specified using ``border xxx`` attributes where ``xxx`` is either ``left``,
+``right``, ``top`` or ``bottom``; if all the borders are the same, a single
+``border`` property is convenient. The value of a border property is a 3-part
+string that describes the thickness, the line style and the line color
+(according to the XSL/FO grammar), like "0.1cm solid #000000" for a one
+millimeter solid black line. The shadow is specified through a ``shadow``
+property whose value is a 3-part string describing the color and the size, like
+"#808080 0.18cm 0.18cm".
 
 A style can be inserted as either *common* (or named and visible for the
 user of a typical office application) or *automatic*, according to a boolean
@@ -1552,10 +1574,53 @@ According to the example above, the default numbering scheme for level 1
 headings will be (E), (F), (G), and so on.
 
 Attributes and properties which are not explicitly supported through predefined
-parameter names in the present version of the API could always be set through
+parameter names in the present version of the API could always be set hrough
 the element-oriented methods of the level 0 API, knowing that get_level_style()
 returns a regular element.
 
+Table-related styles
+--------------------
+
+The API supports 4 kinds of styles that control various table formatting
+properties. While a table style specifies the global formatting properties of
+a table, row, column and cell styles allow a specific layout control for each
+table component.
+
+Table styles
+~~~~~~~~~~~~
+
+A table style specifies the external size, borders and background of a table.
+It may be created through ``odf_create_style()`` with the following parameters:
+
+-``width``: the table width (in length, not in columns), provided either in
+   absolute values or as a percentage of the page width; both absolute and
+   relative values may be provided as a string, separated by a space, if needed;
+- ``margin``: to control all the margins of the table;
+- ``margin xxx`` (where xxx is ``left``, ``right``, ``top`` or ``bottom``): to
+   control the margins of the table separately;
+- ``align``: to specifiy the table alignment scheme, with ``left``, ``right``,
+   ``center``, ``margins`` as possible values;
+- ``together``: to control whether the rows of the table should be kept together
+   on the same page or column, possible values being ``always`` or ``auto``;
+- ``keep with next``: to specify whether or not to keep the paragraph and the
+   next paragraph together on a page or in a column, possible values are
+   ``always`` or ``auto``; default is ``auto``;
+- ``break xxx`` (where ``xxx`` is ``before`` or ``after``): to specify if a page
+   or column break must be inserted before or after any paragraph using the
+   style, legal values are ``page``, ``column``, ``auto``; default is ``auto``;
+- ``display``: boolean property that specifies if a table is visible or not;
+   default is ``true``.
+
+The table styles support the ``set_background()`` method and may have a
+``shadow`` property. However, while a table covers a rectangular area, the
+``border xxx`` properties are not defined at the table style level; the borders
+are cell properties.
+
+Cell styles [todo]
+~~~~~~~~~~~~~~~~~~
+
+Row and column styles [todo]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Graphic styles [todo]
 ---------------------
