@@ -1043,7 +1043,7 @@ A frame is created using ``odf_create_frame()`` with the following properties:
 - ``size``: the size, provided either in absolute values as the position, as
    percentages, or using the special keywords ``scale`` or ``scale-min`` (see
    ODF §9.3 for details); both absolute and relative values may be provided as
-   a string, separated by a space, if needed;
+   a string, separated by a space, if needed, like "10cm 12%";
 
 - ``z index``: an optional sequence number that allows the user to assign a
    particular order of rendering, knowing that frames are rendered by default
@@ -1592,7 +1592,7 @@ Table styles
 A table style specifies the external size, borders and background of a table.
 It may be created through ``odf_create_style()`` with the following parameters:
 
--``width``: the table width (in length, not in columns), provided either in
+- ``width``: the table width (in length, not in columns), provided either in
    absolute values or as a percentage of the page width; both absolute and
    relative values may be provided as a string, separated by a space, if needed;
 - ``margin``: to control all the margins of the table;
@@ -1616,11 +1616,42 @@ The table styles support the ``set_background()`` method and may have a
 ``border xxx`` properties are not defined at the table style level; the borders
 are cell properties.
 
-Cell styles [todo]
-~~~~~~~~~~~~~~~~~~
+Cell styles
+~~~~~~~~~~~
 
-Row and column styles [todo]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A cell style is created using ``odf_create_style()`` with ``table cell`` as the
+family. A ``data style`` may provided as an optional parameter, which is
+recommended as soon as the style is about to be used for numeric cells.
+
+Once created, a cell style may be customized using ``set_properties()``. See
+§15.11 in the ODF specification for the full list of possible properties.
+However, ``set_properties()``, when used from a cell style object, allows the
+following shortcuts for the most used attributes:
+
+- ``border``, ``border top``, ``border left``, ``border right``,
+   ``border bottom``, in the same way as other rectangular area styles;
+- ``shadow``: idem.
+
+The ``set_background()`` method is allowed (with ``color`` or ``uri``).
+
+Column styles
+~~~~~~~~~~~~~
+
+A column style is created using ``odf_create_style()`` with ``table column`` as
+the family. It may be customized using ``set_properties()``.
+
+The most necessary property is ``width``, wich may be an absolute width (i.e.
+a string containing the number and the length unit), a relative length (i.e.
+a string containing a number followed by a "*"), or both (space-separated).
+See §15.9.1 in the ODF specification for details about the relative widths.
+
+The ``break xxx`` parameters (where ``xxx`` is ``before`` or ``after``), are
+allowed to specify if a page or column break must be inserted before or after
+any column using the style, legal values are ``page``, ``column``, ``auto``;
+default is ``auto``.
+
+Row styles [todo]
+~~~~~~~~~~~~~~~~~
 
 Graphic styles [todo]
 ---------------------
