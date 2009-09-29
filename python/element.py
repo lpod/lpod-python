@@ -559,7 +559,7 @@ class odf_element(object):
 
     def clone(self):
         clone = deepcopy(self.__element)
-        # Now the clone is its own root and lxml lost unused namespaces
+        # Now the clone is its own root and lxml lost unused namespace
         # prefixes.
         # Re-attach it to a root with all namespaces
         root = Element('ROOT', nsmap=ODF_NAMESPACES)
@@ -627,11 +627,11 @@ class odf_element(object):
 
 
     def get_section_by_position(self, position):
-        return _get_element(self, 'text:section', position=position)
+        return _get_element(self, 'descendant::text:section', position=position)
 
 
     def get_section_by_content(self, regex):
-        return _get_element(self, 'text:section', regex=regex)
+        return _get_element(self, 'descendant::text:section', regex=regex)
 
 
     #
@@ -665,7 +665,7 @@ class odf_element(object):
 
 
     def get_span_by_content(self, regex):
-        return _get_element(self, 'text:span', regex=regex)
+        return _get_element(self, 'descendant::text:span', regex=regex)
 
 
     #
@@ -683,7 +683,7 @@ class odf_element(object):
 
 
     def get_heading_by_content(self, regex, level=None):
-        return _get_element(self, 'text:h', regex=regex, outline_level=level)
+        return _get_element(self, 'descendant::text:h', regex=regex, outline_level=level)
 
 
     #
@@ -706,11 +706,11 @@ class odf_element(object):
 
 
     def get_frame_by_content(self, regex):
-        return _get_element(self, 'draw:frame', regex=regex)
+        return _get_element(self, 'descendant::draw:frame', regex=regex)
 
 
     def get_frame_by_title(self, regex):
-        return _get_element(self, 'draw:frame', svg_title=regex)
+        return _get_element(self, 'descendant::draw:frame', svg_title=regex)
 
 
     def get_frame_by_description(self, regex):
@@ -758,7 +758,7 @@ class odf_element(object):
 
 
     def get_image_by_content(self, regex):
-        return _get_element(self, 'draw:image', regex=regex)
+        return _get_element(self, 'descendant::draw:image', regex=regex)
 
 
     #
@@ -766,20 +766,20 @@ class odf_element(object):
     #
 
     def get_table_list(self, style=None, regex=None):
-        return _get_element_list(self, 'table:table', style=style,
+        return _get_element_list(self, 'descendant::table:table', style=style,
                                  regex=regex)
 
 
     def get_table_by_name(self, name):
-        return _get_element(self, 'table:table', table_name=name)
+        return _get_element(self, 'descendant::table:table', table_name=name)
 
 
     def get_table_by_position(self, position):
-        return _get_element(self, 'table:table', position=position)
+        return _get_element(self, 'descendant::table:table', position=position)
 
 
     def get_table_by_content(self, regex):
-        return _get_element(self, 'table:table', regex=regex)
+        return _get_element(self, 'descendant::table:table', regex=regex)
 
 
     #
@@ -813,7 +813,7 @@ class odf_element(object):
 
 
     def get_note_by_content(self, regex):
-        return _get_element(self, 'text:note', regex=regex)
+        return _get_element(self, 'descendant::text:note', regex=regex)
 
 
     #
@@ -907,7 +907,7 @@ class odf_element(object):
 
 
     def get_user_field_list(self):
-        return _get_element_list(self, 'text:user-field-decl')
+        return _get_element_list(self, 'descendant::text:user-field-decl')
 
 
     def get_user_field_decl(self, name):
@@ -927,20 +927,20 @@ class odf_element(object):
     # Draw Pages
     #
     def get_draw_page_list(self, style=None, regex=None):
-        return _get_element_list(self, 'draw:page', draw_style=style,
+        return _get_element_list(self, 'descendant::draw:page', draw_style=style,
                                  regex=regex)
 
 
     def get_draw_page_by_name(self, name):
-        return _get_element(self, 'draw:page', draw_name=name)
+        return _get_element(self, 'descendant::draw:page', draw_name=name)
 
 
     def get_draw_page_by_position(self, position):
-        return _get_element(self, 'draw:page', position=position)
+        return _get_element(self, 'descendant::draw:page', position=position)
 
 
     def get_draw_page_by_content(self, regex):
-        return _get_element(self, 'draw:page', regex=regex)
+        return _get_element(self, 'descendant::draw:page', regex=regex)
 
 
     #
@@ -961,7 +961,7 @@ class odf_element(object):
 
 
     def get_link_by_content(self, regex):
-        return _get_element(self, 'text:a', regex=regex)
+        return _get_element(self, 'descendant::text:a', regex=regex)
 
 
     #
@@ -973,23 +973,23 @@ class odf_element(object):
 
 
     def get_bookmark_by_name(self, name):
-        return _get_element(self, 'text:bookmark', text_name=name)
+        return _get_element(self, 'descendant::text:bookmark', text_name=name)
 
 
     def get_bookmark_start_list(self):
-        return _get_element_list(self, 'text:bookmark-start')
+        return _get_element_list(self, 'descendant::text:bookmark-start')
 
 
     def get_bookmark_start_by_name(self, name):
-        return _get_element(self, 'text:bookmark-start', text_name=name)
+        return _get_element(self, 'descendant::text:bookmark-start', text_name=name)
 
 
     def get_bookmark_end_list(self):
-        return _get_element_list(self, 'text:bookmark-end')
+        return _get_element_list(self, 'descendant::text:bookmark-end')
 
 
     def get_bookmark_end_by_name(self, name):
-        return _get_element(self, 'text:bookmark-end', text_name=name)
+        return _get_element(self, 'descendant::text:bookmark-end', text_name=name)
 
 
     #
@@ -997,11 +997,11 @@ class odf_element(object):
     #
 
     def get_reference_mark_list(self):
-        return _get_element_list(self, 'text:reference-mark')
+        return _get_element_list(self, 'descendant::text:reference-mark')
 
 
     def get_reference_mark_by_name(self, name):
-        return _get_element(self, 'text:reference-mark', text_name=name)
+        return _get_element(self, 'descendant::text:reference-mark', text_name=name)
 
 
     def get_reference_mark_start_list(self):
@@ -1009,7 +1009,7 @@ class odf_element(object):
 
 
     def get_reference_mark_start_by_name(self, name):
-        return _get_element(self, 'text:reference-mark-start',
+        return _get_element(self, 'descendant::text:reference-mark-start',
                             text_name=name)
 
 
@@ -1018,7 +1018,7 @@ class odf_element(object):
 
 
     def get_reference_mark_end_by_name(self, name):
-        return _get_element(self, 'text:reference-mark-end', text_name=name)
+        return _get_element(self, 'descendant::text:reference-mark-end', text_name=name)
 
 
     #
@@ -1030,12 +1030,12 @@ class odf_element(object):
     #
 
     def get_draw_line_list(self, draw_style=None, draw_text_style=None, regex=None):
-        return _get_element_list(self, 'draw:line', draw_style=draw_style,
+        return _get_element_list(self, 'descendant::draw:line', draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_line_by_content(self, regex):
-        return _get_element(self, 'draw:line', regex=regex)
+        return _get_element(self, 'descendant::draw:line', regex=regex)
 
 
     def get_draw_line_by_id(self, id):
@@ -1050,12 +1050,12 @@ class odf_element(object):
 
     def get_draw_rectangle_list(self, draw_style=None, draw_text_style=None,
                                 regex=None):
-        return _get_element_list(self, 'draw:rect', draw_style=draw_style,
+        return _get_element_list(self, 'descendant::draw:rect', draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_rectangle_by_content(self, regex):
-        return _get_element(self, 'draw:rect', regex=regex)
+        return _get_element(self, 'descendant::draw:rect', regex=regex)
 
 
     def get_draw_rectangle_by_id(self, id):
@@ -1070,12 +1070,12 @@ class odf_element(object):
 
     def get_draw_ellipse_list(self, draw_style=None, draw_text_style=None,
                               regex=None):
-        return _get_element_list(self, 'draw:ellipse', draw_style=draw_style,
+        return _get_element_list(self, 'descendant::draw:ellipse', draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_ellipse_by_content(self, regex):
-        return _get_element(self, 'draw:ellipse', regex=regex)
+        return _get_element(self, 'descendant::draw:ellipse', regex=regex)
 
 
     def get_draw_ellipse_by_id(self, id):
@@ -1090,12 +1090,12 @@ class odf_element(object):
 
     def get_draw_connector_list(self, draw_style=None, draw_text_style=None,
                                 regex=None):
-        return _get_element_list(self, 'draw:connector', draw_style=draw_style,
+        return _get_element_list(self, 'descendant::draw:connector', draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
     def get_draw_connector_by_content(self, regex):
-        return _get_element(self, 'draw:connector', regex=regex)
+        return _get_element(self, 'descendant::draw:connector', regex=regex)
 
 
     def get_draw_connector_by_id(self, id):
@@ -1130,4 +1130,3 @@ class odf_element(object):
         # Deletion changes
         xpath_query += ' | descendant::text:change/@text:change-id'
         return self.xpath(xpath_query)
-
