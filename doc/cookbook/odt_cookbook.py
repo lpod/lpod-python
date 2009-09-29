@@ -62,4 +62,4 @@ paragraph.insert_note(note, after=u"graph")
 body.append_element(paragraph)
 
 # Save
-document.save('text_cookbook.odt', pretty=True)
+document.save('text.odt', pretty=True)
