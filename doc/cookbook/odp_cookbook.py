@@ -25,23 +25,22 @@ def get_thumbnail_file(filename):
 
 # Creation of the document
 document = odf_new_document_from_type('presentation')
-content = document.get_xmlpart('content')
-body = content.get_body()
+body = document.get_body()
 
 #
 # Work on pages and add textframes
 #
 # The document already contains a page
-page = content.get_draw_page_by_position(1)
+page = body.get_draw_page_by_position(1)
 
 # Add a frame with a text box
-text_element = odf_create_paragraph(u'First Slide')
+text_element = odf_create_paragraph(u'First Slide', style=u"Text_20_body")
 draw_textframe1 = odf_create_text_frame(text_element,
                                         size=('5cm', '100mm'),
                                         position=('3.5cm', '30.6mm'))
 page.append_element(draw_textframe1)
 
-# If first arg is text a paragraph is created
+# If first arg is text a paragraph is created automatically
 draw_textframe2 = odf_create_text_frame(u"Noël",
                                         size=('5cm', '100mm'),
                                         position=('20cm', '14cm'))
@@ -74,20 +73,20 @@ body.append_element(page)
 #
 page2 = page.clone()
 page2.set_page_name(u'Page 2')
-paragraph = content.get_paragraph_by_content(u'First', context=page2)
+paragraph = page2.get_paragraph_by_content(u'First')
 paragraph.set_text(u'Second Slide')
 
 #
 # Add transition for page2
 #
-page2.add_transition('fade')
+#page2.add_transition('fade')
 body.append_element(page2)
 
 #
 # Build a new page from scratch
 #
 page3 = odf_create_draw_page(u"Page 3")
-frame = content.get_frame_by_content(u"Second").clone()
+frame = body.get_frame_by_content(u"Second").clone()
 frame.set_size(('10cm', '100mm'))
 frame.set_position(('100mm', '10cm'))
 # A shortcut to hit embedded paragraph
