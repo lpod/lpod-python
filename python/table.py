@@ -176,7 +176,6 @@ def _append_odf_row(odf_row, rows):
 
 
 
-# XXX useful?
 def odf_create_cell(value=None, representation=None, cell_type=None,
                     currency=None, style=None):
     """Create a cell element containing the given value. The textual
@@ -214,7 +213,6 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
 
 
 
-# XXX useful?
 def odf_create_row(width=None):
     """Create a row element, optionally filled with "width" number of cells.
 
@@ -233,17 +231,21 @@ def odf_create_row(width=None):
 
 
 
-# XXX useful?
-def odf_create_column(style=None):
-    """Create a column element of the optionally given style.
+def odf_create_column(repeated=None, style=None):
+    """Create a column element of the optionally given style. If the column
+    properties apply to several columns, give the number of repeated columns.
 
     Arguments:
+
+        repeated -- int
 
         style -- unicode
 
     Return: odf_element
     """
     element = odf_create_element('<table:table-column/>')
+    if repeated:
+        element.set_attribute('table:number-columns-repeated', str(repeated))
     if style:
         element.set_attribute('table:style-name', style)
     return element
@@ -296,8 +298,7 @@ def odf_create_table(name, width=None, height=None, protected=False,
         width = width if width is not None else 1
         height = height if height is not None else 1
         # FIXME Declare the table is width-column repeated empty cells
-        columns = odf_create_element('<table:table-column '
-                                       'table:number-columns-repeated="3"/>')
+        columns = odf_create_column(repeated=width)
         element.insert_element(columns, LAST_CHILD)
         for i in xrange(height):
             row = odf_create_row(width)
