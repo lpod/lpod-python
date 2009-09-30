@@ -295,6 +295,10 @@ def odf_create_table(name, width=None, height=None, protected=False,
     if width is not None or height is not None:
         width = width if width is not None else 1
         height = height if height is not None else 1
+        # FIXME Declare the table is width-column repeated empty cells
+        columns = odf_create_element('<table:table-column '
+                                       'table:number-columns-repeated="3"/>')
+        element.insert_element(columns, LAST_CHILD)
         for i in xrange(height):
             row = odf_create_row(width)
             element.insert_element(row, LAST_CHILD)
