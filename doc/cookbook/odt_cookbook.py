@@ -93,7 +93,7 @@ assert highlight is not None
 document.insert_style(highlight)
 
 # Apply this style to a pattern
-paragraph = odf_create_paragraph(u'Highligthing the word "highlight".')
+paragraph = odf_create_paragraph(u'Highlighting the word "highlight".')
 paragraph.set_span(highlight, u"highlight")
 body.append_element(paragraph)
 
