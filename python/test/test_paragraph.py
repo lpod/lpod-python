@@ -99,7 +99,8 @@ class TestSetSpan(TestCase):
         paragraph = odf_create_paragraph(text)
         paragraph.set_span(u"highlight", regex=u"rouge")
         expected = ('<text:p>Le P&#232;re No&#235;l a une moustache '
-                      '<text:span style:name="highlight">rouge</text:span>.'
+                      '<text:span '
+                        'text:style-name="highlight">rouge</text:span>.'
                     '</text:p>')
         self.assertEqual(paragraph.serialize(), expected)
 
@@ -111,7 +112,8 @@ class TestSetSpan(TestCase):
         paragraph.set_span(u"highlight", regex=u"rouge")
         expected = ('<text:p>Le P&#232;re No&#235;l a une '
                       '<text:span>moustache</text:span> '
-                      '<text:span style:name="highlight">rouge</text:span>.'
+                      '<text:span '
+                        'text:style-name="highlight">rouge</text:span>.'
                     '</text:p>')
         self.assertEqual(paragraph.serialize(), expected)
 
@@ -121,9 +123,11 @@ class TestSetSpan(TestCase):
         paragraph = odf_create_paragraph(text)
         paragraph.set_span(u"highlight", regex=u"rouge")
         expected = ('<text:p>Le P&#232;re '
-                      '<text:span style:name="highlight">rouge</text:span> '
+                      '<text:span '
+                         'text:style-name="highlight">rouge</text:span> '
                       'a une moustache '
-                      '<text:span style:name="highlight">rouge</text:span>.'
+                      '<text:span '
+                        'text:style-name="highlight">rouge</text:span>.'
                     '</text:p>')
         self.assertEqual(paragraph.serialize(), expected)
 
@@ -134,9 +138,11 @@ class TestSetSpan(TestCase):
         paragraph = odf_create_element(data)
         paragraph.set_span(u"highlight", regex=u"rouge")
         expected = ('<text:p>Le <text:span>P&#232;re</text:span> '
-                      '<text:span style:name="highlight">rouge</text:span> '
+                      '<text:span '
+                        'text:style-name="highlight">rouge</text:span> '
                       'a une moustache '
-                      '<text:span style:name="highlight">rouge</text:span>.'
+                      '<text:span '
+                        'text:style-name="highlight">rouge</text:span>.'
                     '</text:p>')
         self.assertEqual(paragraph.serialize(), expected)
 
@@ -146,7 +152,7 @@ class TestSetSpan(TestCase):
         paragraph = odf_create_paragraph(text)
         paragraph.set_span(u"highlight", offset=text.index(u"moustache"))
         expected = ('<text:p>Le P&#232;re No&#235;l a une '
-                      '<text:span style:name="highlight">moustache '
+                      '<text:span text:style-name="highlight">moustache '
                       'rouge.</text:span>'
                     '</text:p>')
         self.assertEqual(paragraph.serialize(), expected)
@@ -158,7 +164,7 @@ class TestSetSpan(TestCase):
         paragraph.set_span(u"highlight", offset=text.index(u"moustache"),
                            length=len(u"moustache"))
         expected = ('<text:p>Le P&#232;re No&#235;l a une '
-                      '<text:span style:name="highlight">moustache'
+                      '<text:span text:style-name="highlight">moustache'
                       '</text:span> rouge.'
                     '</text:p>')
         self.assertEqual(paragraph.serialize(), expected)

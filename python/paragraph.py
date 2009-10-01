@@ -11,6 +11,7 @@ from lxml.etree import Element
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, ODF_NAMESPACES
 from note import odf_create_note, odf_create_annotation
+from style import odf_style
 
 
 def _get_formated_text(element, context, with_text=True):
@@ -133,10 +134,22 @@ class odf_paragraph(odf_element):
     def set_span(self, style, regex=None, offset=None, length=0):
         """Apply the given style to text content matching the regex OR the
         positional arguments offset and length.
+
+        Arguments:
+
+            style -- style element or name
+
+            regex -- unicode regular expression
+
+            offset -- int
+
+            length -- int
         """
+        if isinstance(style, odf_style):
+            style = style.get_style_name()
         # XXX bad: we expose lxml
         span_name = '{%s}span' % ODF_NAMESPACES['text']
-        span_attrib = {'{%s}name' % ODF_NAMESPACES['style']: style}
+        span_attrib = {'{%s}style-name' % ODF_NAMESPACES['text']: style}
         if offset:
             # XXX quickly hacking the offset
             text = self.get_text()

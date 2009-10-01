@@ -3,7 +3,6 @@
 
 # Import from lpod
 from element import register_element_class, odf_create_element, odf_element
-from paragraph import odf_create_paragraph
 from utils import _get_style_tagname, _expand_properties, _merge_dicts
 from utils import _get_element
 
@@ -402,6 +401,8 @@ class odf_master_page(odf_style):
                 self.append_element(text_or_element)
                 return
             text_or_element = [text_or_element]
+        # FIXME cyclic import
+        from paragraph import odf_create_paragraph
         for item in text_or_element:
             if type(item) is unicode:
                 paragraph = odf_create_paragraph(item, style=style)
