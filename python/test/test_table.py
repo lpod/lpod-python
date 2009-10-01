@@ -72,7 +72,7 @@ class TestGetCell(TestCase):
         # 3 1 1 1 2 3 3 3
         # 4 1 2 3 4 5 6 7
         table = odf_create_table(u'a_table', style='Standard')
-        column = odf_create_column('Standard')
+        column = odf_create_column(style=u'Standard')
         column.set_attribute('table:number-columns-repeated', '7')
         table.insert_element(column, LAST_CHILD)
 
@@ -342,7 +342,7 @@ class TestTable(TestCase):
 
     def test_create_column(self):
         # Test create
-        column = odf_create_column(u'A Style')
+        column = odf_create_column(style=u'A Style')
         expected = '<table:table-column table:style-name="A Style"/>'
         self.assertEqual(column.serialize(), expected)
 
@@ -361,6 +361,7 @@ class TestTable(TestCase):
                                  style='A Style')
         expected = ('<table:table table:name="a_table" '
                     'table:style-name="A Style">'
+                    '<table:table-column table:number-columns-repeated="1"/>'
                     '<table:table-row>'
                       '<table:table-cell office:value-type="string" '
                         'office:string-value="">'
@@ -379,7 +380,7 @@ class TestTable(TestCase):
 
     def test_insert_table(self):
         table = odf_create_table(u"New Table", style='A Style')
-        column = odf_create_column(style='a_column_style')
+        column = odf_create_column(style=u'a_column_style')
         row = odf_create_row()
         cell = odf_create_cell(u"")
 
@@ -454,7 +455,7 @@ class odf_table_TestCase(TestCase):
         # With the python data
         data = [ (u'A float', 3.14),
                  (u'A date', datetime(1975, 5, 7)) ]
-        table = odf_table('table1', 'Standard', data)
+        table = odf_table('table1', style=u'Standard', data=data)
         serialized = table.to_odf_element().serialize()
 
         self.assertEqual(serialized, expected)

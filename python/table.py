@@ -375,7 +375,7 @@ class odf_table(object):
         # 2) The columns
         columns_number = len(data[0])
         # XXX style=?
-        self.__columns = [ odf_create_column('Standard')
+        self.__columns = [ odf_create_column(style=u'Standard')
                            for i in range(columns_number) ]
         # 3) The rows
         rows = self.__rows = []
@@ -622,22 +622,19 @@ class odf_table(object):
         if position is not None:
             position -= 1
             for i in range(number):
-
                 # Append an empty column info
                 # XXX Style = ?
-                columns.insert(position, odf_create_column('Standard'))
-
+                columns.insert(position,
+                               odf_create_column(style=u'Standard'))
                 # And now, insert empty cells
                 for row in rows:
                     cells = row['cells']
                     cells.insert(position, odf_create_cell())
         else:
             for i in range(number):
-
                 # Append an empty column info
                 # XXX Style = ?
-                columns.append(odf_create_column('Standard'))
-
+                columns.append(odf_create_column(style=u'Standard'))
                 # And now, insert empty cells
                 for row in rows:
                     cells = row['cells']
