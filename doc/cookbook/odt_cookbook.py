@@ -2,7 +2,7 @@
 # Copyright (C) 2009 Itaapy, ArsAperta, Pierlis, Talend
 
 # Import from lpod
-from lpod.document import odf_new_document_from_type
+from lpod.document import odf_new_document_from_type, odf_get_document
 from lpod.heading import odf_create_heading
 from lpod.list import odf_create_list, odf_create_list_item
 from lpod.note import odf_create_note, odf_create_annotation
@@ -79,6 +79,23 @@ body.append_element(odf_create_heading(1, u"Tables"))
 body.append_element(odf_create_paragraph(u"A table:"))
 table = odf_create_table(u"Table 1", width=3, height=3)
 body.append_element(table)
+
+#
+# Applying styles
+#
+body.append_element(odf_create_heading(1, u"Applying Styles"))
+
+# Copying a style from another document
+lpod_styles = odf_get_document('../../python/templates/lpod_styles.odt')
+highlight = lpod_styles.get_style('text', u"Yellow Highlight",
+                                  display_name=True)
+assert highlight is not None
+document.insert_style(highlight)
+
+# Apply this style to a pattern
+paragraph = odf_create_paragraph(u'Highligthing the word "highlight".')
+paragraph.set_span(highlight, u"highlight")
+body.append_element(paragraph)
 
 # Save
 document.save('text.odt', pretty=True)

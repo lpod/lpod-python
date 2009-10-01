@@ -11,6 +11,8 @@ from container import odf_new_container_from_type, odf_container
 from container import odf_new_container_from_template
 from content import odf_content
 from meta import odf_meta
+from style import odf_master_page, odf_page_layout, odf_outline_style
+from style import odf_list_style, odf_style
 from styles import odf_styles
 from utils import _get_style_family
 from xmlpart import odf_xmlpart
@@ -286,7 +288,28 @@ class odf_document(object):
 
             default -- bool
         """
-        raise NotImplementedError
+        # TODO This is just a quick hack
+        if isinstance(style, (odf_master_page,  odf_page_layout,
+                odf_outline_style, odf_list_style)):
+            raise NotImplementedError
+        elif type(style) is odf_style:
+            # FIXME simple heuristic
+            family = style.get_style_family()
+            name = style.get_style_name()
+            if name:
+                # Named style
+                part = self.get_xmlpart('styles')
+                container = part.get_element("office:styles")
+            else:
+                # Automatic style
+                part = self.get_xmlpart('content')
+                container = part.get_element("office:automatic-styles")
+            existing = part.get_style(family, name)
+            if existing is not None:
+                container.delete(existing)
+            container.append_element(style)
+            return
+        raise ValueError, "invalid style"
 
 
     def show_styles(self, family=None):
