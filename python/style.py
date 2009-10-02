@@ -154,7 +154,7 @@ class odf_style(odf_element):
         if element is None:
             element = odf_create_element('<style:%s-properties/>' % area)
             self.append_element(element)
-        if properties:
+        if properties or kw:
             properties = _expand_properties(_merge_dicts(properties, kw))
         elif style is not None:
             properties = style.get_style_properties(area=area)
