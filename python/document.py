@@ -296,7 +296,7 @@ class odf_document(object):
             # FIXME simple heuristic
             family = style.get_style_family()
             name = style.get_style_name()
-            if name:
+            if name and automatic is False:
                 # Named style
                 part = self.get_xmlpart('styles')
                 container = part.get_element("office:styles")
