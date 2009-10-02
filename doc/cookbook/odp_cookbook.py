@@ -3,29 +3,23 @@
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
-from lpod.paragraph import odf_create_paragraph
-from lpod.frame import odf_create_text_frame, odf_create_image_frame
 from lpod.draw_page import odf_create_draw_page
+from lpod.frame import odf_create_text_frame, odf_create_image_frame
+from lpod.list import odf_create_list
+from lpod.shapes import odf_create_line, odf_create_connector
+from lpod.shapes import odf_create_rectangle, odf_create_ellipse
+from lpod.style import odf_create_style
 
 PPC = 72 * 2.54
-
-
-# helper function
-def get_thumbnail_file(filename):
-    from PIL import Image
-    from cStringIO import StringIO
-
-    im = Image.open(filename)
-    im.thumbnail((300, 400), Image.ANTIALIAS)
-    filedescriptor = StringIO()
-    im.save(filedescriptor, 'JPEG', quality=80)
-    filedescriptor.seek(0)
-    return filedescriptor, (im.size[0] / PPC), (im.size[1] / PPC)
 
 
 # Creation of the document
 document = odf_new_document_from_type('presentation')
 body = document.get_body()
+
+# Change the default graphic fill color
+standard = document.get_style('graphic', u"standard")
+standard.set_style_properties({'draw:fill-color': '#ffffff'})
 
 #
 # Work on pages and add textframes
@@ -33,66 +27,78 @@ body = document.get_body()
 # The document already contains a page
 page = body.get_draw_page_by_position(1)
 
-# Add a frame with a text box
-text_element = odf_create_paragraph(u'First Slide', style=u"Text_20_body")
-draw_textframe1 = odf_create_text_frame(text_element,
-                                        size=('5cm', '100mm'),
-                                        position=('3.5cm', '30.6mm'))
-page.append_element(draw_textframe1)
-
-# If first arg is text a paragraph is created automatically
-draw_textframe2 = odf_create_text_frame(u"Noël",
-                                        size=('5cm', '100mm'),
-                                        position=('20cm', '14cm'))
-page.append_element(draw_textframe2)
-
 #
-# Add images frames
+# Text Frame
 #
-# Add an image frame from a file name
-local_uri = document.add_file(u'images/zoé.jpg')
-draw_imageframe1 = odf_create_image_frame(local_uri,
-                                          size=('6cm', '24.2mm'),
-                                          position=('1cm', '10cm'))
-page.append_element(draw_imageframe1)
 
-# Add an image frame from a file descriptor
-filedescriptor, width, height = get_thumbnail_file(u'images/zoé.jpg')
-local_uri = document.add_file(filedescriptor)
-draw_imageframe2 = odf_create_image_frame(local_uri,
-                                          size=('%scm' % width,
-                                                '%scm' % height),
-                                          position=('12cm', '2cm'))
-page.append_element(draw_imageframe2)
+# Set the frame color
+colored = odf_create_style('graphic', name=u"colored",
+                           display_name=u"Colored", parent="standard")
+colored.set_style_properties({'draw:fill-color': "#ad7fa8"},
+                                 area='graphic')
+colored.set_style_properties(color="#ffffff", area='text')
+document.insert_style(colored)
 
-# Add the page to the body
-body.append_element(page)
+# A paragraph style with big font
+big = odf_create_style('paragraph', u"big", area='paragraph', align="center")
+big.set_style_properties(area='text', size="32pt")
+document.insert_style(big, automatic=True)
+
+# Set a text frame
+text_frame = odf_create_text_frame([u"lpOD", u"Presentation", u"Cookbook"],
+        size=('7cm', '5cm'), position=('11cm', '8cm'), style=u"colored",
+        text_style=u"big")
+page.append_element(text_frame)
 
 #
-# Get a new page, page2 copy of page1
+# Image Frame
 #
-page2 = page.clone()
-page2.set_page_name(u'Page 2')
-paragraph = page2.get_paragraph_by_content(u'First')
-paragraph.set_text(u'Second Slide')
 
-#
-# Add transition for page2
-#
-#page2.add_transition('fade')
+# Start a new page
+page2 = odf_create_draw_page(u"page2")
 body.append_element(page2)
 
+# Embed an image from a file name
+local_uri = document.add_file(u'images/zoé.jpg')
+
+# Add image frame
+image_frame = odf_create_image_frame(local_uri, size=('60mm', '45mm'),
+                                     position=('4.5cm', '7cm'))
+page2.append_element(image_frame)
+
+# Some text side by side
+list = odf_create_list([u"Item 1", u"Item 2", u"Item 3"])
+text_frame = odf_create_text_frame(list, size=('7cm', '2.5cm'),
+                                   position=('12.5cm', '7cm'),
+                                   style=u"colored")
+page2.append_element(text_frame)
+
 #
-# Build a new page from scratch
+# Shapes
 #
-page3 = odf_create_draw_page(u"Page 3")
-frame = body.get_frame_by_content(u"Second").clone()
-frame.set_size(('10cm', '100mm'))
-frame.set_position(('100mm', '10cm'))
-# A shortcut to hit embedded paragraph
-frame.set_text_content(u"Third Slide")
-page3.append_element(frame)
+
+# Last page
+page3 = odf_create_draw_page(u"page3")
 body.append_element(page3)
+
+# Square
+square = odf_create_rectangle(shape_id=u"square", size=('8cm', '8cm'),
+                              position=('17cm', '2.5cm'),
+                              style=u"colored")
+page3.append_element(square)
+
+# Circle
+circle = odf_create_ellipse(shape_id=u"circle", size=('8cm', '8cm'),
+                            position=('2cm', '10cm'), style=u"colored")
+page3.append_element(circle)
+
+# Line
+line = odf_create_line(p1=('8cm', '5cm'), p2=('20cm', '17.5cm'))
+page3.append_element(line)
+
+# Connector
+connector = odf_create_connector(connected_shapes=(square, circle),
+                                 glue_points=('1', '3'))
 
 # Save
 document.save('presentation.odp', pretty=True)
