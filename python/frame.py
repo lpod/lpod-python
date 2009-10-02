@@ -4,6 +4,7 @@
 # Import from lpod
 from image import odf_create_image
 from element import odf_create_element, odf_element, register_element_class
+from paragraph import odf_create_paragraph
 
 
 def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
@@ -80,7 +81,7 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
 
 
 def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
-                          position=None, style=None):
+                          position=None, style=None, text_style=None):
     """Create a ready-to-use image image, since it must be embedded in a
     frame. Size is a 2-tuple (width, height) and position is a 2-tuple (left,
     top); both are strings including the unit, e.g. ('21cm', '29.7cm'). Images
@@ -97,14 +98,20 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
 
         style -- unicode
 
+        text_style -- unicode
+
     Return: odf_element
     """
     frame = odf_create_frame(size=size, position=position, style=style)
+    if text_style:
+        frame.set_attribute('draw:text-style-name', text_style)
     text_box = odf_create_element('<draw:text-box/>')
-    if type(text_or_element) is unicode:
-        text_box.set_text_content(text_or_element)
-    else:
-        text_box.append_element(text_or_element)
+    if not isinstance(text_or_element, (list, tuple)):
+        text_or_element = [text_or_element]
+    for item in text_or_element:
+        if type(item) is unicode:
+            item = odf_create_paragraph(item, style=text_style)
+        text_box.append_element(item)
     frame.append_element(text_box)
     return frame
 
