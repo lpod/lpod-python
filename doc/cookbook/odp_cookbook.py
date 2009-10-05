@@ -24,8 +24,8 @@ standard.set_style_properties({'draw:fill-color': '#ffffff'})
 #
 # Work on pages and add textframes
 #
-# The document already contains a page
-page = body.get_draw_page_by_position(1)
+page = odf_create_draw_page('page1', name=u"Page 1")
+body.append_element(page)
 
 #
 # Text Frame
