@@ -124,9 +124,11 @@ Create a ods from multiples csv files
        table = import_from_csv(filename, u'Table %s' % (id + 1))
 
 - Serialize the matrix into ODF XML::
+
        body.append_element(table.to_odf_element())
 
-- Save
+- Save::
+
    document.save('spreadsheet.ods', pretty=True)
 
 
