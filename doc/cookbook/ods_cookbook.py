@@ -12,9 +12,6 @@ from lpod.table import import_from_csv
 document = odf_new_document_from_type('spreadsheet')
 body = document.get_body()
 
-# Delete the 3 default sheets
-body.clear()
-
 for id, filename in enumerate(glob('./files/*.csv')):
     table = import_from_csv(filename, u'Table %s' % (id + 1))
     # Table is represented as a matrix in memory,
