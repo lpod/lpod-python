@@ -7,60 +7,104 @@ Cookbook
 Basic text
 =============
 
-- Create a text document with paragraph style field and metadata::
+- Create a text document::
 
-   # Import from lpod
-   from lpod.document import odf_new_document_from_type
-   from lpod.document import odf_create_paragraph, odf_create_heading
+    # Import from lpod
+    from lpod.document import odf_new_document_from_type
+    from lpod.document import odf_create_paragraph, odf_create_heading
 
-   # Creation of the document
-   document = odf_new_document_from_type('text')
-   body = document.get_body()
+    document = odf_new_document_from_type('text')
 
-   # Add Heading
-   heading = odf_create_heading(1, text=u'Headings, Paragraph, Liste and Notes')
-   body.append_element(heading)
+- Contents go into the body::
 
-   # Add Paragraph
-   paragraph = odf_create_paragraph(text=u'lpOD generated Document')
-   body.append_element(paragraph)
+    body = document.get_body()
 
-   # Save
-   document.save('text_cookbook.odt', pretty=True)
+- Add a table of content (TOC)::
 
-- To add a list::
+    toc = odf_create_toc()
+    body.append_element(toc)
 
-   # Import from lpod
-   from lpod.document import odf_create_list, odf_create_list_item
-   my_list = odf_create_list([u'chocolat', u'café'])
+- Add a paragraph::
 
-   item = odf_create_list_item(u'Du thé')
-   item.append_element(odf_create_list([u'thé vert', u'thé rouge']))
-   my_list.append_item(item)
+    paragraph = odf_create_paragraph(u'lpOD generated Document')
+    body.append_element(paragraph)
 
-   # insert item by position
-   my_list.insert_item(u'Chicoré', position=1)
+- Add an heading of level 1::
 
-   # insert item by relativ position
-   the = my_list.get_item_by_content(u'thé')
-   my_list.insert_item(u'Chicoré', before=the)
-   my_list.insert_item(u'Chicoré', after=the)
+    heading = odf_create_heading(1, text=u'Lists')
+    body.append_element(heading)
 
-   body.append_element(my_list)
+- Add a list::
 
-- And footnote::
+    my_list = odf_create_list([u'chocolat', u'café'])
 
-   # Footnote with odf_create_footnote and insert_note
-   paragraph = odf_create_paragraph(text=u'A paragraph with a footnote '
-                                         u'about references in it.')
+- Add an item with a sublist::
 
-   note = odf_create_footnote(note_id='note1', citation=u"1",
-                              body=u'Author, A. (2007). "How to cite references", '
-                                   u'New York: McGraw-Hill.')
+    item = odf_create_list_item(u'Du thé')
+    item.append_element(odf_create_list([u'thé vert', u'thé rouge']))
+    my_list.append_item(item)
 
-   paragraph.insert_note(note, after=u"graphe")
+- Insert item by position::
 
-   body.append_element(paragraph)
+    my_list.insert_item(u'Chicorée', position=1)
+
+- Insert item by relative position::
+
+    the = my_list.get_item_by_content(u'thé')
+    my_list.insert_item(u'Chicorée', before=the)
+    my_list.insert_item(u'Chicorée', after=the)
+
+    body.append_element(my_list)
+
+- Add a footnote::
+
+    body.append_element(odf_create_heading(1, u"Footnotes"))
+    paragraph = odf_create_paragraph(u'A paragraph with a footnote '
+                                          u'about references in it.')
+    note = odf_create_note(note_id='note1', citation=u"1",
+                           body=u'Author, A. (2007). "How to cite references", '
+                                u'New York: McGraw-Hill.')
+    paragraph.insert_note(note, after=u"graph")
+    body.append_element(paragraph)
+
+- Add an annotation::
+
+    body.append_element(odf_create_heading(1, u"Annotations"))
+    paragraph = odf_create_paragraph(u"A paragraph with an annotation "
+                                     u"in the middle.")
+    annotation = odf_create_annotation(u"It's so easy!", creator=u"Luis")
+    paragraph.insert_annotation(annotation, after=u"annotation")
+    body.append_element(paragraph)
+
+- Add a table::
+
+    body.append_element(odf_create_heading(1, u"Tables"))
+    body.append_element(odf_create_paragraph(u"A table:"))
+    table = odf_create_table(u"Table 1", width=3, height=3)
+    body.append_element(table)
+
+- Applying styles::
+
+    body.append_element(odf_create_heading(1, u"Applying Styles"))
+
+- Copying a style from another document::
+
+    lpod_styles = odf_get_document('../../python/templates/lpod_styles.odt')
+    highlight = lpod_styles.get_style('text', u"Yellow Highlight",
+                                      display_name=True)
+    assert highlight is not None
+    document.insert_style(highlight)
+
+- Apply this style to a pattern::
+
+    paragraph = odf_create_paragraph(u'Highlighting the word "highlight".')
+    paragraph.set_span(highlight, u"highlight")
+    body.append_element(paragraph)
+
+- Save::
+
+    document.save('text.odt', pretty=True)
+
 
 Styles
 =======
