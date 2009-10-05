@@ -14,22 +14,17 @@ from lpod.toc import odf_create_toc
 document = odf_new_document_from_type('text')
 body = document.get_body()
 
-# The document already contains an empty paragraph, like when you open a
-# new document in your office application.
-# Let's replace it
-body.clear()
-
 # Add (empty) Table of content
 toc = odf_create_toc()
 body.append_element(toc)
 
-# Add Heading
-heading = odf_create_heading(1, text=u'Lists')
-body.append_element(heading)
-
 # Add Paragraph
 paragraph = odf_create_paragraph(u'lpOD generated Document')
 body.append_element(paragraph)
+
+# Add Heading
+heading = odf_create_heading(1, text=u'Lists')
+body.append_element(heading)
 
 #
 # A list
