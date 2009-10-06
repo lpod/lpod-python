@@ -197,7 +197,7 @@ class odf_style(odf_element):
 
         The repeat is 'no-repeat', 'repeat' or 'stretch'.
 
-        The opacity is an percentage integer (no string with the '%s' sign)
+        The opacity is a percentage integer (not a string with the '%s' sign)
 
         The filter is an application-specific filter name defined elsewhere.
 
