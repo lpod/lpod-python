@@ -67,7 +67,7 @@ def sheet_to_csv(document, target):
     for table in content.get_table_list():
         table = odf_table(odf_element=table)
 
-        name = table.get_name()
+        name = table.get_tagname()
         filename = clean_filename(name) + '.csv'
 
         csv_file = target.open(filename, 'w')

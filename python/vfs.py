@@ -65,7 +65,7 @@ def _get_names(g_file):
         return listdir(path)
 
     children = g_file.enumerate_children(FILE_ATTRIBUTE_STANDARD_NAME)
-    return [child.get_name() for child in children]
+    return [child.get_tagname() for child in children]
 
 
 

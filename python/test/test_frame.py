@@ -48,13 +48,13 @@ class TestFrame(TestCase):
         body = self.body
         result = body.get_frame_list(title=u"Intitulé")
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].get_name(), 'draw:frame')
+        self.assertEqual(result[0].get_tagname(), 'draw:frame')
 
 
     def test_get_frame_by_name(self):
         body = self.body
         frame = body.get_frame_by_name(u"Logo")
-        self.assertEqual(frame.get_name(), 'draw:frame')
+        self.assertEqual(frame.get_tagname(), 'draw:frame')
 
 
     def test_get_frame_by_position(self):
@@ -66,7 +66,7 @@ class TestFrame(TestCase):
     def test_get_frame_by_description(self):
         body = self.body
         frame = body.get_frame_by_description(u"描述")
-        self.assertEqual(frame.get_name(), 'draw:frame')
+        self.assertEqual(frame.get_tagname(), 'draw:frame')
 
 
     def test_insert_frame(self):
@@ -81,9 +81,9 @@ class TestFrame(TestCase):
         result = body.get_frame_list(style='Graphics')
         self.assertEqual(len(result), 2)
         element = body.get_frame_by_name(u"frame1")
-        self.assertEqual(element.get_name(), 'draw:frame')
+        self.assertEqual(element.get_tagname(), 'draw:frame')
         element = body.get_frame_by_name(u"frame2")
-        self.assertEqual(element.get_name(), 'draw:frame')
+        self.assertEqual(element.get_tagname(), 'draw:frame')
 
 
 

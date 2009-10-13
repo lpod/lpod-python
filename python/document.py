@@ -29,7 +29,7 @@ def _show_styles(element, level=0):
     # Don't show the empty elements
     if not attributes and not children:
         return None
-    tag_name = element.get_name()
+    tag_name = element.get_tagname()
     output.append(tag_name)
     # Underline and Overline the name
     underline = underline_lvl[level] * len(tag_name)
@@ -48,7 +48,7 @@ def _show_styles(element, level=0):
         output.extend(attrs)
     # Children
     # Sort children according to their names
-    children = [(child.get_name(), child) for child in children]
+    children = [(child.get_tagname(), child) for child in children]
     children.sort()
     children = [child for name, child in children]
     for child in children:
@@ -138,7 +138,7 @@ class odf_document(object):
         # Get the text
         result = []
         for element in body.get_children():
-            if element.get_name() == 'table:table':
+            if element.get_tagname() == 'table:table':
                 table = odf_table(odf_element=element)
                 result.append(table.get_formated_text(context))
             else:
@@ -338,14 +338,14 @@ class odf_document(object):
         styles = self.get_xmlpart('styles')
         content = self.get_xmlpart('content')
         for style in document.get_style_list():
-            tagname = style.get_name()
+            tagname = style.get_tagname()
             family = style.get_style_family()
             if family is None:
                 family = _get_style_family(tagname)
             stylename = style.get_style_name()
             container = style.get_parent()
-            container_name = container.get_name()
-            partname = container.get_parent().get_name()
+            container_name = container.get_tagname()
+            partname = container.get_parent().get_tagname()
             # The destination part
             if partname == "office:document-styles":
                 part = styles

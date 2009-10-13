@@ -142,7 +142,7 @@ class odf_frame(odf_element):
     def get_formated_text(self, context):
         result = []
         for element in self.get_children():
-            tag = element.get_name()
+            tag = element.get_tagname()
             if tag == 'draw:image':
                 result.append(u'[Image %s]\n' %
                               element.get_attribute('xlink:href'))

@@ -92,7 +92,7 @@ class odf_list(odf_element):
 
     def insert_item(self, item, position=None, before=None, after=None):
         # Check if the item is already a list-item
-        tag_name = item.get_name() if isinstance(item, odf_element) else None
+        tag_name = item.get_tagname() if isinstance(item, odf_element) else None
         if tag_name != 'text:list-item':
             item = odf_create_list_item(item)
 
@@ -108,7 +108,7 @@ class odf_list(odf_element):
 
     def append_item(self, item):
         # Check if the item is already a list-item
-        tag_name = item.get_name() if isinstance(item, odf_element) else None
+        tag_name = item.get_tagname() if isinstance(item, odf_element) else None
         if tag_name != 'text:list-item':
             item = odf_create_list_item(item)
         self.append_element(item)

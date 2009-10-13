@@ -24,7 +24,7 @@ def _get_formated_text(element, context, with_text=True):
         if type(obj) is unicode:
             result.append(obj)
         else:
-            tag = obj.get_name()
+            tag = obj.get_tagname()
             # Good tags with text
             if tag in ('text:span', 'text:a', 'text:p'):
                 result.append(_get_formated_text(obj, context,

@@ -152,7 +152,8 @@ class odf_element(object):
 
 
     def __str__(self):
-        return '%s "%s"' % (object.__str__(self), self.get_name())
+        return '%s "%s"' % (super(odf_element, self).__str__(),
+                            self.get_tagname())
 
 
     def _insert_after(self, element, after):
@@ -294,12 +295,12 @@ class odf_element(object):
         raise ValueError, "end text not found"
 
 
-    def get_name(self):
+    def get_tagname(self):
         element = self.__element
         return _get_prefixed_name(element.tag)
 
 
-    def set_name(self, qname):
+    def set_tagname(self, qname):
         """XXX side effects?
         and the wrapping class won't change
         """
@@ -360,22 +361,18 @@ class odf_element(object):
 
 
     def get_text(self):
-        """This function returns a "raw" version of the text
+        """Concatenated string of element and subelements text contents.
         """
         return u''.join(self.__element.itertext())
 
 
-    def get_formated_text(self, context):
-        """This function must return a beautiful version of the text
-        """
-        return u''
-
-
     def set_text(self, text, after=False):
-        """If "after" is true, sets the text at the end of the element, not
+        """Set the text content of the element.
+
+        If "after" is true, sets the text at the end of the element, not
         inside.
-        FIXME maybe too specific to lxml, see at the end if disposable
         """
+        # FIXME "after" too specific to lxml, see at the end if disposable
         element = self.__element
         if after:
             element.tail = text
@@ -489,7 +486,7 @@ class odf_element(object):
 
 
     def get_text_content(self):
-        """Like "get_text" but applied to the embedded paragraph:
+        """Like "get_text" but return the text of the embedded paragraph:
         annotations, cells...
         """
         element = self.__element
@@ -498,8 +495,10 @@ class odf_element(object):
 
 
     def set_text_content(self, text):
-        """Like "set_text" but applied to the embedded paragraph:
+        """Like "set_text" but set the text of the embedded paragraph:
         annotations, cells...
+
+        Create the paragraph if missing.
         """
         # Was made descendant for text:p in draw:text-box in draw:frame
         paragraph = self.get_element('descendant::text:p')
@@ -582,6 +581,12 @@ class odf_element(object):
     #
     # Element helpers usable from any context
     #
+
+    def get_formated_text(self, context):
+        """This function must return a beautiful version of the text
+        """
+        return u''
+
 
     #
     # Dublin core

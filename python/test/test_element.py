@@ -58,7 +58,7 @@ class ElementTestCase(TestCase):
 
     def test_get_name(self):
         element = self.paragraph_element
-        self.assertEqual(element.get_name(), 'text:p')
+        self.assertEqual(element.get_tagname(), 'text:p')
 
 
     def test_clone(self):
@@ -219,7 +219,7 @@ class ElementTraverseTestCase(TestCase):
     def test_get_parent(self):
         paragraph = self.paragraph_element
         parent = paragraph.get_parent()
-        self.assertEqual(parent.get_name(), 'text:section')
+        self.assertEqual(parent.get_tagname(), 'text:section')
 
 
     def test_get_parent_root(self):
@@ -276,9 +276,9 @@ class ElementTraverseTestCase(TestCase):
         children = element.get_children()
         self.assertEqual(len(children), 4)
         child = children[0]
-        self.assertEqual(child.get_name(), 'dc:creator')
+        self.assertEqual(child.get_tagname(), 'dc:creator')
         child = children[-1]
-        self.assertEqual(child.get_name(), 'text:p')
+        self.assertEqual(child.get_tagname(), 'text:p')
 
 
 

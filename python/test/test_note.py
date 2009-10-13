@@ -49,7 +49,7 @@ class TestNote(TestCase):
     def test_get_note(self):
         body = self.body
         note = body.get_note_by_id('ftn1')
-        self.assertEqual(note.get_name(), 'text:note')
+        self.assertEqual(note.get_tagname(), 'text:note')
 
 
     def test_get_note_list(self):

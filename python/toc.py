@@ -32,7 +32,7 @@ class odf_toc(odf_element):
 
         result = []
         for element in index_body.get_children():
-            if element.get_name() == 'text:index-title':
+            if element.get_tagname() == 'text:index-title':
                 for element in element.get_children():
                     result.append(element.get_formated_text(context))
                 result.append(u'\n')

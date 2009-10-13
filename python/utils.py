@@ -373,7 +373,7 @@ def set_value(element, value):
     """Only for "with office:value-type" elements
     """
 
-    tag = element.get_name()
+    tag = element.get_tagname()
 
     # A table:cell ?
     if tag == 'table:table-cell':
