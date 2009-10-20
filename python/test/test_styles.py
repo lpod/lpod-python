@@ -155,5 +155,34 @@ class TestStyle(TestCase):
 
 
 
+class TestInsertStyleCase(TestCase):
+
+    def setUp(self):
+        self.doc = odf_get_document('samples/example.odt')
+
+
+    def test_insert_common_style(self):
+        doc = self.doc
+
+        style = odf_create_style('paragraph', u'MyStyle')
+        doc.insert_style(style)
+        inserted_style = doc.get_style('paragraph', u'MyStyle')
+
+        self.assertEqual(style.serialize(), inserted_style.serialize())
+
+
+    def test_insert_default_style(self):
+        doc = self.doc
+
+        style = odf_create_style('paragraph', u'MyStyle')
+        #doc.insert_style(style, default=True)
+
+        inserted_style = doc.get_style('paragraph')
+        expected = '<style:default-style style:family="paragraph"/>'
+
+        self.assertEqual(inserted_style.serialize(), expected)
+
+
+
 if __name__ == '__main__':
     main()
