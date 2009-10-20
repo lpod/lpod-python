@@ -293,18 +293,51 @@ class odf_document(object):
                 odf_outline_style, odf_list_style)):
             raise NotImplementedError
         elif type(style) is odf_style:
-            # FIXME simple heuristic
             family = style.get_style_family()
-            name = style.get_style_name()
-            if name and automatic is False:
-                # Named style
+            if name is None:
+                name = style.get_style_name()
+
+            # Named Style
+            if name and automatic is False and default is False:
                 part = self.get_xmlpart('styles')
                 container = part.get_element("office:styles")
-            else:
-                # Automatic style
+                existing = part.get_style(family, name)
+
+            # Automatic style
+            elif automatic is True and default is False:
                 part = self.get_xmlpart('content')
                 container = part.get_element("office:automatic-styles")
-            existing = part.get_style(family, name)
+
+                # A name ?
+                if name is None:
+                    styles = self.get_style_list(family=family, automatic=True)
+
+                    # XXX Hack, not beautiful
+                    names = [ s.get_style_name () for s in styles
+                              if s.get_style_name () ]
+                    names.sort()
+                    name = names[-1]
+                    name += 'a'
+
+                existing = None
+
+            # Default style
+            elif automatic is False and default is True:
+                part = self.get_xmlpart('styles')
+                container = part.get_element("office:styles")
+
+                # Force default style
+                style.set_tagname("style:default-style")
+                if name is not None:
+                    style.del_attribute("style:name")
+
+                existing = part.get_style(family)
+
+            # Error
+            else:
+              raise AttributeError, "invalid combination of arguments"
+
+            # Insert!
             if existing is not None:
                 container.delete(existing)
             container.append_element(style)
