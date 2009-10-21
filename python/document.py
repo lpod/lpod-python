@@ -310,15 +310,22 @@ class odf_document(object):
 
                 # A name ?
                 if name is None:
+                    # Make a beautiful name
+
+                    # TODO: Use prefixes of Ooo: Mpm1, ...
+                    prefix = 'lpod_auto_'
+
                     styles = self.get_style_list(family=family, automatic=True)
+                    names = [ s.get_style_name () for s in styles ]
+                    numbers = [ int(name[len(prefix):]) for name in names
+                                if name and name.startswith(prefix) ]
+                    if numbers:
+                        number = max(numbers) + 1
+                    else:
+                        number = 1
+                    name = prefix + str(number)
 
-                    # XXX Hack, not beautiful
-                    names = [ s.get_style_name () for s in styles
-                              if s.get_style_name () ]
-                    names.sort()
-                    name = names[-1]
-                    name += 'a'
-
+                    # And set it
                     style.set_style_name(name)
 
                 existing = None
