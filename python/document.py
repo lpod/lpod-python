@@ -319,6 +319,8 @@ class odf_document(object):
                     name = names[-1]
                     name += 'a'
 
+                    style.set_style_name(name)
+
                 existing = None
 
             # Default style
