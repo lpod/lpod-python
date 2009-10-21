@@ -56,7 +56,12 @@ class odf_content(odf_xmlpart):
 
         Return: odf_style or None if not found
         """
-        if type(name_or_element) is unicode or name_or_element is None:
+        # Default style
+        if name_or_element is None and display_name is False:
+            return None
+
+        # Common style
+        elif type(name_or_element) is unicode or name_or_element is None:
             if display_name is True:
                 style_name = None
                 display_name = name_or_element
@@ -71,8 +76,12 @@ class odf_content(odf_xmlpart):
                                       family=famattr)
             context = self._get_style_context(name_or_element, family)
             return context.get_element(query)
+
+        # An odf_style
         elif isinstance(name_or_element, odf_style):
             return name_or_element
+
+        # Error
         raise TypeError, "style name or element expected"
 
 
