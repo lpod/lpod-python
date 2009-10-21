@@ -175,12 +175,28 @@ class TestInsertStyleCase(TestCase):
         doc = self.doc
 
         style = odf_create_style('paragraph', u'MyStyle')
-        #doc.insert_style(style, default=True)
+        doc.insert_style(style, default=True)
 
         inserted_style = doc.get_style('paragraph')
         expected = '<style:default-style style:family="paragraph"/>'
 
         self.assertEqual(inserted_style.serialize(), expected)
+
+
+    def test_insert_automatic_style(self):
+        doc = self.doc
+
+        style = odf_create_style('paragraph')
+        doc.insert_style(style, automatic=True)
+        self.assertNotEqual(style.get_style_name(), None)
+
+
+    def test_insert_with_error(self):
+        doc = self.doc
+
+        style = odf_create_style('paragraph', u'MyStyle')
+        self.assertRaises(AttributeError, doc.insert_style,
+                          style=style, automatic=True, default=True)
 
 
 
