@@ -101,4 +101,6 @@ connector = odf_create_connector(connected_shapes=(square, circle),
                                  glue_points=('1', '3'))
 
 # Save
-document.save('presentation.odp', pretty=True)
+filename = 'presentation.odp'
+document.save(filename, pretty=True)
+print 'Document "%s" generated.' % filename

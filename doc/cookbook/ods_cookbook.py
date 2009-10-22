@@ -19,4 +19,6 @@ for id, filename in enumerate(glob('./files/*.csv')):
     body.append_element(table.to_odf_element())
 
 # Save
-document.save('spreadsheet.ods', pretty=True)
+filename = 'spreadsheet.ods'
+document.save(filename, pretty=True)
+print 'Document "%s" generated.' % filename

@@ -93,4 +93,6 @@ paragraph.set_span(highlight, u"highlight")
 body.append_element(paragraph)
 
 # Save
-document.save('text.odt', pretty=True)
+filename = 'text.odt'
+document.save(filename, pretty=True)
+print 'Document "%s" generated.' % filename
