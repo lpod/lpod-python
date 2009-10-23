@@ -1,3 +1,30 @@
+..
+ 
+ Copyright (c) 2009 Ars Aperta, Itaapy, Pierlis, Talend.
+ 
+ Authors: Hervé Cauwelier <herve@itaapy.com>
+          Jean-Marie Gouarné <jean-marie.gouarne@arsaperta.com>
+          Luis Belmar-Letelier <luis@itaapy.com>
+ 
+ This file is part of Lpod (see: http://lpod-project.org).
+ Lpod is free software; you can redistribute it and/or modify it under
+ the terms of either:
+ 
+ a) the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option)
+    any later version.
+    Lpod is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Lpod.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ b) the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+
 ################################
 Level 1 Functional specification
 ################################
@@ -60,7 +87,7 @@ attributes like "xxx-style-name" are very frequently used, this feature provides
 a "xxx style" shortcut.  As a consequence, the following instruction does the
 same as each one of the previous example::
 
-  p.get_attribute('style') 
+  p.get_attribute('style')
 
 A ``get_attributes()`` method is provided, that returns all the attributes of
 the calling element (with their real ODF names) and their values as a array
@@ -195,7 +222,7 @@ A paragraph is basically a text container associated with a layout style.
 The text content may be directly hold as the text of the paragraph element;
 however, a paragraph can contain sub-paragraph elements so-called *spans*
 (introduced later in this documentation).
- 
+
 
 Creation and attachment
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -642,7 +669,7 @@ According to the same logic, each of the two instruction below returns the
 columns from 8 to 15::
 
    cols = t.get_column_list(8, 15)
-   cols = t.get_column_list('I:P') 
+   cols = t.get_column_list('I:P')
 
 Once selected, knowing that cells are contained in rows, a row-based
 ``get_cell()`` method is provided. When called from a row object,
@@ -708,7 +735,7 @@ attributes are:
 - ``cell style``: the default style which apply to each cell in the column or
   row unless this cell has no defined style attribute;
 - ``visibility``: specifies the visibility of the row or column; legal values
-  are ``visible``, ``collapse`` and ``filter``.				 
+  are ``visible``, ``collapse`` and ``filter``.
 
 Table expansion
 ~~~~~~~~~~~~~~~
