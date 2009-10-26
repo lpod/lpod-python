@@ -363,7 +363,7 @@ class odf_outline_style(odf_list_style):
 
 
 class odf_page_layout(odf_style):
-    """Phyisical presentation of a page.
+    """Physical presentation of a page.
 
     XXX to verify
     """
@@ -401,7 +401,7 @@ class odf_page_layout(odf_style):
 class odf_master_page(odf_style):
     """A master page is the style of a page.
 
-    Phyisical presentation is in the associated page layout.
+    Physical presentation is in the associated page layout.
 
     XXX to verify
     """
