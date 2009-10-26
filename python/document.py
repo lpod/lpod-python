@@ -313,16 +313,24 @@ class odf_document(object):
 
             default -- bool
         """
-        # TODO This is just a quick hack
-        if isinstance(style, (odf_master_page,  odf_page_layout,
-                odf_outline_style, odf_list_style)):
-            raise NotImplementedError
-        elif type(style) is odf_style:
-            family = style.get_style_family()
-            if name is None:
-                name = style.get_style_name()
 
-            # Named Style
+        # Get family and name
+        family = style.get_style_family()
+        if name is None:
+            name = style.get_style_name()
+
+        # Not implemented
+        if isinstance(style, (odf_page_layout, odf_outline_style,
+                              odf_list_style)):
+            raise NotImplementedError
+        # Master page style
+        elif isinstance(style, odf_master_page):
+            part = self.get_xmlpart('styles')
+            container = part.get_element("office:master-styles")
+            existing = part.get_style(family, name)
+        # common style
+        elif type(style) is odf_style:
+            # Named style
             if name and automatic is False and default is False:
                 part = self.get_xmlpart('styles')
                 container = part.get_element("office:styles")
@@ -370,13 +378,14 @@ class odf_document(object):
             # Error
             else:
               raise AttributeError, "invalid combination of arguments"
+        # Invalid style
+        else:
+            raise ValueError, "invalid style"
 
-            # Insert!
-            if existing is not None:
-                container.delete(existing)
-            container.append_element(style)
-            return
-        raise ValueError, "invalid style"
+        # Insert it!
+        if existing is not None:
+            container.delete(existing)
+        container.append_element(style)
 
 
     def show_styles(self, family=None):
