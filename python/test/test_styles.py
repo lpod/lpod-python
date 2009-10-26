@@ -199,6 +199,16 @@ class TestInsertStyleCase(TestCase):
                           style=style, automatic=True, default=True)
 
 
+    def test_insert_master_page_style(self):
+        doc = self.doc
+
+        style = odf_create_style('master-page', u'MyPageStyle')
+        doc.insert_style(style)
+
+        inserted_style = doc.get_style('master-page',  u'MyPageStyle')
+        self.assertEqual(style.serialize(), inserted_style.serialize())
+
+
 
 if __name__ == '__main__':
     main()
