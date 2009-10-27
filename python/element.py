@@ -712,7 +712,8 @@ class odf_element(object):
 
 
     def get_heading_by_content(self, regex, level=None):
-        return _get_element(self, 'descendant::text:h', regex=regex, outline_level=level)
+        return _get_element(self, 'descendant::text:h', regex=regex,
+                            outline_level=level)
 
 
     #
@@ -956,8 +957,8 @@ class odf_element(object):
     # Draw Pages
     #
     def get_draw_page_list(self, style=None, regex=None):
-        return _get_element_list(self, 'descendant::draw:page', draw_style=style,
-                                 regex=regex)
+        return _get_element_list(self, 'descendant::draw:page',
+                                 draw_style=style, regex=regex)
 
 
     def get_draw_page_by_name(self, name):
@@ -1010,7 +1011,8 @@ class odf_element(object):
 
 
     def get_bookmark_start_by_name(self, name):
-        return _get_element(self, 'descendant::text:bookmark-start', text_name=name)
+        return _get_element(self, 'descendant::text:bookmark-start',
+                            text_name=name)
 
 
     def get_bookmark_end_list(self):
@@ -1018,7 +1020,8 @@ class odf_element(object):
 
 
     def get_bookmark_end_by_name(self, name):
-        return _get_element(self, 'descendant::text:bookmark-end', text_name=name)
+        return _get_element(self, 'descendant::text:bookmark-end',
+                            text_name=name)
 
 
     #
@@ -1030,7 +1033,8 @@ class odf_element(object):
 
 
     def get_reference_mark_by_name(self, name):
-        return _get_element(self, 'descendant::text:reference-mark', text_name=name)
+        return _get_element(self, 'descendant::text:reference-mark',
+                            text_name=name)
 
 
     def get_reference_mark_start_list(self):
@@ -1047,7 +1051,8 @@ class odf_element(object):
 
 
     def get_reference_mark_end_by_name(self, name):
-        return _get_element(self, 'descendant::text:reference-mark-end', text_name=name)
+        return _get_element(self, 'descendant::text:reference-mark-end',
+                            text_name=name)
 
 
     #
@@ -1058,8 +1063,10 @@ class odf_element(object):
     # Lines
     #
 
-    def get_draw_line_list(self, draw_style=None, draw_text_style=None, regex=None):
-        return _get_element_list(self, 'descendant::draw:line', draw_style=draw_style,
+    def get_draw_line_list(self, draw_style=None, draw_text_style=None,
+                           regex=None):
+        return _get_element_list(self, 'descendant::draw:line',
+                                 draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
@@ -1079,7 +1086,8 @@ class odf_element(object):
 
     def get_draw_rectangle_list(self, draw_style=None, draw_text_style=None,
                                 regex=None):
-        return _get_element_list(self, 'descendant::draw:rect', draw_style=draw_style,
+        return _get_element_list(self, 'descendant::draw:rect',
+                                 draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
@@ -1099,7 +1107,8 @@ class odf_element(object):
 
     def get_draw_ellipse_list(self, draw_style=None, draw_text_style=None,
                               regex=None):
-        return _get_element_list(self, 'descendant::draw:ellipse', draw_style=draw_style,
+        return _get_element_list(self, 'descendant::draw:ellipse',
+                                 draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
@@ -1119,7 +1128,8 @@ class odf_element(object):
 
     def get_draw_connector_list(self, draw_style=None, draw_text_style=None,
                                 regex=None):
-        return _get_element_list(self, 'descendant::draw:connector', draw_style=draw_style,
+        return _get_element_list(self, 'descendant::draw:connector',
+                                 draw_style=draw_style,
                                  draw_text_style=draw_text_style, regex=regex)
 
 
