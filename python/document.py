@@ -319,17 +319,14 @@ class odf_document(object):
         if name is None:
             name = style.get_style_name()
 
-        # Not implemented
-        if isinstance(style, (odf_page_layout, odf_outline_style,
-                              odf_list_style)):
-            raise NotImplementedError
         # Master page style
-        elif isinstance(style, odf_master_page):
+        if isinstance(style, odf_master_page):
             part = self.get_xmlpart('styles')
             container = part.get_element("office:master-styles")
             existing = part.get_style(family, name)
-        # common style
-        elif type(style) is odf_style:
+        # Common style
+        elif type(style) in (odf_style, odf_page_layout, odf_outline_style,
+                             odf_list_style):
             # Named style
             if name and automatic is False and default is False:
                 part = self.get_xmlpart('styles')
@@ -360,8 +357,9 @@ class odf_document(object):
 
                     # And set it
                     style.set_style_name(name)
-
-                existing = None
+                    existing = None
+                else:
+                    existing = part.get_style(family, name)
 
             # Default style
             elif automatic is False and default is True:
