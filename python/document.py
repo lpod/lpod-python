@@ -32,16 +32,17 @@ from uuid import uuid4
 
 # Import from lpod
 from container import ODF_PARTS, odf_get_container
-from container import odf_new_container_from_type, odf_container
 from container import odf_new_container_from_template
+from container import odf_new_container_from_type, odf_container
 from content import odf_content
 from meta import odf_meta
-from style import odf_master_page, odf_page_layout, odf_outline_style
 from style import odf_list_style, odf_style
+from style import odf_master_page, odf_page_layout, odf_outline_style
 from styles import odf_styles
+from table import odf_table
 from utils import _get_style_family
-from xmlpart import odf_xmlpart
 from vfs import vfs
+from xmlpart import odf_xmlpart
 
 
 underline_lvl = ['=', '-', ':', '`', "'", '"', '~', '^', '_', '*', '+']
@@ -149,8 +150,6 @@ class odf_document(object):
 
 
     def get_formated_text(self):
-        # XXX Fix thix cyclic import
-        from table import odf_table
         # For the moment, only "type='text'"
         if self.get_type() != 'text':
             raise NotImplementedError, ('This functionality is only '
