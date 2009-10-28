@@ -224,8 +224,6 @@ Slide Show with ODP
                                        style=u"colored")
     page2.append_element(text_frame)
 
-- Shapes::
-
 - Add a last page::
 
     page3 = odf_create_draw_page(u"page3")
