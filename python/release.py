@@ -41,6 +41,15 @@ def _run_command(command):
 
 
 
+def has_git():
+    try:
+        probe = _run_command(['git', 'branch'])
+    except ValueError:
+        return False
+    return True
+
+
+
 def get_date():
     date = _run_command(['git', 'log', '--pretty=format:%at', '-n1'])
     return datetime.fromtimestamp(int(date))
