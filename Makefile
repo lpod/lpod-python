@@ -13,8 +13,9 @@ dist:
 	@cp gpl-3.0.txt $(DEST)
 	@cp apacheLICENSE-2.0.txt $(DEST)
 	# Copy documentation
-	@(cd doc && make clean > /dev/null)
-	@cp -r doc $(DEST)
+	@make -C doc html > /dev/null
+	@cp -r doc/.build/html $(DEST)
+	@mv $(DEST)/html $(DEST)/doc
 	# Copy Python
 	@(cd python && rm dist -rf && $(PYTHON) setup.py sdist > /dev/null)
 	@(cd $(DEST)/python && tar --strip-components 1 -xf ../../python/dist/*.tar.gz)
