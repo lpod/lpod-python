@@ -68,4 +68,6 @@ core.setup(description='lpOD Library',
            scripts=scripts,
            packages=['lpod'],
            url='http://www.lpod-project.org/',
-           version=release)
+           version=release,
+           author="lpOD Team",
+           author_email="team@lpod-project.org")
