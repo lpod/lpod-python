@@ -19,7 +19,9 @@ dist:
 	@(cd python && rm dist -rf && $(PYTHON) setup.py sdist > /dev/null)
 	@(cd $(DEST)/python && tar --strip-components 1 -xf ../../python/dist/*.tar.gz)
 	# Copy Perl
+	@cp -r perl $(DEST)
 	# Copy Ruby
+	@cp -r ruby $(DEST)
 	@tar cf $(DEST).tar.gz $(DEST)
 	@rm $(DEST) -rf
 	@echo
