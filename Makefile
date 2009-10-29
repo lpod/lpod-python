@@ -18,7 +18,7 @@ dist:
 	@mv $(DEST)/html $(DEST)/doc
 	# Copy Python
 	@(cd python && rm dist -rf && $(PYTHON) setup.py sdist > /dev/null)
-	@(cd $(DEST)/python && tar --strip-components 1 -xf ../../python/dist/*.tar.gz)
+	@(cd $(DEST)/python && tar --strip-components 1 -zxf ../../python/dist/*.tar.gz)
 	# Copy Perl
 	@cp -r perl $(DEST)
 	# Copy Ruby
