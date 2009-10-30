@@ -33,6 +33,7 @@ from lpod.list import odf_create_list
 from lpod.shapes import odf_create_line, odf_create_connector
 from lpod.shapes import odf_create_rectangle, odf_create_ellipse
 from lpod.style import odf_create_style
+from lpod.smil import odf_create_anim_par, odf_create_anim_transitionFilter
 
 PPC = 72 * 2.54
 
@@ -73,6 +74,16 @@ text_frame = odf_create_text_frame([u"lpOD", u"Presentation", u"Cookbook"],
         size=('7cm', '5cm'), position=('11cm', '8cm'), style=u"colored",
         text_style=u"big")
 page.append_element(text_frame)
+
+# Add a transition for this frame: "Fade Through black"
+anim_page1 = odf_create_anim_par(presentation_node_type="timing-root")
+anim_begin = odf_create_anim_par(smil_begin="page1.begin")
+transition = odf_create_anim_transitionFilter(smil_dur="2s", smil_type="fade",
+                                              smil_subtype="fadeOverColor")
+anim_page1.append_element(anim_begin)
+anim_begin.append_element(transition)
+page.append_element(anim_page1)
+
 
 #
 # Image Frame
