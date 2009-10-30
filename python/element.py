@@ -40,34 +40,36 @@ from utils import get_value
 
 
 ODF_NAMESPACES = {
-    'office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
-    'style': "urn:oasis:names:tc:opendocument:xmlns:style:1.0",
-    'text': "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
-    'presentation': "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0",
-    'table': "urn:oasis:names:tc:opendocument:xmlns:table:1.0",
+    'anim': "urn:oasis:names:tc:opendocument:xmlns:animation:1.0",
+    'chart': "urn:oasis:names:tc:opendocument:xmlns:chart:1.0",
+    'config': "urn:oasis:names:tc:opendocument:xmlns:config:1.0",
+    'dc': "http://purl.org/dc/elements/1.1/",
+    'dom': "http://www.w3.org/2001/xml-events",
+    'dr3d': "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0",
     'draw': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
     'fo': "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0",
-    'xlink': "http://www.w3.org/1999/xlink",
-    'dc': "http://purl.org/dc/elements/1.1/",
+    'form': "urn:oasis:names:tc:opendocument:xmlns:form:1.0",
+    'math': "http://www.w3.org/1998/Math/MathML",
     'meta': "urn:oasis:names:tc:opendocument:xmlns:meta:1.0",
     'number': "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0",
-    'svg': "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0",
-    'chart': "urn:oasis:names:tc:opendocument:xmlns:chart:1.0",
-    'dr3d': "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0",
-    'math': "http://www.w3.org/1998/Math/MathML",
-    'form': "urn:oasis:names:tc:opendocument:xmlns:form:1.0",
-    'script': "urn:oasis:names:tc:opendocument:xmlns:script:1.0",
+    'of': "urn:oasis:names:tc:opendocument:xmlns:of:1.2",
+    'office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
     'ooo': "http://openoffice.org/2004/office",
-    'ooow': "http://openoffice.org/2004/writer",
     'oooc': "http://openoffice.org/2004/calc",
-    'dom': "http://www.w3.org/2001/xml-events",
+    'ooow': "http://openoffice.org/2004/writer",
+    'presentation': "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0",
+    'rdfa': "http://docs.oasis-open.org/opendocument/meta/rdfa#",
+    'rpt': "http://openoffice.org/2005/report",
+    'script': "urn:oasis:names:tc:opendocument:xmlns:script:1.0",
+    'smil': "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0",
+    'style': "urn:oasis:names:tc:opendocument:xmlns:style:1.0",
+    'svg': "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0",
+    'table': "urn:oasis:names:tc:opendocument:xmlns:table:1.0",
+    'text': "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
     'xforms': "http://www.w3.org/2002/xforms",
+    'xlink': "http://www.w3.org/1999/xlink",
     'xsd': "http://www.w3.org/2001/XMLSchema",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance",
-    'rpt': "http://openoffice.org/2005/report",
-    'of': "urn:oasis:names:tc:opendocument:xmlns:of:1.2",
-    'rdfa': "http://docs.oasis-open.org/opendocument/meta/rdfa#",
-    'config': "urn:oasis:names:tc:opendocument:xmlns:config:1.0",
 }
 
 
@@ -656,7 +658,8 @@ class odf_element(object):
 
 
     def get_section_by_position(self, position):
-        return _get_element(self, 'descendant::text:section', position=position)
+        return _get_element(self, 'descendant::text:section',
+                            position=position)
 
 
     def get_section_by_content(self, regex):
