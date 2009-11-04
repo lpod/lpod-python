@@ -401,6 +401,7 @@ class odf_document(object):
         Return: list
         """
         content = self.get_xmlpart('content')
+        # Header, footer, etc. have styles too
         styles = self.get_xmlpart('styles')
         return (content.get_root().get_styled_elements(name)
                 + styles.get_root().get_styled_elements(name))
@@ -451,13 +452,16 @@ class odf_document(object):
         """
         i = 0
         for style in self.get_style_list():
-            for element in self.get_styled_elements(style.get_style_name()):
-                try:
-                    element.del_attribute('text:style-name')
-                    element.del_attribute('draw:style-name')
-                    element.del_attribute('draw:text-style-name')
-                except KeyError:
-                    continue
+            name = style.get_style_name()
+            if name is not None:
+                # Not a default style
+                for element in self.get_styled_elements(name):
+                    for attribute in ('text:style-name', 'draw:style-name',
+                            'draw:text-style-name', 'table:style-name'):
+                        try:
+                            element.del_attribute(attribute)
+                        except KeyError:
+                            continue
             style.get_parent().delete(style)
             i += 1
         return i
