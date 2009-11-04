@@ -127,7 +127,7 @@ class TestStyle(TestCase):
     def test_get_style_list(self):
         content = self.content
         styles = content.get_style_list()
-        self.assertEqual(len(styles), 3)
+        self.assertEqual(len(styles), 6)
 
 
     def test_get_style_list_family(self):

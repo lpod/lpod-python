@@ -296,6 +296,10 @@ class odf_list_style(odf_style):
                  '|text:list-level-style-image)')
 
 
+    def get_style_family(self):
+        return 'list'
+
+
     def get_level_style(self, level):
         return _get_element(self, self.any_style, level=level)
 
@@ -499,14 +503,39 @@ class odf_master_page(odf_style):
                                            style=u"Footer")
 
 
+# FIXME stub
+class odf_font_style(odf_style):
+
+    def get_style_family(self):
+        return 'font-face'
+
+
+
+# FIXME stub
+class odf_number_style(odf_style):
+
+    def get_style_family(self):
+        return 'number'
+
+
+
+# FIXME stub
+class odf_date_style(odf_style):
+
+    def get_style_family(self):
+        return 'date'
+
+
 
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
              'style:footer-style', 'text:list-level-style-number',
-             'text:list-level-style-bullet', 'text:list-level-style-image',
-             'style:font-face'):
+             'text:list-level-style-bullet', 'text:list-level-style-image'):
     register_element_class(name, odf_style)
 register_element_class('text:list-style', odf_list_style)
 register_element_class('text:outline-style', odf_outline_style)
 register_element_class('style:page-layout', odf_page_layout)
 register_element_class('style:master-page', odf_master_page)
+register_element_class('style:font-face', odf_font_style)
+register_element_class('number:number-style', odf_number_style)
+register_element_class('number:date-style', odf_date_style)

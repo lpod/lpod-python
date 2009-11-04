@@ -152,7 +152,10 @@ family_mapping = {'paragraph': ('style:style', 'paragraph'),
                   'list': ('text:list-style', None),
                   'outline': ('text:outline-style', None),
                   'page-layout': ('style:page-layout', None),
-                  'master-page': ('style:master-page', None)}
+                  'master-page': ('style:master-page', None),
+                  'font-face': ('style:font-face', None),
+                  'number': ('number:number-style', None),
+                  'date': ('number:date-style', None)}
 
 
 def _get_style_tagname(family):
