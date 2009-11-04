@@ -38,6 +38,20 @@ from lpod.smil import odf_create_anim_par, odf_create_anim_transitionFilter
 PPC = 72 * 2.54
 
 
+
+# Creation of a transition for all pages: "Fade Through black"
+def get_transition(page):
+    anim_page = odf_create_anim_par(presentation_node_type="timing-root")
+    anim_begin = odf_create_anim_par(smil_begin="%s.begin" % page)
+    transition = odf_create_anim_transitionFilter(smil_dur="2s",
+                                                  smil_type="fade",
+                                                  smil_subtype="fadeOverColor")
+    anim_page.append_element(anim_begin)
+    anim_begin.append_element(transition)
+    return anim_page
+
+
+
 # Creation of the document
 document = odf_new_document_from_type('presentation')
 body = document.get_body()
@@ -49,8 +63,8 @@ standard.set_style_properties({'draw:fill-color': '#ffffff'})
 #
 # Work on pages and add textframes
 #
-page = odf_create_draw_page('page1', name=u"Page 1")
-body.append_element(page)
+page1 = odf_create_draw_page('page1', name=u"Page 1")
+body.append_element(page1)
 
 #
 # Text Frame
@@ -73,17 +87,10 @@ document.insert_style(big, automatic=True)
 text_frame = odf_create_text_frame([u"lpOD", u"Presentation", u"Cookbook"],
         size=('7cm', '5cm'), position=('11cm', '8cm'), style=u"colored",
         text_style=u"big")
-page.append_element(text_frame)
+page1.append_element(text_frame)
 
-# Add a transition for this frame: "Fade Through black"
-anim_page1 = odf_create_anim_par(presentation_node_type="timing-root")
-anim_begin = odf_create_anim_par(smil_begin="page1.begin")
-transition = odf_create_anim_transitionFilter(smil_dur="2s", smil_type="fade",
-                                              smil_subtype="fadeOverColor")
-anim_page1.append_element(anim_begin)
-anim_begin.append_element(transition)
-page.append_element(anim_page1)
-
+# Add the transition for this frame
+page1.append_element(get_transition("page1"))
 
 #
 # Image Frame
@@ -107,6 +114,9 @@ text_frame = odf_create_text_frame(list, size=('7cm', '2.5cm'),
                                    position=('12.5cm', '7cm'),
                                    style=u"colored")
 page2.append_element(text_frame)
+
+# Add the transition for this frame
+page2.append_element(get_transition("page2"))
 
 #
 # Shapes
@@ -134,6 +144,9 @@ page3.append_element(line)
 # Connector
 connector = odf_create_connector(connected_shapes=(square, circle),
                                  glue_points=('1', '3'))
+
+# Add the transition for this frame
+page3.append_element(get_transition("page3"))
 
 # Save
 filename = 'presentation.odp'
