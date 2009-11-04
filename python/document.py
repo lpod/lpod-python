@@ -424,6 +424,8 @@ class odf_document(object):
                           'display_name': style.get_style_display_name()})
             if properties:
                 raise NotImplementedError
+        if not infos:
+            return u""
         # Sort by family and name
         infos.sort(key=itemgetter('family', 'name'))
         # Show common and used first
