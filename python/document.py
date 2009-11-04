@@ -28,6 +28,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from operator import itemgetter
 from uuid import uuid4
 
 # Import from lpod
@@ -40,7 +41,7 @@ from style import odf_list_style, odf_style
 from style import odf_master_page, odf_page_layout, odf_outline_style
 from styles import odf_styles
 from table import odf_table
-from utils import _get_style_family
+from utils import _get_style_family, _get_element_list
 from vfs import vfs
 from xmlpart import odf_xmlpart
 
@@ -326,7 +327,7 @@ class odf_document(object):
         # Common style
         elif type(style) in (odf_style, odf_page_layout, odf_outline_style,
                              odf_list_style):
-            # Named style
+            # Common style
             if name and automatic is False and default is False:
                 part = self.get_xmlpart('styles')
                 container = part.get_element("office:styles")
@@ -385,21 +386,45 @@ class odf_document(object):
         container.append_element(style)
 
 
-    def show_styles(self, family=None):
-        if family is None:
-            family = ['paragraph', 'text',  'graphic', 'table', 'list',
-                      'number', 'page-layout', 'master-page']
+    def show_styles(self, automatic=True, common=True, properties=False):
+        body = self.get_body()
+        infos = []
+        for style in self.get_style_list():
+            name = style.get_style_name()
+            is_auto = (style.get_parent().get_tagname()
+                    == 'office:automatic-styles')
+            if (is_auto and automatic is False
+                    or not is_auto and common is False):
+                continue
+            is_used = bool(_get_element_list(body, 'descendant::*',
+                    text_style=name)
+                + _get_element_list(body, 'descendant::*', draw_style=name)
+                + _get_element_list(body, 'descendant::*',
+                    draw_text_style=name))
+            infos.append({'type': u"auto  " if is_auto else u"common",
+                          'used': u"y" if is_used else u"n",
+                          'family': style.get_style_family(),
+                          'parent': style.get_parent_style_name() or u"",
+                          'name': name or u"",
+                          'display_name': style.get_style_display_name()})
+            if properties:
+                raise NotImplementedError
+        # Sort by family and name
+        infos.sort(key=itemgetter('family', 'name'))
+        # Show common and used first
+        infos.sort(key=itemgetter('type', 'used'), reverse=True)
+        max_family = unicode(max([len(x['family']) for x in infos]))
+        max_parent = unicode(max([len(x['parent']) for x in infos]))
+        format = (u"%(type)s used:%(used)s family:%(family)-0" + max_family
+                + u"s parent:%(parent)-0" + max_parent + u"s name:%(name)s")
         output = []
-        family.sort()
-        for family_type in family:
-            # Overline and underline the family
-            underline = '#' * len(family_type)
-            output.append(underline)
-            output.append(family_type)
-            output.append(underline + '\n')
-            for style in self.get_style_list(family=family_type):
-                output.append(_show_styles(style))
-        return u'\n'.join(output)
+        for info in infos:
+            line = format % info
+            if info['display_name']:
+                line += u' display_name: ' + info['display_name']
+            output.append(line)
+        output.append(u"")
+        return u"\n".join(output)
 
 
     def merge_styles_from(self, document):
