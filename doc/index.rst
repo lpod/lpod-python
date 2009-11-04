@@ -34,13 +34,14 @@ Welcome to LPOD's documentation!
    level0.rst
    level1.rst
 
-Slides Draft
-=============
+..
+    Slides Draft
+    =============
 
-.. toctree::
-   :maxdepth: 1
+    .. toctree::
+       :maxdepth: 1
 
-   slide_draft.rst
+       slide_draft.rst
 
 lpOD Cookbook
 =============
