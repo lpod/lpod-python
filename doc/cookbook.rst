@@ -268,36 +268,42 @@ Creation of the document::
 
    document = odf_new_document_from_type('text')
    body = document.get_body()
-   paragraph = odf_create_paragraph(text=u'lpOD generated Document '
-                                          'with styled pages')
 
-- Use **merge_styles_from** to copy default style from some document::
+Use **merge_styles_from** to copy default style from some document::
 
    doc_style = odf_get_document(u'my_ref_doc.odt')
    document.merge_styles_from(doc_style)
 
+Automatic style to set the master page::
 
-- Pages, header and footer::
+    style = odf_create_style('paragraph', master_page=u"First_20_Page")
+    document.insert_style(style, automatic=True)
 
-   # Apply a named style to a page e.g. here 'first page style'
-   paragraph.set_master_page_style(u'first page style')
+The first paragraph will set the page::
 
-   # to modify the footer and header we get the style
+    paragraph = odf_create_paragraph(text=u"lpOD generated Document "
+            u"with styled pages", style=style.get_style_name())
+    body.append_element(paragraph)
+
+To modify the footer and header we get the style::
+
    first_page_style = document.get_style(u'first page style')
 
-   # and we set the content to modify footer or header
-   # this orverwrite every footer elements by a paragraphe.
+Overwrite the footer::
+
    first_page_style.set_footer(u'lpOD project')
 
-   # instade of using set_header we can just modify a part of it
+Complement the header::
+
    header = first_page_style.get_header()
    par = header.get_paragraph_by_content(u'Draft')
    par.set_text(u'Final Version')
 
 Save::
 
-   body.append_element(paragraph)
-   document.save('styles_cookbook.odt', pretty=True)
+    filename = 'styles.odt'
+    document.save(filename, pretty=True)
+    print 'Document "%s" generated.' % filename
 
 Styles instropection
 ---------------------

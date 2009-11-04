@@ -31,6 +31,8 @@ from utils import _get_element
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
+                     # For paragraphs
+                     master_page=None,
                      # For master pages
                      layout=None, next=None,
                      area=None, **kw):
@@ -61,6 +63,10 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
         area -- str
 
+    Paragraphs Arguments:
+
+        master_page -- unicode
+
     Master Page Arguments:
 
         layout -- unicode
@@ -80,6 +86,10 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         element.set_attribute('style:display-name', display_name)
     if parent:
         element.set_attribute('style:parent-style-name', parent)
+    # Paragraph
+    if family == 'paragraph':
+        if master_page:
+            element.set_attribute('style:master-page-name', master_page)
     # Master Page
     if family == 'master-page':
         if layout:
@@ -364,9 +374,10 @@ class odf_list_style(odf_style):
 
 
 class odf_outline_style(odf_list_style):
-    # Seems like nothing to do
-    # Yet the document has different expectations for list and outline styles
-    pass
+
+    # FIXME stubs
+    def get_style_family(self):
+        return 'outline'
 
 
 

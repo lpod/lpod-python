@@ -498,15 +498,18 @@ class odf_document(object):
             else:
                 raise NotImplementedError, partname
             # Implemented containers
-            if container_name not in ("office:styles",
-                                      "office:automatic-styles",
-                                      "office:master-styles"):
+            if container_name not in ('office:styles',
+                                      'office:automatic-styles',
+                                      'office:master-styles',
+                                      'office:font-face-decls'):
                 raise NotImplementedError, container_name
             dest = part.get_element('//%s' % container_name)
             # Implemented style types
-            if tagname not in ("style:default-style", "style:style",
-                               "style:style", "style:page-layout",
-                               "style:master-page"):
+            if tagname not in ('style:default-style', 'style:style',
+                               'style:style', 'style:page-layout',
+                               'style:master-page', 'style:font-face',
+                               'text:list-style', 'number:number-style',
+                               'text:outline-style', 'number:date-style'):
                 raise NotImplementedError, tagname
             duplicate = part.get_style(family, stylename)
             if duplicate is not None:
