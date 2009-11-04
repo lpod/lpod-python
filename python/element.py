@@ -629,7 +629,8 @@ class odf_element(object):
                 + _get_element_list(self, 'descendant::*', draw_style=name)
                 + _get_element_list(self, 'descendant::*',
                     draw_text_style=name)
-                + _get_element_list(self, 'descendant::*', table_style=name))
+                + _get_element_list(self, 'descendant::*', table_style=name)
+                + _get_element_list(self, 'descendant::*', page_layout=name))
 
 
     #

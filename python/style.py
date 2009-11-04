@@ -136,6 +136,7 @@ class odf_style(odf_element):
         properties of the same family, e.g. a paragraph style and its
         paragraph properties. Specify the area to get the text properties of
         a paragraph style for example.
+
         Arguments:
 
             area -- str
@@ -143,7 +144,7 @@ class odf_style(odf_element):
         Return: dict
         """
         if area is None:
-            area = self.get_attribute('style:family')
+            area = self.get_style_family()
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             return None
@@ -154,7 +155,8 @@ class odf_style(odf_element):
         return properties
 
 
-    def set_style_properties(self, properties={}, style=None, area=None, **kw):
+    def set_style_properties(self, properties={}, style=None, area=None,
+            **kw):
         """Set the properties of the "area" type of this style. Properties
         are given either as a dict or as named arguments (or both). The area
         is identical to the style family by default. If the properties
@@ -172,7 +174,7 @@ class odf_style(odf_element):
             area -- 'paragraph', 'text'...
         """
         if area is None:
-            area = self.get_attribute('style:family')
+            area = self.get_style_family()
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             element = odf_create_element('<style:%s-properties/>' % area)
@@ -194,13 +196,15 @@ class odf_style(odf_element):
         """Delete the given properties, either by list argument or
         positional argument (or both). Remove only from the given area,
         identical to the style family by default.
+
         Arguments:
 
             properties -- list
+
             area -- str
         """
         if area is None:
-            area = self.get_attribute('style:family')
+            area = self.get_style_family()
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             raise ValueError, "properties element is inexistent"

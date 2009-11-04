@@ -453,7 +453,8 @@ class odf_document(object):
         # First remove references to styles
         for element in self.get_styled_elements():
             for attribute in ('text:style-name', 'draw:style-name',
-                    'draw:text-style-name', 'table:style-name'):
+                    'draw:text-style-name', 'table:style-name',
+                    'style:page-layout-name'):
                 try:
                     element.del_attribute(attribute)
                 except KeyError:
@@ -463,6 +464,9 @@ class odf_document(object):
         for style in self.get_style_list():
             if style.get_style_name() is None:
                 # Don't delete default styles
+                continue
+            elif type(style) is odf_master_page:
+                # Don't suppress header and footer, just styling was removed
                 continue
             style.get_parent().delete(style)
             i += 1

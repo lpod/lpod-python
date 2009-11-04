@@ -86,7 +86,7 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         table_name=None, table_style=None, style_name=None,
         display_name=None, note_class=None, text_id=None, text_name=None,
         office_name=None, office_title=None, outline_level=None, level=None,
-        position=None, **kw):
+        page_layout=None, position=None, **kw):
     query = [element_name]
     attributes = kw
     if text_style:
@@ -121,6 +121,8 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         attributes['text:outline-level'] = outline_level
     if level:
         attributes['text:level'] = level
+    if page_layout:
+        attributes['style:page-layout-name'] = page_layout
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]
@@ -230,7 +232,7 @@ def _get_element_list(context, element_name, family=None, text_style=None,
         table_name=None, table_style=None, note_class=None, style_name=None,
         text_id=None, text_name=None, office_name=None, office_title=None,
         outline_level=None, level=None, href=None, svg_title=None,
-        svg_desc=None, position=None, regex=None):
+        svg_desc=None, page_layout=None, position=None, regex=None):
     query = _make_xpath_query(element_name, family=family,
             text_style=text_style, draw_name=draw_name,
             draw_style=draw_style, draw_text_style=draw_text_style,
@@ -238,7 +240,7 @@ def _get_element_list(context, element_name, family=None, text_style=None,
             style_name=style_name, note_class=note_class, text_id=text_id,
             text_name=text_name, office_name=office_name,
             office_title=office_title, outline_level=outline_level,
-            level=level, position=position)
+            level=level, page_layout=page_layout, position=position)
     elements = context.get_element_list(query)
     # Filter the elements with the regex
     if regex is not None:
@@ -267,15 +269,15 @@ def _get_element(context, element_name, family=None, text_style=None,
         draw_name=None, table_name=None, table_style=None, style_name=None,
         text_id=None, text_name=None, office_name=None, office_title=None,
         outline_level=None, level=None, href=None, svg_title=None,
-        svg_desc=None, position=None, regex=None):
+        svg_desc=None, page_layout=None, position=None, regex=None):
     result = _get_element_list(context, element_name, family=family,
             text_style=text_style, draw_name=draw_name,
             table_name=table_name, table_style=table_style,
             style_name=style_name, text_id=text_id, text_name=text_name,
             office_name=office_name, office_title=office_title,
             outline_level=outline_level, level=level, href=href,
-            svg_title=svg_title, svg_desc=svg_desc, position=position,
-            regex=regex)
+            svg_title=svg_title, svg_desc=svg_desc, page_layout=page_layout,
+            position=position, regex=regex)
     if result:
         return result[0]
     return None
