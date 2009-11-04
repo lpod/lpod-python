@@ -11,10 +11,9 @@ from lpod import __version__
 from lpod.document import odf_get_document
 
 
-def show(odf_file_url, automatic=True, common=True, properties=False):
+def show_styles(document, automatic=True, common=True, properties=False):
     """Show the different styles of a document and their properties.
     """
-    document = odf_get_document(odf_file_url)
     output = document.show_styles(automatic=automatic, common=common,
             properties=properties)
     # Print the styles
@@ -23,17 +22,23 @@ def show(odf_file_url, automatic=True, common=True, properties=False):
 
 
 
-def merge(odf_file_url, from_file, pretty=True):
+def delete_styles(document, pretty=True):
+    n = document.delete_styles()
+    document.save(pretty=pretty)
+    print n, "styles removed (0 error, 0 warning)."
+
+
+
+def merge_styles(document, from_file, pretty=True):
     source = odf_get_document(from_file)
-    dest = odf_get_document(odf_file_url)
-    dest.merge_styles_from(source)
-    dest.save(pretty=pretty)
+    document.delete_styles()
+    document.merge_styles_from(source)
+    document.save(pretty=pretty)
     print "Done (0 error, 0 warning)."
 
 
 
 if  __name__ == '__main__':
-
     # Options initialisation
     usage = '%prog <file>'
     description = 'A command line interface to manipulate styles of ' \
@@ -63,15 +68,15 @@ if  __name__ == '__main__':
     if len(args) != 1:
         parser.print_help()
         exit(1)
-    odf_file_url = args[0]
+    document = odf_get_document(args[0])
     if options.delete:
-        raise NotImplementedError
+        delete_styles(document)
     elif options.merge:
-        merge(odf_file_url, options.merge)
+        merge_styles(document, options.merge)
     else:
         automatic = options.automatic
-        common =  options.common
+        common = options.common
         if not automatic ^ common:
             automatic, common = True, True
-        show(odf_file_url, automatic=automatic, common=common,
+        show_styles(document, automatic=automatic, common=common,
                 properties=options.properties)

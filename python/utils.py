@@ -121,15 +121,15 @@ def _make_xpath_query(element_name, family=None, text_style=None,
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]
-        if value is not None:
-            query.append(u'[@{qname}="{value}"]'.format(qname=qname,
-                                                        value=unicode(value)))
-        else:
+        if value is True:
             query.append(u'[@{qname}]'.format(qname=qname))
+        else:
+            query.append(u'[@{qname}="{value}"]'.format(qname=qname,
+                value=unicode(value)))
     query = ''.join(query)
     if position is not None:
         query = u'({query})[{position}]'.format(query=query,
-                                                position=str(position))
+                position=str(position))
     return query
 
 
@@ -226,12 +226,12 @@ def _get_element_list(context, element_name, family=None, text_style=None,
         outline_level=None, level=None, href=None, svg_title=None,
         svg_desc=None, position=None, regex=None):
     query = _make_xpath_query(element_name, family=family,
-            text_style=text_style, draw_name=draw_name, draw_style=draw_style,
-            draw_text_style=draw_text_style, table_name=table_name,
-            style_name=style_name, note_class=note_class, text_id=text_id,
-            text_name=text_name, office_name=office_name,
-            office_title=office_title, outline_level=outline_level,
-            level=level, position=position)
+            text_style=text_style, draw_name=draw_name,
+            draw_style=draw_style, draw_text_style=draw_text_style,
+            table_name=table_name, style_name=style_name,
+            note_class=note_class, text_id=text_id, text_name=text_name,
+            office_name=office_name, office_title=office_title,
+            outline_level=outline_level, level=level, position=position)
     elements = context.get_element_list(query)
     # Filter the elements with the regex
     if regex is not None:

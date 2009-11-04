@@ -614,6 +614,23 @@ class odf_element(object):
         return u''
 
 
+    def get_styled_elements(self, name):
+        """Brute-force to find paragraphs, tables, etc. using the given style
+        name (or all by default).
+
+        Arguments:
+
+            name -- unicode
+
+        Return: list
+        """
+        # FIXME incomplete (and possibly inaccurate)
+        return (_get_element_list(self, 'descendant::*', text_style=name)
+                + _get_element_list(self, 'descendant::*', draw_style=name)
+                + _get_element_list(self, 'descendant::*',
+                    draw_text_style=name))
+
+
     #
     # Dublin core
     #

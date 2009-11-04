@@ -41,7 +41,7 @@ from style import odf_list_style, odf_style
 from style import odf_master_page, odf_page_layout, odf_outline_style
 from styles import odf_styles
 from table import odf_table
-from utils import _get_style_family, _get_element_list
+from utils import _get_style_family
 from vfs import vfs
 from xmlpart import odf_xmlpart
 
@@ -202,6 +202,7 @@ class odf_document(object):
 
     def clone(self):
         """Return an exact copy of the document.
+
         Return: odf_document
         """
         clone = object.__new__(self.__class__)
@@ -224,10 +225,13 @@ class odf_document(object):
         """Save the document, at the same place it was opened or at the given
         URI. It can be saved as a Zip file or as a plain XML file. The XML
         can be pretty printed.
+
         Arguments:
 
             uri -- str
+
             packaging -- 'zip' or 'flat'
+
             pretty -- bool
         """
         # Synchronize data with container
@@ -386,8 +390,23 @@ class odf_document(object):
         container.append_element(style)
 
 
+    def get_styled_elements(self, name):
+        """Brute-force to find paragraphs, tables, etc. using the given style
+        name (or all by default).
+
+        Arguments:
+
+            name -- unicode
+
+        Return: list
+        """
+        content = self.get_xmlpart('content')
+        styles = self.get_xmlpart('styles')
+        return (content.get_root().get_styled_elements(name)
+                + styles.get_root().get_styled_elements(name))
+
+
     def show_styles(self, automatic=True, common=True, properties=False):
-        body = self.get_body()
         infos = []
         for style in self.get_style_list():
             name = style.get_style_name()
@@ -396,11 +415,7 @@ class odf_document(object):
             if (is_auto and automatic is False
                     or not is_auto and common is False):
                 continue
-            is_used = bool(_get_element_list(body, 'descendant::*',
-                    text_style=name)
-                + _get_element_list(body, 'descendant::*', draw_style=name)
-                + _get_element_list(body, 'descendant::*',
-                    draw_text_style=name))
+            is_used = bool(self.get_styled_elements(name))
             infos.append({'type': u"auto  " if is_auto else u"common",
                           'used': u"y" if is_used else u"n",
                           'family': style.get_style_family(),
@@ -425,6 +440,25 @@ class odf_document(object):
             output.append(line)
         output.append(u"")
         return u"\n".join(output)
+
+
+    def delete_styles(self):
+        """Remove all style information from content and all styles.
+
+        Return: number of deleted styles
+        """
+        i = 0
+        for style in self.get_style_list():
+            for element in self.get_styled_elements(style.get_style_name()):
+                try:
+                    element.del_attribute('text:style-name')
+                    element.del_attribute('draw:style-name')
+                    element.del_attribute('draw:text-style-name')
+                except KeyError:
+                    continue
+            style.get_parent().delete(style)
+            i += 1
+        return i
 
 
     def merge_styles_from(self, document):
