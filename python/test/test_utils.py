@@ -19,14 +19,15 @@ class GenerateXPathTestCase(TestCase):
 
 
     def test_attribute(self):
-        query = _make_xpath_query('descendant::text:p', style='Standard')
+        query = _make_xpath_query('descendant::text:p',
+                text_style=u"Standard")
         self.assertEqual(query,
                          'descendant::text:p[@text:style-name="Standard"]')
 
 
     def test_two_attributes(self):
-        query = _make_xpath_query('descendant::text:h', style='Standard',
-                                  outline_level=1)
+        query = _make_xpath_query('descendant::text:h',
+                text_style=u"Standard", outline_level=1)
         expected = ('descendant::text:h[@text:outline-level="1"]'
                     '[@text:style-name="Standard"]')
         self.assertEqual(query, expected)
@@ -38,15 +39,15 @@ class GenerateXPathTestCase(TestCase):
 
 
     def test_attribute_position(self):
-        query = _make_xpath_query('descendant::text:p', style='Standard',
-                                  position=2)
+        query = _make_xpath_query('descendant::text:p',
+                text_style=u"Standard", position=2)
         self.assertEqual(query,
                 '(descendant::text:p[@text:style-name="Standard"])[2]')
 
 
     def test_two_attributes_position(self):
-        query = _make_xpath_query('descendant::text:h', style='Standard',
-                                  outline_level=1, position=2)
+        query = _make_xpath_query('descendant::text:h',
+                text_style=u"Standard", outline_level=1, position=2)
         expected = ('(descendant::text:h[@text:outline-level="1"]'
                     '[@text:style-name="Standard"])[2]')
         self.assertEqual(query, expected)

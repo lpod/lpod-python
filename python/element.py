@@ -653,8 +653,8 @@ class odf_element(object):
     #
 
     def get_section_list(self, style=None, regex=None):
-        return _get_element_list(self, 'text:section', style=style,
-                                 regex=regex)
+        return _get_element_list(self, 'text:section', text_style=style,
+                regex=regex)
 
 
     def get_section_by_position(self, position):
@@ -671,8 +671,8 @@ class odf_element(object):
     #
 
     def get_paragraph_list(self, style=None, regex=None):
-        return _get_element_list(self, 'descendant::text:p', style=style,
-                                 regex=regex)
+        return _get_element_list(self, 'descendant::text:p', text_style=style,
+                regex=regex)
 
 
     def get_paragraph_by_position(self, position):
@@ -688,8 +688,8 @@ class odf_element(object):
     #
 
     def get_span_list(self, style=None, regex=None):
-        return _get_element_list(self, 'descendant::text:span', style=style,
-                                 regex=regex)
+        return _get_element_list(self, 'descendant::text:span',
+                text_style=style, regex=regex)
 
 
     def get_span_by_position(self, position):
@@ -705,8 +705,8 @@ class odf_element(object):
     #
 
     def get_heading_list(self, style=None, level=None, regex=None):
-        return _get_element_list(self, 'descendant::text:h', style=style,
-                                 outline_level=level, regex=regex)
+        return _get_element_list(self, 'descendant::text:h', text_style=style,
+                outline_level=level, regex=regex)
 
 
     def get_heading_by_position(self, position, level=None):
@@ -770,8 +770,8 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::draw:image', style=style,
-                                 href=href, regex=regex)
+        return _get_element_list(self, 'descendant::draw:image',
+                text_style=style, href=href, regex=regex)
 
 
     def get_image_by_name(self, name):
@@ -799,8 +799,8 @@ class odf_element(object):
     #
 
     def get_table_list(self, style=None, regex=None):
-        return _get_element_list(self, 'descendant::table:table', style=style,
-                                 regex=regex)
+        return _get_element_list(self, 'descendant::table:table',
+                text_style=style, regex=regex)
 
 
     def get_table_by_name(self, name):
@@ -859,8 +859,7 @@ class odf_element(object):
         """
         annotations = []
         for annotation in _get_element_list(self,
-                                            'descendant::office:annotation',
-                                            regex=regex):
+                'descendant::office:annotation', regex=regex):
             if (creator is not None
                     and creator != annotation.get_dc_creator()):
                 continue
