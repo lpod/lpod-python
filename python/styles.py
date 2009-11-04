@@ -128,18 +128,16 @@ class odf_styles(odf_xmlpart):
     def _get_style_tagname(self, family, name):
         if name is None:
             return ('style:default-style', family)
+        # Treat the case for get_style_list where the name is undefined
         elif name is False:
-            # Treat the case for get_style_list where the name is undefined
             if family is None:
-                all = ['style:default-style', 'style:style',
-                       'style:page-layout', 'style:master-page']
-                return ('(//%s)' % '|//'.join(all), None)
+                return ('(//style:default-style|//*[@style:name])', None)
             tagname, famattr = _get_style_tagname(family)
             tagname = '//' + tagname
             if famattr:
                 # Candidate for a default style
                 tagname = '(%s|//style:default-style)' % tagname
-            return tagname, famattr
+            return (tagname, famattr)
         return _get_style_tagname(family)
 
 

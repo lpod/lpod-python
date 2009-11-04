@@ -390,7 +390,7 @@ class odf_document(object):
         container.append_element(style)
 
 
-    def get_styled_elements(self, name):
+    def get_styled_elements(self, name=True):
         """Brute-force to find paragraphs, tables, etc. using the given style
         name (or all by default).
 
@@ -450,18 +450,20 @@ class odf_document(object):
 
         Return: number of deleted styles
         """
+        # First remove references to styles
+        for element in self.get_styled_elements():
+            for attribute in ('text:style-name', 'draw:style-name',
+                    'draw:text-style-name', 'table:style-name'):
+                try:
+                    element.del_attribute(attribute)
+                except KeyError:
+                    continue
+        # Then remove supposedly orphaned styles
         i = 0
         for style in self.get_style_list():
-            name = style.get_style_name()
-            if name is not None:
-                # Not a default style
-                for element in self.get_styled_elements(name):
-                    for attribute in ('text:style-name', 'draw:style-name',
-                            'draw:text-style-name', 'table:style-name'):
-                        try:
-                            element.del_attribute(attribute)
-                        except KeyError:
-                            continue
+            if style.get_style_name() is None:
+                # Don't delete default styles
+                continue
             style.get_parent().delete(style)
             i += 1
         return i

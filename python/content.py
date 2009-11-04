@@ -45,10 +45,13 @@ class odf_content(odf_xmlpart):
 
 
     def _get_style_tagname(self, family, name):
+        # Treat the case for get_style_list where the name is undefined
         if name is False:
-            # Treat the case for get_style_list where the name is undefined
-            all = ['style:style']
-            return ('(//%s)' % '|//'.join(all), family)
+            if family is None:
+                return ('(//*[@style:name])', None)
+            tagname, famattr = _get_style_tagname(family)
+            tagname = '//' + tagname
+            return (tagname, famattr)
         return _get_style_tagname(family)
 
 

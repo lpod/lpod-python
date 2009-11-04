@@ -614,7 +614,7 @@ class odf_element(object):
         return u''
 
 
-    def get_styled_elements(self, name):
+    def get_styled_elements(self, name=True):
         """Brute-force to find paragraphs, tables, etc. using the given style
         name (or all by default).
 

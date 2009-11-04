@@ -102,7 +102,7 @@ def _make_xpath_query(element_name, family=None, text_style=None,
     if table_name:
         attributes['table:name'] = table_name
     if table_style:
-        attributes['table:style-name'] = table_name
+        attributes['table:style-name'] = table_style
     if style_name:
         attributes['style:name'] = style_name
     if display_name:
@@ -266,12 +266,13 @@ def _get_element(context, element_name, family=None, text_style=None,
         outline_level=None, level=None, href=None, svg_title=None,
         svg_desc=None, position=None, regex=None):
     result = _get_element_list(context, element_name, family=family,
-            text_style=text_style, draw_name=draw_name, table_name=table_name,
-            table_style=table_style, style_name=style_name, text_id=text_id,
-            text_name=text_name, office_name=office_name,
-            office_title=office_title, outline_level=outline_level,
-            level=level, href=href, svg_title=svg_title, svg_desc=svg_desc,
-            position=position, regex=regex)
+            text_style=text_style, draw_name=draw_name,
+            table_name=table_name, table_style=table_style,
+            style_name=style_name, text_id=text_id, text_name=text_name,
+            office_name=office_name, office_title=office_title,
+            outline_level=outline_level, level=level, href=href,
+            svg_title=svg_title, svg_desc=svg_desc, position=position,
+            regex=regex)
     if result:
         return result[0]
     return None
