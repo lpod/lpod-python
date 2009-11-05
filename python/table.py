@@ -572,7 +572,7 @@ class odf_table(object):
         return len(self.__columns), len(self.__rows)
 
 
-    def get_name(self):
+    def get_tagname(self):
         return self.__table_attributes['table:name']
 
 
@@ -678,7 +678,6 @@ class odf_table(object):
         if type(target) is str:
             target = vfs.open(target, 'w')
             close_after = True
-
         for row in self.__rows:
             current_row = []
             for cell in row['cells']:
@@ -695,7 +694,6 @@ class odf_table(object):
                 # Append !
                 current_row.append(value)
             target.write(delimiter.join(current_row) + lineterminator)
-
         if close_after:
             target.close()
 

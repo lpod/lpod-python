@@ -152,7 +152,7 @@ class odf_document(object):
 
     def get_formated_text(self):
         # For the moment, only "type='text'"
-        if self.get_type() != 'text':
+        if self.get_type() not in ('text', 'text-template'):
             raise NotImplementedError, ('This functionality is only '
                                         'implemented for a "text" document')
         # Initialize an empty context

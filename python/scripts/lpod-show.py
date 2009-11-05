@@ -4,9 +4,7 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from os.path import basename
 from sys import exit, stdout, stdin
-from urlparse import urlparse
 
 # Import from lpod
 from lpod import __version__
@@ -17,27 +15,13 @@ from lpod.table import odf_table
 
 
 def get_target_directory(dirname, container_url):
-
-    # Compute a name if not given
-    if dirname is None:
-        # Find the filename
-        path = urlparse(container_url).path
-        dirname = basename(path)
-
-        # The last . => '_'
-        point = dirname.rfind('.')
-        if point != -1:
-            dirname = ''.join([dirname[:point], '_', dirname[point + 1:]])
-
     # Check the name and create the directory
     if vfs.exists(dirname):
         message = 'The directory "%s" exists, can i overwrite it? [y/N]'
         stdout.write(message % dirname)
         stdout.flush()
-
         line = stdin.readline()
         line = line.strip().lower()
-
         if line == 'y':
             vfs.remove(dirname)
         else:
@@ -49,7 +33,6 @@ def get_target_directory(dirname, container_url):
 
 def clean_filename(filename):
     filename = filename.encode('utf-8')
-
     allowed_characters = set([u'.', u'-', u'_', u'@'])
     result = []
     for c in filename:
@@ -60,73 +43,78 @@ def clean_filename(filename):
     return ''.join(result)
 
 
+def text_to_stdout(document):
+    text = document.get_formated_text()
+    stdout.write(text.encode('utf-8'))
+    stdout.flush()
 
-def sheet_to_csv(document, target):
-    content = document.get_xmlpart('content')
 
-    for table in content.get_table_list():
-        table = odf_table(odf_element=table)
 
+def text_to_text(document, target):
+    text_file = target.open('text.txt', 'w')
+    text = document.get_formated_text()
+    text_file.write(text.encode('utf-8'))
+    text_file.close()
+
+
+
+def spreadsheet_to_stdout(document):
+    body = document.get_body()
+    for table_element in body.get_table_list():
+        table = odf_table(odf_element=table_element)
+        table.export_to_csv(stdout)
+        stdout.write("\n")
+    stdout.flush()
+
+
+
+def spreadsheet_to_csv(document, target):
+    body = document.get_body()
+    for table_element in body.get_table_list():
+        table = odf_table(odf_element=table_element)
         name = table.get_tagname()
         filename = clean_filename(name) + '.csv'
-
         csv_file = target.open(filename, 'w')
         table.export_to_csv(csv_file)
+        csv_file.close()
 
 
 
 if  __name__ == '__main__':
-
     # Options initialisation
-    usage = '%prog <file>'
-    description = 'Extract informations from an OpenDocument file.'
-    parser = OptionParser(usage, version=__version__, description=description)
-
-    # "target"
+    usage = "%prog <file>"
+    description = ("Dump text from an OpenDocument file to the standard "
+                   "output")
+    parser = OptionParser(usage, version=__version__,
+            description=description)
+    # --dirname
     parser.add_option('-d', '--dirname', action='store', type='string',
-                      dest='dirname', metavar='<dirname>',
-                      help='lpod-show.py stores all its output files in a '
-                           'directory. With this option you can choice the '
-                           'name of this directory. By default a name is '
-                           'computed based on the input file name.')
-
-    # "sdtout"
-    parser.add_option('--stdout', dest='stdout', action='store_true',
-                      default=False,
-                  help='For an odt, dump "text.txt" in the standard output.')
-
+            dest='dirname', metavar='DIRNAME',
+            help="Dump output in files in the given directory.")
     # Parse !
     opts, args = parser.parse_args()
-
     # Container
     if len(args) != 1:
         parser.print_help()
         exit(1)
     container_url = args[0]
-
     # Open it!
     document = odf_get_document(container_url)
     doc_type = document.get_type()
-
-    # Arguments OK ?
-    if opts.stdout and doc_type != 'text':
-        parser.print_help()
-        exit(1)
-
-    # text
-    if doc_type == 'text':
-        text = document.get_formated_text()
-
-        if opts.stdout:
-            stdout.write(text.encode('utf-8'))
-        else:
-            target = get_target_directory(opts.dirname, container_url)
-            text_file = target.open('text.txt', 'w')
-            text_file.write(text.encode('utf-8'))
-    # spreadsheet
-    elif doc_type == 'spreadsheet':
+    if opts.dirname:
         target = get_target_directory(opts.dirname, container_url)
-        sheet_to_csv(document, target)
-
-
-
+    # text
+    if doc_type in ('text', 'text-template'):
+        if opts.dirname:
+            text_to_text(document, target)
+        else:
+            text_to_stdout(document)
+    # spreadsheet
+    elif doc_type in ('spreadsheet', 'spreadsheet-template'):
+        if opts.dirname:
+            spreadsheet_to_csv(document, target)
+        else:
+            spreadsheet_to_stdout(document)
+    else:
+        print "The OpenDocument format", doc_type, "is not supported yet."
+        exit(1)
