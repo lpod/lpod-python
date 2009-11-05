@@ -37,6 +37,7 @@ for filename in filenames:
     if type not in ('text', 'text-template'):
         print "Skip", filename, type, "not text"
         continue
+    # Copy content
     src_body = document.get_body()
     for element in src_body.get_children():
         tagname = element.get_tagname()
@@ -45,6 +46,14 @@ for filename in filenames:
             continue
         # Copy the rest recursively
         dest_body.append_element(element.clone())
+    # Copy extra parts (images...)
+    container = document.container
+    for partname in container._odf_container__get_contents():
+        if partname.startswith('Pictures/'):
+            data = container.get_part(partname)
+            # Suppose uniqueness
+            output_doc.container.set_part(partname, data)
+        # TODO embedded objects
     del document
     print "Added", filename, "document"
 
