@@ -129,9 +129,8 @@ class odf_document(object):
 
         Return: 'chart', 'database', 'formula', 'graphics',
             'graphics-template', 'image', 'presentation',
-            'presentation-templatemplate', 'spreadsheet',
-            'spreadsheet-template', 'text', 'text-master',
-            'text-template' or 'text-web'
+            'presentation-template', 'spreadsheet', 'spreadsheet-template',
+            'text', 'text-master', 'text-template' or 'text-web'
         """
 
         mimetype = self.container.get_part('mimetype').strip()
