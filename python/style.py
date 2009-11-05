@@ -31,9 +31,12 @@ from utils import _get_element
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
-                     # For paragraphs
+                     # For family 'text':
+                     color=None, background_color=None, italic=False,
+                     bold=False,
+                     # For family 'paragraph'
                      master_page=None,
-                     # For master pages
+                     # For family 'master-page
                      layout=None, next=None,
                      area=None, **kw):
     """Create a style of the given family. The name is not mandatory at this
@@ -63,7 +66,13 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
         area -- str
 
-    Paragraphs Arguments:
+    Text Arguments:
+
+        italic -- bool
+
+        bold -- bool
+
+    Paragraph Arguments:
 
         master_page -- unicode
 
@@ -97,6 +106,20 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         if next:
             element.set_attribute('style:next-style-name', next)
     # Properties
+    # Text
+    if family == 'text':
+        if color:
+            kw['fo:color'] = color
+        if background_color:
+            kw['fo:background-color'] = background_color
+        if italic:
+            kw['fo:font-style'] = 'italic'
+            kw['style:font-style-asian'] = 'italic'
+            kw['style:font-style-complex'] = 'italic'
+        if bold:
+            kw['fo:font-weight'] = 'bold'
+            kw['style:font-weight-asian'] = 'bold'
+            kw['style:font-weight-complex'] = 'bold'
     if kw:
         if area is None:
             area = family
