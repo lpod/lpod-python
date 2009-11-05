@@ -104,7 +104,8 @@ if  __name__ == '__main__':
     if opts.dirname:
         target = get_target_directory(opts.dirname, container_url)
     # text
-    if doc_type in ('text', 'text-template'):
+    if doc_type in ('text', 'text-template', 'presentation',
+            'presentation-template'):
         if opts.dirname:
             text_to_text(document, target)
         else:

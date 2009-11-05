@@ -102,5 +102,20 @@ class odf_draw_page(odf_element):
         self.append_element(anim_page)
 
 
+    def get_formated_text(self, context):
+        result = []
+        for element in self.get_children():
+            if element.get_tagname() == 'presentation:notes':
+                # No need for an advanced odf_notes.get_formated_text()
+                # because the text seems to be only contained in paragraphs
+                # and frames, that we already handle
+                for child in element.get_children():
+                    result.append(child.get_formated_text(context))
+                result.append(u"\n")
+            result.append(element.get_formated_text(context))
+        result.append(u"\n")
+        return u"".join(result)
+
+
 
 register_element_class('draw:page', odf_draw_page)

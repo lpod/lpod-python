@@ -26,7 +26,18 @@
 #
 
 # Import from lpod
-from element import odf_create_element
+from element import odf_element, odf_create_element, register_element_class
+
+
+class odf_shape(odf_element):
+
+    def get_formated_text(self, context):
+        result = []
+        for child in self.get_children():
+            result.append(child.get_formated_text(context))
+        result.append(u"\n")
+        return u"".join(result)
+
 
 
 def _odf_create_shape(type, style=None, text_style=None, shape_id=None,
@@ -201,3 +212,9 @@ def odf_create_connector(style=None, text_style=None, shape_id=None,
         element.set_attribute('svg:y2', p2[1])
     return element
 
+
+
+for name in ('draw:custom-shape', 'draw:line', 'draw:polyline',
+        'draw:polygon', 'draw:regular-polygon', 'draw:path', 'draw:rect',
+        'draw:ellipse', 'draw:circle', 'draw:connector'):
+    register_element_class(name, odf_shape)

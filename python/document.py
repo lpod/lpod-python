@@ -151,9 +151,11 @@ class odf_document(object):
 
     def get_formated_text(self):
         # For the moment, only "type='text'"
-        if self.get_type() not in ('text', 'text-template'):
-            raise NotImplementedError, ('This functionality is only '
-                                        'implemented for a "text" document')
+        type = self.get_type()
+        if type not in ('text', 'text-template', 'presentation',
+                'presentation-template'):
+            raise NotImplementedError, ('Type of document "%s" not '
+                                        'supported yet' % type)
         # Initialize an empty context
         context = {'notes_counter': 0,
                    'footnotes': [],
