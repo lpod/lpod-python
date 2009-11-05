@@ -106,8 +106,10 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         if next:
             element.set_attribute('style:next-style-name', next)
     # Properties
+    if area is None:
+        area = family
     # Text
-    if family == 'text':
+    if area == 'text':
         if color:
             kw['fo:color'] = color
         if background_color:
@@ -121,8 +123,6 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
             kw['style:font-weight-asian'] = 'bold'
             kw['style:font-weight-complex'] = 'bold'
     if kw:
-        if area is None:
-            area = family
         element.set_style_properties(kw, area=area)
     return element
 
