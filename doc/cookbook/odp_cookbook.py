@@ -76,7 +76,7 @@ text_frame = odf_create_text_frame([u"lpOD", u"Presentation", u"Cookbook"],
         text_style=u"big")
 page1.append_element(text_frame)
 
-# Add a transition for this frame
+# Add a transition for this page
 page1.set_transition("fade", "fadeOverColor")
 
 #
