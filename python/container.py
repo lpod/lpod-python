@@ -299,7 +299,11 @@ def odf_new_container_from_template(template_uri):
     """
     template_container = odf_get_container(template_uri)
     # Return a copy of the template container
-    return template_container.clone()
+    clone = template_container.clone()
+    # Change type from template to regular
+    mimetype = clone.get_part('mimetype')
+    clone.set_part('mimetype', mimetype.replace('-template', ''))
+    return clone
 
 
 
