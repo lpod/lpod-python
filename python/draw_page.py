@@ -26,16 +26,16 @@
 
 # Import from lpod
 from element import register_element_class, odf_element, odf_create_element
+from smil import odf_create_anim_par, odf_create_anim_transitionFilter
 
-
-def odf_create_draw_page(page_id, name=None, master_page=None,
+def odf_create_draw_page(draw_id, name=None, master_page=None,
                          page_layout=None, style=None):
     """This element is a container for content in a drawing or presentation
     document.
 
     Arguments:
 
-        page_id -- str
+        draw_id -- str
 
         name -- unicode
 
@@ -48,7 +48,7 @@ def odf_create_draw_page(page_id, name=None, master_page=None,
     Return: odf_element
     """
     element = odf_create_element('<draw:page/>')
-    element.set_attribute('draw:id', page_id)
+    element.set_attribute('draw:id', draw_id)
     if name:
         element.set_attribute(u'draw:name', name)
     if style:
@@ -71,6 +71,29 @@ class odf_draw_page(odf_element):
 
     def set_page_name(self, name):
         self.set_attribute('draw:name', name)
+
+
+    def get_draw_id(self):
+        return self.get_attribute('draw:id')
+
+
+    def set_draw_id(self, draw_id):
+        self.set_attribute('draw:id', draw_id)
+
+
+    def set_transition(self, type, subtype=None, dur='2s'):
+        # Create the new animation
+        anim_page = odf_create_anim_par(presentation_node_type="timing-root")
+        my_draw_id = self.get_draw_id()
+        anim_begin = odf_create_anim_par(smil_begin="%s.begin" % my_draw_id)
+        transition = odf_create_anim_transitionFilter(smil_dur=dur,
+                                                      smil_type=type,
+                                                      smil_subtype=subtype)
+        anim_page.append_element(anim_begin)
+        anim_begin.append_element(transition)
+
+        # XXX Replace when already a transition
+        self.append_element(anim_page)
 
 
 
