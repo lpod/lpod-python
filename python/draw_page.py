@@ -92,7 +92,13 @@ class odf_draw_page(odf_element):
         anim_page.append_element(anim_begin)
         anim_begin.append_element(transition)
 
-        # XXX Replace when already a transition
+        # Replace when already a transition:
+        #   anim:seq => After the frame's transition
+        #   cf page 349 of OpenDocument-v1.0-os.pdf
+        #   Conclusion: We must delete the first child 'anim:par'
+        existing = self.get_element('anim:par')
+        if existing:
+            self.delete(existing)
         self.append_element(anim_page)
 
 
