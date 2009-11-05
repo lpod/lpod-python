@@ -4,6 +4,7 @@
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
 #          Luis Belmar-Letelier <luis@itaapy.com>
+#          David Versmisse <david.versmisse@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.org).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -33,23 +34,9 @@ from lpod.list import odf_create_list
 from lpod.shapes import odf_create_line, odf_create_connector
 from lpod.shapes import odf_create_rectangle, odf_create_ellipse
 from lpod.style import odf_create_style
-from lpod.smil import odf_create_anim_par, odf_create_anim_transitionFilter
+
 
 PPC = 72 * 2.54
-
-
-
-# Creation of a transition for all pages: "Fade Through black"
-def get_transition(page):
-    anim_page = odf_create_anim_par(presentation_node_type="timing-root")
-    anim_begin = odf_create_anim_par(smil_begin="%s.begin" % page)
-    transition = odf_create_anim_transitionFilter(smil_dur="2s",
-                                                  smil_type="fade",
-                                                  smil_subtype="fadeOverColor")
-    anim_page.append_element(anim_begin)
-    anim_begin.append_element(transition)
-    return anim_page
-
 
 
 # Creation of the document
@@ -89,8 +76,8 @@ text_frame = odf_create_text_frame([u"lpOD", u"Presentation", u"Cookbook"],
         text_style=u"big")
 page1.append_element(text_frame)
 
-# Add the transition for this frame
-page1.append_element(get_transition("page1"))
+# Add a transition for this frame
+page1.set_transition("fade", "fadeOverColor")
 
 #
 # Image Frame
@@ -115,8 +102,8 @@ text_frame = odf_create_text_frame(list, size=('7cm', '2.5cm'),
                                    style=u"colored")
 page2.append_element(text_frame)
 
-# Add the transition for this frame
-page2.append_element(get_transition("page2"))
+# Add a transition for this frame
+page2.set_transition("fade", "fadeOverColor")
 
 #
 # Shapes
@@ -145,8 +132,8 @@ page3.append_element(line)
 connector = odf_create_connector(connected_shapes=(square, circle),
                                  glue_points=('1', '3'))
 
-# Add the transition for this frame
-page3.append_element(get_transition("page3"))
+# Add a transition for this frame
+page3.set_transition("fade", "fadeOverColor")
 
 # Save
 filename = 'presentation.odp'
