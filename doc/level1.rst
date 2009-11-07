@@ -917,7 +917,7 @@ paragraphs, headings, or lists. Its properties are ``style``, that is an
 appropriate list style, and ``continue numbering``, a boolean value that, if
 true, means that *if the numbering style of the preceding list is the same as the current list, the number of the first list item in the current list is the number of the last item in the preceding list incremented by one* (default=false).
 
-  .. figure:: figures/lpod_list.png
+  .. figure:: figures/lpod_list.*
      :align: center
 
 A list is created using ``odf_create_list()``, then inserted using
@@ -981,7 +981,7 @@ documents. They shouldn't appear in text or spreadsheet documents.
 A draw page can contain forms, drawings, frames, presentation animations, and/or
 presentation notes (§9.1.4 in the ODF specification).
 
-  .. figure:: figures/lpod_drawpage.png
+  .. figure:: figures/lpod_drawpage.*
      :align: center
 
 *[Unfinished diagram]*
@@ -1725,7 +1725,7 @@ addition, any *master page* may own a property that tells what should be the
 may de defined in order to ensure that any page using it will be followed by
 a page that will use a "Left page" style and vice-versa).
 
-   .. figure:: figures/lpod_page_style.png
+   .. figure:: figures/lpod_page_style.*
       :align: center
 
 *Master page* objects (and the corresponding *page layouts*) apply to
