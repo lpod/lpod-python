@@ -53,7 +53,7 @@ def dump_meta(doc):
     print_info("Editing cycles", meta.get_editing_cycles())
     print_info("Generator", meta.get_generator())
 
-    # Complex values
+    # Statistic
     print "Statistic:"
     statistic =  meta.get_statistic()
     for name, value in statistic.iteritems():
@@ -70,11 +70,51 @@ def dump_meta(doc):
 
 
 
+def set_metadata(doc, set_list):
+    meta = doc.get_xmlpart("meta")
+    for set_info in set_list:
+        if '=' not in set_info:
+            print ('Error: Bad argument -s "%s" (must be "name=value")' %
+                   set_info)
+            exit(1)
+        name, value = set_info.split('=', 1)
+        name = name.lower().strip()
+        value = value.strip()
+
+        if name in ("title", "subject", "initial_creator",
+                    "keyword", "generator", "description"):
+            # XXX We must use the terminal encoding, not utf-8 !!
+            value = value.decode('utf-8')
+            func = meta.__getattribute__('set_' + name)
+            func(value)
+        elif name == "language":
+            meta.set_language(value)
+        else:
+            print 'Error: Unknown metadata name "%s", please choose: ' % name
+            print ("       title, subject, initial_creator, keyword, "
+                   "generator or description")
+            exit(1)
+
+        # XXX TODO
+        #"Modification date", meta.get_modification_date())
+        #"Creation date", meta.get_creation_date())
+        # XXX User defined metadata
+
+    doc.save()
+
+
+
 if  __name__ == '__main__':
     # Options initialisation
-    usage = "%prog <file>"
+    usage = "%prog [options] <file>"
     description = "Dump metadata informations on the standard output"
     parser = OptionParser(usage, version=__version__, description=description)
+
+    # Set
+    parser.add_option('-s', '--set', action='append', dest='set_list',
+                      metavar='NAME=VALUE',
+                      help='Replace and/or set the metadata NAME with the '
+                           'value VALUE')
 
     # Parse !
     opts, args = parser.parse_args()
@@ -85,6 +125,10 @@ if  __name__ == '__main__':
         exit(1)
     doc = odf_get_document(args[0])
 
-    # Dump
-    dump_meta(doc)
+    if opts.set_list:
+        # Set metadata, ...
+        set_metadata(doc, opts.set_list)
+    else:
+        # Dump
+        dump_meta(doc)
 
