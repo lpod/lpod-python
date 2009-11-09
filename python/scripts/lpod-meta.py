@@ -31,6 +31,7 @@ from sys import exit
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
+from lpod.datatype import Date, DateTime
 
 
 
@@ -89,15 +90,25 @@ def set_metadata(doc, set_list):
             func(value)
         elif name == "language":
             meta.set_language(value)
+        elif name in ("modification_date", "creation_date"):
+            try:
+                if 'T' in value:
+                    date = DateTime.decode(value)
+                else:
+                    date = Date.decode(value)
+            except ValueError, error:
+                print 'Error: Bad argument -s "%s": %s' % (set_info,
+                                                           str(error))
+                exit(1)
+            func = meta.__getattribute__('set_' + name)
+            func(date)
         else:
             print 'Error: Unknown metadata name "%s", please choose: ' % name
             print ("       title, subject, initial_creator, keyword, "
-                   "generator or description")
+                   "generator, description, modification_date or "
+                   "creation_date")
             exit(1)
 
-        # XXX TODO
-        #"Modification date", meta.get_modification_date())
-        #"Creation date", meta.get_creation_date())
         # XXX User defined metadata
 
     doc.save()
