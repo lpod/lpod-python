@@ -423,9 +423,9 @@ class odf_document(object):
                           'family': style.get_style_family(),
                           'parent': style.get_parent_style_name() or u"",
                           'name': name or u"",
-                          'display_name': style.get_style_display_name()})
-            if properties:
-                raise NotImplementedError
+                          'display_name': style.get_style_display_name(),
+                          'properties': style.get_style_properties() if
+                                        properties else None})
         if not infos:
             return u""
         # Sort by family and name
@@ -440,8 +440,11 @@ class odf_document(object):
         for info in infos:
             line = format % info
             if info['display_name']:
-                line += u' display_name: ' + info['display_name']
+                line += u' display_name:' + info['display_name']
             output.append(line)
+            if info['properties']:
+                for name, value in info['properties'].iteritems():
+                    output.append("   - %s: %s" % (name, value))
         output.append(u"")
         return u"\n".join(output)
 
