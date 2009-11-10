@@ -467,7 +467,7 @@ class odf_element(object):
             pattern = unicode(pattern)
         pattern = compile(pattern)
         count = 0
-        for text in element.xpath('descendant-or-self::text()'):
+        for text in element.xpath('descendant::text()'):
             if new is None:
                 count += len(pattern.findall(text))
             else:
