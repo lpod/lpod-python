@@ -26,7 +26,7 @@
 #
 # Import from the standard library
 from optparse import OptionParser
-from sys import exit
+from sys import exit, stdin
 
 # Import from lpod
 from lpod import __version__
@@ -84,8 +84,7 @@ def set_metadata(doc, set_list):
 
         if name in ("title", "subject", "initial_creator",
                     "keyword", "generator", "description"):
-            # XXX We must use the terminal encoding, not utf-8 !!
-            value = value.decode('utf-8')
+            value = value.decode(stdin.encoding)
             func = meta.__getattribute__('set_' + name)
             func(value)
         elif name == "language":
@@ -109,7 +108,7 @@ def set_metadata(doc, set_list):
                    "creation_date")
             exit(1)
 
-        # XXX User defined metadata
+        # XXX User defined metadata?
 
     doc.save()
 
