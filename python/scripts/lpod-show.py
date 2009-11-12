@@ -76,7 +76,7 @@ def text_to_stdout(document):
 
 
 def text_to_text(document, target):
-    text_file = target.open('text.txt', 'w')
+    text_file = target.open('content.txt', 'w')
     text = document.get_formated_text()
     text_file.write(text.encode('utf-8'))
     text_file.close()
