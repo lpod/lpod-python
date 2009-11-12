@@ -397,39 +397,31 @@ def get_value(element, value_type=None, try_get_text=True):
 def set_value(element, value):
     """Only for "with office:value-type" elements
     """
-
     tag = element.get_tagname()
-
     # A table:cell ?
     if tag == 'table:table-cell':
         element.clear()
         representation = _set_value_and_type(element, value=value)
         element.set_text_content(representation)
         return
-
     # A text:variable-set ?
     if tag == 'text:variable-set':
         name = element.get_attribute('text:name')
         display = element.get_attribute('text:display')
         element.clear()
-
         representation = _set_value_and_type(element, value=value)
-
         element.set_attribute('text:name', name)
         if display is not None:
             element.set_attribute('text:display', display)
         element.set_text(representation)
         return
-
     # A text:user-field-decl ?
     if tag == 'text:user-field-decl':
         name = element.get_attribute('text:name')
         element.clear()
         _set_value_and_type(element, value=value)
-
         element.set_attribute('text:name', name)
         return
-
     # Else => error
     raise ValueError, 'set_value: unexpected element "%s"' % tag
 

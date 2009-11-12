@@ -77,9 +77,7 @@ class Get_ValueTestCase(TestCase):
 class Set_Get_ValueTestCase(TestCase):
 
     def test_with_cell(self):
-
         cell = odf_create_cell(42)
-
         set_value(cell, u'你好 Zoé')
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="%s">'
@@ -92,9 +90,7 @@ class Set_Get_ValueTestCase(TestCase):
 
 
     def test_with_variable(self):
-
         variable_set = odf_create_variable_set(u'你好 Zoé', 42)
-
         set_value(variable_set, u'你好 Zoé')
         expected = ('<text:variable-set office:value-type="string" '
                       'office:string-value="%s" text:name="%s" '
@@ -107,7 +103,6 @@ class Set_Get_ValueTestCase(TestCase):
 
     def test_with_user_field(self):
         user_field_decl = odf_create_user_field_decl(u'你好 Zoé', 42)
-
         set_value(user_field_decl, u'你好 Zoé')
         expected = (('<text:user-field-decl office:value-type="string" '
                        'office:string-value="%s" text:name="%s"/>') %
