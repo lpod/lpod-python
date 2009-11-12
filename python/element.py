@@ -165,9 +165,33 @@ def _debug_element(native_element):
 
 
 
+class odf_text(unicode):
+    """Representation of an XML text node. Created to hide the specifics of
+    lxml in searching text nodes using XPath.
+
+    Constructed like any unicode object but only accepts lxml text objects.
+    """
+    def __init__(self, text_result):
+        unicode.__init__(self, text_result)
+        self.__text_result = text_result
+
+
+    def get_parent(self):
+        return _make_odf_element(self.__text_result.getparent())
+
+
+    def is_text(self):
+        return self.__text_result.is_text
+
+
+    def is_tail(self):
+        return self.__text_result.is_tail
+
+
+
 class odf_element(object):
-    """Representation of an XML element.
-    Abstraction of the XML library behind.
+    """Representation of an XML element.  Abstraction of the XML library
+    behind.
     """
 
     def __init__(self, native_element):
@@ -386,24 +410,36 @@ class odf_element(object):
             del element.attrib['{%s}%s' % (uri, name)]
 
 
-    def get_text(self):
-        """Concatenated string of element and subelements text contents.
+    def get_text(self, recursive=False):
+        """Return the text content of the element.
+
+        If recursive is True, all text contents of the subtree.
         """
-        return u''.join(self.__element.itertext())
+        if recursive:
+            return u''.join(self.__element.itertext())
+        return unicode(self.__element.text)
 
 
-    def set_text(self, text, after=False):
+    def set_text(self, text):
         """Set the text content of the element.
-
-        If "after" is true, sets the text at the end of the element, not
-        inside.
         """
-        # FIXME "after" too specific to lxml, see at the end if disposable
-        element = self.__element
-        if after:
-            element.tail = text
-        else:
-            element.text = text
+        self.__element.text = text
+
+
+    def get_tail(self):
+        """Return the text immediately following the element.
+
+        Inspired by lxml.
+        """
+        return unicode(self.__element.tail)
+
+
+    def set_tail(self, text):
+        """Set the text immediately following the element.
+
+        Inspired by lxml.
+        """
+        self.__element.tail = text
 
 
     def search(self, pattern):
@@ -421,7 +457,7 @@ class odf_element(object):
         if isinstance(pattern, str):
             # Fail properly if the pattern is an non-ascii bytestring
             pattern = unicode(pattern)
-        text = self.get_text()
+        text = self.get_text(recursive=True)
         match = search(pattern, text)
         if match is None:
             return None
@@ -444,9 +480,9 @@ class odf_element(object):
 
 
     def replace(self, pattern, new=None):
-        """Replace the pattern with the given text, or delete if the text is
-        an empty string, and return the number of replacements. By default,
-        only return the number of occurences of the pattern.
+        """Replace the pattern with the given text, or delete if text is an
+        empty string, and return the number of replacements. By default, only
+        return the number of occurences that would be replaced.
 
         It cannot replace patterns found across several element, like a word
         split into two consecutive spans.
@@ -461,22 +497,21 @@ class odf_element(object):
 
         Returns: int
         """
-        element = self.__element
         if isinstance(pattern, str):
             # Fail properly if the pattern is an non-ascii bytestring
             pattern = unicode(pattern)
         pattern = compile(pattern)
         count = 0
-        for text in element.xpath('descendant::text()'):
+        for text in self.xpath('descendant-or-self::text()'):
             if new is None:
                 count += len(pattern.findall(text))
             else:
                 new_text, number = pattern.subn(new, text)
-                container = text.getparent()
-                if text.is_text:
-                    container.text = new_text
+                container = text.get_parent()
+                if text.is_text():
+                    container.set_text(new_text)
                 else:
-                    container.tail = new_text
+                    container.set_tail(new_text)
                 count += number
         return count
 
@@ -511,13 +546,20 @@ class odf_element(object):
         return [_make_odf_element(e) for e in element]
 
 
+    def index(self, child):
+        """Return the position of the child in this element.
+
+        Inspired by lxml
+        """
+        return self.__element.index(child.__element)
+
+
     def get_text_content(self):
         """Like "get_text" but return the text of the embedded paragraph:
         annotations, cells...
         """
         element = self.__element
-        text = element.xpath('string(text:p)', namespaces=ODF_NAMESPACES)
-        return unicode(text)
+        return element.xpath('string(text:p)', namespaces=ODF_NAMESPACES)
 
 
     def set_text_content(self, text):
@@ -526,13 +568,22 @@ class odf_element(object):
 
         Create the paragraph if missing.
         """
-        # Was made descendant for text:p in draw:text-box in draw:frame
-        paragraph = self.get_element('descendant::text:p')
-        if paragraph is None:
+        paragraphs = self.get_element_list('text:p')
+        if not paragraphs:
+            # E.g., text:p in draw:text-box in draw:frame
+            paragraphs = self.get_element_list('*/text:p')
+        if paragraphs:
+            paragraph = paragraphs.pop(0)
+            for obsolete in paragraphs:
+                obsolete.get_parent().delete(obsolete)
+        else:
             paragraph = odf_create_element('<text:p/>')
             self.insert_element(paragraph, FIRST_CHILD)
+        # As "get_text_content" returned all text nodes, "set_text_content"
+        # will overwrite all text nodes and children that may contain them
         element = paragraph.__element
-        element.clear()
+        # Clear but the attributes
+        del element[:]
         element.text = text
 
 
@@ -564,22 +615,25 @@ class odf_element(object):
 
 
     def xpath(self, xpath_query):
+        """Apply XPath query to the element and its subtree. Return list of
+        odf_element or odf_text instances translated from the nodes found.
+        """
         element = self.__element
         elements = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
         result = []
         for obj in elements:
-            # The results of a xpath query can be a str
-            if type(obj) in (_ElementStringResult, _ElementUnicodeResult):
-                result.append(unicode(obj))
+            if (type(obj) is _ElementStringResult or
+                    type(obj) is _ElementUnicodeResult):
+                result.append(odf_text(obj))
             else:
                 result.append(_make_odf_element(obj))
         return result
 
 
     def clear(self):
-        element = self.__element
-        element.clear()
-        element.text = None
+        """Remove text, children and attributes from the element.
+        """
+        self.__element.clear()
 
 
     def clone(self):

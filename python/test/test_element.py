@@ -201,7 +201,8 @@ class ElementTextTestCase(TestCase):
         text = u"Have a break"
         element.set_text_content(text)
         self.assertEqual(element.get_text_content(), text)
-        element.set_text_content
+        element.set_text_content(old_text)
+        self.assertEqual(element.get_text_content(), old_text)
 
 
 
@@ -444,7 +445,7 @@ class ReplaceTestCase(TestCase):
         count =  clone.replace(u"moustache", u"barbe")
         self.assertEqual(count, 1)
         expected = u"Le Père Noël a une barbe rouge."
-        self.assertEqual(clone.get_text(), expected)
+        self.assertEqual(clone.get_text(recursive=True), expected)
         # Ensure the orignal was not altered
         self.assertNotEqual(clone.serialize(), paragraph.serialize())
 
