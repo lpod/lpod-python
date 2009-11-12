@@ -67,9 +67,10 @@ def clean_filename(filename):
     return ''.join(result)
 
 
+
 def text_to_stdout(document):
     text = document.get_formated_text()
-    stdout.write(text.encode('utf-8'))
+    stdout.write(text.encode(stdout.encoding))
     stdout.flush()
 
 
