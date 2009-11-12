@@ -29,13 +29,11 @@
 # Import from the Standard Library
 from re import compile, escape
 
-# XXX Import from lxml
-from lxml.etree import Element
-
 # Import from lpod
 from element import register_element_class, odf_element, odf_create_element
-from element import FIRST_CHILD, ODF_NAMESPACES
+from element import FIRST_CHILD, odf_text
 from note import odf_create_note, odf_create_annotation
+from span import odf_create_span
 from style import odf_style
 
 
@@ -46,7 +44,7 @@ def _get_formated_text(element, context, with_text=True):
     else:
         objects = element.get_children()
     for obj in objects:
-        if type(obj) is unicode:
+        if type(obj) is odf_text:
             result.append(obj)
         else:
             tag = obj.get_tagname()
@@ -56,21 +54,21 @@ def _get_formated_text(element, context, with_text=True):
                                                  with_text=True))
             # Footnote or endnote
             elif tag == 'text:note':
-                note_class = obj.get_attribute('text:note-class')
-                citation = obj.get_element('text:note-citation').get_text()
-                body = obj.get_element('text:note-body').get_text().strip()
-                for expected, container, marker in [
-                    ('footnote', context['footnotes'], u"[%s]"),
-                    ('endnote', context['endnotes'], u"(%s)")]:
-                    if note_class == expected:
-                        if not citation:
-                            # Would only happen with hand-made documents
-                            citation = len(container)
-                        container.append((citation, body))
-                        result.append(marker % citation)
+                note_class = obj.get_note_class()
+                container = {'footnote': context['footnotes'],
+                             'endnote': context['endnotes']}[note_class]
+                citation = obj.get_note_citation()
+                if not citation:
+                    # Would only happen with hand-made documents
+                    citation = len(container)
+                body = obj.get_note_body()
+                container.append((citation, body))
+                marker = {'footnote': u"[%s]",
+                          'endnote': u"(%s)"}[note_class]
+                result.append(marker % citation)
             # Annotations
             elif tag == 'office:annotation':
-                context['annotations'].append(obj.get_text())
+                context['annotations'].append(obj.get_annotation_body())
                 result.append('[*]')
             # Tabulation
             elif tag == 'text:tab':
@@ -179,9 +177,6 @@ class odf_paragraph(odf_element):
         """
         if isinstance(style, odf_style):
             style = style.get_style_name()
-        # XXX bad: we expose lxml
-        span_name = '{%s}span' % ODF_NAMESPACES['text']
-        span_attrib = {'{%s}style-name' % ODF_NAMESPACES['text']: style}
         if offset:
             # XXX quickly hacking the offset
             text = self.get_text()
@@ -192,39 +187,35 @@ class odf_paragraph(odf_element):
             regex = escape(regex)
         if regex:
             pattern = compile(unicode(regex))
-            element = self._odf_element__element
-            for text in element.xpath('descendant-or-self::text()'):
+            for text in self.xpath('descendant::text()'):
                 # Static information about the text node
-                container = text.getparent()
-                wrapper = container.getparent()
-                is_text = text.is_text
-                is_tail = text.is_tail
+                container = text.get_parent()
+                wrapper = container.get_parent()
+                is_text = text.is_text()
+                is_tail = text.is_tail()
                 # Group positions are calculated and static, so apply in
                 # reverse order to preserve positions
                 for group in reversed(list(pattern.finditer(text))):
                     start, end = group.span()
                     # Do not use the text node as it changes at each loop
                     if is_text:
-                        text = container.text
+                        text = container.get_text()
                     else:
-                        text = container.tail
+                        text = container.get_tail()
                     before = text[:start]
                     match = text[start:end]
                     after = text[end:]
-                    span = Element(span_name, attrib=span_attrib,
-                                   nsmap=ODF_NAMESPACES)
-                    span.text = match
-                    span.tail = after
+                    span = odf_create_span(match, style=style)
+                    span.set_tail(after)
                     if is_text:
-                        container.text = before
+                        container.set_text(before)
                         # Insert as first child
-                        span.tail = after
-                        container.insert(0, span)
+                        container.insert_element(span, position=0)
                     else:
-                        container.tail = before
+                        container.set_tail(before)
                         # Insert as next sibling
                         index = wrapper.index(container)
-                        wrapper.insert(index + 1, span)
+                        wrapper.insert_element(span, position=index + 1)
 
 
     def set_link(self, url, regex=None, offset=None, length=0):
