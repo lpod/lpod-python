@@ -169,13 +169,15 @@ class TestNote(TestCase):
         document = self.document
         body = self.body
         paragraph = body.get_element('//text:p')
-        list_whith_note = odf_create_list()
-        list_whith_note.append_item(paragraph)
-        body.append_element(list_whith_note)
-        expected = (u"- Un paragraphe[1] d'apparence(i) banale.\n"
+        list_with_note = odf_create_list()
+        list_with_note.append_item(paragraph)
+        body.append_element(list_with_note)
+        expected = (u"- Un paragraphe[1] d'apparence(i) banale[*].\n"
                     u"---\n"
                     u"[1] C'est-à-dire l'élément « text:p ».\n\n"
-                    u"\n------\n"
+                    u"---\n"
+                    u"[*] Sauf qu'il est commenté !\n\n"
+                    u"------\n"
                     u"(i) Les apparences sont trompeuses !\n")
         self.assertEqual(document.get_formated_text(), expected)
 

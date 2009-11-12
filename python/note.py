@@ -126,10 +126,7 @@ class odf_note(odf_element):
 
     def get_note_body(self):
         note_body = self.get_element('text:note-body')
-        children = note_body.get_children()
-        if children:
-            return children[0]
-        return None
+        return note_body.get_text_content()
 
 
     def set_note_body(self, text_or_element):
@@ -137,6 +134,7 @@ class odf_note(odf_element):
         if type(text_or_element) is unicode:
             note_body.set_text_content(text_or_element)
         elif isinstance(text_or_element, odf_element):
+            note_body.clear()
             note_body.append_element(text_or_element)
         else:
             raise ValueError, 'unexpected type for body: "%s"' % type(
@@ -159,15 +157,15 @@ class odf_note(odf_element):
 class odf_annotation(odf_element):
 
     def get_annotation_body(self):
-        # FIXME improvizing here
-        return self.get_element('text:p')
+        return self.get_text_content()
 
 
     def set_annotation_body(self, text_or_element):
         if type(text_or_element) is unicode:
             self.set_text_content(text_or_element)
         elif isinstance(text_or_element, odf_element):
-            self.append(text_or_element)
+            self.clear()
+            self.append_element(text_or_element)
         else:
             raise TypeError, 'expected unicode or odf_element'
 
