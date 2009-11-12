@@ -87,7 +87,7 @@ def spreadsheet_to_stdout(document):
     body = document.get_body()
     for table_element in body.get_table_list():
         table = odf_table(odf_element=table_element)
-        table.export_to_csv(stdout)
+        table.export_to_csv(stdout, encoding=stdout.encoding)
         stdout.write("\n")
     stdout.flush()
 
