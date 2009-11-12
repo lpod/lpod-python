@@ -109,13 +109,21 @@ if  __name__ == '__main__':
     # Options initialisation
     usage = "%prog <file>"
     description = ("Dump text from an OpenDocument file to the standard "
-                   "output")
+                   "output, optionally styles and meta.")
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --dirname
     parser.add_option('-d', '--dirname', action='store', type='string',
             dest='dirname', metavar='DIRNAME',
-            help="Dump output in files in the given directory.")
+            help="dump output in files in the given directory.")
+    # --meta
+    parser.add_option('-m', '--meta', dest='meta', action='store_true',
+                      default=False,
+                      help='dump metadata (if -d DIR add DIR/meta.txt)')
+    # --styles
+    parser.add_option('-s', '--styles', dest='styles', action='store_true',
+                      default=False,
+                      help='dump styles (if -d DIR add DIR/styles.txt)')
     # Parse !
     opts, args = parser.parse_args()
     # Container
