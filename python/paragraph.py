@@ -68,6 +68,10 @@ def _get_formated_text(element, context, with_text=True):
                             citation = len(container)
                         container.append((citation, body))
                         result.append(marker % citation)
+            # Annotations
+            elif tag == 'office:annotation':
+                context['annotations'].append(obj.get_text())
+                result.append('[*]')
             # Tabulation
             elif tag == 'text:tab':
                 result.append(u'\t')

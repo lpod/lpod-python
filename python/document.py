@@ -157,9 +157,9 @@ class odf_document(object):
             raise NotImplementedError, ('Type of document "%s" not '
                                         'supported yet' % type)
         # Initialize an empty context
-        context = {'notes_counter': 0,
-                   'footnotes': [],
-                   'endnotes': []}
+        context = {'footnotes': [],
+                   'endnotes': [],
+                   'annotations': []}
         body = self.get_body()
         # Get the text
         result = []
@@ -180,6 +180,14 @@ class odf_document(object):
                     result.append(u'\n')
                     # Reset for the next paragraph
                     context['footnotes'] = []
+                # Insert the annotations
+                annotations = context['annotations']
+                # With a separation
+                if annotations:
+                    result.append(u'---\n')
+                    for annotation in annotations:
+                        result.append('[*] %s\n' % annotation)
+                    context['annotations'] = []
         # Append the end notes
         endnotes = context['endnotes']
         if endnotes:
