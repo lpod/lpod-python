@@ -35,42 +35,6 @@ from lpod.datatype import Date, DateTime
 
 
 
-def dump_meta(doc):
-    meta = doc.get_xmlpart("meta")
-
-    # Simple values
-    def print_info(name, value):
-        if value:
-            print "%s: %s" % (name, value)
-
-    print_info("Title", meta.get_title())
-    print_info("Subject", meta.get_subject())
-    print_info("Language", meta.get_language())
-    print_info("Modification date", meta.get_modification_date())
-    print_info("Creation date", meta.get_creation_date())
-    print_info("Initial creator", meta.get_initial_creator())
-    print_info("Keyword", meta.get_keyword())
-    print_info("Editing duration", meta.get_editing_duration())
-    print_info("Editing cycles", meta.get_editing_cycles())
-    print_info("Generator", meta.get_generator())
-
-    # Statistic
-    print "Statistic:"
-    statistic =  meta.get_statistic()
-    for name, value in statistic.iteritems():
-        print "  - %s: %s" % (name[5:].replace('-', ' ').capitalize(), value)
-
-    # User defined metadata
-    print "User defined metadata:"
-    user_metadata = meta.get_user_defined_metadata()
-    for name, value in user_metadata.iteritems():
-        print "  - %s: %s" % (name, value)
-
-    # And the description
-    print_info("Description", meta.get_description())
-
-
-
 def set_metadata(doc, set_list):
     meta = doc.get_xmlpart("meta")
     for set_info in set_list:
@@ -140,5 +104,5 @@ if  __name__ == '__main__':
         set_metadata(doc, opts.set_list)
     else:
         # Dump
-        dump_meta(doc)
+        print doc.get_formated_meta()
 

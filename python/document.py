@@ -197,6 +197,49 @@ class odf_document(object):
         return u''.join(result)
 
 
+
+    def get_formated_meta(self):
+        result = []
+
+        meta = self.get_xmlpart("meta")
+
+        # Simple values
+        def print_info(name, value):
+            if value:
+                result.append("%s: %s" % (name, value))
+
+        print_info("Title", meta.get_title())
+        print_info("Subject", meta.get_subject())
+        print_info("Language", meta.get_language())
+        print_info("Modification date", meta.get_modification_date())
+        print_info("Creation date", meta.get_creation_date())
+        print_info("Initial creator", meta.get_initial_creator())
+        print_info("Keyword", meta.get_keyword())
+        print_info("Editing duration", meta.get_editing_duration())
+        print_info("Editing cycles", meta.get_editing_cycles())
+        print_info("Generator", meta.get_generator())
+
+        # Statistic
+        result.append("Statistic:")
+        statistic =  meta.get_statistic()
+        for name, value in statistic.iteritems():
+            result.append("  - %s: %s" % (
+                              name[5:].replace('-', ' ').capitalize(),
+                              value))
+
+        # User defined metadata
+        result.append("User defined metadata:")
+        user_metadata = meta.get_user_defined_metadata()
+        for name, value in user_metadata.iteritems():
+            result.append("  - %s: %s" % (name, value))
+
+        # And the description
+        print_info("Description", meta.get_description())
+
+        return u"\n".join(result)
+
+
+
     def add_file(self, uri_or_file):
         if type(uri_or_file) is unicode or type(uri_or_file) is str:
             uri_or_file = uri_or_file.encode('utf_8')
