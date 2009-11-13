@@ -41,7 +41,7 @@ def show_styles(document, automatic=True, common=True, properties=False):
     output = document.show_styles(automatic=automatic, common=common,
             properties=properties)
     # Print the styles
-    stdout.write(output.encode('utf-8'))
+    stdout.write(output.encode(stdout.encoding))
     stdout.flush()
 
 
