@@ -68,33 +68,13 @@ def clean_filename(filename):
 
 
 
-def text_to_stdout(document):
-    text = document.get_formated_text()
-    stdout.write(text.encode(stdout.encoding))
-    stdout.flush()
-
-
-
-def text_to_text(document, target):
-    text_file = target.open('content.txt', 'w')
-    text = document.get_formated_text()
-    text_file.write(text.encode('utf-8'))
-    text_file.close()
-
-
-
-def meta_to_stdout(document):
-    meta = document.get_formated_meta()
-    stdout.write(meta.encode(stdout.encoding))
-    stdout.flush()
-
-
-
-def meta_to_text(document, target):
-    meta_file = target.open('meta.txt', 'w')
-    meta = document.get_formated_meta()
-    meta_file.write(meta.encode('utf-8'))
-    meta_file.close()
+def dump(txt, to_file):
+    try:
+        encoding = to_file.encoding if to_file.encoding else 'utf-8'
+    except AttributeError:
+        encoding = 'utf-8'
+    txt = txt.encode(encoding)
+    to_file.write(txt)
 
 
 
@@ -156,11 +136,14 @@ if  __name__ == '__main__':
             'presentation-template'):
         if opts.dirname:
             if opts.meta:
-                meta_to_text(document, target)
-            text_to_text(document, target)
+                to_file = target.open('meta.txt', 'w')
+                dump(document.get_formated_meta(), to_file)
+            to_file = target.open('content.txt', 'w')
+            dump(document.get_formated_text(), to_file)
         else:
-            meta_to_stdout(document)
-            text_to_stdout(document)
+            if opts.meta:
+                dump(document.get_formated_meta(), stdout)
+            dump(document.get_formated_text(), stdout)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
         if opts.dirname:
