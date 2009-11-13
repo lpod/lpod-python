@@ -82,6 +82,7 @@ def spreadsheet_to_stdout(document):
     body = document.get_body()
     for table_element in body.get_table_list():
         table = odf_table(odf_element=table_element)
+        # XXX FIX ME
         table.export_to_csv(stdout, encoding=stdout.encoding)
         stdout.write("\n")
     stdout.flush()
@@ -131,18 +132,26 @@ if  __name__ == '__main__':
     doc_type = document.get_type()
     if opts.dirname:
         target = get_target_directory(opts.dirname)
+    # Meta & Styles
+    if opts.dirname:
+        if opts.meta:
+            to_file = target.open('meta.txt', 'w')
+            dump(document.get_formated_meta(), to_file)
+        if opts.styles:
+            to_file = target.open('styles.txt', 'w')
+            dump(document.show_styles(), to_file)
+    else:
+        if opts.meta:
+            dump(document.get_formated_meta(), stdout)
+        if opts.styles:
+            dump(document.show_styles(), stdout)
     # text
     if doc_type in ('text', 'text-template', 'presentation',
             'presentation-template'):
         if opts.dirname:
-            if opts.meta:
-                to_file = target.open('meta.txt', 'w')
-                dump(document.get_formated_meta(), to_file)
             to_file = target.open('content.txt', 'w')
             dump(document.get_formated_text(), to_file)
         else:
-            if opts.meta:
-                dump(document.get_formated_meta(), stdout)
             dump(document.get_formated_text(), stdout)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
