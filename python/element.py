@@ -173,13 +173,22 @@ class odf_text(unicode):
     """
     def __init__(self, text_result):
         # There's some black magic in inheriting from unicode
-        self.__parent = text_result.getparent()
-        self.__is_text = text_result.is_text
-        self.__is_tail = text_result.is_tail
+        # _ElementStringResult have no default value
+        try:
+            self.__parent = text_result.getparent()
+            self.__is_text = text_result.is_text
+            self.__is_tail = text_result.is_tail
+        except AttributeError:
+            self.__parent = None
+            self.__is_text = None
+            self.__is_tail = None
 
 
     def get_parent(self):
-        return _make_odf_element(self.__parent)
+        parent = self.__parent
+        if parent is None:
+            return None
+        return _make_odf_element(parent)
 
 
     def is_text(self):

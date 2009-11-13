@@ -27,6 +27,7 @@ import test_span
 import test_style
 import test_styles
 import test_table
+import test_text
 import test_tracked_changes
 import test_utils
 import test_variable
@@ -55,6 +56,7 @@ test_modules = [test_bookmark,
                 test_style,
                 test_styles,
                 test_table,
+                test_text,
                 test_tracked_changes,
                 test_utils,
                 test_variable,
