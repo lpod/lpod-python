@@ -38,7 +38,7 @@ from lpod.table import odf_table
 
 
 
-def get_target_directory(dirname, container_url):
+def get_target_directory(dirname):
     # Check the name and create the directory
     if vfs.exists(dirname):
         message = 'The directory "%s" exists, can i overwrite it? [y/N]'
@@ -80,6 +80,21 @@ def text_to_text(document, target):
     text = document.get_formated_text()
     text_file.write(text.encode('utf-8'))
     text_file.close()
+
+
+
+def meta_to_stdout(document):
+    meta = document.get_formated_meta()
+    stdout.write(meta.encode(stdout.encoding))
+    stdout.flush()
+
+
+
+def meta_to_text(document, target):
+    meta_file = target.open('meta.txt', 'w')
+    meta = document.get_formated_meta()
+    meta_file.write(meta.encode('utf-8'))
+    meta_file.close()
 
 
 
@@ -135,13 +150,16 @@ if  __name__ == '__main__':
     document = odf_get_document(container_url)
     doc_type = document.get_type()
     if opts.dirname:
-        target = get_target_directory(opts.dirname, container_url)
+        target = get_target_directory(opts.dirname)
     # text
     if doc_type in ('text', 'text-template', 'presentation',
             'presentation-template'):
         if opts.dirname:
+            if opts.meta:
+                meta_to_text(document, target)
             text_to_text(document, target)
         else:
+            meta_to_stdout(document)
             text_to_stdout(document)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
