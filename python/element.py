@@ -171,21 +171,16 @@ class odf_text(unicode):
 
     Constructed like any unicode object but only accepts lxml text objects.
     """
+    # There's some black magic in inheriting from unicode
     def __init__(self, text_result):
-        # There's some black magic in inheriting from unicode
-        # _ElementStringResult have no default value
-        try:
-            self.__parent = text_result.getparent()
-            self.__is_text = text_result.is_text
-            self.__is_tail = text_result.is_tail
-        except AttributeError:
-            self.__parent = None
-            self.__is_text = None
-            self.__is_tail = None
+        self.__parent = text_result.getparent()
+        self.__is_text = text_result.is_text
+        self.__is_tail = text_result.is_tail
 
 
     def get_parent(self):
         parent = self.__parent
+        # XXX happens just because of the unit test
         if parent is None:
             return None
         return _make_odf_element(parent)
