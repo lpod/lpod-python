@@ -565,6 +565,14 @@ class odf_date_style(odf_style):
 
 
 
+# FIXME stub
+class odf_currency_style(odf_style):
+
+    def get_style_family(self):
+        return 'currency'
+
+
+
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
              'style:footer-style', 'text:list-level-style-number',
@@ -577,3 +585,4 @@ register_element_class('style:master-page', odf_master_page)
 register_element_class('style:font-face', odf_font_style)
 register_element_class('number:number-style', odf_number_style)
 register_element_class('number:date-style', odf_date_style)
+register_element_class('number:currency-style', odf_currency_style)
