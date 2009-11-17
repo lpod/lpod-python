@@ -5,8 +5,11 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.content import odf_content
 from lpod.document import odf_new_document_from_template
 from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.meta import odf_meta
+from lpod.styles import odf_styles
 
 
 class NewDocumentFromTemplateTestCase(TestCase):
@@ -89,13 +92,23 @@ class DocumentTestCase(TestCase):
         self.document = odf_get_document('samples/example.odt')
 
 
-    def tearDown(self):
-        del self.document
+    def test_get_content(self):
+        content = self.document.get_content()
+        self.assert_(type(content) is odf_content)
+
+
+    def test_get_meta(self):
+        meta = self.document.get_meta()
+        self.assert_(type(meta) is odf_meta)
+
+
+    def test_get_styles(self):
+        styles = self.document.get_styles()
+        self.assert_(type(styles) is odf_styles)
 
 
     def test_get_body(self):
-        document = self.document
-        body = document.get_body()
+        body = self.document.get_body()
         self.assertEqual(body.get_tagname(), 'office:text')
 
 
@@ -117,10 +130,6 @@ class TestStyle(TestCase):
 
     def setUp(self):
         self.document = odf_get_document('../templates/lpod_styles.odt')
-
-
-    def tearDown(self):
-        del self.document
 
 
     def test_get_style_list(self):

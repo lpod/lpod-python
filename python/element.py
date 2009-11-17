@@ -784,18 +784,35 @@ class odf_element(object):
     #
 
     def get_heading_list(self, style=None, level=None, regex=None):
-        return _get_element_list(self, 'descendant::text:h', text_style=style,
-                outline_level=level, regex=regex)
+        return _get_element_list(self, 'descendant::text:h',
+                text_style=style, outline_level=level, regex=regex)
 
 
     def get_heading_by_position(self, position, level=None):
         return _get_element(self, 'descendant::text:h', position=position,
-                            outline_level=level)
+                outline_level=level)
 
 
     def get_heading_by_content(self, regex, level=None):
         return _get_element(self, 'descendant::text:h', regex=regex,
-                            outline_level=level)
+                outline_level=level)
+
+
+    #
+    # Lists
+    #
+
+    def get_list_list(self, style=None, regex=None):
+        return _get_element_list(self, 'descendant::text:list',
+                text_style=style, regex=regex)
+
+
+    def get_list_by_position(self, position):
+        return _get_element(self, 'descendant::text:list', position=position)
+
+
+    def get_list_by_content(self, regex):
+        return _get_element(self, 'descendant::text:list', regex=regex)
 
 
     #

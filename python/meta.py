@@ -97,6 +97,7 @@ class odf_meta(odf_xmlpart):
 
     def get_subject(self):
         """Get the subject of the document.
+
         Return: unicode (or None if inexistant)
         """
         element = self.get_element('//dc:subject')
@@ -127,7 +128,7 @@ class odf_meta(odf_xmlpart):
         Example::
 
             >>> document.get_language()
-            >>> 'fr-FR'
+            fr-FR
         """
         element = self.get_element('//dc:language')
         if element is None:
@@ -159,6 +160,7 @@ class odf_meta(odf_xmlpart):
 
     def get_modification_date(self):
         """Get the last modified date of the document.
+
         Return: datetime (or None if inexistant)
         """
         element = self.get_element('//dc:date')
@@ -170,6 +172,7 @@ class odf_meta(odf_xmlpart):
 
     def set_modification_date(self, date):
         """Set the last modified date of the document.
+
         Arguments:
 
             date -- datetime
@@ -184,6 +187,7 @@ class odf_meta(odf_xmlpart):
 
     def get_creation_date(self):
         """Get the creation date of the document.
+
         Return: datetime (or None if inexistant)
         """
         element = self.get_element('//meta:creation-date')
@@ -195,6 +199,7 @@ class odf_meta(odf_xmlpart):
 
     def set_creation_date(self, date):
         """Set the creation date of the document.
+
         Arguments:
 
             date -- datetime
@@ -209,12 +214,13 @@ class odf_meta(odf_xmlpart):
 
     def get_initial_creator(self):
         """Get the first creator of the document.
+
         Return: unicode (or None if inexistant)
 
         Example::
 
             >>> document.get_initial_creator()
-            >>> u"Unknown"
+            Unknown
         """
         element = self.get_element('//meta:initial-creator')
         if element is None:
@@ -224,6 +230,7 @@ class odf_meta(odf_xmlpart):
 
     def set_initial_creator(self, creator):
         """Set the first creator of the document.
+
         Arguments:
 
             creator -- unicode
@@ -241,6 +248,7 @@ class odf_meta(odf_xmlpart):
 
     def get_keyword(self):
         """Get the keyword(s) of the document.
+
         Return: unicode (or None if inexistant)
         """
         element = self.get_element('//meta:keyword')
@@ -251,6 +259,7 @@ class odf_meta(odf_xmlpart):
 
     def set_keyword(self, keyword):
         """Set the keyword(s) of the document.
+
         Arguments:
 
             keyword -- unicode
@@ -263,7 +272,9 @@ class odf_meta(odf_xmlpart):
 
 
     def get_editing_duration(self):
-        """Get the time the document was edited, as reported by the generator.
+        """Get the time the document was edited, as reported by the
+        generator.
+
         Return: timedelta (or None if inexistant)
         """
         element = self.get_element('//meta:editing-duration')
@@ -275,8 +286,10 @@ class odf_meta(odf_xmlpart):
 
     def set_editing_duration(self, duration):
         """Set the time the document was edited.
+
         Arguments:
-        duration -- timedelta
+
+            duration -- timedelta
         """
         if type(duration) is not timedelta:
             raise TypeError, u"duration must be a timedelta"
@@ -289,8 +302,9 @@ class odf_meta(odf_xmlpart):
 
 
     def get_editing_cycles(self):
-        """Get the number of times the document was edited, as reported by the
-        generator.
+        """Get the number of times the document was edited, as reported by
+        the generator.
+
         Return: int (or None if inexistant)
         """
         element = self.get_element('//meta:editing-cycles')
@@ -302,6 +316,7 @@ class odf_meta(odf_xmlpart):
 
     def set_editing_cycles(self, cycles):
         """Set the number of times the document was edited.
+
         Arguments:
 
             cycles -- int
@@ -320,12 +335,13 @@ class odf_meta(odf_xmlpart):
 
     def get_generator(self):
         """Get the signature of the software that generated this document.
+
         Return: unicode (or None if inexistant)
 
         Example::
 
             >>> document.get_generator()
-            >>> u"KOffice/2.0.0"
+            KOffice/2.0.0
         """
         element = self.get_element('//meta:generator')
         if element is None:
@@ -335,6 +351,7 @@ class odf_meta(odf_xmlpart):
 
     def set_generator(self, generator):
         """Set the signature of the software that generated this document.
+
         Arguments:
 
             generator -- unicode
@@ -352,6 +369,7 @@ class odf_meta(odf_xmlpart):
 
     def get_statistic(self):
         """Get the statistic from the software that generated this document.
+
         Return: dict (or None if inexistant)
 
         Example::
@@ -377,6 +395,7 @@ class odf_meta(odf_xmlpart):
     def set_statistic(self, statistic):
         """Set the statistic for the documents: number of words, paragraphs,
         etc.
+
         Arguments:
 
             statistic -- dict

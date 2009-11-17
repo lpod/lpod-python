@@ -123,6 +123,30 @@ class odf_document(object):
         return part
 
 
+    def get_content(self):
+        """Return the content part.
+
+        Return: odf_content
+        """
+        return self.get_xmlpart('content')
+
+
+    def get_meta(self):
+        """Return the meta part.
+
+        Return: odf_meta
+        """
+        return self.get_xmlpart('meta')
+
+
+    def get_styles(self):
+        """Return the styles part.
+
+        Return: odf_styles
+        """
+        return self.get_xmlpart('styles')
+
+
     def get_type(self):
         """
         Get the ODF type (also called class) of this document.
