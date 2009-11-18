@@ -130,8 +130,26 @@ class odf_toc(odf_element):
         #2. The section
         content = document.get_xmlpart("content")
         body = content.get_body()
-        for number, heading in enumerate(body.get_heading_list(level=1)):
-            title = u"%d. %s" % (number + 1, heading.get_text())
+        level_indexes = {}
+        for heading in body.get_heading_list():
+            level = heading.get_outline_level()
+            number = []
+            # 1. l < level
+            for l in range(1, level):
+                index = level_indexes.setdefault(l, 1)
+                number.append(unicode(index))
+            # 2. l == level
+            index = level_indexes.setdefault(level, 0) + 1
+            level_indexes[level] = index
+            number.append(unicode(index))
+            # 3. l > level
+            for l in range(level + 1, 11):
+                if level_indexes.has_key(l):
+                    del level_indexes[l]
+            number = u'.'.join(number)
+            number += u'.'
+            # Make the title
+            title = u"%s %s" % (number, heading.get_text())
             paragraph = odf_create_paragraph(text=title)
             index_body.append_element(paragraph)
 
