@@ -32,19 +32,18 @@ from re import search
 
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
-from element import odf_create_element
+from element import odf_create_element, register_element_class, odf_element
 from utils import get_value, _set_value_and_type
 from vfs import vfs
 
 
 def _get_cell_coordinates(obj):
-    # By values ?
+    # By (1, 2) ?
     if isinstance(obj, (list, tuple)):
         return tuple(obj)
     # Or by 'B3' notation ?
     if not isinstance(obj, (str, unicode)):
-        raise ValueError, ('_get_cell_coordinates called with a bad argument '
-                'type: "%s"' % type(obj))
+        raise ValueError, 'bad coordinates type: "%s"' % type(obj)
     lowered = obj.lower()
     # First "B"
     column = 0
@@ -69,47 +68,39 @@ def _get_cell_coordinates(obj):
 
 def _get_python_value(data, encoding):
     data = unicode(data, encoding)
-
     # An int ?
     try:
         return int(data)
     except ValueError:
         pass
-
-    # An float ?
+    # A float ?
     try:
         return float(data)
     except ValueError:
         pass
-
     # A Date ?
     try:
         return Date.decode(data)
     except ValueError:
         pass
-
     # A DateTime ?
     try:
         # Two tests: "yyyy-mm-dd hh:mm:ss" or "yyyy-mm-ddThh:mm:ss"
         return DateTime.decode(data.replace(' ', 'T'))
     except ValueError:
         pass
-
     # A Duration ?
     try:
         return Duration.decode(data)
     except ValueError:
         pass
-
     # A Boolean ?
     try:
         # "True" or "False" with a .lower
         return Boolean.decode(data.lower())
     except ValueError:
         pass
-
-    # XXX Try some other types ?
-
+    # TODO Try some other types ?
     # So a text
     return data
 
@@ -238,8 +229,12 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
 
 
 
-def odf_create_row(width=None):
+def odf_create_row(width=None): # TODO style?
     """Create a row element, optionally filled with "width" number of cells.
+
+    Rows contain cells, their number determine the number of columns.
+
+    You don't generally have to create rows by hand, use the odf_table API.
 
     Arguments:
 
@@ -256,23 +251,55 @@ def odf_create_row(width=None):
 
 
 
-def odf_create_column(repeated=None, style=None):
-    """Create a column element of the optionally given style. If the column
-    properties apply to several columns, give the number of repeated columns.
+def odf_create_row_group(height=None, width=None):
+    """Create a group of rows, optionnaly filled with "height" number of rows,
+    of "width" cells each.
+
+    Row group bear style information applied to a series of rows.
 
     Arguments:
 
-        repeated -- int
+        height -- int
+
+    Return odf_element
+    """
+    row_group = odf_create_row_group('<table:table-row-group')
+    if height is not None:
+        for i in xrange(height):
+            row = odf_create_row(width)
+            row_group.append_element(row)
+    return row_group
+
+
+
+def odf_create_column_group(style=None, default_cell_style=None,
+        repeated=None):
+    """Create a column group element of the optionally given style. Cell style
+    can be set for the whole column. If the properties apply to several
+    columns, give the number of repeated columns.
+
+    Columns don't contain cells, just style information.
+
+    You don't generally have to create columns by hand, use the odf_table API.
+
+    Arguments:
 
         style -- unicode
+
+        default_cell_style -- unicode
+
+        repeated -- int
 
     Return: odf_element
     """
     element = odf_create_element('<table:table-column/>')
-    if repeated:
-        element.set_attribute('table:number-columns-repeated', str(repeated))
     if style:
         element.set_attribute('table:style-name', style)
+    if default_cell_style:
+        element.set_attribute('table:default-cell-style-name',
+                default_cell_style)
+    if repeated:
+        element.set_attribute('table:number-columns-repeated', str(repeated))
     return element
 
 
@@ -280,8 +307,8 @@ def odf_create_column(repeated=None, style=None):
 def odf_create_table(name, width=None, height=None, protected=False,
                      protection_key=None, display=True, printable=True,
                      print_ranges=None, style=None):
-    """Create a table element, optionally prefilled with "width" columns and
-    "height" rows.
+    """Create a table element, optionally prefilled with "height" rows of
+    "width" cells each.
 
     If the table is to be protected, a protection key must be provided, i.e. a
     hash value of the password (XXX what algorithm?).
@@ -294,6 +321,12 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
     Ranges of cells to print can be provided as a list of cell ranges, e.g.
     ['E6:K12', 'P6:R12'] or directly as a raw string, e.g. "E6:K12 P6:R12".
+
+    You can access and modify the XML tree manuall, but you probably want to
+    use the API to access and alter cells. It will save you from handling
+    repetitions and the same number of cells for each row.
+
+    If you modify both the 
 
     Arguments:
 
@@ -317,19 +350,7 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
     Return: odf_element
     """
-    name = name
     element = odf_create_element(u'<table:table table:name="%s"/>' % name)
-    if width is not None or height is not None:
-        width = width if width is not None else 1
-        height = height if height is not None else 1
-
-        columns = odf_create_column(repeated=width)
-        element.append_element(columns)
-
-        # XXX Use repeat or not ?
-        for i in xrange(height):
-            row = odf_create_row(width)
-            element.append_element(row)
     if protected:
         if protection_key is None:
             raise ValueError, "missing protection key"
@@ -344,176 +365,123 @@ def odf_create_table(name, width=None, height=None, protected=False,
         element.set_attribute('table:print-ranges', print_ranges)
     if style:
         element.set_attribute('table:style-name', style)
+    # Prefill the table
+    if width is not None or height is not None:
+        width = width or 1
+        height = height or 1
+        # Column groups for style information
+        columns = odf_create_column_group(repeated=width)
+        element.append_element(columns)
+        # TODO Use repeat for compacity (and row group?)
+        for i in xrange(height):
+            row = odf_create_row(width)
+            element.append_element(row)
     return element
 
 
 
-class odf_table(object):
+class odf_table(odf_element):
 
-    def __init__(self, name=None, style=None, data=None, odf_element=None):
-        """Create an odf_table object.
-
-        We have two manners to create a new odf_table:
-
-        1) With 'python' data: we must fill name, style and data. data must
-           be  a matrix (a list of list) of python objects.
-        2) With an odf_element
-
-        name -- unicode
-
-        style -- string
-
-        data -- list / tuple of list / tuple
-
-        odf_element -- odf_element
-        """
-        # Attributes of table:table
-        self.__table_attributes = {}
-        # List of odf_element
-        self.__columns = []
-        # List of dict {'attributes': {}, 'cells': []}
-        self.__rows = []
-        # Load the state
-        if data is not None:
-            if name is None:
-                # XXX For now accept u""
-                raise ValueError, "name is mandatory with data"
-            self.__load_state_from_list(name, data, style=style)
-        elif odf_element is not None:
-            self.__load_state_from_odf_element(odf_element)
-        else:
-            raise ValueError, "either data or odf_element is expected"
-
+    # Internal representation is a list of lists, modified cells are stored,
+    # others are marked as None
+    __state = []
+    __width = 0
+    __heigt = 0
 
     #
     # Private API
     #
 
-    def __load_state_from_list(self, name, data, style=None):
-        # 1) table attributes
-        self.__table_attributes['table:name'] = name.encode('utf-8')
-        if style:
-            self.__table_attributes['table:style-name'] = style
-        # Nothing ??
-        if len(data) == 0:
-            self.__columns = []
-            self.__rows = []
-            return
-        # 2) The columns
-        columns_number = len(data[0])
-        # XXX style=?
-        self.__columns = [ odf_create_column(style=u'Standard')
-                           for i in range(columns_number) ]
-        # 3) The rows
-        rows = self.__rows = []
-        for row_data in data:
-            cells = []
-            # The columns number must be constant
-            if len(row_data) != columns_number:
-                raise ValueError, 'the columns number must be constant'
-            # Append
-            for cell_data in row_data:
-                cells.append(odf_create_cell(cell_data))
-            # In table
-            rows.append({'attributes': {},
-                         'cells': cells})
+    def __init__(self, native_element):
+        super(self).__init__(native_element)
+        width, height = (0, 0)
+        # Determine the height from the number of rows
+        rows = self.xpath('table:table-row')
+        repeated = self.xpath('table:table-row/@table:number-rows-repeated')
+        unrepeated = len(rows) - len(repeated)
+        height = sum(int(r) for r in repeated) + unrepeated
+        # Determine the width from the first row
+        row = rows[0]
+        cells = row.xpath('table:table-cell')
+        repeated = row.xpath('(table:table-cell|table:covered-table-cell)/'
+                '@table:number-columns-repeated')
+        unrepeated = len(cells) - len(repeated)
+        width = sum(int(r) for r in repeated) + unrepeated
+        print "width", width, "height", height
+        self.__width = width
+        self.__heigt = height
 
 
-    def __load_state_from_odf_element(self, odf_element):
-
-        # 1) table attributes
-        self.__table_attributes = odf_element.get_attributes()
-        # 2) The columns
-        columns = self.__columns = []
-        for column in odf_element.get_element_list('table:table-column'):
-            # Delete the table:number-columns-repeated attribute
-            repeat = column.get_attribute('table:number-columns-repeated')
-            if repeat is not None:
-                column.del_attribute('table:number-columns-repeated')
-                repeat = int(repeat)
-                for i in range(repeat):
-                    columns.append(column.clone())
-            else:
-                columns.append(column)
-        # 3) The rows
-        rows = self.__rows = []
-        empty_rows = []
-        for row  in odf_element.get_element_list('table:table-row'):
-            # An empty row ?
-            if _is_odf_row_empty(row):
-                empty_rows.append(row)
-                continue
-            # We must append the last empty rows
-            for empty_row in empty_rows:
-                _append_odf_row(empty_row, rows)
-                empty_rows = []
-            # And we append this new row
-            _append_odf_row(row, rows)
+    def __get_cell(self, x, y):
+        if x >= self.__width or y >= self.__height:
+            raise ValueError, "cell outside of table"
+        # In the internal structure
+        try:
+            cell = self.__state[y][x]
+        except KeyError:
+            cell = None
+        else:
+            return cell
+        w, h = 0, 0
+        for row in self.get_element_list('table:table-row'):
+            h += row.get_attribute('table:number-rows-repeated') or 1
+            if y < h:
+                for cell in row.get_element_list(
+                        '(<table:table-cell|table:covered-table-cell)'):
+                    w += (cell.get_attribute('table:number-columns-repeated')
+                            or 1)
+                    if x < w:
+                        cell.del_attribute('table:number-columns-repeated')
+                        return cell
+        raise ValueError
 
 
-    def __get_odf_row(self, row):
-        attributes = row['attributes']
-        cells = row['cells']
-        # Create the node
-        odf_row = odf_create_row()
-        for key, value in attributes.iteritems():
-            odf_row.set_attribute(key, value)
-        # Add the cells
-        _insert_elements(cells, odf_row)
-        return odf_row
+    def __set_cell(self, x, y, cell):
+        state = self.__state
+        height = len(state)
+        width = len(state[0]) if h else 0
+        if y + 1 > height:
+            state.extend([[None] * width for h in xrange(y - height + 1)])
+            self.__height = y + 1
+        if x + 1 > width:
+            for row in state:
+                row.extend([None] * (x - width + 1))
+            self.__width = x + 1
+        state[y][x] = cell
 
 
-    def __insert_rows(self, table):
-        rows = self.__rows
-        # No rows => nothing to do
-        if not rows:
-            return
-        # At least a row
-        current_row = self.__get_odf_row(rows[0])
-        current_row_serialized = current_row.serialize()
-        repeat = 1
-        for row in rows[1:]:
-            row = self.__get_odf_row(row)
-            row_serialized = row.serialize()
-            if row_serialized == current_row_serialized:
-                repeat += 1
-            else:
-                # Insert the current_row
-                if repeat > 1:
-                    current_row.set_attribute('table:number-rows-repeated',
-                                              str(repeat))
-                table.append_element(current_row)
-                # Current row is now this row
-                current_row = row
-                current_row_serialized = row_serialized
-                repeat = 1
-        # Insert the last rows
-        if repeat > 1:
-            current_row.set_attribute('table:number-rows-repeated',
-                                      str(repeat))
-        table.append_element(current_row)
+    def __expand_cells(self, row):
+        for cell in row.get_element_list(
+                '(<table:table-cell|table:covered-table-cell)'):
+            repeated = (cell.get_attribute('table:number-columns-repeated')
+                    or 1)
+            cell.del_attribute('table:number-columns-repeated')
+            for i in xrange(repeated):
+                yield cell
 
 
     #
     # Public API
     #
 
-    def to_odf_element(self):
-        # 1) Create the table:table
-        table = odf_create_element('<table:table/>')
-        for key, value in self.__table_attributes.iteritems():
-            table.set_attribute(key, value)
-        # 2) Add the columns
-        _insert_elements(self.__columns, table)
-        # 3) The rows
-        self.__insert_rows(table)
-        return table
+    def get_size(self):
+        return self.__width, self.__height
+
+
+    def get_table_name(self):
+        return self.get_attribute('table:name')
+
+
+    def synchronize(self):
+        """Report the modifications to the XML tree.
+        """
+        raise NotImplementedError
 
 
     def get_formated_text(self, context):
         result = []
-        for row in self.__rows:
-            for cell in row['cells']:
+        for row in self.traverse_rows():
+            for cell in row.get_children():
                 value = get_value(cell, try_get_text=False)
                 # None ?
                 if value is None:
@@ -531,89 +499,110 @@ class odf_table(object):
 
 
     #
+    # Rows
+    #
+
+    def traverse_rows(self):
+        """Return as many row elements as real rows, i.e. expand repetitions.
+
+        Modified cells are returned in place of original cells from the XML
+        tree.
+        """
+        state = self.__state
+        y = 0
+        for row in self.get_element_list('table:table-row'):
+            repeated = row.get_attribute('table:number-rows-repeated') or 1
+            row.del_attribute('table:number-rows-repeated')
+            for x, original_cell in enumerate(self.__expand_cells(row)):
+                try:
+                    cell = state[y][x]
+                except KeyError:
+                    cell = None
+                if cell is None:
+                    cell = original_cell
+                row.append_element(cell)
+            for i in xrange(repeated):
+                yield row.clone()
+            y += repeated
+
+
+    def get_row_list(self, regex=None, style=None):
+        """Return the list of  rows matching the criteria. Each result is a
+        tuple of (y, cell).
+
+        Arguments:
+
+            regex -- unicode
+
+            style -- unicode
+
+        Return: list of tuples
+        """
+        rows = []
+        for y, row in enumerate(self.traverse_rows()):
+            # Filter the cells with the regex
+            if regex and not row.match(regex):
+                continue
+            # Filter the cells with the style
+            if style and row.get_attribute('table:style-name') != style:
+                continue
+            rows.append((y, row))
+        return rows
+
+
+    def set_row(self, y, row):
+        raise NotImplementedError
+
+
+    # XXX Add a cells argument ??
+    def add_row(self, number=1, position=None):
+        """Insert number rows before the row at the given position. Append by
+        default.
+
+        Positions start at 0.
+        """
+        raise NotImplementedError
+
+
+    #
     # Cells
     #
 
     def get_cell(self, coordinates):
         x, y = _get_cell_coordinates(coordinates)
-        return self.__rows[y]['cells'][x]
+        return self.__get_cell(x, y)
 
 
-    def set_cell(self, coordinates, odf_cell):
-        # XXX auto-adjust the table size ?
+    def set_cell(self, coordinates, cell):
         x, y = _get_cell_coordinates(coordinates)
-        self.__rows[y]['cells'][x] = odf_cell
+        return self.__set_cell(x, y, cell)
 
 
     def get_cell_list(self, regex=None, style=None):
-        cells = []
-        rows = self.__rows
-        # Get all the cells
-        for y, row in enumerate(rows):
-            for x, cell in enumerate(row['cells']):
-                cells.append((cell, x, y))
-        # Filter the cells with the regex
-        if regex:
-            cells = [(cell, x, y) for cell, x, y in cells
-                                  if cell.match(regex)]
-        # Filter the cells with the style
-        if style:
-            filter = []
-            for cell, x, y in cells:
-                style_name = cell.get_attribute('table:style-name')
-                if style_name and search(style, style_name):
-                    filter.append((cell, x, y))
-            cells = filter
-        # Return only the coordinates
-        return [(x, y) for cell, x, y in cells]
+        """Return the list of cells matching the criteria. Each result is a
+        tuple of (x, y, cell).
 
+        Arguments:
 
-    def get_size(self):
-        return len(self.__columns), len(self.__rows)
+            regex -- unicode
 
+            style -- unicode
 
-    def get_tagname(self):
-        return self.__table_attributes['table:name']
-
-
-    #
-    # Rows
-    #
-
-    def get_row_list(self, regex=None, style=None):
-        coordinates = []
-        rows = self.__rows
-        for y, row in enumerate(rows):
-            for cell in row['cells']:
-                if regex and cell.match(regex):
-                    coordinates.append(y)
-                    break
-                style_name = cell.get_attribute('table:style-name')
-                if style and style_name and search(style, style_name):
-                    coordinates.append(y)
-                    break
-        return coordinates
-
-
-    # XXX Add a cells argument ??
-    def add_row(self, number=1, position=None):
-        """Insert number rows before the row 'position' (append if None)
+        Return: list of tuples
         """
-        rows = self.__rows
-        row_size = len(self.__columns)
-
-        if position is not None:
-            position -= 1
-            for i in range(number):
-                rows.insert(position,
-                            {'attributes': {},
-                             'cells': [ odf_create_cell()
-                                        for i in range(row_size) ]})
-        else:
-            for i in range(number):
-                rows.append({'attributes': {},
-                             'cells': [ odf_create_cell()
-                                        for i in range(row_size) ]})
+        cells = []
+        state = self.__state
+        for y, row in enumerate(self.traverse_rows()):
+            for x, cell in enumerate(row.get_children()):
+                # Filter the cells with the regex
+                if regex and not cell.match(regex):
+                    continue
+                # Filter the cells with the style
+                if style and cell.get_attribute('table:style-name') != style:
+                        continue
+                cells.append((x, y, cell))
+        # Return the coordinates and element
+        return cells
 
 
     #
@@ -621,66 +610,51 @@ class odf_table(object):
     #
 
     def get_column_list(self, regex=None, style=None):
-        rows = self.__rows
-        columns = self.__columns
-        row_size = len(columns)
-        column_size = len(rows)
-        coordinates = []
-        for x in xrange(row_size):
-            for y in xrange(column_size):
-                cell = rows[y]['cells'][x]
-                if regex and cell.match(regex):
-                    coordinates.append(x)
-                    break
-                style_name = cell.get_attribute('table:style-name')
-                if style and style_name and search(style, style_name):
-                    coordinates.append(x)
-                    break
-        return coordinates
+        raise NotImplementedError
 
 
     # XXX Add a cells argument ??
     def add_column(self, number=1, position=None):
-        """Insert number columns before the column 'position' (append if None)
+        """Insert number columns before the column at the given position.
+        Append by default.
+
+        Positions start at 0.
         """
-        columns = self.__columns
-        rows = self.__rows
-
-        if position is not None:
-            position -= 1
-            for i in range(number):
-                # Append an empty column info
-                # XXX Style = ?
-                columns.insert(position,
-                               odf_create_column(style=u'Standard'))
-                # And now, insert empty cells
-                for row in rows:
-                    cells = row['cells']
-                    cells.insert(position, odf_create_cell())
-        else:
-            for i in range(number):
-                # Append an empty column info
-                # XXX Style = ?
-                columns.append(odf_create_column(style=u'Standard'))
-                # And now, insert empty cells
-                for row in rows:
-                    cells = row['cells']
-                    cells.append(odf_create_cell())
+        raise NotImplementedError
 
 
-    def export_to_csv(self, target, delimiter=';', quotechar='"',
+    #
+    # Utilities
+    #
+
+    def export_to_csv(self, file, delimiter=';', quotechar='"',
                       lineterminator='\n', encoding='utf-8'):
-        """Arguments:
+        """
+        Write the table as CSV in the file. If the file is a name, it is
+        opened as a URI. Else a file-like is expected. Opened file-like
+        are closed, given file-like are left open.
 
-            target -- file-like or URI
+        Arguments:
+
+            file -- file-like or URI
+
+            delimiter -- str
+
+            quotechar -- str
+
+            lineterminator -- str
+
+            encoding -- str
         """
         close_after = False
-        if type(target) is str:
-            target = vfs.open(target, 'w')
+        if type(file) is str or type(file) is unicode:
+            file = vfs.open(file, 'w')
             close_after = True
-        for row in self.__rows:
+        quoted = '\\' + quotechar
+        state = self.__state
+        for row in self.traverse_rows():
             current_row = []
-            for cell in row['cells']:
+            for cell in row.get_children():
                 # Get value
                 value = get_value(cell)
                 if type(value) is unicode:
@@ -689,45 +663,48 @@ class odf_table(object):
                     value = value.strip()
                 value = '' if value is None else str(value)
                 # Quote
-                value = value.replace(quotechar, '\\' + quotechar)
-                value = '%s%s%s' % (quotechar, value, quotechar)
+                value = value.replace(quotechar, quoted)
                 # Append !
-                current_row.append(value)
-            target.write(delimiter.join(current_row) + lineterminator)
+                current_row.append(quotechar + value + quotechar)
+            file.write(delimiter.join(current_row) + lineterminator)
         if close_after:
-            target.close()
+            file.close()
 
 
 
-def import_from_csv(fileobj, name, style=None, delimiter=None,
-                    quotechar=None, lineterminator=None, encoding='utf-8'):
-    """Convert the CSV fileobj to a odf_table.
+def import_from_csv(file, name, style=None, delimiter=None, quotechar=None,
+        lineterminator=None, encoding='utf-8'):
+    """Convert the CSV file to an odf_table.
 
     CSV format can be autodetected to a certain limit, but encoding is
     important.
 
     Arguments:
 
-      fileobj -- file-like or URI
+      file -- file-like or URI
 
       name -- unicode
 
-      style -- string
+      style -- str
 
-      delimiter -- string
+      delimiter -- str
 
-      quotechar -- string
+      quotechar -- str
 
-      lineterminator -- string
+      lineterminator -- str
 
-      encoding -- string
+      encoding -- str
     """
 
     # Load the data
     # XXX We load the entire file, this can be a problem with a very big file
-    if type(fileobj) is str:
-        fileobj = vfs.open(fileobj)
-    data = fileobj.read().splitlines(True)
+    if type(file) is str:
+        file = vfs.open(file)
+        data = file.read().splitlines(True)
+        file.close()
+    else:
+        # Leave the file we were given open
+        data = file.read().splitlines(True)
     # Sniff the dialect
     sample = ''.join(data[:10])
     dialect = Sniffer().sniff(sample)
@@ -740,6 +717,14 @@ def import_from_csv(fileobj, name, style=None, delimiter=None,
         dialect.lineterminator = lineterminator
     # Make the rows
     csv = reader(data, dialect)
-    rows = [ [ _get_python_value(value, encoding) for value in line]
+    state = [ [ _get_python_value(value, encoding) for value in line]
              for line in csv ]
-    return odf_table(name=name, style=style, data=rows)
+    table = odf_table(name=name, style=style)
+    table.__state = state
+    table.__height = len(state)
+    table.__width = len(state[0])
+
+
+
+# Register
+register_element_class('table:table', odf_table)
