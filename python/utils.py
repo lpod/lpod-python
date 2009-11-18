@@ -28,7 +28,7 @@
 
 # Import from the Standard Library
 from datetime import date, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal as dec
 from os import getcwd
 from os.path import splitdrive, join, sep
 from re import search
@@ -286,13 +286,21 @@ def _get_element(context, element_name, family=None, text_style=None,
 
 def _set_value_and_type(element, value=None, value_type=None,
                         representation=None, currency=None):
+    # Remove possible previous value and type
+    for name in ('office:value-type', 'office:boolean-value',
+            'office:value', 'office:date-value', 'office:string-value',
+            'office:time-value'):
+        try:
+            element.del_attribute(name)
+        except KeyError:
+            pass
     if type(value) is bool:
         if value_type is None:
             value_type = 'boolean'
         if representation is None:
             representation = u'true' if value else u'false'
         value = Boolean.encode(value)
-    elif isinstance(value, (int, float, Decimal)):
+    elif isinstance(value, (int, float, dec)):
         if value_type is None:
             value_type = 'float'
         if representation is None:
@@ -364,8 +372,11 @@ def get_value(element, value_type=None, try_get_text=True):
         value = element.get_attribute('office:boolean-value')
         return Boolean.decode(value)
     elif value_type in  ('float', 'percentage', 'currency'):
-        value = element.get_attribute('office:value')
-        return float(value)
+        value = dec(element.get_attribute('office:value'))
+        # Return 3 instead of 3.0 if possible
+        if int(value) == value:
+            return int(value)
+        return value
     elif value_type == 'date':
         value = element.get_attribute('office:date-value')
         if 'T' in value:
@@ -376,7 +387,6 @@ def get_value(element, value_type=None, try_get_text=True):
         value = element.get_attribute('office:string-value')
         if value is not None:
             return unicode(value)
-
         # XXX: get_text or get_formated_text ???
         if try_get_text:
             value = element.get_text(recursive=True)

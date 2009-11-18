@@ -37,7 +37,7 @@ from vfs import vfs
 
 
 def alpha_to_base10(alpha):
-    """Translates A to 1, B to 2, etc. So "AB" is value 28.
+    """Translates A to 0, B to 1, etc. So "AB" is value 27.
     """
     if type(alpha) is int:
         return alpha
@@ -47,7 +47,7 @@ def alpha_to_base10(alpha):
     for c in alpha.lower():
         v = ord(c) - ord('a') + 1
         column = column * 26 + v
-    return column
+    return column - 1
 
 
 def _get_cell_coordinates(obj):
@@ -78,7 +78,7 @@ def _get_cell_coordinates(obj):
     if line <= 0:
         raise ValueError, 'cell name "%s" is malformed' % obj
     # Indexes start at 0
-    return column - 1, line - 1
+    return column, line - 1
 
 
 
@@ -221,11 +221,12 @@ def _delete_element(position, real_elements, get_repeated, set_repeated):
 
 
 def odf_create_cell(value=None, representation=None, cell_type=None,
-                    currency=None, style=None):
+                    currency=None, repeated=None, style=None):
     """Create a cell element containing the given value. The textual
     representation is automatically formatted but can be provided. Cell type
     can be deduced as well, unless the number is a percentage or currency. If
-    cell type is "currency", the currency must be given.
+    cell type is "currency", the currency must be given. The cell can be
+    repeated on the given number of columns.
 
     Arguments:
 
@@ -239,6 +240,8 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
 
         currency -- three-letter str
 
+        repeated -- int
+
         style -- unicode
 
     Return: odf_cell
@@ -247,6 +250,8 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
     element = odf_create_element('<table:table-cell/>')
     element.set_cell_value(value, representation=representation,
             cell_type=cell_type, currency=currency)
+    if repeated and repeated > 1:
+        element.set_cell_repeated(repeated)
     if style is not None:
         element.set_cell_style(style)
     return element
@@ -273,8 +278,7 @@ def odf_create_row(width=None, repeated=None, style=None):
     element = odf_create_element('<table:table-row/>')
     if width is not None:
         for i in xrange(width):
-            cell = odf_create_cell(u"")
-            element.append_element(cell)
+            element.append_element(odf_create_cell())
     if repeated:
         element.set_row_repeated(repeated)
     if style is not None:
@@ -383,10 +387,10 @@ def odf_create_table(name, width=None, height=None, protected=False,
     """
     element = odf_create_element(u'<table:table table:name="%s"/>' % name)
     if protected:
-        raise NotImplementedError, "protected"
-        # TODO
         if protection_key is None:
             raise ValueError, "missing protection key"
+        # TODO
+        raise NotImplementedError, "protected"
         element.set_table_protected(protected)
     if not display:
         element.set_table_displayed(display)
@@ -414,17 +418,79 @@ class odf_cell(odf_element):
     """Class for the table cell element.
     """
 
-    def get_cell_value(self, try_get_text=False):
-        return get_value(self, try_get_text=try_get_text)
+    def get_cell_value(self):
+        """Get the Python value that represent the cell.
+
+        Possible return types are unicode, int, Decimal, datetime,
+        timedelta.
+
+        Return: Python type
+        """
+        return get_value(self)
 
 
     def set_cell_value(self, value, representation=None, cell_type=None,
             currency=None):
+        """Set the cell state from the Python value type.
+
+        Representation is how the cell is displayed. Cell type is guessed,
+        unless provided.
+
+        For monetary values, provide the name of the currency.
+
+        Arguments:
+
+            value -- Python type
+
+            representation -- unicode
+
+            cell_type -- 'boolean', 'float', 'date', 'string' or 'time'
+
+            currency -- unicode
+        """
         representation = _set_value_and_type(self, value=value,
                 representation=representation, value_type=cell_type,
                 currency=currency)
         if representation is not None:
             self.set_text_content(representation)
+
+
+    def get_cell_type(self):
+        """Get the type of the cell: boolean, float, date, string or time.
+
+        Return: str
+        """
+        return self.get_attribute('office:value-type')
+
+
+    def set_cell_type(self, cell_type):
+        """Set the type ofthe cell manually.
+
+        Arguments:
+
+            value -- Python type
+
+            representation -- unicode
+
+            cell_type -- 'boolean', 'float', 'date', 'string' or 'time'
+        """
+        self.set_attribute('office:value-type', cell_type)
+
+
+    def get_cell_currency(self):
+        """Get the currency used for monetary values.
+        """
+        return self.get_attribute('office:currency')
+
+
+    def set_cell_currency(self, currency):
+        """Set the currency used for monetary values.
+
+        Arguments:
+
+            currency -- unicode
+        """
+        self.set_attribute('office:currency', currency)
 
 
     def get_cell_repeated(self):
@@ -446,36 +512,61 @@ class odf_cell(odf_element):
 
             repeated -- int or None
         """
-        if repeated is None or repeated == 0:
+        if repeated is None or repeated < 2:
             try:
                 self.del_attribute('table:number-columns-repeated')
             except KeyError:
-                return
+                pass
+            return
         self.set_attribute('table:number-columns-repeated', str(repeated))
 
 
     def get_cell_style(self):
+        """Get the style of the cell itself.
+
+        Return: unicode
+        """
         return self.get_attribute('table:style-name')
 
 
     def set_cell_style(self, style):
+        """Set the style of the cell itself.
+
+        Arguments:
+
+            style -- unicode
+        """
         self.set_attribute('table:style-name', style)
 
 
 
 class odf_row(odf_element):
 
+    # Private API
 
     def __check_x(self, x):
+        x = alpha_to_base10(x)
         width = self.get_row_width()
         if x < 0:
-            x = width - x
+            x = width + x
         if x < 0 or x >= width:
-            raise ValueError, "X outside of row"
+            raise ValueError, "X %d outside of row" % x
         return x
 
 
+    def _get_cells(self):
+        return self.get_element_list(
+                '(table:table-cell|table:covered-table-cell)')
+
+    # Public API
+
     def get_row_repeated(self):
+        """Get the number of times the "real" row is repeated.
+
+        Always None when using the table API.
+
+        Return: int or None
+        """
         repeated = self.get_attribute('table:number-rows-repeated')
         if repeated is None:
             return None
@@ -483,91 +574,239 @@ class odf_row(odf_element):
 
 
     def set_row_repeated(self, repeated):
-        if repeated is None or repeated == 0:
+        """Set the number of times the "real" row is repeated.
+
+        Useless and even dangerous when using the table API.
+
+        Arguments:
+
+            repeated -- int or None
+        """
+        if repeated is None or repeated < 2:
             try:
                 self.del_attribute('table:number-rows-repeated')
             except KeyError:
-                return
+                pass
+            return
         self.set_attribute('table:number-rows-repeated', str(repeated))
 
 
     def get_row_style(self):
+        """Get the style of the row itself.
+
+        Return: unicode
+        """
         return self.get_attribute('table:style-name')
 
 
     def set_row_style(self, style):
+        """Set the style of the row itself.
+
+        Arguments:
+
+            style -- unicode
+        """
         self.set_attribute('table:style-name', style)
 
 
-    def traverse_cells(self):
-        """Return as many cell elements as expected cells in the row, i.e.
-        expand repetitions by returning the same cell as many times as
-        necessary.
-
-        The original cell element is returned, with its repetition
-        attribute.
-
-        Mostly used by the odf_table API.
-        """
-        for cell in self.get_element_list(
-                '(table:table-cell|table:covered-table-cell)'):
-            repeated = cell.get_cell_repeated() or 1
-            for i in xrange(repeated):
-                yield cell
-
-
-    def get_cell(self, x):
-        x = alpha_to_base10(x)
-        x = self.__check_x(x)
-        for w, cell in enumerate(self.traverse_cells()):
-            if w == x:
-                # Return a copy without the now obsolete repetition
-                cell = cell.clone()
-                cell.set_cell_repeated(None)
-                return cell
-
-
-
-    def set_cell(self, x, cell):
-        x = self.__check_x(x)
-        if cell.get_cell_repeated():
-            raise ValueError, "setting a repeted cell not supported"
-        _set_element(x, cell, self.get_element_list(
-                '(table:table-cell|table:covered-table-cell)'),
-                odf_cell.get_cell_repeated, odf_cell.set_cell_repeated)
-
-
-    def insert_cell(self, x, cell):
-        x = self.__check_x(x)
-        # Inserting a repeated cell accepted
-        _insert_element(x, cell, self.get_element_list(
-                '(table:table-cell|table:covered-table-cell)'),
-                odf_cell.get_cell_repeated, odf_cell.set_cell_repeated)
-
-
-    def append_cell(self, cell):
-        # Appending a repeated cell accepted
-        self.append_element(cell)
-
-
-    def delete_cell(self, x):
-        x = self.__check_x(x)
-        _delete_element(x, self.get_element_list(
-                '(table:table-cell|table:covered-table-cell)/'),
-                odf_cell.get_cell_repeated, odf_cell.set_cell_repeated)
-
-
     def get_row_width(self):
-        """Return the number of expected cells in the row, i.e. addition
+        """Get the number of expected cells in the row, i.e. addition
         repetitions.
+
+        Return: int
         """
-        cells = self.get_element_list(
-                '(table:table-cell|table:covered-table-cell)')
+        cells = self._get_cells()
         repeated = self.xpath(
                 '(table:table-cell|table:covered-table-cell)/'
                 '@table:number-columns-repeated')
         unrepeated = len(cells) - len(repeated)
         return sum(int(r) for r in repeated) + unrepeated
+
+
+    def traverse_cells(self):
+        """Yield as many cell elements as expected cells in the row, i.e.
+        expand repetitions by returning the same cell as many times as
+        necessary.
+
+        Copies are returned, use ``set_cell`` to push them back.
+        """
+        for cell in self._get_cells():
+            repeated = cell.get_cell_repeated() or 1
+            for i in xrange(repeated):
+                # Return a copy without the now obsolete repetition
+                cell = cell.clone()
+                cell.set_cell_repeated(None)
+                yield cell
+
+
+    def get_cell_list(self, regex=None, style=None):
+        """Get the list of cells matching the criteria. Each result is a
+        tuple of (x, y, cell).
+
+        Arguments:
+
+            regex -- unicode
+
+            style -- unicode
+
+        Return: list of tuples
+        """
+        cells = []
+        for x, cell in enumerate(self.traverse_cells()):
+            # Filter the cells with the regex
+            if regex and not cell.match(regex):
+                continue
+            # Filter the cells with the style
+            if style and cell.get_cell_style() != style:
+                continue
+            cells.append((x, cell))
+        # Return the coordinate and element
+        return cells
+
+
+    def get_cell(self, x):
+        """Get the cell at position "x" starting from 0. Alphabetical
+        positions like "D" are accepted.
+
+        A  copy is returned, use ``set_cell`` to push it back.
+
+        Arguments:
+
+            x -- int or str
+
+        Return: odf_cell
+        """
+        x = self.__check_x(x)
+        for w, cell in enumerate(self.traverse_cells()):
+            if w == x:
+                return cell
+
+
+    def get_cell_value(self, x):
+        """Shortcut to get the value of the cell at position "x".
+
+        See ``get_cell`` and ``odf_cell.get_cell_value``.
+        """
+        return self.get_cell(x).get_cell_value()
+
+
+
+    def set_cell(self, x, cell):
+        """Push the cell back in the row at position "x" starting from 0.
+        Alphabetical positions like "D" are accepted.
+
+        Arguments:
+
+            x -- int or str
+        """
+        x = self.__check_x(x)
+        if cell.get_cell_repeated():
+            raise ValueError, "setting a repeted cell not supported"
+        _set_element(x, cell, self._get_cells(), odf_cell.get_cell_repeated,
+                odf_cell.set_cell_repeated)
+
+
+    def set_cell_value(self, x, value):
+        """Shortcut to set the value of the cell at position "x".
+
+        See ``get_cell`` and ``odf_cell.get_cell_value``.
+        """
+        self.set_cell(x, odf_create_cell(value))
+
+
+    def insert_cell(self, x, cell):
+        """Insert the given cell at position "x" starting from 0.
+        Alphabetical positions like "D" are accepted.
+
+        Do not use when working on a table, use ``odf_table.insert_cell``.
+
+        Arguments:
+
+            x -- int or str
+
+            cell -- odf_cell
+        """
+        x = self.__check_x(x)
+        # Inserting a repeated cell accepted
+        _insert_element(x, cell, self._get_cells(),
+                odf_cell.get_cell_repeated, odf_cell.set_cell_repeated)
+
+
+    def append_cell(self, cell):
+        """Append the given cell at the end of the row. Repeated cells are
+        accepted.
+
+        Do not use when working on a table, use ``odf_table.append_cell``.
+
+        Arguments:
+
+            cell -- odf_cell
+        """
+        self.append_element(cell)
+
+
+    def delete_cell(self, x):
+        """Delete the cell at the given position "x" starting from 0.
+        Alphabetical positions like "D" are accepted.
+
+        Do not use when working on a table, use ``odf_table.delete_cell``.
+
+        Arguments:
+
+            x -- int or str
+        """
+        x = self.__check_x(x)
+        _delete_element(x, self._get_cells(), odf_cell.get_cell_repeated,
+                odf_cell.set_cell_repeated)
+
+
+    def get_cell_values(self):
+        """Get the list of all cell values in this row.
+
+        Return: list of Python types
+        """
+        return [cell.get_cell_value() for cell in self.traverse_cells()]
+
+
+    def set_cell_values(self, values):
+        """Set the list of all cell values in this row. The list must have
+        the same length than the row.
+
+        Arguments:
+
+            values -- list of Python types
+        """
+        width = self.get_row_width()
+        if len(values) != width:
+            raise ValueError, "row mismatch: %s cells expected" % width
+        for x in enumerate(values):
+            self.set_cell_value(x)
+
+
+    def rstrip_row(self):
+        """Remove *in-place* the empty cells at the right of the row.
+
+        Do not use when working on a table, use ``odf_table.rstrip_table``.
+
+        """
+        for cell in reversed(self._get_cells()):
+            if (cell.get_cell_style() is None
+                    and cell.get_cell_value() is None):
+                self.delete_element(cell)
+            else:
+                return
+
+
+    def is_row_empty(self):
+        """Wether all cells in the row are empty.
+
+        Return: bool
+        """
+        for cell in self._get_cells():
+            if (cell.get_cell_style() is not None
+                    or cell.get_cell_value() is not None):
+                return False
+        return True
 
 
 
@@ -601,7 +840,8 @@ class odf_column(odf_element):
             try:
                 self.del_attribute('table:number-columns-repeated')
             except KeyError:
-                return
+                pass
+            return
         self.set_attribute('table:number-columns-repeated', str(repeated))
 
 
@@ -622,18 +862,18 @@ class odf_table(odf_element):
     def __check_x(self, x):
         width = self.get_table_width()
         if x < 0:
-            x = width - x
+            x = width + x
         if x < 0 or x >= width:
-            raise ValueError, "X outside of table"
+            raise ValueError, "X %d outside of table" % x
         return x
 
 
     def __check_y(self, y):
         height = self.get_table_height()
         if y < 0:
-            y = height - y
+            y = height + y
         if y < 0 or y >= height:
-            raise ValueError, "Y outside of table"
+            raise ValueError, "Y %d outside of table" % y
         return y
 
 
@@ -650,8 +890,10 @@ class odf_table(odf_element):
 
     def get_table_height(self):
         """Get the current height of the table.
+
+        Return: int
         """
-        rows = self.get_element_list('table:table-row')
+        rows = self._get_rows()
         repeated = self.xpath('table:table-row/@table:number-rows-repeated')
         unrepeated = len(rows) - len(repeated)
         return sum(int(r) for r in repeated) + unrepeated
@@ -659,9 +901,14 @@ class odf_table(odf_element):
 
     def get_table_width(self):
         """Get the current width of the table.
+
+        Measured on columns. Use the odf_table API to ensure width
+        consistency.
+
+        Return: int
         """
         # Count columns: a good way to ensure consistency with row width
-        columns = self.get_element_list('table:table-column')
+        columns = self._get_columns()
         repeated = self.xpath(
                 'table:table-column/@table:number-columns-repeated')
         unrepeated = len(columns) - len(repeated)
@@ -669,7 +916,7 @@ class odf_table(odf_element):
 
 
     def get_table_size(self):
-        """Get the current width and height of the table.
+        """Shortcut to get the current width and height of the table.
 
         Return: (int, int)
         """
@@ -746,26 +993,59 @@ class odf_table(odf_element):
         return u''.join(result)
 
 
+    def get_table_values(self):
+        """Get a matrix of all Python values of the cells.
+
+        Return: list of lists
+        """
+        return [row.get_cell_values() for row in self.traverse_rows()]
+
+
+    def rstrip_table(self):
+        """Remove *in-place* empty rows below and empty cells at the right of
+        the table.
+        """
+        # Step 1: remove empty rows below the table
+        for row in reversed(self._get_rows()):
+            if row.is_row_empty():
+                row.get_parent().delete_element(row)
+            else:
+                break
+        # Step 2: remove empty columns of cells for remaining rows
+        for x in xrange(self.get_table_width() - 1, -1, -1):
+            if self.is_column_empty(x):
+                self.delete_column(x)
+            else:
+                break
+
+
+
     #
     # Rows
     #
 
+    def _get_rows(self):
+        return self.get_element_list('table:table-row')
+
+
     def traverse_rows(self):
-        """Return as many row elements as expected rows, i.e. expand
-        repetitions by returning the same row as many times as necessary.
+        """Yield as many row elements as expected rows in the table, i.e.
+        expand repetitions by returning the same row as many times as
+        necessary.
 
-        The original row element is returned, with its repetition attribute.
-
-        Mostly used by the higher-level API like "get_row" and "set_row".
+        Copies are returned, use ``set_row`` to push them back.
         """
-        for row in self.get_element_list('table:table-row'):
+        for row in self._get_rows():
             repeated = row.get_row_repeated() or 1
             for i in xrange(repeated):
+                # Return a copy without the now obsolete repetition
+                row = row.clone()
+                row.set_row_repeated(None)
                 yield row
 
 
     def get_row_list(self, regex=None, style=None):
-        """Return the list of rows matching the criteria. Each result is a
+        """Get the list of rows matching the criteria. Each result is a
         tuple of (y, row).
 
         The original row elements are returned, with their repetition
@@ -790,21 +1070,21 @@ class odf_table(odf_element):
 
 
     def get_row(self, y):
-        """Return a copy of the row at the given position. The object is
-        editable but only taken into account when put back using "set_row".
+        """Get the row at the given "y" position.
 
         Position start at 0. So cell A4 is on row 3.
+
+        A copy is returned, use ``set_cell`` to push it back.
 
         Arguments:
 
             y -- int
+
+        Return: odf_row
         """
         y = self.__check_y(y)
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
-                # Return a copy without the now obsolete repetition
-                row = row.clone()
-                row.set_row_repeated(None)
                 return row
 
 
@@ -824,13 +1104,13 @@ class odf_table(odf_element):
         y = self.__check_y(y)
         self.__check_width(row)
         # Setting a repeated row accepted
-        _set_element(y, row, self.get_element_list('table:table-row'),
-                odf_row.get_row_repeated, odf_row.set_row_repeated)
+        _set_element(y, row, self._get_rows(), odf_row.get_row_repeated,
+                odf_row.set_row_repeated)
 
 
     def insert_row(self, y, row):
-        """Insert the row before the given position. It must have the same
-        number of cells.
+        """Insert the row before the given "y" position. It must have the
+        same number of cells.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -843,8 +1123,8 @@ class odf_table(odf_element):
         y = self.__check_y(y)
         self.__check_width(row)
         # Inserting a repeated row accepted
-        _insert_element(y, row, self.get_element_list('table:table-row'),
-                odf_row.get_row_repeated, odf_row.set_row_repeated)
+        _insert_element(y, row, self._get_rows(), odf_row.get_row_repeated,
+                odf_row.set_row_repeated)
 
 
     def append_row(self, row):
@@ -863,7 +1143,7 @@ class odf_table(odf_element):
 
 
     def delete_row(self, y):
-        """Delete the row at the given position.
+        """Delete the row at the given "y" position.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -872,22 +1152,84 @@ class odf_table(odf_element):
             y -- int
         """
         y = self.__check_y(y)
-        _delete_element(y, self.get_element_list('table:table-row'),
-                odf_row.get_row_repeated, odf_row.set_row_repeated)
+        _delete_element(y, self._get_rows(), odf_row.get_row_repeated,
+                odf_row.set_row_repeated)
+
+
+    def get_row_values(self, y):
+        """Get the list of Python values for the cells of the row at the
+        given "y" position.
+
+        Position start at 0. So cell A4 is on row 3.
+
+        Arguments:
+
+            y -- int
+        """
+        return self.get_row(y).get_cell_values()
+
+
+    def set_row_values(self, y, values):
+        """Set the values of all cells of the row at the given "y" position.
+        It must have the same number of cells.
+
+        Position start at 0. So cell A4 is on row 3.
+
+        Arguments:
+
+            y -- int
+
+            values -- list of Python types
+        """
+        row = self.get_row(y)
+        row.set_cell_values(values)
+        self.set_row(y, row)
+
+
+    def is_row_empty(self, y):
+        """Wether all the cells of the row at the given "y" position are
+        undefined.
+
+        Position start at 0. So cell A4 is on row 3.
+
+        Arguments:
+
+            y -- int
+        """
+        return self.get_row(y).is_row_empty()
 
 
     #
     # Cells
     #
 
+    def get_cell_list(self, regex=None, style=None):
+        """Get the list of cells matching the criteria. Each result is a
+        tuple of (x, y, cell).
+
+        Arguments:
+
+            regex -- unicode
+
+            style -- unicode
+
+        Return: list of tuples
+        """
+        cells = []
+        for y, row in enumerate(self.traverse_rows()):
+            for x, cell in row.get_cell_list(regex=regex, style=style):
+                cells.append((x, y, cell))
+        # Return the coordinates and element
+        return cells
+
+
     def get_cell(self, coordinates):
-        """Return the cell at the given coordinates.
+        """Get the cell at the given coordinates.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
         human-readable position like "C4".
 
-        The cell object is modifiable but you need to put it back using
-        "set_cell".
+        A  copy is returned, use ``set_cell`` to push it back.
 
         Arguments:
 
@@ -900,6 +1242,20 @@ class odf_table(odf_element):
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
                 return row.get_cell(x)
+
+
+    def get_cell_value(self, coordinates):
+        """Get the Python value of the cell at the given coordinates.
+
+        They are either a 2-uplet of (x, y) starting from 0, or a
+        human-readable position like "C4".
+        Arguments:
+
+            coordinates -- (int, int) or str
+
+        Return: Python type
+        """
+        return self.get_cell().get_cell_value()
 
 
     def set_cell(self, coordinates, cell):
@@ -918,57 +1274,133 @@ class odf_table(odf_element):
         y = self.__check_y(y)
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
-                return row.set_cell(x, cell)
+                row.set_cell(x, cell)
+                self.set_row(y, row)
 
 
-    def get_cell_list(self, regex=None, style=None):
-        """Return the list of cells matching the criteria. Each result is a
-        tuple of (x, y, cell).
+    def set_cell_value(self, coordinates, value):
+        """Set the Python value of the cell at the given coordinates.
+
+        They are either a 2-uplet of (x, y) starting from 0, or a
+        human-readable position like "C4".
 
         Arguments:
 
-            regex -- unicode
+            coordinates -- (int, int) or str
 
-            style -- unicode
-
-        Return: list of tuples
+            value -- Python type
         """
-        cells = []
-        for y, row in enumerate(self.traverse_rows()):
-            for x, cell in enumerate(row.traverse_cells()):
-                # Filter the cells with the regex
-                if regex and not cell.match(regex):
-                    continue
-                # Filter the cells with the style
-                if style and cell.get_cell_style() != style:
-                        continue
-                cells.append((x, y, cell))
-        # Return the coordinates and element
-        return cells
+        self.set_cell(coordinates, odf_create_cell(value))
+
+
+    def insert_cell(self, coordinates, cell):
+        """Insert the given cell at the given coordinates.
+
+        They are either a 2-uplet of (x, y) starting from 0, or a
+        human-readable position like "C4".
+
+        Other rows are expanded to maintain width consistency.
+
+        Arguments:
+
+            coordinates -- (int, int) or str
+
+            cell -- odf_cell
+        """
+        x, y = _get_cell_coordinates(coordinates)
+        x = self.__check_y(x)
+        y = self.__check_y(y)
+        # Repetited cells are accepted
+        repeated = cell.get_cell_repeated()
+        stub = odf_create_cell(repeated=repeated)
+        for h, row in enumerate(self.traverse_rows()):
+            if h == y:
+                row.insert_cell(x, cell)
+                self.set_row(y, row)
+            else:
+                row.insert_cell(x, stub)
+                self.set_row(y, row)
+
+
+    def append_cell(self, coordinates, cell):
+        """Append the given cell at the given coordinates.
+
+        They are either a 2-uplet of (x, y) starting from 0, or a
+        human-readable position like "C4".
+
+        Other rows are expanded to maintain width consistency.
+
+        Arguments:
+
+            coordinates -- (int, int) or str
+
+            cell -- odf_cell
+        """
+        x, y = _get_cell_coordinates(coordinates)
+        x = self.__check_y(x)
+        y = self.__check_y(y)
+        # Repetited cells are accepted
+        repeated = cell.get_cell_repeated()
+        stub = odf_create_cell(repeated=repeated)
+        for h, row in enumerate(self.traverse_rows()):
+            if h == y:
+                row.append_cell(x, cell)
+                self.set_row(y, row)
+            else:
+                row.append_cell(x, stub)
+                self.set_row(y, row)
+
+
+    def delete_cell(self, coordinates):
+        """Delete the cell at the given coordinates.
+
+        They are either a 2-uplet of (x, y) starting from 0, or a
+        human-readable position like "C4".
+
+        Other rows are reduced to maintain width consistency.
+
+        Arguments:
+
+            coordinates -- (int, int) or str
+        """
+        x, y = _get_cell_coordinates(coordinates)
+        x = self.__check_y(x)
+        y = self.__check_y(y)
+        for h, row in enumerate(self.traverse_rows()):
+            if h == y:
+                row.delete_cell(x)
+                self.set_row(y, row)
+            else:
+                row.delete_cell(x)
+                self.set_row(y, row)
 
 
     #
     # Columns
     #
 
+    def _get_columns(self):
+        return self.get_element_list('table:table-column')
+
+
     def traverse_columns(self):
-        """Return as many column elements as expected columns, i.e. expand
-        repetitions by returning the same column as many times as necessary.
+        """Yield as many column elements as expected columns in the table,
+        i.e. expand repetitions by returning the same column as many times as
+        necessary.
 
-        The original column elements are returned, with their repetition
-        attribute.
-
-        Mostly used by the higher-level API like "get_column" and
-        "set_column".
+        Copies are returned, use ``set_column`` to push them back.
         """
-        for column in self.get_element_list('table:table-column'):
+        for column in self._get_columns():
             repeated = column.get_column_repeated() or 1
             for i in xrange(repeated):
+                # Return a copy without the now obsolete repetition
+                column = column.clone()
+                column.set_column_repeated(None)
                 yield column
 
 
     def get_column_list(self, style=None):
-        """Return the list of columns matching the criteria. Each result is a
+        """Get the list of columns matching the criteria. Each result is a
         tuple of (x, column).
 
         The original column elements are returned, with their repetition
@@ -989,13 +1421,14 @@ class odf_table(odf_element):
 
 
     def get_column(self, x):
-        """Return a copy of the column at the given position. The object is
-        editable but only taken into account when put back using "set_column".
+        """Get the column at the given "x" position.
 
         ODF columns don't contain cells, only style information.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
         like "C" is accepted.
+
+        A copy is returned, use ``set_column`` to push it back.
 
         Arguments:
 
@@ -1006,14 +1439,11 @@ class odf_table(odf_element):
         x = self.__check_x(x)
         for w, column in enumerate(self.traverse_columns()):
             if w == x:
-                # Return a copy without the now obsolete repetition
-                column = column.clone()
-                column.set_column_repeated(None)
                 return column
 
 
     def set_column(self, x, column):
-        """Replace the column at the given position.
+        """Replace the column at the given "x" position.
 
         ODF columns don't contain cells, only style information.
 
@@ -1027,14 +1457,14 @@ class odf_table(odf_element):
             column -- odf_column
         """
         x = self.__check_x(x)
-        _set_element(x, column, self.get_element_list('table:table-column'),
+        _set_element(x, column, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
 
 
 
     def insert_column(self, x, column):
-        """Insert the column before the given position.
+        """Insert the column before the given "x" position.
 
         ODF columns don't contain cells, only style information.
 
@@ -1048,10 +1478,12 @@ class odf_table(odf_element):
             column -- odf_column
         """
         x = self.__check_x(x)
-        _insert_element(x, column,
-                self.get_element_list('table:table-column'),
+        _insert_element(x, column, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
+        # Increment row width
+        for row in self._get_rows():
+            row.insert_cell(x, odf_create_cell())
 
 
     def append_column(self, column):
@@ -1067,6 +1499,9 @@ class odf_table(odf_element):
             column -- odf_column
         """
         self.append_element(column)
+        # Increment row width
+        for row in self._get_rows():
+            row.append_cell(odf_create_cell())
 
 
     def delete_column(self, x):
@@ -1081,9 +1516,98 @@ class odf_table(odf_element):
             x -- int or str.isalpha()
         """
         x = self.__check_x(x)
-        _delete_element(x, self.get_element_list('table:table-column'),
+        _delete_element(x, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
+        # Decrement row width
+        for row in self._get_rows():
+            row.delete_cell(x)
+
+
+    def get_column_cells(self, x):
+        """Get the list of cells at the given position.
+
+        Position start at 0. So cell C4 is on column 2. Alphabetical position
+        like "C" is accepted.
+
+        Arguments:
+
+            x -- int or str.isalpha()
+
+        Return: list of odf_cell
+        """
+        return [row.get_cell(x) for row in self.traverse_rows()]
+
+
+    def get_column_cell_values(self, x):
+        """Get the list of Python values for the cells at the given position.
+
+        Position start at 0. So cell C4 is on column 2. Alphabetical position
+        like "C" is accepted.
+
+        Arguments:
+
+            x -- int or str.isalpha()
+
+        Return: list of Python types
+        """
+        return [cell.get_cell_value() for cell in self.get_column_cells(x)]
+
+
+    def set_column_cells(self, x, cells):
+        """Set the list of cells at the given position.
+
+        Position start at 0. So cell C4 is on column 2. Alphabetical position
+        like "C" is accepted.
+
+        The list must have the same length than the table height.
+
+        Arguments:
+
+            x -- int or str.isalpha()
+
+            cells -- list of odf_cell
+        """
+        height = self.get_table_height()
+        if len(cells) != height:
+            raise ValueError, "col mismatch: %s cells expected" % height
+        cells = iter(cells)
+        for y, row in enumerate(self.traverse_rows()):
+            row.set_cell(x, cells.next())
+            self.set_row(y, row)
+
+
+    def set_column_cell_values(self, x, values):
+        """Set the list of Python values of cells at the given position.
+
+        Position start at 0. So cell C4 is on column 2. Alphabetical position
+        like "C" is accepted.
+
+        The list must have the same length than the table height.
+
+        Arguments:
+
+            x -- int or str.isalpha()
+
+            values -- list of Python types
+        """
+        cells = [odf_create_cell(value) for value in values]
+        self.set_column_cells(x, cells)
+
+
+    def is_column_empty(self, x):
+        """Wether all the cells at the given position are empty.
+
+        Position start at 0. So cell C4 is on column 2. Alphabetical position
+        like "C" is accepted.
+
+        Return: bool
+        """
+        for cell in self.get_column_cells(x):
+            if (cell.get_cell_style() is not None
+                    or cell.get_cell_value() is not None):
+                return False
+        return True
 
 
 
@@ -1117,9 +1641,7 @@ class odf_table(odf_element):
         quoted = '\\' + quotechar
         for row in self.traverse_rows():
             current_row = []
-            for cell in row.traverse_cells():
-                # Get value
-                value = cell.get_cell_value()
+            for value in row.get_cell_values():
                 if type(value) is unicode:
                     value = value.encode(encoding)
                 if type(value) is str:
@@ -1188,12 +1710,15 @@ def import_from_csv(file, name, style=None, delimiter=None, quotechar=None,
             cell = odf_create_cell(_get_python_value(value, encoding))
             row.append_cell(cell)
         table.append_row(row)
+    # Make the columns (FIXME by hand)
+    table.insert_element(odf_create_column(repeated=len(line)), position=0)
     return table
 
 
 
 # Register
 register_element_class('table:table-cell', odf_cell)
+register_element_class('table:covered-table-cell', odf_cell)
 register_element_class('table:table-row', odf_row)
 register_element_class('table:table-column', odf_column)
 register_element_class('table:table', odf_table)

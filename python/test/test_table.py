@@ -3,7 +3,7 @@
 
 # Import from the Standard Library
 from datetime import date, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal as dec
 from cStringIO import StringIO
 from unittest import TestCase, main
 
@@ -21,7 +21,15 @@ csv_data = '"A float","3.14"\n"A date","1975-05-07"\n'
 class TestCoordinates(TestCase):
 
     def test_alpha_to_base10(self):
-        self.assertEqual(alpha_to_base10('ABC'), 731)
+        self.assertEqual(alpha_to_base10('ABC'), 730)
+
+
+    def test_base10_to_base10(self):
+        self.assertEqual(alpha_to_base10(730), 730)
+
+
+    def test_digit_to_base10(self):
+        self.assertRaises(ValueError, alpha_to_base10, '730')
 
 
     def test_get_cell_coordinates_tuple(self):
@@ -38,7 +46,7 @@ class TestCoordinates(TestCase):
 
 class TestCreateCell(TestCase):
 
-    def test_create_cell_bool(self):
+    def test_bool(self):
         cell = odf_create_cell(True)
         expected = ('<table:table-cell office:value-type="boolean" '
                       'office:boolean-value="true">'
@@ -47,7 +55,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_bool_repr(self):
+    def test_bool_repr(self):
         cell = odf_create_cell(True, representation=u"VRAI")
         expected = ('<table:table-cell office:value-type="boolean" '
                       'office:boolean-value="true">'
@@ -56,7 +64,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_int(self):
+    def test_int(self):
         cell = odf_create_cell(23)
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="23">'
@@ -65,7 +73,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_int_repr(self):
+    def test_int_repr(self):
         cell = odf_create_cell(23, representation=u"00023")
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="23">'
@@ -74,7 +82,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_float(self):
+    def test_float(self):
         cell = odf_create_cell(3.141592654)
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="3.141592654">'
@@ -83,7 +91,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_float_repr(self):
+    def test_float_repr(self):
         cell = odf_create_cell(3.141592654, representation=u"3,14")
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="3.141592654">'
@@ -92,8 +100,8 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_decimal(self):
-        cell = odf_create_cell(Decimal('2.718281828'))
+    def test_decimal(self):
+        cell = odf_create_cell(dec('2.718281828'))
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="2.718281828">'
                       '<text:p>2.718281828</text:p>'
@@ -101,8 +109,8 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_decimal_repr(self):
-        cell = odf_create_cell(Decimal('2.718281828'),
+    def test_decimal_repr(self):
+        cell = odf_create_cell(dec('2.718281828'),
                                representation=u"2,72")
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="2.718281828">'
@@ -111,7 +119,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_date(self):
+    def test_date(self):
         cell = odf_create_cell(date(2009, 6, 30))
         expected = ('<table:table-cell office:value-type="date" '
                       'office:date-value="2009-06-30">'
@@ -120,7 +128,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_date_repr(self):
+    def test_date_repr(self):
         cell = odf_create_cell(date(2009, 6, 30),
                                representation=u"30/6/2009")
         expected = ('<table:table-cell office:value-type="date" '
@@ -130,7 +138,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_datetime(self):
+    def test_datetime(self):
         cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18))
         expected = ('<table:table-cell office:value-type="date" '
                 'office:date-value="2009-06-30T17:33:18">'
@@ -139,7 +147,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_datetime_repr(self):
+    def test_datetime_repr(self):
         cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18),
                                representation=u"30/6/2009 17:33")
         expected = ('<table:table-cell office:value-type="date" '
@@ -149,7 +157,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_str(self):
+    def test_str(self):
         cell = odf_create_cell('red')
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="red">'
@@ -158,7 +166,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_str_repr(self):
+    def test_str_repr(self):
         cell = odf_create_cell('red', representation=u"Red")
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="red">'
@@ -167,7 +175,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_unicode(self):
+    def test_unicode(self):
         cell = odf_create_cell(u"Plato")
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="Plato">'
@@ -176,7 +184,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_unicode_repr(self):
+    def test_unicode_repr(self):
         cell = odf_create_cell(u"Plato", representation=u"P.")
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="Plato">'
@@ -185,7 +193,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_timedelta(self):
+    def test_timedelta(self):
         cell = odf_create_cell(timedelta(0, 8))
         expected = ('<table:table-cell office:value-type="time" '
                       'office:time-value="PT00H00M08S">'
@@ -194,7 +202,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_timedelta_repr(self):
+    def test_timedelta_repr(self):
         cell = odf_create_cell(timedelta(0, 8), representation=u"00:00:08")
         expected = ('<table:table-cell office:value-type="time" '
                       'office:time-value="PT00H00M08S">'
@@ -203,7 +211,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_percentage(self):
+    def test_percentage(self):
         cell = odf_create_cell(90, cell_type='percentage')
         expected = ('<table:table-cell office:value-type="percentage" '
                       'office:value="90">'
@@ -212,7 +220,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_percentage_repr(self):
+    def test_percentage_repr(self):
         cell = odf_create_cell(90, representation=u"90 %",
                                cell_type='percentage')
         expected = ('<table:table-cell office:value-type="percentage" '
@@ -222,7 +230,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_currency(self):
+    def test_currency(self):
         cell = odf_create_cell(1.54, cell_type='currency', currency='EUR')
         expected = ('<table:table-cell office:value-type="currency" '
                       'office:value="1.54" office:currency="EUR">'
@@ -231,7 +239,7 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_currency_repr(self):
+    def test_currency_repr(self):
         cell = odf_create_cell(1.54, representation=u"1,54 €",
                                cell_type='currency', currency='EUR')
         expected = ('<table:table-cell office:value-type="currency" '
@@ -241,50 +249,48 @@ class TestCreateCell(TestCase):
         self.assertEqual(cell.serialize(), expected)
 
 
-    def test_create_cell_bad(self):
+    def test_style(self):
+        cell = odf_create_cell(style=u"Monétaire")
+        expected = '<table:table-cell table:style-name="Mon&#233;taire"/>'
+        self.assertEqual(cell.serialize(), expected)
+
+
+    def test_bad(self):
         self.assertRaises(TypeError, odf_create_cell, [])
 
 
 
 class TestCreateRow(TestCase):
 
-    def test_create_row(self):
+    def test_default(self):
         row = odf_create_row()
         expected = '<table:table-row/>'
         self.assertEqual(row.serialize(), expected)
 
 
-    def test_create_row_width(self):
+    def test_width(self):
         row = odf_create_row(1)
-        expected = ('<table:table-row>'
-                      '<table:table-cell office:value-type="string" '
-                        'office:string-value="">'
-                        '<text:p></text:p>'
-                      '</table:table-cell>'
-                    '</table:table-row>')
+        expected = '<table:table-row><table:table-cell/></table:table-row>'
         self.assertEqual(row.serialize(), expected)
 
 
-    def test_create_row_repeated(self):
+    def test_repeated(self):
         row = odf_create_row(repeated=3)
         expected = '<table:table-row table:number-rows-repeated="3"/>'
         self.assertEqual(row.serialize(), expected)
 
 
-    def test_create_row_style(self):
+    def test_style(self):
         row = odf_create_row(style=u"ro1")
         expected = '<table:table-row table:style-name="ro1"/>'
         self.assertEqual(row.serialize(), expected)
 
 
-    def test_create_row_all(self):
+    def test_all(self):
         row = odf_create_row(1, repeated=3, style=u"ro1")
         expected = ('<table:table-row table:number-rows-repeated="3" '
                       'table:style-name="ro1">'
-                      '<table:table-cell office:value-type="string" '
-                        'office:string-value="">'
-                        '<text:p></text:p>'
-                      '</table:table-cell>'
+                      '<table:table-cell/>'
                     '</table:table-row>')
         self.assertEqual(row.serialize(), expected)
 
@@ -292,32 +298,26 @@ class TestCreateRow(TestCase):
 
 class TestCreateColumn(TestCase):
 
-    def test_create_column(self):
+    def test_default(self):
         column = odf_create_column()
         expected = '<table:table-column/>'
         self.assertEqual(column.serialize(), expected)
 
 
-    def test_create_column_style(self):
-        column = odf_create_column(style=u"A Style")
-        expected = '<table:table-column table:style-name="A Style"/>'
-        self.assertEqual(column.serialize(), expected)
-
-
-    def test_create_column_default_cell_style(self):
+    def test_default_cell_style(self):
         column = odf_create_column(default_cell_style=u"A Style")
         expected = ('<table:table-column '
                       'table:default-cell-style-name="A Style"/>')
         self.assertEqual(column.serialize(), expected)
 
 
-    def test_create_column_repeated(self):
-        column = odf_create_column(repeated=3)
-        expected = '<table:table-column table:number-columns-repeated="3"/>'
+    def test_style(self):
+        column = odf_create_column(style=u"A Style")
+        expected = '<table:table-column table:style-name="A Style"/>'
         self.assertEqual(column.serialize(), expected)
 
 
-    def test_create_column_all(self):
+    def test_all(self):
         column =  odf_create_column(style=u"co1",
                 default_cell_style="Standard", repeated=3)
         expected = ('<table:table-column table:style-name="co1" '
@@ -328,46 +328,275 @@ class TestCreateColumn(TestCase):
 
 class TestCreateTable(TestCase):
 
-    def test_create_table(self):
+    def test_default(self):
         table = odf_create_table(u"A Table")
         expected = '<table:table table:name="A Table"/>'
         self.assertEqual(table.serialize(), expected)
 
 
-    def test_create_table_style(self):
+    def test_width_height(self):
+        table = odf_create_table(u"A Table", width=1, height=2)
+        expected = ('<table:table table:name="A Table">'
+                    '<table:table-column table:number-columns-repeated="1"/>'
+                    '<table:table-row>'
+                      '<table:table-cell/>'
+                    '</table:table-row>'
+                    '<table:table-row>'
+                      '<table:table-cell/>'
+                    '</table:table-row>'
+                    '</table:table>')
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_protected_no_key(self):
+        self.assertRaises(ValueError, odf_create_table, u"Protected",
+                protected=True)
+
+
+    def test_protected(self):
+        # TODO
+        self.assertRaises(NotImplementedError, odf_create_table,
+                u"Protected", protected=True, protection_key='1234')
+
+
+    def test_display(self):
+        table = odf_create_table(u"Displayed")
+        expected = '<table:table table:name="Displayed"/>'
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_display_false(self):
+        table = odf_create_table(u"Hidden", display=False)
+        expected = '<table:table table:name="Hidden" table:display="false"/>'
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_print(self):
+        table = odf_create_table(u"Printable")
+        expected = '<table:table table:name="Printable"/>'
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_print_false(self):
+        table = odf_create_table(u"Hidden", printable=False)
+        expected = '<table:table table:name="Hidden" table:print="false"/>'
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_print_ranges_str(self):
+        table = odf_create_table(u"Ranges", print_ranges='E6:K12 P6:R12')
+        expected = ('<table:table table:name="Ranges" '
+                      'table:print-ranges="E6:K12 P6:R12"/>')
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_print_ranges_list(self):
+        table = odf_create_table(u"Ranges",
+                print_ranges=['E6:K12', 'P6:R12'])
+        expected = ('<table:table table:name="Ranges" '
+                      'table:print-ranges="E6:K12 P6:R12"/>')
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_style(self):
         table = odf_create_table(u"A Table", style=u"A Style")
         expected = ('<table:table table:name="A Table" '
                       'table:style-name="A Style"/>')
         self.assertEqual(table.serialize(), expected)
 
 
-    def test_create_table_width_height(self):
-        table = odf_create_table(u"A Table", width=1, height=2)
-        expected = ('<table:table table:name="A Table">'
-                    '<table:table-column table:number-columns-repeated="1"/>'
-                    '<table:table-row>'
-                      '<table:table-cell office:value-type="string" '
-                        'office:string-value="">'
-                        '<text:p></text:p>'
-                      '</table:table-cell>'
-                    '</table:table-row>'
-                    '<table:table-row>'
-                      '<table:table-cell office:value-type="string" '
-                        'office:string-value="">'
-                        '<text:p></text:p>'
-                      '</table:table-cell>'
-                    '</table:table-row>'
-                    '</table:table>')
-        self.assertEqual(table.serialize(), expected)
+
+class TestCell(TestCase):
+
+    def setUp(self):
+        self.cell = odf_create_cell(1, repeated=3, style=u"ce1")
+
+
+    def test_get_value(self):
+        self.assertEqual(self.cell.get_cell_value(), 1)
+
+
+    def test_set_value(self):
+        cell = self.cell.clone()
+        cell.set_cell_value(u"€")
+        self.assertEqual(cell.get_cell_value(), u"€")
+
+
+    def test_repeated(self):
+        self.assertEqual(self.cell.get_cell_repeated(), 3)
+
+
+    def test_style(self):
+        self.assertEqual(self.cell.get_cell_style(), u"ce1")
+
+
+
+class TestRow(TestCase):
+
+    def setUp(self):
+        row = odf_create_row(width=2, repeated=3, style=u"ro1")
+        # Add repeated cell
+        row.append_element(odf_create_cell(1, repeated=2))
+        # Add regular cell
+        row.append_element(odf_create_cell(style=u"ce1"))
+        self.row = row
+
+
+    def test_repeated(self):
+        self.assertEqual(self.row.get_row_repeated(), 3)
+
+
+    def test_style(self):
+        self.assertEqual(self.row.get_row_style(), u"ro1")
+
+
+    def test_width(self):
+        self.assertEqual(self.row.get_row_width(), 5)
+
+
+    def test_traverse(self):
+        self.assertEqual(len(list(self.row.traverse_cells())), 5)
+
+
+    def test_get_cell_values(self):
+        self.assertEqual(self.row.get_cell_values(),
+                [None, None, 1, 1, None])
+
+
+    def test_check_x(self):
+        check_x = self.row._odf_row__check_x
+        self.assertRaises(ValueError, check_x, 5)
+        self.assertEqual(check_x(4), 4)
+        self.assertEqual(check_x(3), 3)
+        self.assertEqual(check_x(2), 2)
+        self.assertEqual(check_x(1), 1)
+        self.assertEqual(check_x(0), 0)
+        self.assertEqual(check_x(-1), 4)
+        self.assertEqual(check_x(-2), 3)
+        self.assertEqual(check_x(-3), 2)
+        self.assertEqual(check_x(-4), 1)
+        self.assertEqual(check_x(-5), 0)
+        self.assertRaises(ValueError, check_x, -6)
+
+
+    def test_is_empty(self):
+        row = odf_create_row(width=100)
+        self.assertEqual(row.is_row_empty(), True)
+
+
+    def test_is_empty_no(self):
+        row = odf_create_row(width=100)
+        row.set_cell_value(50, 1)
+        self.assertEqual(row.is_row_empty(), False)
+
+
+    def test_rstrip(self):
+        row = odf_create_row(width=100)
+        row.set_cell_value(0, 1)
+        row.set_cell_value(1, 2)
+        row.set_cell_value(2, 3)
+        row.set_cell(3, odf_create_cell(style=u"ce1"))
+        row.rstrip_row()
+        self.assertEqual(row.get_row_width(), 4)
+
+
+
+class TestRowCell(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        body = document.get_body()
+        table = body.get_table_by_name(u"Example1").clone()
+        self.row_repeats = table.get_row(0)
+        self.row = table.get_row(1)
+
+
+    def test_get_cell_list_regex(self):
+        coordinates = [x for x, cell in self.row.get_cell_list(regex=ur'3')]
+        expected = [4, 5, 6]
+        self.assertEqual(coordinates, expected)
+
+
+    def test_get_cell_list_style(self):
+        coordinates = [x for x, cell in self.row.get_cell_list(style=ur"ce1")]
+        expected = [1, 5]
+        self.assertEqual(coordinates, expected)
+
+
+    def test_get_cell_alpha(self):
+        row = self.row
+        cell_5 = row.get_cell('F')
+        self.assertEqual(cell_5.get_cell_value(), 3)
+        self.assertEqual(cell_5.get_text_content(), u"3")
+        self.assertEqual(cell_5.get_cell_type(), 'float')
+        self.assertEqual(cell_5.get_cell_style(), u"ce1")
+
+
+    def test_get_cell_int(self):
+        row = self.row
+        cell_5 = row.get_cell(5)
+        self.assertEqual(cell_5.get_cell_value(), 3)
+        self.assertEqual(cell_5.get_text_content(), u"3")
+        self.assertEqual(cell_5.get_cell_type(), 'float')
+        self.assertEqual(cell_5.get_cell_style(), u"ce1")
+
+
+    def test_set_cell(self):
+        row = self.row.clone()
+        row.set_cell_value(1, 3.14)
+        self.assertEqual(row.get_cell_values(),
+                [1, dec('3.14'), 1, 2, 3, 3, 3])
+
+
+    def test_set_cell_repeat(self):
+        row = self.row_repeats.clone()
+        row.set_cell_value(1, 3.14)
+        self.assertEqual(row.get_cell_values(),
+                [1, dec('3.14'), 1, 2, 3, 3, 3])
+
+
+    def test_insert_cell(self):
+        row = self.row.clone()
+        row.insert_cell(3, odf_create_cell(u"Inserted"))
+        self.assertEqual(row.get_row_width(), 8)
+        self.assertEqual(row.get_cell_values(),
+                [1, 1, 1, u"Inserted", 2, 3, 3, 3])
+
+
+    def test_insert_cell_repeat(self):
+        row = self.row_repeats.clone()
+        row.insert_cell(6, odf_create_cell(u"Inserted"))
+        self.assertEqual(row.get_row_width(), 8)
+        self.assertEqual(row.get_cell_values(),
+                [1, 1, 1, 2, 3, 3, u"Inserted", 3])
+
+
+    def test_append_cell(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(u"Appended"))
+        self.assertEqual(row.get_row_width(), 8)
+        self.assertEqual(row.get_cell(7).get_cell_value(), u"Appended")
+
+
+    def test_delete_cell(self):
+        row = self.row.clone()
+        row.delete_cell(3)
+        self.assertEqual(row.get_cell_values(), [1, 1, 1, 3, 3, 3])
+
+
+    def test_delete_cell_repeat(self):
+        row = self.row_repeats.clone()
+        row.delete_cell(-1)
+        self.assertEqual(row.get_cell_values(), [1, 1, 1, 2, 3, 3])
 
 
 
 class TestTable(TestCase):
 
     def setUp(self):
-        document = document = odf_get_document('samples/simple_table.ods')
-        self.document = document
-        self.body = document.get_body()
+        document = odf_get_document('samples/simple_table.ods')
+        self.body = body = document.get_body()
+        self.table = body.get_table_by_name(u"Example1")
 
 
     def test_get_table_list(self):
@@ -395,37 +624,354 @@ class TestTable(TestCase):
 
 
     def test_style(self):
-        table = self.body.get_table_by_position(1)
-        self.assertEqual(table.get_table_style(), u"ta1")
+        self.assertEqual(self.table.get_table_style(), u"ta1")
 
 
     def test_print(self):
-        table = self.body.get_table_by_position(1)
-        self.assertEqual(table.is_table_printable(), False)
+        self.assertEqual(self.table.is_table_printable(), False)
+
+
+    def test_width(self):
+        self.assertEqual(self.table.get_table_width(), 7)
+
+
+    def test_height(self):
+        self.assertEqual(self.table.get_table_height(), 4)
 
 
     def test_width_height(self):
-        table = self.body.get_table_by_name(u"Example1")
-        self.assertEqual(table.get_table_size(), (7, 4))
+        self.assertEqual(self.table.get_table_size(), (7, 4))
 
 
-    def test_empty(self):
+    def test_width_height_empty(self):
         table = odf_create_table(u"Empty")
         self.assertEqual(table.get_table_size(), (0, 0))
 
 
+    def test_get_values(self):
+        self.assertEqual(self.table.get_table_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+
+
+    def test_rstrip(self):
+        document = odf_get_document('samples/styled_table.ods')
+        table = document.get_body().get_table_by_name(u'Feuille1').clone()
+        table.rstrip_table()
+        self.assertEqual(table.get_table_size(), (5, 9))
+
+
+
+class TestTableRow(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        self.table = document.get_body().get_table_by_name(u"Example1")
+
+
     def test_traverse_rows(self):
-        table = self.body.get_table_by_name(u"Example1")
-        rows = list(table.traverse_rows())
-        self.assertEqual(len(rows), 4)
-        row = rows[0]
-        self.assertEqual(len(row.get_children()), 7)
+        self.assertEqual(len(list(self.table.traverse_rows())), 4)
+
+
+    def test_get_row_values(self):
+        self.assertEqual(self.table.get_row_values(3), [1, 2, 3, 4, 5, 6, 7])
+
+
+    def test_get_row_list_regex(self):
+        coordinates = [y for y, row in self.table.get_row_list(regex=ur'4')]
+        self.assertEqual(coordinates, [3])
+
+
+    def test_get_row_list_style(self):
+        table = self.table.clone()
+        # Set a different style manually
+        row = table.get_element_list('table:table-row')[2]
+        row.set_row_style(u"A Style")
+        coordinates = [y for y, row in table.get_row_list(style=ur'A Style')]
+        self.assertEqual(coordinates, [2])
+
+
+    def test_get_row(self):
+        row = self.table.get_row(3)
+        self.assertEqual(row.get_cell_values(), [1, 2, 3, 4, 5, 6, 7])
+
+
+    def test_get_row_repeat(self):
+        table = self.table.clone()
+        # Set a repetition manually
+        table.get_element_list('table:table-row')[1].set_row_repeated(2)
+        row = table.get_row(4)
+        self.assertEqual(row.get_cell_values(), [1, 2, 3, 4, 5, 6, 7])
+
+
+    def test_set_row(self):
+        table = self.table.clone()
+        row = table.get_row(3)
+        row.set_cell_value(3, u"Changed")
+        table.set_row(1, row)
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1,          2, 3, 3, 3],
+                 [1, 2, 3, u"Changed", 5, 6, 7],
+                 [1, 1, 1,          2, 3, 3, 3],
+                 [1, 2, 3,          4, 5, 6, 7]])
+
+
+    def test_set_row_repeat(self):
+        table = self.table.clone()
+        # Set a repetition manually
+        table.get_element_list('table:table-row')[2].set_row_repeated(3)
+        row = table.get_row(5)
+        row.set_cell_value(3, u"Changed")
+        table.set_row(2, row)
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1,          2, 3, 3, 3],
+                 [1, 1, 1,          2, 3, 3, 3],
+                 [1, 2, 3, u"Changed", 5, 6, 7],
+                 [1, 1, 1,          2, 3, 3, 3],
+                 [1, 1, 1,          2, 3, 3, 3],
+                 [1, 2, 3,          4, 5, 6, 7]])
+
+
+    def test_set_row_smaller(self):
+        table = self.table.clone()
+        small_row = odf_create_row(width=table.get_table_width() - 1)
+        self.assertRaises(ValueError, table.set_row, 0, small_row)
+
+
+    def test_set_row_bigger(self):
+        table = self.table.clone()
+        big_row = odf_create_row(width=table.get_table_width() + 1)
+        self.assertRaises(ValueError, table.set_row, 0, big_row)
+
+
+    def test_insert_row(self):
+        table = self.table.clone()
+        row = table.get_row(3)
+        table.insert_row(2, row)
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+
+
+    def test_insert_row_repeated(self):
+        table = self.table.clone()
+        # Set a repetition manually
+        table.get_element_list('table:table-row')[2].set_row_repeated(3)
+        row = table.get_row(5)
+        table.insert_row(2, row)
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+
+
+    def test_insert_row_smaller(self):
+        table = self.table.clone()
+        small_row = odf_create_row(width=table.get_table_width() - 1)
+        self.assertRaises(ValueError, table.insert_row, 0, small_row)
+
+
+    def test_insert_row_bigger(self):
+        table = self.table.clone()
+        big_row = odf_create_row(width=table.get_table_width() + 1)
+        self.assertRaises(ValueError, table.insert_row, 0, big_row)
+
+
+    def test_append_row(self):
+        table = self.table.clone()
+        row = table.get_row(0)
+        table.append_row(row)
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7],
+                 [1, 1, 1, 2, 3, 3, 3]])
+
+
+    def test_append_row_smaller(self):
+        table = self.table.clone()
+        small_row = odf_create_row(width=table.get_table_width() - 1)
+        self.assertRaises(ValueError, table.append_row, small_row)
+
+
+    def test_append_row_bigger(self):
+        table = self.table.clone()
+        big_row = odf_create_row(width=table.get_table_width() + 1)
+        self.assertRaises(ValueError, table.append_row, big_row)
+
+
+    def test_delete_row(self):
+        table = self.table.clone()
+        table.delete_row(2)
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+
+
+    def test_delete_row_repeat(self):
+        table = self.table.clone()
+        # Set a repetition manually
+        table.get_element_list('table:table-row')[2].set_row_repeated(3)
+        table.delete_row(2)
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+
+
+    def test_is_row_empty(self):
+        table = odf_create_table(u"Empty", width=10, height=20)
+        for y in xrange(20):
+            self.assertEqual(table.is_row_empty(y), True)
+
+
+    def test_is_row_empty_no(self):
+        table = odf_create_table(u"Not Empty", width=10, height=20)
+        table.set_cell_value((4, 9), u"Bouh !")
+        self.assertEqual(table.is_row_empty(9), False)
+
+
+
+class TestTableCell(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        body = document.get_body()
+        self.table = body.get_table_by_name(u"Example1").clone()
+
+
+    def test_get_cell_alpha(self):
+        table = self.table
+        cell_D2 = table.get_cell('D3')
+        self.assertEqual(cell_D2.get_cell_value(), 2)
+        self.assertEqual(cell_D2.get_text_content(), u"2")
+        self.assertEqual(cell_D2.get_cell_type(), 'float')
+        self.assertEqual(cell_D2.get_cell_style(), u"ce1")
+
+
+    def test_get_cell_tuple(self):
+        table = self.table
+        cell_D2 = table.get_cell((3, 2))
+        self.assertEqual(cell_D2.get_cell_value(), 2)
+        self.assertEqual(cell_D2.get_text_content(), u"2")
+        self.assertEqual(cell_D2.get_cell_type(), 'float')
+        self.assertEqual(cell_D2.get_cell_style(), u"ce1")
+
+
+    def test_get_cell_list_regex(self):
+        table = self.table
+        coordinates = [(x, y)
+                for x, y, cell in table.get_cell_list(regex=ur'3')]
+        expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
+                (5, 2), (6, 2), (2, 3)]
+        self.assertEqual(coordinates, expected)
+
+
+    def test_get_cell_list_style(self):
+        table = self.table
+        coordinates = [(x, y)
+                for x, y, cell in table.get_cell_list(style=ur"ce1")]
+        expected = [(1, 1), (5, 1), (3, 2)]
+        self.assertEqual(coordinates, expected)
+
+
+
+class TestTableColumn(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        body = document.get_body()
+        self.table = body.get_table_by_name(u"Example1").clone()
 
 
     def test_traverse_columns(self):
-        table = self.body.get_table_by_name(u"Example1")
-        columns = list(table.traverse_columns())
+        columns = list(self.table.traverse_columns())
         self.assertEqual(len(columns), 7)
+
+
+    def test_get_column_list_style(self):
+        table = self.table
+        coordinates = [x for x, col in table.get_column_list(style=ur"co2")]
+        self.assertEqual(coordinates, [2, 3])
+
+
+    def test_get_column(self):
+        table = self.table
+        column = table.get_column(3)
+        self.assertEqual(column.get_column_style(), u"co2")
+        column = table.get_column(4)
+        self.assertEqual(column.get_column_style(), u"co1")
+
+
+    def test_set_column(self):
+        table = self.table.clone()
+        column = table.get_column(3)
+        table.set_column(4, column)
+        column = table.get_column(4)
+        self.assertEqual(column.get_column_style(), u"co2")
+
+
+    def test_insert_column(self):
+        table = self.table.clone()
+        width = table.get_table_width()
+        table.insert_column(3, odf_create_column())
+        self.assertEqual(table.get_table_width(), width + 1)
+        self.assertEqual(table.get_row(0).get_row_width(), width + 1)
+
+
+    def test_append_column(self):
+        table = self.table.clone()
+        width = table.get_table_width()
+        table.append_column(odf_create_column())
+        self.assertEqual(table.get_table_width(), width + 1)
+        self.assertEqual(table.get_row(0).get_row_width(), width + 1)
+
+
+    def test_delete_column(self):
+        table = self.table.clone()
+        width = table.get_table_width()
+        table.delete_column(3)
+        self.assertEqual(table.get_table_width(), width - 1)
+        self.assertEqual(table.get_row(0).get_row_width(), width - 1)
+
+
+    def test_get_column_cell_values(self):
+        self.assertEqual(self.table.get_column_cell_values(3), [2, 2, 2, 4])
+
+
+    def test_set_column_cell_values(self):
+        table = self.table.clone()
+        table.set_column_cell_values(5, [u"a", u"b", u"c", u"d"])
+        self.assertEqual(table.get_table_values(),
+                [[1, 1, 1, 2, 3, u"a", 3],
+                 [1, 1, 1, 2, 3, u"b", 3],
+                 [1, 1, 1, 2, 3, u"c", 3],
+                 [1, 2, 3, 4, 5, u"d", 7]])
+
+
+    def test_is_column_empty(self):
+        table = odf_create_table(u"Empty", width=10, height=20)
+        for x in xrange(10):
+            self.assertEqual(table.is_column_empty(x), True)
+
+
+    def test_is_column_empty_no(self):
+        table = odf_create_table(u"Not Empty", width=10, height=20)
+        table.set_cell_value((4, 9), u"Bouh !")
+        self.assertEqual(table.is_column_empty(4), False)
 
 
 
@@ -436,9 +982,8 @@ class TestCSV(TestCase):
 
 
     def test_import_from_csv(self):
-        expected = ('<table:table table:name="table1" '
-                      'table:style-name="Standard">'
-                      '<table:table-column table:style-name="Standard" '
+        expected = ('<table:table table:name="From CSV">'
+                      '<table:table-column '
                       'table:number-columns-repeated="2"/>'
                       '<table:table-row>'
                         '<table:table-cell office:value-type="string" '
@@ -464,146 +1009,8 @@ class TestCSV(TestCase):
         self.assertEqual(self.table.serialize(), expected)
 
 
-
-class TestCell(TestCase):
-
-    def setUp(self):
-        document = odf_get_document('samples/simple_table.ods')
-        body = document.get_body()
-        self.table = body.get_table_by_name(u"Example1").clone()
-
-
-    def test_get_cell(self):
-        table = import_from_csv(StringIO(csv_data), u"From CSV")
-        cell_A2 = table.get_cell('A2')
-        expected = ('<table:table-cell office:value-type="string" '
-                      'office:string-value="A date">'
-                      '<text:p>A date</text:p>'
-                    '</table:table-cell>')
-        self.assertEqual(cell_A2.serialize(), expected)
-
-
-    def test_get_cell_list_regex(self):
-        # Find these cells
-        #   |A B C D E F G
-        # --+-------------
-        # 1 |- - - - 3 3 3
-        # 2 |- - - - 3 3 3
-        # 3 |- - - - 3 3 3
-        # 4 |- - 3 - - - -
-        table = self.table.clone()
-        coordinates = [(x, y)
-                for x, y, cell in table.get_cell_list(regex=ur'3')]
-        expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
-                (5, 2), (6, 2), (2, 3)]
-        self.assertEqual(coordinates, expected)
-
-
-    def test_get_cell_list_style(self):
-        # Find these cells
-        #   |A B C D E F G
-        # --+-------------
-        # 1 |0 1 2 3 4 5 6
-        # 2 |- - - - - - -
-        # 3 |- - - - - - -
-        # 4 |- - - - - - -
-        table = self.table.clone()
-        # Set the first line to : 0 1 2 3 4 5 6
-        for i in xrange(7):
-            cell = odf_create_cell(value=i, style=u'A Style')
-            table.set_cell((i, 0), cell)
-        coordinates = [(x, y)
-                for x, y, cell in table.get_cell_list(style=ur'Style')]
-        expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
-        self.assertEqual(coordinates, expected)
-
-
-
-class TestRow(TestCase):
-
-    def setUp(self):
-        document = odf_get_document('samples/simple_table.ods')
-        body = document.get_body()
-        self.table = body.get_table_by_name(u"Example1").clone()
-
-
-    def test_get_row_list_regex(self):
-        # Find these rows
-        #   |A B C D E F G
-        # --+-------------
-        # 1 |7 - - - - - -
-        # 2 |- - - - - - -
-        # 3 |- - - - - - -
-        # 4 |7 - - - - - 7
-        table = self.table.clone()
-        # Set some cells to the value 7
-        cell = odf_create_cell(7)
-        table.set_cell((0, 0), cell)
-        cell = odf_create_cell(7)
-        table.set_cell((0, 3), cell)
-        coordinates = [y for y, row in table.get_row_list(regex=ur'7')]
-        expected = [0, 3]
-        self.assertEqual(coordinates, expected)
-
-
-    def test_get_row_list_style(self):
-        # Find these rows
-        #   |A B C D E F G
-        # --+-------------
-        # 1 |- - - - - - -
-        # 2*|- - - - - - -
-        # 3 |- - - - - - -
-        # 4*|- - - - - - -
-        table = self.table.clone()
-        # Set the styles
-        row1 = table.get_row(1)
-        row1.set_row_style(u"My Style")
-        row3 =  table.get_row(3)
-        row3.set_row_style(u"My Style")
-        coordinates = [y for y, row in table.get_row_list(style=ur'Style')]
-        expected = [1, 3]
-        self.assertEqual(coordinates, expected)
-
-
-
-class TestColumn(TestCase):
-
-    def setUp(self):
-        document = odf_get_document('samples/simple_table.ods')
-        body = document.get_body()
-        self.table = body.get_table_by_name(u"Example1").clone()
-
-
-    def test_get_column_list_style(self):
-        # Find these columns
-        #   |A B*C D*E F G
-        # --+-------------
-        # 1 |- - - - - - -
-        # 2 |- - - - - - -
-        # 3 |- - - - - - -
-        # 4 |- - - - - - -
-        table = self.table.clone()
-        # Set the styles
-        column1 = table.get_column(1)
-        column1.set_column_style(u"My Style")
-        column3 = table.get_column(3)
-        column3.set_column_style(u"My Style")
-        coordinates = [x
-                for x, column in table.get_column_list(style=ur'Style')]
-        expected = [1, 3]
-        self.assertEqual(coordinates, expected)
-
-
-
-class TestOOoBugs(TestCase):
-
-    def test_bug_openoffice(self):
-        """Ensure empty rows have been removed.
-        """
-        document = odf_get_document('samples/styled_table.ods')
-        body = document.get_body()
-        table = body.get_table_by_name(u'Feuille1')
-        self.assertEqual(table.get_table_size(), (1024, 9))
+    def export_to_csv(self):
+        raise NotImplementedError
 
 
 
