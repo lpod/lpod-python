@@ -14,7 +14,7 @@ class TestTrackedChanges(TestCase):
     def setUp(self):
         file = 'samples/tracked_changes.odt'
         self.document = document = odf_get_document(file)
-        self.content = document.get_xmlpart('content')
+        self.content = document.get_content()
 
 
     def tearDown(self):

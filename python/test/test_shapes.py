@@ -17,7 +17,7 @@ class TestShapes(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/base_shapes.odg')
-        self.content = document.get_xmlpart('content')
+        self.content = document.get_content()
 
 
     def tearDown(self):

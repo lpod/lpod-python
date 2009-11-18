@@ -114,7 +114,7 @@ class DocumentTestCase(TestCase):
 
     def test_clone(self):
         document = self.document
-        document.get_xmlpart('content')
+        document.get_content()
         self.assertNotEqual(document._odf_document__xmlparts, {})
         clone = document.clone()
         self.assertNotEqual(clone._odf_document__xmlparts, {})

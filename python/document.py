@@ -168,7 +168,7 @@ class odf_document(object):
 
     def get_body(self):
         if self.__body is None:
-            content = self.get_xmlpart('content')
+            content = self.get_content()
             self.__body = content.get_body()
         return self.__body
 
@@ -225,7 +225,7 @@ class odf_document(object):
     def get_formated_meta(self):
         result = []
 
-        meta = self.get_xmlpart("meta")
+        meta = self.get_meta()
 
         # Simple values
         def print_info(name, value):
@@ -323,8 +323,8 @@ class odf_document(object):
     #
 
     def get_style_list(self, family=None, automatic=False):
-        content = self.get_xmlpart('content')
-        styles = self.get_xmlpart('styles')
+        content = self.get_content()
+        styles = self.get_styles()
         return (content.get_style_list(family=family)
                 + styles.get_style_list(family=family, automatic=automatic))
 
@@ -350,13 +350,13 @@ class odf_document(object):
         Returns: odf_style or None if not found.
         """
         # 1. content.xml
-        content = self.get_xmlpart('content')
+        content = self.get_content()
         element = content.get_style(family, name_or_element=name_or_element,
                                     display_name=display_name)
         if element is not None:
             return element
         # 2. styles.xml
-        styles = self.get_xmlpart('styles')
+        styles = self.get_styles()
         return styles.get_style(family, name_or_element=name_or_element,
                                 display_name=display_name)
 
@@ -400,7 +400,7 @@ class odf_document(object):
 
         # Master page style
         if isinstance(style, odf_master_page):
-            part = self.get_xmlpart('styles')
+            part = self.get_styles()
             container = part.get_element("office:master-styles")
             existing = part.get_style(family, name)
         # Common style
@@ -408,13 +408,13 @@ class odf_document(object):
                              odf_list_style):
             # Common style
             if name and automatic is False and default is False:
-                part = self.get_xmlpart('styles')
+                part = self.get_styles()
                 container = part.get_element("office:styles")
                 existing = part.get_style(family, name)
 
             # Automatic style
             elif automatic is True and default is False:
-                part = self.get_xmlpart('content')
+                part = self.get_content()
                 container = part.get_element("office:automatic-styles")
 
                 # A name ?
@@ -442,7 +442,7 @@ class odf_document(object):
 
             # Default style
             elif automatic is False and default is True:
-                part = self.get_xmlpart('styles')
+                part = self.get_styles()
                 container = part.get_element("office:styles")
 
                 # Force default style
@@ -475,9 +475,9 @@ class odf_document(object):
 
         Return: list
         """
-        content = self.get_xmlpart('content')
+        content = self.get_content()
         # Header, footer, etc. have styles too
-        styles = self.get_xmlpart('styles')
+        styles = self.get_styles()
         return (content.get_root().get_styled_elements(name)
                 + styles.get_root().get_styled_elements(name))
 
@@ -557,8 +557,8 @@ class odf_document(object):
         Styles with the same type and name will be replaced, so only unique
         styles will be preserved.
         """
-        styles = self.get_xmlpart('styles')
-        content = self.get_xmlpart('content')
+        styles = self.get_styles()
+        content = self.get_content()
         for style in document.get_style_list():
             tagname = style.get_tagname()
             family = style.get_style_family()

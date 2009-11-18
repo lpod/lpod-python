@@ -121,7 +121,7 @@ class TestStyle(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/span_style.odt')
-        self.content = document.get_xmlpart('content')
+        self.content = document.get_content()
 
 
     def test_get_style_list(self):

@@ -38,10 +38,10 @@ print 'Generating test_output/use_case2.odt ...'
 # Go
 document = odf_new_document_from_type('text')
 
-content = document.get_xmlpart('content')
+content = document.get_content()
 body = content.get_body()
 
-styles = document.get_xmlpart('styles')
+styles = document.get_styles()
 named_styles = styles.get_category_context('named')
 
 

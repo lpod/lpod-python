@@ -15,7 +15,7 @@ class TestList(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/list.odt')
-        self.content = document.get_xmlpart('content')
+        self.content = document.get_content()
 
 
     def tearDown(self):

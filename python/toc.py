@@ -121,14 +121,14 @@ class odf_toc(odf_element):
 
         # Auto fill the index
         # 1. The title
-        meta = document.get_xmlpart("meta")
+        meta = document.get_meta()
         title = meta.get_title()
         if not title:
             title = u"(no title)"
         title = odf_create_index_title(title)
         index_body.append_element(title)
         #2. The section
-        content = document.get_xmlpart("content")
+        content = document.get_content()
         body = content.get_body()
         level_indexes = {}
         for heading in body.get_heading_list():

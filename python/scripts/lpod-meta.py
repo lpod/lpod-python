@@ -36,7 +36,7 @@ from lpod.datatype import Date, DateTime
 
 
 def set_metadata(doc, set_list):
-    meta = doc.get_xmlpart("meta")
+    meta = doc.get_meta()
     for set_info in set_list:
         if '=' not in set_info:
             print ('Error: Bad argument -s "%s" (must be "name=value")' %
