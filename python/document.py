@@ -263,7 +263,6 @@ class odf_document(object):
         return u"\n".join(result)
 
 
-
     def add_file(self, uri_or_file):
         if type(uri_or_file) is unicode or type(uri_or_file) is str:
             uri_or_file = uri_or_file.encode('utf_8')
