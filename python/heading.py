@@ -71,8 +71,14 @@ class odf_heading(odf_paragraph):
     """Specialised element for headings, which themselves are Specialised
     paragraphs.
     """
-    # TODO change numbering options
-    pass
+
+
+    def set_outline_level(self, level):
+        self.set_attribute('text:outline-level', unicode(level))
+
+
+    def get_outline_level(self):
+        return int(self.get_attribute('text:outline-level'))
 
 
 
