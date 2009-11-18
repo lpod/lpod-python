@@ -35,7 +35,7 @@ from xmlpart import odf_xmlpart
 class odf_content(odf_xmlpart):
 
     def get_body(self):
-        return self.get_element('//office:body/*[1]')
+        return self.get_root().get_body()
 
 
     # The following two seem useless but they match styles API

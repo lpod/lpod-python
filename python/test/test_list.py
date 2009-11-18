@@ -45,9 +45,9 @@ class TestList(TestCase):
         clone = content.clone()
         item = odf_create_list_item()
         a_list = odf_create_list(style='a_style')
-        a_list.insert_element(item, LAST_CHILD)
+        a_list.append_element(item)
         body = clone.get_body()
-        body.insert_element(a_list, LAST_CHILD)
+        body.append_element(a_list)
 
         expected = ('<text:list text:style-name="a_style">'
                     '<text:list-item/>'

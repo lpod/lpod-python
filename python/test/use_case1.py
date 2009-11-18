@@ -8,11 +8,13 @@ from itools.handlers import get_handler, Image
 # Import from lpod
 from lpod import __version__, __installation_path__
 from lpod.document import odf_new_document_from_type
-from lpod.document import odf_create_paragraph, odf_create_heading
-from lpod.document import odf_create_frame, odf_create_image
-from lpod.document import odf_create_cell, odf_create_row
-from lpod.document import odf_create_column, odf_create_table
 from lpod.element import FIRST_CHILD
+from lpod.frame import odf_create_frame
+from lpod.heading import odf_create_heading
+from lpod.image import odf_create_image
+from lpod.paragraph import odf_create_paragraph
+from lpod.table import odf_create_cell, odf_create_row
+from lpod.table import odf_create_column, odf_create_table
 from lpod.vfs import vfs
 
 
@@ -55,7 +57,7 @@ for numero, filename in enumerate(samples.get_names()):
         container.set_part(internal_name,
                            samples.open(filename).read())
     elif isinstance(handler, CSVFile):
-        table = odf_create_table('table_%d' % numero, 'Standard')
+        table = odf_create_table(u"table %d" % numero, style=u"Standard")
         for csv_row in handler.get_rows():
             size = len(csv_row)
             row = odf_create_row()
@@ -64,11 +66,12 @@ for numero, filename in enumerate(samples.get_names()):
                 row.append_element(cell)
             table.append_element(row)
         for i in xrange(size):
-            column = odf_create_column('Standard')
+            column = odf_create_column(style=u"Standard")
             table.insert_element(column, FIRST_CHILD)
         body.append_element(table)
     else:
-        paragraph = odf_create_paragraph('Standard', u'Not image / csv')
+        paragraph = odf_create_paragraph(u"Not image / csv",
+                style=u"Standard")
         body.append_element(paragraph)
 
 vfs.make_folder('test_output')

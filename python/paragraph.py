@@ -161,6 +161,10 @@ class odf_paragraph(odf_element):
             self.insert_element(annotation_element, FIRST_CHILD)
 
 
+    def insert_variable(self, variable_element,  after):
+        self._insert_after(variable_element, after)
+
+
     def set_span(self, style, regex=None, offset=None, length=0):
         """Apply the given style to text content matching the regex OR the
         positional arguments offset and length.

@@ -133,7 +133,7 @@ def _insert_elements(elements, target):
             if repeat > 1:
                 current_element.set_attribute('table:number-columns-repeated',
                                               str(repeat))
-            target.insert_element(current_element, xmlposition=LAST_CHILD)
+            target.append_element(current_element)
 
             # Current element is now this element
             current_element = element
@@ -144,7 +144,7 @@ def _insert_elements(elements, target):
     if repeat > 1:
         current_element.set_attribute('table:number-columns-repeated',
                                      str(repeat))
-    target.insert_element(current_element, xmlposition=LAST_CHILD)
+    target.append_element(current_element)
 
 
 
@@ -251,7 +251,7 @@ def odf_create_row(width=None):
     if width is not None:
         for i in xrange(width):
             cell = odf_create_cell(u"")
-            row.insert_element(cell, LAST_CHILD)
+            row.append_element(cell)
     return row
 
 
@@ -324,12 +324,12 @@ def odf_create_table(name, width=None, height=None, protected=False,
         height = height if height is not None else 1
 
         columns = odf_create_column(repeated=width)
-        element.insert_element(columns, LAST_CHILD)
+        element.append_element(columns)
 
         # XXX Use repeat or not ?
         for i in xrange(height):
             row = odf_create_row(width)
-            element.insert_element(row, LAST_CHILD)
+            element.append_element(row)
     if protected:
         if protection_key is None:
             raise ValueError, "missing protection key"
@@ -482,7 +482,7 @@ class odf_table(object):
                 if repeat > 1:
                     current_row.set_attribute('table:number-rows-repeated',
                                               str(repeat))
-                table.insert_element(current_row, xmlposition=LAST_CHILD)
+                table.append_element(current_row)
                 # Current row is now this row
                 current_row = row
                 current_row_serialized = row_serialized
@@ -491,7 +491,7 @@ class odf_table(object):
         if repeat > 1:
             current_row.set_attribute('table:number-rows-repeated',
                                       str(repeat))
-        table.insert_element(current_row, xmlposition=LAST_CHILD)
+        table.append_element(current_row)
 
 
     #

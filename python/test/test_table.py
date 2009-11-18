@@ -74,7 +74,7 @@ class TestGetCell(TestCase):
         table = odf_create_table(u'a_table', style='Standard')
         column = odf_create_column(style=u'Standard')
         column.set_attribute('table:number-columns-repeated', '7')
-        table.insert_element(column, LAST_CHILD)
+        table.append_element(column)
 
         # 3 x "1 1 1 2 3 3 3"
         row = odf_create_row()
@@ -82,25 +82,25 @@ class TestGetCell(TestCase):
         # 3 x "1"
         cell = odf_create_cell(u'1')
         cell.set_attribute('table:number-columns-repeated', '3')
-        row.insert_element(cell, LAST_CHILD)
+        row.append_element(cell)
         # 1 x "2"
         cell = odf_create_cell(u'2')
-        row.insert_element(cell, LAST_CHILD)
+        row.append_element(cell)
         # 3 x "3"
         cell = odf_create_cell(u'3')
         cell.set_attribute('table:number-columns-repeated', '3')
-        row.insert_element(cell, LAST_CHILD)
+        row.append_element(cell)
 
-        table.insert_element(row, LAST_CHILD)
+        table.append_element(row)
 
         # 1 x "1 2 3 4 5 6 7"
         row = odf_create_row()
         for i in xrange(1, 8):
             cell = odf_create_cell(unicode(i))
-            row.insert_element(cell, LAST_CHILD)
-        table.insert_element(row, LAST_CHILD)
+            row.append_element(cell)
+        table.append_element(row)
 
-        body.insert_element(table, LAST_CHILD)
+        body.append_element(table)
 
 
     def test_get_cell_coordinates(self):
@@ -384,9 +384,9 @@ class TestTable(TestCase):
         row = odf_create_row()
         cell = odf_create_cell(u"")
 
-        table.insert_element(column, LAST_CHILD)
-        row.insert_element(cell, LAST_CHILD)
-        table.insert_element(row, LAST_CHILD)
+        table.append_element(column)
+        row.append_element(cell)
+        table.append_element(row)
         expected = ('<table:table table:name="New Table" '
                       'table:style-name="A Style">'
                       '<table:table-column '
@@ -405,7 +405,7 @@ class TestTable(TestCase):
         body = self.body.clone()
 
         table = odf_create_table(u"New Table", style='A Style')
-        body.insert_element(table, LAST_CHILD)
+        body.append_element(table)
 
         # Get OK ?
         table = body.get_table_by_name(u"New Table")
@@ -415,7 +415,7 @@ class TestTable(TestCase):
     def test_get_table_by_position(self):
         body = self.body.clone()
         table = odf_create_table(u"New Table", style='A Style')
-        body.insert_element(table, LAST_CHILD)
+        body.append_element(table)
         # Get OK ?
         table = body.get_table_by_position(4)
         self.assertEqual(table.get_attribute('table:name'), u"New Table")

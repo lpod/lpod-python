@@ -617,7 +617,7 @@ class odf_element(object):
     def append_element(self, element):
         """Shortcut to insert at the end.
         """
-        self.insert_element(element, LAST_CHILD)
+        self.insert_element(element, xmlposition=LAST_CHILD)
 
 
     def xpath(self, xpath_query):
@@ -667,6 +667,10 @@ class odf_element(object):
     #
     # Element helpers usable from any context
     #
+
+    def get_body(self):
+        return self.get_element('//office:body/*[1]')
+
 
     def get_formated_text(self, context):
         """This function must return a beautiful version of the text
@@ -986,9 +990,7 @@ class odf_element(object):
     def get_variable_decls(self):
         variable_decls = self.get_element('//text:variable-decls')
         if variable_decls is None:
-            from document import odf_create_variable_decls
-
-            # Variable only in a "text" document ?
+            from variable import odf_create_variable_decls
             body = self.get_body()
             body.insert_element(odf_create_variable_decls(), FIRST_CHILD)
             variable_decls = body.get_element('//text:variable-decls')
@@ -1026,7 +1028,7 @@ class odf_element(object):
     def get_user_field_decls(self):
         user_field_decls = self.get_element('//text:user-field-decls')
         if user_field_decls is None:
-            from document import odf_create_user_field_decls
+            from variable import odf_create_user_field_decls
             body = self.get_body()
             body.insert_element(odf_create_user_field_decls(), FIRST_CHILD)
             user_field_decls = body.get_element('//text:user-field-decls')

@@ -240,7 +240,7 @@ class ElementTraverseTestCase(TestCase):
     def test_insert_element_last_child(self):
         element = odf_create_element('<root><a/></root>')
         child = odf_create_element('<b/>')
-        element.insert_element(child, LAST_CHILD)
+        element.append_element(child)
         self.assertEqual(element.serialize(), '<root><a/><b/></root>')
 
 

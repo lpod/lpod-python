@@ -58,7 +58,7 @@ class TestImage(TestCase):
         image = odf_create_image(path)
         frame = odf_create_frame(u"Image Frame", size=('0cm', '0cm'),
                                  style='Graphics')
-        frame.insert_element(image, LAST_CHILD)
+        frame.append_element(image)
         body.get_frame_by_position(1).insert_element(frame, NEXT_SIBLING)
         element = body.get_image_by_name(u"Image Frame")
         self.assertEqual(element.get_attribute('xlink:href'), path)
