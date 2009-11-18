@@ -118,6 +118,10 @@ paragraph = odf_create_paragraph(u'Highlighting the word "highlight".')
 paragraph.set_span(highlight, u"highlight")
 body.append_element(paragraph)
 
+# Fill the TOC
+toc.auto_fill(document)
+
+
 # Save
 filename = 'text.odt'
 document.save(filename, pretty=True)

@@ -292,6 +292,10 @@ Basic text
     paragraph.set_span(highlight, u"highlight")
     body.append_element(paragraph)
 
+' And Auto fill the TOC::
+
+    toc.auto_fill(document)
+
 - Save::
 
     document.save('text.odt', pretty=True)
