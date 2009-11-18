@@ -4,117 +4,39 @@
 # Import from the Standard Library
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+from cStringIO import StringIO
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.document import odf_new_document_from_type, odf_get_document
-from lpod.element import LAST_CHILD, odf_create_element
-from lpod.table import odf_create_row, odf_create_cell, odf_table
-from lpod.table import odf_create_table, odf_create_column
-from lpod.table import _get_cell_coordinates
+from lpod.document import odf_get_document
+from lpod.table import _get_cell_coordinates, alpha_to_base10
+from lpod.table import odf_create_cell, odf_create_row, odf_create_column
+from lpod.table import odf_create_table, import_from_csv
+
+
+csv_data = '"A float","3.14"\n"A date","1975-05-07"\n'
 
 
 
-def get_example():
-    # Encode this table
-    #   |A B C D E F G
-    # --+-------------
-    # 1 |1 1 1 2 3 3 3
-    # 2 |1 1 1 2 3 3 3
-    # 3 |1 1 1 2 3 3 3
-    # 4 |1 2 3 4 5 6 7
+class TestCoordinates(TestCase):
 
-    # Header
-    data = ['<table:table table:name="a_table" '
-              'table:style-name="Standard">'
-              '<table:table-column table:style-name="Standard" '
-                'table:number-columns-repeated="7"/>']
-
-    # 3x "1 1 1 2 3 3 3"
-    data.append('<table:table-row table:number-rows-repeated="3">')
-    for i in range(1, 4):
-        data.append(('<table:table-cell office:value-type="string" '
-                      'office:string-value="%d"'
-                      '%s>'
-                      '<text:p>%d</text:p>'
-                     '</table:table-cell>') %
-                  (i,
-                   ' table:number-columns-repeated="3"' if i != 2 else '',
-                   i))
-    data.append('</table:table-row>')
-
-    # 1x "1 2 3 4 5 6 7"
-    data.append('<table:table-row>')
-    for i in range(1, 8):
-        data.append(('<table:table-cell office:value-type="string" '
-                        'office:string-value="%d">'
-                        '<text:p>%d</text:p>'
-                     '</table:table-cell>') % (i, i))
-    data.append('</table:table-row>')
-
-    # Footer
-    data.append('</table:table>')
-
-    return ''.join(data)
+    def test_alpha_to_base10(self):
+        self.assertEqual(alpha_to_base10('ABC'), 731)
 
 
-
-class TestGetCell(TestCase):
-
-    def setUp(self):
-        self.document = document = odf_new_document_from_type('text')
-        self.body = body = document.get_body()
-
-        # Encode this table
-        #   A B C D E F G
-        # 1 1 1 1 2 3 3 3
-        # 2 1 1 1 2 3 3 3
-        # 3 1 1 1 2 3 3 3
-        # 4 1 2 3 4 5 6 7
-        table = odf_create_table(u'a_table', style='Standard')
-        column = odf_create_column(style=u'Standard')
-        column.set_attribute('table:number-columns-repeated', '7')
-        table.append_element(column)
-
-        # 3 x "1 1 1 2 3 3 3"
-        row = odf_create_row()
-        row.set_attribute('table:number-rows-repeated', '3')
-        # 3 x "1"
-        cell = odf_create_cell(u'1')
-        cell.set_attribute('table:number-columns-repeated', '3')
-        row.append_element(cell)
-        # 1 x "2"
-        cell = odf_create_cell(u'2')
-        row.append_element(cell)
-        # 3 x "3"
-        cell = odf_create_cell(u'3')
-        cell.set_attribute('table:number-columns-repeated', '3')
-        row.append_element(cell)
-
-        table.append_element(row)
-
-        # 1 x "1 2 3 4 5 6 7"
-        row = odf_create_row()
-        for i in xrange(1, 8):
-            cell = odf_create_cell(unicode(i))
-            row.append_element(cell)
-        table.append_element(row)
-
-        body.append_element(table)
+    def test_get_cell_coordinates_tuple(self):
+        x1, y1 = (12, 34)
+        x2, y2 = _get_cell_coordinates((x1, y1))
+        self.assertEqual((x1, y1), (x2, y2))
 
 
-    def test_get_cell_coordinates(self):
+    def test_get_cell_coordinates_alphanum(self):
         x, y = _get_cell_coordinates('ABC123')
         self.assertEqual((x, y), (730, 122))
 
 
 
-class TestTable(TestCase):
-
-    def setUp(self):
-        self.document = document = odf_get_document('samples/table.ods')
-        self.body = document.get_body()
-
+class TestCreateCell(TestCase):
 
     def test_create_cell_bool(self):
         cell = odf_create_cell(True)
@@ -323,13 +245,16 @@ class TestTable(TestCase):
         self.assertRaises(TypeError, odf_create_cell, [])
 
 
+
+class TestCreateRow(TestCase):
+
     def test_create_row(self):
-        # Test 1
         row = odf_create_row()
         expected = '<table:table-row/>'
         self.assertEqual(row.serialize(), expected)
 
-        # Test 2
+
+    def test_create_row_width(self):
         row = odf_create_row(1)
         expected = ('<table:table-row>'
                       '<table:table-cell office:value-type="string" '
@@ -340,27 +265,85 @@ class TestTable(TestCase):
         self.assertEqual(row.serialize(), expected)
 
 
+    def test_create_row_repeated(self):
+        row = odf_create_row(repeated=3)
+        expected = '<table:table-row table:number-rows-repeated="3"/>'
+        self.assertEqual(row.serialize(), expected)
+
+
+    def test_create_row_style(self):
+        row = odf_create_row(style=u"ro1")
+        expected = '<table:table-row table:style-name="ro1"/>'
+        self.assertEqual(row.serialize(), expected)
+
+
+    def test_create_row_all(self):
+        row = odf_create_row(1, repeated=3, style=u"ro1")
+        expected = ('<table:table-row table:number-rows-repeated="3" '
+                      'table:style-name="ro1">'
+                      '<table:table-cell office:value-type="string" '
+                        'office:string-value="">'
+                        '<text:p></text:p>'
+                      '</table:table-cell>'
+                    '</table:table-row>')
+        self.assertEqual(row.serialize(), expected)
+
+
+
+class TestCreateColumn(TestCase):
+
     def test_create_column(self):
-        # Test create
-        column = odf_create_column(style=u'A Style')
+        column = odf_create_column()
+        expected = '<table:table-column/>'
+        self.assertEqual(column.serialize(), expected)
+
+
+    def test_create_column_style(self):
+        column = odf_create_column(style=u"A Style")
         expected = '<table:table-column table:style-name="A Style"/>'
         self.assertEqual(column.serialize(), expected)
 
 
-    def test_create_table1(self):
-        # Test 1
-        table = odf_create_table(u'a_table', style='A Style')
-        expected = ('<table:table table:name="a_table" '
-                    'table:style-name="A Style"/>')
+    def test_create_column_default_cell_style(self):
+        column = odf_create_column(default_cell_style=u"A Style")
+        expected = ('<table:table-column '
+                      'table:default-cell-style-name="A Style"/>')
+        self.assertEqual(column.serialize(), expected)
+
+
+    def test_create_column_repeated(self):
+        column = odf_create_column(repeated=3)
+        expected = '<table:table-column table:number-columns-repeated="3"/>'
+        self.assertEqual(column.serialize(), expected)
+
+
+    def test_create_column_all(self):
+        column =  odf_create_column(style=u"co1",
+                default_cell_style="Standard", repeated=3)
+        expected = ('<table:table-column table:style-name="co1" '
+                      'table:default-cell-style-name="A Style"/>'
+                      'table:number-columns-repeated="3"/>')
+
+
+
+class TestCreateTable(TestCase):
+
+    def test_create_table(self):
+        table = odf_create_table(u"A Table")
+        expected = '<table:table table:name="A Table"/>'
         self.assertEqual(table.serialize(), expected)
 
 
-    def test_create_table2(self):
-        # Test 2
-        table = odf_create_table(u'a_table', width=1, height=2,
-                                 style='A Style')
-        expected = ('<table:table table:name="a_table" '
-                    'table:style-name="A Style">'
+    def test_create_table_style(self):
+        table = odf_create_table(u"A Table", style=u"A Style")
+        expected = ('<table:table table:name="A Table" '
+                      'table:style-name="A Style"/>')
+        self.assertEqual(table.serialize(), expected)
+
+
+    def test_create_table_width_height(self):
+        table = odf_create_table(u"A Table", width=1, height=2)
+        expected = ('<table:table table:name="A Table">'
                     '<table:table-column table:number-columns-repeated="1"/>'
                     '<table:table-row>'
                       '<table:table-cell office:value-type="string" '
@@ -378,54 +361,81 @@ class TestTable(TestCase):
         self.assertEqual(table.serialize(), expected)
 
 
-    def test_insert_table(self):
-        table = odf_create_table(u"New Table", style='A Style')
-        column = odf_create_column(style=u'a_column_style')
-        row = odf_create_row()
-        cell = odf_create_cell(u"")
 
-        table.append_element(column)
-        row.append_element(cell)
-        table.append_element(row)
-        expected = ('<table:table table:name="New Table" '
-                      'table:style-name="A Style">'
-                      '<table:table-column '
-                        'table:style-name="a_column_style"/>'
-                      '<table:table-row>'
-                        '<table:table-cell office:value-type="string" '
-                          'office:string-value="">'
-                          '<text:p></text:p>'
-                        '</table:table-cell>'
-                      '</table:table-row>'
-                    '</table:table>')
-        self.assertEqual(table.serialize(), expected)
+class TestTable(TestCase):
+
+    def setUp(self):
+        document = document = odf_get_document('samples/simple_table.ods')
+        self.document = document
+        self.body = document.get_body()
+
+
+    def test_get_table_list(self):
+        body = self.body
+        self.assertEqual(len(body.get_table_list()), 3)
+
+
+    def test_get_table_list_style(self):
+        body = self.body
+        self.assertEqual(len(body.get_table_list(style=u"ta1")), 3)
 
 
     def test_get_table_by_name(self):
         body = self.body.clone()
-
-        table = odf_create_table(u"New Table", style='A Style')
-        body.append_element(table)
-
-        # Get OK ?
+        body.append_element(odf_create_table(u"New Table"))
         table = body.get_table_by_name(u"New Table")
-        self.assertEqual(table.get_attribute('table:name'), u"New Table")
+        self.assertEqual(table.get_table_name(), u"New Table")
 
 
     def test_get_table_by_position(self):
         body = self.body.clone()
-        table = odf_create_table(u"New Table", style='A Style')
-        body.append_element(table)
-        # Get OK ?
+        body.append_element(odf_create_table(u"New Table"))
         table = body.get_table_by_position(4)
-        self.assertEqual(table.get_attribute('table:name'), u"New Table")
+        self.assertEqual(table.get_table_name(), u"New Table")
+
+
+    def test_style(self):
+        table = self.body.get_table_by_position(1)
+        self.assertEqual(table.get_table_style(), u"ta1")
+
+
+    def test_print(self):
+        table = self.body.get_table_by_position(1)
+        self.assertEqual(table.is_table_printable(), False)
+
+
+    def test_width_height(self):
+        table = self.body.get_table_by_name(u"Example1")
+        self.assertEqual(table.get_table_size(), (7, 4))
+
+
+    def test_empty(self):
+        table = odf_create_table(u"Empty")
+        self.assertEqual(table.get_table_size(), (0, 0))
+
+
+    def test_traverse_rows(self):
+        table = self.body.get_table_by_name(u"Example1")
+        rows = list(table.traverse_rows())
+        self.assertEqual(len(rows), 4)
+        row = rows[0]
+        self.assertEqual(len(row.get_children()), 7)
+
+
+    def test_traverse_columns(self):
+        table = self.body.get_table_by_name(u"Example1")
+        columns = list(table.traverse_columns())
+        self.assertEqual(len(columns), 7)
 
 
 
-class odf_table_TestCase(TestCase):
+class TestCSV(TestCase):
 
-    def test_create_table_with_data(self):
+    def setUp(self):
+        self.table = import_from_csv(StringIO(csv_data), u"From CSV")
 
+
+    def test_import_from_csv(self):
         expected = ('<table:table table:name="table1" '
                       'table:style-name="Standard">'
                       '<table:table-column table:style-name="Standard" '
@@ -451,78 +461,21 @@ class odf_table_TestCase(TestCase):
                         '</table:table-cell>'
                       '</table:table-row>'
                     '</table:table>')
-
-        # With the python data
-        data = [ (u'A float', 3.14),
-                 (u'A date', datetime(1975, 5, 7)) ]
-        table = odf_table('table1', style=u'Standard', data=data)
-        serialized = table.to_odf_element().serialize()
-
-        self.assertEqual(serialized, expected)
+        self.assertEqual(self.table.serialize(), expected)
 
 
-    def test_create_table_with_odf_element(self):
 
-        expected = ('<table:table table:name="table1" '
-                      'table:style-name="Standard">'
-                      '<table:table-column table:style-name="Standard" '
-                      'table:number-columns-repeated="2"/>'
-                      '<table:table-row>'
-                        '<table:table-cell office:value-type="string" '
-                          'office:string-value="A float">'
-                          '<text:p>A float</text:p>'
-                        '</table:table-cell>'
-                        '<table:table-cell office:value-type="float" '
-                          'office:value="3.14">'
-                          '<text:p>3.14</text:p>'
-                        '</table:table-cell>'
-                      '</table:table-row>'
-                      '<table:table-row>'
-                        '<table:table-cell office:value-type="string" '
-                          'office:string-value="A date">'
-                          '<text:p>A date</text:p>'
-                        '</table:table-cell>'
-                        '<table:table-cell office:value-type="date" '
-                          'office:date-value="1975-05-07T00:00:00">'
-                          '<text:p>1975-05-07T00:00:00</text:p>'
-                        '</table:table-cell>'
-                      '</table:table-row>'
-                    '</table:table>')
+class TestCell(TestCase):
 
-
-        # With an odf_element
-        odf_element = odf_create_element(expected)
-
-        table = odf_table(odf_element=odf_element)
-        serialized = table.to_odf_element().serialize()
-
-        self.assertEqual(serialized, expected)
-
-
-    def test_create_with_repeat(self):
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
-
-        get_value = lambda coordinates: int(table.get_cell(coordinates).
-                                      get_attribute('office:string-value'))
-
-        # Tests
-        self.assertEqual(get_value('C2'), 1)
-        self.assertEqual(get_value('G3'), 3)
-        self.assertEqual(get_value('B4'), 2)
-
-        self.assertRaises(IndexError, get_value, 'A5')
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        body = document.get_body()
+        self.table = body.get_table_by_name(u"Example1").clone()
 
 
     def test_get_cell(self):
-        # With the python data
-        data = [ (u'A float', 3.14),
-                 (u'A date', datetime(1975, 5, 7)) ]
-
-        table = odf_table('table1', 'Standard', data)
+        table = import_from_csv(StringIO(csv_data), u"From CSV")
         cell_A2 = table.get_cell('A2')
-
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="A date">'
                       '<text:p>A date</text:p>'
@@ -538,12 +491,11 @@ class odf_table_TestCase(TestCase):
         # 2 |- - - - 3 3 3
         # 3 |- - - - 3 3 3
         # 4 |- - 3 - - - -
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
-        coordinates = table.get_cell_list(regex=ur'3')
+        table = self.table.clone()
+        coordinates = [(x, y)
+                for x, y, cell in table.get_cell_list(regex=ur'3')]
         expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
-                       (5, 2), (6, 2), (2, 3)]
+                (5, 2), (6, 2), (2, 3)]
         self.assertEqual(coordinates, expected)
 
 
@@ -555,16 +507,24 @@ class odf_table_TestCase(TestCase):
         # 2 |- - - - - - -
         # 3 |- - - - - - -
         # 4 |- - - - - - -
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
+        table = self.table.clone()
         # Set the first line to : 0 1 2 3 4 5 6
         for i in xrange(7):
             cell = odf_create_cell(value=i, style=u'A Style')
             table.set_cell((i, 0), cell)
-        coordinates = table.get_cell_list(style=ur'Style')
+        coordinates = [(x, y)
+                for x, y, cell in table.get_cell_list(style=ur'Style')]
         expected = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
         self.assertEqual(coordinates, expected)
+
+
+
+class TestRow(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        body = document.get_body()
+        self.table = body.get_table_by_name(u"Example1").clone()
 
 
     def test_get_row_list_regex(self):
@@ -575,15 +535,13 @@ class odf_table_TestCase(TestCase):
         # 2 |- - - - - - -
         # 3 |- - - - - - -
         # 4 |7 - - - - - 7
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
+        table = self.table.clone()
         # Set some cells to the value 7
-        cell = odf_create_cell(value=7)
+        cell = odf_create_cell(7)
         table.set_cell((0, 0), cell)
-        cell = odf_create_cell(value=7)
+        cell = odf_create_cell(7)
         table.set_cell((0, 3), cell)
-        coordinates = table.get_row_list(regex=ur'7')
+        coordinates = [y for y, row in table.get_row_list(regex=ur'7')]
         expected = [0, 3]
         self.assertEqual(coordinates, expected)
 
@@ -593,173 +551,59 @@ class odf_table_TestCase(TestCase):
         #   |A B C D E F G
         # --+-------------
         # 1 |- - - - - - -
-        # 2 |1 - - - - - 3
-        # 3 |1 - - - - - 3
-        # 4 |- - - - - - -
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
+        # 2*|- - - - - - -
+        # 3 |- - - - - - -
+        # 4*|- - - - - - -
+        table = self.table.clone()
         # Set the styles
-        cell = table.get_cell((0, 1))
-        cell.set_attribute('table:style-name', u'A Style')
-        cell = table.get_cell((6, 1))
-        cell.set_attribute('table:style-name', u'A Style')
-        cell = table.get_cell((0, 2))
-        cell.set_attribute('table:style-name', u'A Style')
-        cell = table.get_cell((6, 2))
-        cell.set_attribute('table:style-name', u'A Style')
-        coordinates = table.get_row_list(style=ur'Style')
-        expected = [1, 2]
-        self.assertEqual(coordinates, expected)
-
-
-    def test_get_column_list_regex(self):
-        # Find these columns
-        #   |A B C D E F G
-        # --+-------------
-        # 1 |- - - 2 - - -
-        # 2 |- - - 2 - - -
-        # 3 |- - - 2 - - -
-        # 4 |- 2 - - - - -
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
-        coordinates = table.get_column_list(regex=ur'2')
+        row1 = table.get_row(1)
+        row1.set_row_style(u"My Style")
+        row3 =  table.get_row(3)
+        row3.set_row_style(u"My Style")
+        coordinates = [y for y, row in table.get_row_list(style=ur'Style')]
         expected = [1, 3]
         self.assertEqual(coordinates, expected)
 
 
+
+class TestColumn(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        body = document.get_body()
+        self.table = body.get_table_by_name(u"Example1").clone()
+
+
     def test_get_column_list_style(self):
         # Find these columns
-        #   |A B C D E F G
+        #   |A B*C D*E F G
         # --+-------------
-        # 1 |1 - - - - - -
-        # 2 |1 - - - - - -
-        # 3 |- - - - - - 3
-        # 4 |- - - - - - 7
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
+        # 1 |- - - - - - -
+        # 2 |- - - - - - -
+        # 3 |- - - - - - -
+        # 4 |- - - - - - -
+        table = self.table.clone()
         # Set the styles
-        cell = table.get_cell((0, 0))
-        cell.set_attribute('table:style-name', u'A Style')
-        cell = table.get_cell((0, 1))
-        cell.set_attribute('table:style-name', u'A Style')
-        cell = table.get_cell((6, 2))
-        cell.set_attribute('table:style-name', u'A Style')
-        cell = table.get_cell((6, 3))
-        cell.set_attribute('table:style-name', u'A Style')
-        coordinates = table.get_column_list(style=ur'[sS]tyle')
-        expected = [0, 6]
+        column1 = table.get_column(1)
+        column1.set_column_style(u"My Style")
+        column3 = table.get_column(3)
+        column3.set_column_style(u"My Style")
+        coordinates = [x
+                for x, column in table.get_column_list(style=ur'Style')]
+        expected = [1, 3]
         self.assertEqual(coordinates, expected)
 
 
-    def test_to_odf_element(self):
-        data = get_example()
-        odf_element = odf_create_element(data)
-        table = odf_table(odf_element=odf_element)
 
-        table_serialized = table.to_odf_element().serialize()
-        self.assertEqual(table_serialized, data)
-
-
-    def test_change_table(self):
-        data1 = ((1, 1, 1, 1),
-                 (1, 1, 1, 1),
-                 (2, 2, 2, 2))
-        # Force repeat
-        table1 = odf_table(name=u'table', style='Standard', data=data1)
-        table1 = odf_table(odf_element=table1.to_odf_element())
-
-        # Change the value of C2 to 3, not with a new cell, but with the same
-        cell = table1.get_cell('C2')
-        cell.set_attribute('office:value', u'3')
-        paragraph = cell.get_element('text:p')
-        paragraph.set_text(u'3')
-
-        # Expected
-        data2 = ((1, 1, 1, 1),
-                 (1, 1, 3, 1),
-                 (2, 2, 2, 2))
-        table2 = odf_table(name=u'table', style='Standard', data=data2)
-
-        self.assertEqual(table1.to_odf_element().serialize(),
-                         table2.to_odf_element().serialize())
-
-
-    def test_set_cell_table(self):
-        data1 = ((1, 1, 1, 1),
-                 (1, 1, 1, 1),
-                 (2, 2, 2, 2))
-        # Force repeat
-        table1 = odf_table(name=u'table', style='Standard', data=data1)
-        table1 = odf_table(odf_element=table1.to_odf_element())
-
-        # Change the value of C2 to 3 with a new cell
-        cell = odf_create_cell(3)
-        table1.set_cell('C2', cell)
-
-        # Expected
-        data2 = ((1, 1, 1, 1),
-                 (1, 1, 3, 1),
-                 (2, 2, 2, 2))
-        table2 = odf_table(name=u'table', style='Standard', data=data2)
-
-        self.assertEqual(table1.to_odf_element().serialize(),
-                         table2.to_odf_element().serialize())
-
+class TestOOoBugs(TestCase):
 
     def test_bug_openoffice(self):
-        document = odf_get_document('samples/table.ods')
+        """Ensure empty rows have been removed.
+        """
+        document = odf_get_document('samples/styled_table.ods')
         body = document.get_body()
         table = body.get_table_by_name(u'Feuille1')
-        table = odf_table(odf_element=table)
-        self.assertEqual(table.get_size(), (1024, 9))
-
-
-    def test_add_row(self):
-        data1 = ((1, 1, 1, 1),
-                 (1, 1, 1, 1),
-                 (2, 2, 2, 2))
-        table1 = odf_table(name=u'table', style='Standard', data=data1)
-
-        table1.add_row()
-        self.assertEqual(table1.get_size(), (4, 4))
-
-        table1.add_row(number=2, position=2)
-        self.assertEqual(table1.get_size(), (4, 6))
-
-        # Test the table
-        data2 = ((1, 1, 1, 1),
-                 (None, None, None, None),
-                 (None, None, None, None),
-                 (1, 1, 1, 1),
-                 (2, 2, 2, 2),
-                 (None, None, None, None))
-        table2 = odf_table(name=u'table', style='Standard', data=data2)
-        self.assertEqual(table1.to_odf_element().serialize(),
-                         table2.to_odf_element().serialize())
-
-
-    def test_add_column(self):
-        data1 = ((1, 1, 1, 1),
-                 (1, 1, 1, 1),
-                 (2, 2, 2, 2))
-        table1 = odf_table(name=u'table', style='Standard', data=data1)
-
-        table1.add_column()
-        self.assertEqual(table1.get_size(), (5, 3))
-
-        table1.add_column(number=2, position=2)
-        self.assertEqual(table1.get_size(), (7, 3))
-
-        # Test the table
-        data2 = ((1, None, None, 1, 1, 1, None),
-                 (1, None, None, 1, 1, 1, None),
-                 (2, None, None, 2, 2, 2, None))
-        table2 = odf_table(name=u'table', style='Standard', data=data2)
-        self.assertEqual(table1.to_odf_element().serialize(),
-                         table2.to_odf_element().serialize())
+        self.assertEqual(table.get_table_size(), (1024, 9))
 
 
 

@@ -901,7 +901,7 @@ class odf_element(object):
 
     def get_table_list(self, style=None, regex=None):
         return _get_element_list(self, 'descendant::table:table',
-                text_style=style, regex=regex)
+                table_style=style, regex=regex)
 
 
     def get_table_by_name(self, name):
