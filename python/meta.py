@@ -31,7 +31,7 @@ from decimal import Decimal
 from datatype import DateTime, Duration, Boolean, Date
 
 # Import from lpod
-from element import LAST_CHILD, odf_create_element
+from element import odf_create_element
 from xmlpart import odf_xmlpart
 
 
