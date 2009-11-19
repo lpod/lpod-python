@@ -631,8 +631,10 @@ class odf_element(object):
             if (type(obj) is _ElementStringResult or
                     type(obj) is _ElementUnicodeResult):
                 result.append(odf_text(obj))
-            else:
+            elif type(obj) is _Element:
                 result.append(_make_odf_element(obj))
+            else:
+                result.append(obj)
         return result
 
 
