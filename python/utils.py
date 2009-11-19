@@ -379,7 +379,7 @@ def get_value(element, value_type=None, try_get_text=True):
 
         # XXX: get_text or get_formated_text ???
         if try_get_text:
-            value = element.get_text()
+            value = element.get_text(recursive=True)
             if value != '':
                 return value
         return None
