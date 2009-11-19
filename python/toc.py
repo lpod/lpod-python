@@ -120,11 +120,10 @@ class odf_toc(odf_element):
         self.append_element(index_body)
 
         # Auto fill the index
-        # 1. The title
-        meta = document.get_meta()
-        title = meta.get_title()
+        # 1. The title: "Table Of Content"
+        title = self.get_attribute('text:name')
         if not title:
-            title = u"(no title)"
+            title = u"Table of content"
         title = odf_create_index_title(title)
         index_body.append_element(title)
         #2. The section
