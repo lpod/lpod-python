@@ -581,7 +581,7 @@ class odf_element(object):
         if paragraphs:
             paragraph = paragraphs.pop(0)
             for obsolete in paragraphs:
-                obsolete.get_parent().delete(obsolete)
+                obsolete.get_parent().delete_element(obsolete)
         else:
             paragraph = odf_create_element('<text:p/>')
             self.insert_element(paragraph, FIRST_CHILD)
@@ -618,6 +618,10 @@ class odf_element(object):
         """Shortcut to insert at the end.
         """
         self.insert_element(element, xmlposition=LAST_CHILD)
+
+
+    def delete_element(self, child):
+        self.__element.remove(child.__element)
 
 
     def xpath(self, xpath_query):
@@ -659,11 +663,6 @@ class odf_element(object):
         data = tostring(element, with_tail=False, pretty_print=pretty)
         # Hack over lxml: remove namespaces
         return ns_stripper.sub('', data)
-
-
-    def delete(self, child):
-        element = self.__element
-        element.remove(child.__element)
 
 
     #

@@ -98,7 +98,7 @@ class odf_draw_page(odf_element):
         #   Conclusion: We must delete the first child 'anim:par'
         existing = self.get_element('anim:par')
         if existing:
-            self.delete(existing)
+            self.delete_element(existing)
         self.append_element(anim_page)
 
 

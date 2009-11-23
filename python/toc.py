@@ -115,7 +115,7 @@ class odf_toc(odf_element):
         # Clean the old index-body
         index_body = self.get_element('text:index-body')
         if index_body:
-            self.delete(index_body)
+            self.delete_element(index_body)
         index_body = odf_create_index_body()
         self.append_element(index_body)
 

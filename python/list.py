@@ -107,7 +107,7 @@ class odf_list(odf_element):
             text_or_element = [text_or_element]
         # Remove existing header
         for element in self.get_element_list('text:p'):
-            self.delete(element)
+            self.delete_element(element)
         for paragraph in reversed(text_or_element):
             if type(paragraph) is unicode:
                 paragraph = odf_create_paragraph(paragraph)

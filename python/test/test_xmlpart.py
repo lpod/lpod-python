@@ -85,7 +85,7 @@ class XmlPartTestCase(TestCase):
         content = odf_xmlpart('content', container)
         paragraphs = content.get_element_list('//text:p')
         for paragraph in paragraphs:
-            content.delete(paragraph)
+            content.delete_element(paragraph)
         serialized = content.serialize()
         self.assertEqual(serialized.count('<text:p'), 0)
 

@@ -71,7 +71,7 @@ class ElementTestCase(TestCase):
     def test_delete(self):
         element = odf_create_element('<a><b/></a>')
         child = element.get_element('//b')
-        element.delete(child)
+        element.delete_element(child)
         self.assertEqual(element.serialize(), '<a/>')
 
 

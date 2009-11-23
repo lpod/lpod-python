@@ -460,7 +460,7 @@ class odf_document(object):
 
         # Insert it!
         if existing is not None:
-            container.delete(existing)
+            container.delete_element(existing)
         container.append_element(style)
 
 
@@ -545,7 +545,7 @@ class odf_document(object):
             elif type(style) is odf_master_page:
                 # Don't suppress header and footer, just styling was removed
                 continue
-            style.get_parent().delete(style)
+            style.get_parent().delete_element(style)
             i += 1
         return i
 
@@ -590,7 +590,7 @@ class odf_document(object):
                 raise NotImplementedError, tagname
             duplicate = part.get_style(family, stylename)
             if duplicate is not None:
-                duplicate.get_parent().delete(duplicate)
+                duplicate.get_parent().delete_element(duplicate)
             dest.append_element(style)
 
 

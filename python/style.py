@@ -295,7 +295,7 @@ class odf_style(odf_element):
                 return
             properties.del_attribute('fo:background-color')
             if bg_image is not None:
-                properties.delete(bg_image)
+                properties.delete_element(bg_image)
             return
         # Add the properties if necessary
         if properties is None:
@@ -306,7 +306,7 @@ class odf_style(odf_element):
         if color:
             properties.set_attribute('fo:background-color', color)
             if bg_image is not None:
-                properties.delete(bg_image)
+                properties.delete_element(bg_image)
         # ... or the background
         elif uri:
             properties.set_attribute('fo:background-color', 'transparent')
@@ -424,7 +424,7 @@ class odf_page_layout(odf_style):
     def set_header_style(self, new_style):
         header_style = self.get_header_style()
         if header_style is not None:
-            self.delete(header_style)
+            self.delete_element(header_style)
         self.append_element(new_style)
 
 
@@ -435,7 +435,7 @@ class odf_page_layout(odf_style):
     def set_footer_style(self, new_style):
         footer_style = self.get_footer_style()
         if footer_style is not None:
-            self.delete(footer_style)
+            self.delete_element(footer_style)
         self.append_element(new_style)
 
 
@@ -462,7 +462,7 @@ class odf_master_page(odf_style):
             # Already a header or footer?
             if (isinstance(text_or_element, odf_element)
                     and text_or_element.get_tagname() == 'style:%s' % name):
-                self.delete(header_or_footer)
+                self.delete_element(header_or_footer)
                 self.append_element(text_or_element)
                 return
             text_or_element = [text_or_element]

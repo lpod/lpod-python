@@ -80,6 +80,10 @@ class odf_xmlpart(object):
         return result[0]
 
 
+    def delete_element(self, child):
+        child.get_parent().delete_element(child)
+
+
     def clone(self):
         clone = object.__new__(self.__class__)
         for name in self.__dict__:
@@ -103,8 +107,3 @@ class odf_xmlpart(object):
         if pretty:
             data = data.strip()
         return data
-
-
-    def delete(self, child):
-        parent = child.get_parent()
-        parent.delete(child)
