@@ -404,8 +404,7 @@ class odf_document(object):
             container = part.get_element("office:master-styles")
             existing = part.get_style(family, name)
         # Common style
-        elif type(style) in (odf_style, odf_page_layout, odf_outline_style,
-                             odf_list_style):
+        elif isinstance(style, odf_style):
             # Common style
             if name and automatic is False and default is False:
                 part = self.get_styles()
