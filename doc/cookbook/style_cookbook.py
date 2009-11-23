@@ -24,10 +24,14 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
+# Import from Standard Library
+from datetime import date
+
 # Import from lpod
 from lpod.document import odf_get_document, odf_new_document_from_type
 from lpod.paragraph import odf_create_paragraph
-from lpod.style import odf_create_style
+from lpod.style import odf_create_style, odf_create_default_date_style
+from lpod.variable import odf_create_date_variable
 
 # Creation of the document
 document = odf_new_document_from_type('text')
@@ -61,6 +65,17 @@ first_page_style.set_footer(u'lpOD project')
 # Complement the header
 header = first_page_style.get_header()
 header.append_element(odf_create_paragraph(u"Final Version"))
+
+# Example of default style: a date
+date_style = odf_create_default_date_style()
+document.insert_style(date_style, automatic=True)
+today = odf_create_date_variable(date.today(),
+                                 data_style=date_style.get_style_name())
+paragraph = odf_create_paragraph(
+                text=u"The current date with the default lpOD date style: ")
+paragraph.append_element(today)
+body.append_element(paragraph)
+
 
 # Save
 filename = 'styles.odt'

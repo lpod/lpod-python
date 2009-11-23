@@ -474,6 +474,17 @@ Complement the header::
    par = header.get_paragraph_by_content(u'Draft')
    par.set_text(u'Final Version')
 
+Use default lpOD styles::
+
+   date_style = odf_create_default_date_style()
+   document.insert_style(date_style, automatic=True)
+   today = odf_create_date_variable(date.today(),
+                                    data_style=date_style.get_style_name())
+   paragraph = odf_create_paragraph(
+                  text=u"The current date with the default lpOD date style: ")
+   paragraph.append_element(today)
+   body.append_element(paragraph)
+
 Save::
 
     filename = 'styles.odt'
