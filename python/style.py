@@ -573,6 +573,74 @@ class odf_currency_style(odf_style):
 
 
 
+# Some predefined styles
+def odf_create_default_number_style():
+    return odf_create_element(
+            """<number:number-style style:name="lpod-default-number-style">
+                  <number:number number:decimal-places="2"
+                                 number:min-integer-digits="1"/>
+               </number:number-style>""")
+
+
+
+def odf_create_default_percentage_style():
+    return odf_create_element(
+            """<number:percentage-style
+                  style:name="lpod-default-percentage-style">
+                  <number:number number:decimal-places="2"
+                                 number:min-integer-digits="1"/>
+                  <number:text>%</number:text>
+               </number:percentage-style>""")
+
+
+
+def odf_create_default_time_style():
+    return odf_create_element(
+            """<number:time-style style:name="lpod-default-time-style">
+                  <number:hours number:style="long"/>
+                  <number:text>:</number:text>
+                  <number:minutes number:style="long"/>
+                  <number:text>:</number:text>
+                  <number:seconds number:style="long"/>
+               </number:time-style>""")
+
+
+
+def odf_create_default_date_style():
+    return odf_create_element(
+            """<number:date-style style:name="lpod-default-date-style">
+                  <number:year number:style="long"/>
+                  <number:text>-</number:text>
+                  <number:month number:style="long"/>
+                  <number:text>-</number:text>
+                  <number:day number:style="long"/>
+               </number:date-style>""")
+
+
+
+def odf_create_default_boolean_style():
+    return odf_create_element(
+            """<number:boolean-style style:name="lpod-default-boolean-style">
+                  <number:boolean/>
+               </number:boolean-style>""")
+
+
+
+def odf_create_default_currency_style():
+    return odf_create_element(
+            """<number:currency-style style:name="lpod-default-currency-style">
+                  <number:text>-</number:text>
+                  <number:number number:decimal-places="2"
+                                 number:min-integer-digits="1"
+                                 number:grouping="true"/>
+                  <number:text> </number:text>
+                  <number:currency-symbol
+                      number:language="fr"
+                      number:country="FR">€</number:currency-symbol>
+               </number:currency-style>""")
+
+
+
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
              'style:footer-style', 'text:list-level-style-number',
