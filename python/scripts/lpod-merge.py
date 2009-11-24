@@ -44,6 +44,10 @@ if  __name__ == '__main__':
     description = "Merge all input files in an unique OpenDocument file"
     parser = OptionParser(usage, version=__version__,
             description=description)
+    # --output
+    parser.add_option('-o', '--output', action='store', type='string',
+            dest='output', metavar='FILE', default="out.odt",
+            help="Place output in file FILE (out.odt by default)")
 
     # Parse !
     opts, args = parser.parse_args()
@@ -55,7 +59,7 @@ if  __name__ == '__main__':
         exit(1)
 
     # Create the output file
-    output_filename = 'out.odt'
+    output_filename = opts.output
     if vfs.exists(output_filename):
         vfs.remove(output_filename)
     output_doc = odf_new_document_from_type('text')
