@@ -38,6 +38,30 @@ from lpod.vfs import vfs
 
 
 
+def add_an_odt(filename, output_body):
+    document = odf_get_document(filename)
+
+    # Copy content
+    src_body = document.get_body()
+    for element in src_body.get_children():
+        tagname = element.get_tagname()
+        # Skip TOC, etc.
+        if tagname in ('text:sequence-decls', 'text:table-of-content'):
+            continue
+        # Copy the rest recursively
+        output_body.append_element(element.clone())
+    # Copy extra parts (images...)
+    container = document.container
+    for partname in container._odf_container__get_contents():
+        if partname.startswith('Pictures/'):
+            data = container.get_part(partname)
+            # Suppose uniqueness
+            output_doc.container.set_part(partname, data)
+        # TODO embedded objects
+    print "Added", filename, "document"
+
+
+
 if  __name__ == '__main__':
     # Options initialisation
     usage = "%prog <file1> [<file2> ...]"
@@ -87,7 +111,6 @@ if  __name__ == '__main__':
                 output_doc = odf_new_document_from_type('text')
                 output_body = output_doc.get_body()
 
-
                 # Begin with a TOC
                 output_body.append_element(odf_create_toc())
 
@@ -102,33 +125,14 @@ if  __name__ == '__main__':
             if output_mimetype == "spreadsheet":
                 print "We cannot merge a mix of text and spreadsheet!"
                 exit(1)
-
-            document = odf_get_document(filename)
-            # Copy content
-            src_body = document.get_body()
-            for element in src_body.get_children():
-                tagname = element.get_tagname()
-                # Skip TOC, etc.
-                if tagname in ('text:sequence-decls', 'text:table-of-content'):
-                    continue
-                # Copy the rest recursively
-                output_body.append_element(element.clone())
-            # Copy extra parts (images...)
-            container = document.container
-            for partname in container._odf_container__get_contents():
-                if partname.startswith('Pictures/'):
-                    data = container.get_part(partname)
-                    # Suppose uniqueness
-                    output_doc.container.set_part(partname, data)
-                # TODO embedded objects
-            del document
-            print "Added", filename, "document"
+            add_an_odt(filename, output_body)
         # Add a spreadsheet doc
         else:
             if output_mimetype == "text":
                 print "We cannot merge a mix of text and spreadsheet!"
                 exit(1)
 
+    # Save
     if output_doc is not None:
         output_doc.save(output_filename, pretty=True)
         print "Document", output_filename, "generated."
