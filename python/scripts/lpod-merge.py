@@ -50,53 +50,87 @@ if  __name__ == '__main__':
             help="Place output in file FILE (out.odt by default)")
 
     # Parse !
-    opts, args = parser.parse_args()
+    opts, filenames = parser.parse_args()
 
     # Arguments
-    filenames = args
     if not filenames:
         parser.print_help()
         exit(1)
-
-    # Create the output file
     output_filename = opts.output
-    if vfs.exists(output_filename):
-        vfs.remove(output_filename)
-    output_doc = odf_new_document_from_type('text')
-
-    # Begin with a TOC
-    dest_body = output_doc.get_body()
-    dest_body.append_element(odf_create_toc())
+    output_doc = None
 
     # Concatenate content in the output doc
     for filename in filenames:
+
+        # Exists ?
         if not vfs.exists(filename):
             print "Skip", filename, "not existing"
             continue
-        document = odf_get_document(filename)
-        type = document.get_type()
-        if type not in ('text', 'text-template'):
-            print "Skip", filename, type, "not text"
-            continue
-        # Copy content
-        src_body = document.get_body()
-        for element in src_body.get_children():
-            tagname = element.get_tagname()
-            # Skip TOC, etc.
-            if tagname in ('text:sequence-decls', 'text:table-of-content'):
-                continue
-            # Copy the rest recursively
-            dest_body.append_element(element.clone())
-        # Copy extra parts (images...)
-        container = document.container
-        for partname in container._odf_container__get_contents():
-            if partname.startswith('Pictures/'):
-                data = container.get_part(partname)
-                # Suppose uniqueness
-                output_doc.container.set_part(partname, data)
-            # TODO embedded objects
-        del document
-        print "Added", filename, "document"
 
-    output_doc.save(output_filename, pretty=True)
-    print "Document", output_filename, "generated."
+        # A good file => Only text, spreadsheet and CSV
+        mimetype = vfs.get_mimetype(filename)
+        if mimetype not in ("application/vnd.oasis.opendocument.text",
+                            "application/vnd.oasis.opendocument.spreadsheet",
+                            "text/csv"):
+            print 'Skip "%s" with mimetype "%s"' % (filename, mimetype)
+            continue
+
+        # Not yet an output_doc ?
+        if output_doc is None:
+            # Delete the target
+            if vfs.exists(output_filename):
+                vfs.remove(output_filename)
+
+            # Text mode
+            if mimetype == "application/vnd.oasis.opendocument.text":
+                output_mimetype = "text"
+                output_doc = odf_new_document_from_type('text')
+                output_body = output_doc.get_body()
+
+
+                # Begin with a TOC
+                output_body.append_element(odf_create_toc())
+
+            # Spreadsheet mode
+            else:
+                output_mimetype = "spreadsheet"
+                print "Spreadsheet merge not yet implemented"
+                exit(1)
+
+        # Add a text doc
+        if mimetype == "application/vnd.oasis.opendocument.text":
+            if output_mimetype == "spreadsheet":
+                print "We cannot merge a mix of text and spreadsheet!"
+                exit(1)
+
+            document = odf_get_document(filename)
+            # Copy content
+            src_body = document.get_body()
+            for element in src_body.get_children():
+                tagname = element.get_tagname()
+                # Skip TOC, etc.
+                if tagname in ('text:sequence-decls', 'text:table-of-content'):
+                    continue
+                # Copy the rest recursively
+                output_body.append_element(element.clone())
+            # Copy extra parts (images...)
+            container = document.container
+            for partname in container._odf_container__get_contents():
+                if partname.startswith('Pictures/'):
+                    data = container.get_part(partname)
+                    # Suppose uniqueness
+                    output_doc.container.set_part(partname, data)
+                # TODO embedded objects
+            del document
+            print "Added", filename, "document"
+        # Add a spreadsheet doc
+        else:
+            if output_mimetype == "text":
+                print "We cannot merge a mix of text and spreadsheet!"
+                exit(1)
+
+    if output_doc is not None:
+        output_doc.save(output_filename, pretty=True)
+        print "Document", output_filename, "generated."
+    else:
+        print "Nothing to save, ..."
