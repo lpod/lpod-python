@@ -82,7 +82,12 @@ def add_odt(filename, output_body):
 
 
 def add_ods(filename, output_body):
-    print 'Skip "%s" => not yet implemented' % filename
+    ods_body = odf_get_document(filename).get_body()
+    # XXX Only children tables ?
+    # XXX We must verify that the name doesn't exist yet
+    for table in ods_body.get_table_list():
+        output_body.append_element(table)
+    print 'Add "%s"' % filename
 
 
 
