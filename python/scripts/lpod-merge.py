@@ -38,7 +38,24 @@ from lpod.vfs import vfs
 
 
 
-def add_an_odt(filename, output_body):
+def init_doc(mimetype):
+    # Text mode
+    if mimetype == "application/vnd.oasis.opendocument.text":
+        output_doc = odf_new_document_from_type("text")
+
+        # Begin with a TOC
+        output_body = output_doc.get_body()
+        output_body.append_element(odf_create_toc())
+
+    # Spreadsheet mode
+    else:
+        output_doc = odf_new_document_from_type("spreadsheet")
+
+    return output_doc
+
+
+
+def add_odt(filename, output_body):
     document = odf_get_document(filename)
 
     # Copy content
@@ -58,7 +75,17 @@ def add_an_odt(filename, output_body):
             # Suppose uniqueness
             output_doc.container.set_part(partname, data)
         # TODO embedded objects
-    print "Added", filename, "document"
+    print 'Add "%s"' % filename
+
+
+
+def add_ods(filename, output_body):
+    print 'Add "%s"' % filename
+
+
+
+def add_csv(filename, output_body):
+    print 'Add "%s"' % filename
 
 
 
@@ -70,8 +97,8 @@ if  __name__ == '__main__':
             description=description)
     # --output
     parser.add_option('-o', '--output', action='store', type='string',
-            dest='output', metavar='FILE', default="out.odt",
-            help="Place output in file FILE (out.odt by default)")
+            dest='output', metavar='FILE', default=None,
+            help="Place output in file FILE (out.od[t|s|p] by default)")
 
     # Parse !
     opts, filenames = parser.parse_args()
@@ -101,40 +128,39 @@ if  __name__ == '__main__':
 
         # Not yet an output_doc ?
         if output_doc is None:
-            # Delete the target
+            # Create an empty doc
+            output_doc = init_doc(mimetype)
+            output_body = output_doc.get_body()
+            output_mimetype = output_doc.get_type()
+            print '%s documents detected' % output_mimetype.title()
+
+            # Make the filename
+            if output_filename is None:
+                output_filename = "out.od%s" % output_mimetype[0]
             if vfs.exists(output_filename):
                 vfs.remove(output_filename)
-
-            # Text mode
-            if mimetype == "application/vnd.oasis.opendocument.text":
-                output_mimetype = "text"
-                output_doc = odf_new_document_from_type('text')
-                output_body = output_doc.get_body()
-
-                # Begin with a TOC
-                output_body.append_element(odf_create_toc())
-
-            # Spreadsheet mode
-            else:
-                output_mimetype = "spreadsheet"
-                print "Spreadsheet merge not yet implemented"
-                exit(1)
 
         # Add a text doc
         if mimetype == "application/vnd.oasis.opendocument.text":
             if output_mimetype == "spreadsheet":
                 print "We cannot merge a mix of text and spreadsheet!"
                 exit(1)
-            add_an_odt(filename, output_body)
+            add_odt(filename, output_body)
         # Add a spreadsheet doc
         else:
             if output_mimetype == "text":
                 print "We cannot merge a mix of text and spreadsheet!"
                 exit(1)
+            # CSV ?
+            if mimetype == "text/csv":
+                add_csv(filename, output_body)
+            else:
+                add_ods(filename, output_body)
+
 
     # Save
     if output_doc is not None:
         output_doc.save(output_filename, pretty=True)
-        print "Document", output_filename, "generated."
+        print 'Document "%s" generated' % output_filename
     else:
         print "Nothing to save, ..."
