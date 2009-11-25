@@ -37,8 +37,7 @@ from container import odf_new_container_from_template
 from container import odf_new_container_from_type, odf_container
 from content import odf_content
 from meta import odf_meta
-from style import odf_list_style, odf_style
-from style import odf_master_page, odf_page_layout, odf_outline_style
+from style import odf_style, odf_master_page
 from styles import odf_styles
 from table import odf_table
 from utils import _get_style_family
