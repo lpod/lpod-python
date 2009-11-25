@@ -28,6 +28,7 @@
 
 # Import from the standard library
 from optparse import OptionParser
+from os.path import basename, splitext
 from sys import exit
 
 # Import from lpod
@@ -35,6 +36,7 @@ from lpod import __version__
 from lpod.document import odf_new_document_from_type, odf_get_document
 from lpod.toc import odf_create_toc
 from lpod.vfs import vfs
+from lpod.table import import_from_csv
 
 
 
@@ -80,11 +82,16 @@ def add_odt(filename, output_body):
 
 
 def add_ods(filename, output_body):
-    print 'Add "%s"' % filename
+    print 'Skip "%s" => not yet implemented' % filename
 
 
 
 def add_csv(filename, output_body):
+    # Make the name
+    # XXX We must verify that the name doesn't exist yet
+    name = splitext(basename(filename))[0]
+    table = import_from_csv(filename, name)
+    output_body.append_element(table.to_odf_element())
     print 'Add "%s"' % filename
 
 
