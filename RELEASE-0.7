@@ -1,0 +1,88 @@
+==========
+LpOD 0.7.5
+==========
+
+lpOD -- languages & platforms OpenDocument.
+
+The lpOD Project develops a set of multilanguage tools around the
+OpenDocument Format standard.
+
+    * Development of a library implementing the ISO/IEC 26300 OpenDocument
+      Format standard.
+    * Development of a set of high-level APIs in the Python, Perl, Ruby
+      languages. The project has some industrial relevance through projects
+      and applications in the fields of Business Intelligence (BI), CMS
+      applied to museography, ETL, etc.
+
+This release focuses on bla bla bla... [scripts]
+
+- Web: http://lpod-project.org
+- Documentation: http://docs.lpod-project.org
+- IRC: irc://irc.freenode.org/lpod
+
+Documentation
+=============
+
+- Cookbooks were refactored and hopefully improved.
+
+Python Implementation
+=====================
+
+Low-level API
+-------------
+
+- Virtually all types of styles are supported in the limit of the current API.
+
+- An API is available for searching and replacing patterns of text in a
+  document.
+
+- Basic shapes can be created: ellipse and circle, rectangle and square, and
+  line.
+
+- A basic API is available to add image, etc. files in documents, and
+  reference them in e.g. image frames.
+
+- A Virtual File System (VFS) layer handles grabbing document from HTTP and
+  FTP.
+
+- Tables are trying to automatically circumvent loading of big OOo tables of
+  1024x65535 cells, even though the real content only makes 10x20 cells.
+
+- After starting with the libxml2 Python wrapper, switched to lxml for both
+  speed and ease of use.
+
+High-level API
+--------------
+
+- The navigation API no longer use a context element. The element itself is
+  the navigation API.
+
+- Template are provided, with empty body, i.e. the ODT template has no
+  paragraph, the ODS template has no table and the ODP template has no draw
+  page.
+
+- A document can grab styles from another document to merge them with its own
+  ones.
+
+- A specific API is available on paragraphs to insert notes and annotation.
+
+- A specific API is available for table to work on them as a linear matrix,
+  i.e. repetitions are expanded. Coordinate syntax like "C3" is supported.
+
+- Tables can be created from and exported to CSV.
+
+- The full API to metadata is available. Only RDF would be missing.
+
+Command-line Utilities
+----------------------
+
+- The lpod-meta.py introspection tool can list and edit metadata of the
+  document.
+
+- The lpod-merge.py tool can merge documents of the same type. ODT, ODS and
+  CSV and supported for now. ODP to come.
+
+- The lpod-highlight.py tool can apply a style on a text pattern. The default
+  style is overlining as if you were using a yellow highlighter pen.
+
+- The lpod-mm2odt.py converts XML mind-map files to ODT.

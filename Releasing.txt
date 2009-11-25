@@ -1,0 +1,29 @@
+=================
+Releasing Process
+=================
+
+Releasing Process
+=================
+
+Documentation only
+------------------
+
+::
+
+  $ make -C doc release
+
+Documentation, Python, Perl, Ruby
+---------------------------------
+
+::
+
+  $ make dist
+
+Sites to publish announces
+==========================
+
+- http://odftoolkit.org/
+- http://freshmeat.net/
+- http://sourceforge.org/
+- http://pypi.python.org/
+- ... ?
