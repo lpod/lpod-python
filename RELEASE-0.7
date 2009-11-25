@@ -1,0 +1,56 @@
+========
+LpOD 0.7
+========
+
+Documentation
+=============
+
+- Cookbooks were refactored and hopefully improved.
+
+Python Implementation
+=====================
+
+Low-level API
+-------------
+
+- Virtually all types of styles are supported in the limit of the current API.
+
+- An API is available for searching and replacing patterns of text in a
+  document.
+
+- Basic shapes can be created: ellipse and circle, rectangle and square, and
+  line.
+
+- A basic API is available to add image, etc. files in documents, and
+  reference them in e.g. image frames.
+
+- A Virtual File System (VFS) layer handles grabbing document from HTTP and
+  FTP.
+
+- Tables are trying to automatically circumvent loading of big OOo tables of
+  1024x65535 cells, even though the real content only makes 10x20 cells.
+
+- After starting with the libxml2 Python wrapper, switched to lxml for both
+  speed and ease of use.
+
+High-level API
+--------------
+
+- The navigation API no longer use a context element. The element itself is
+  the navigation API.
+
+- Template are provided, with empty body, i.e. the ODT template has no
+  paragraph, the ODS template has no table and the ODP template has no draw
+  page.
+
+- A document can grab styles from another document to merge them with its own
+  ones.
+
+- A specific API is available on paragraphs to insert notes and annotation.
+
+- A specific API is available for table to work on them as a linear matrix,
+  i.e. repetitions are expanded. Coordinate syntax like "C3" is supported.
+
+- Tables can be created from and exported to CSV.
+
+- The full API to metadata is available. Only RDF would be missing.

@@ -1,0 +1,53 @@
+========
+LpOD 0.8
+========
+
+Documentation
+=============
+
+- Cookbooks illustrating the navigation API and the metadata API are now
+  available.
+
+Python Implementation
+=====================
+
+Low-level API
+-------------
+
+- Default numeric types were added, targeting the French locale for now.
+
+- The text API is now richer.
+
+High-level API
+--------------
+
+- Started to implement a templating language in the content of ODF documents.
+  Only setting values and "if" are implemented for now, and only on text.
+
+  You can see an example template in "python/templates/template.ott" and an
+  example script in "python/templates/template.py".
+
+- Tables of content can now be filled with the titles found in the document.
+
+- Draw page can use the fade transition.
+
+Command-line Utilities
+----------------------
+
+- The lpod-show.py tool dumps a textual representation of the content. It can
+  also dump the latter, style information and metadata list in a directory.
+
+- The lpod-style.py introspection tool shows the list of styles of the
+  document, wether it is used, and is able to remove them all. It can also
+  merge styles from one document to another.
+
+- The lpod-meta.py introspection tool can list and edit metadata of the
+  document.
+
+- The lpod-merge.py tool can merge documents of the same type. ODT, ODS and
+  CSV and supported for now. ODP to come.
+
+- The lpod-highlight.py tool can apply a style on a text pattern. The default
+  style is overlining as if you were using a yellow highlighter pen.
+
+- The lpod-mm2odt.py converts XML mind-map files to ODT.
