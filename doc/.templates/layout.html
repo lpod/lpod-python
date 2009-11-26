@@ -1,0 +1,16 @@
+{% extends "!layout.html" %}
+
+{% block relbar1 %}
+<div style="background-color: white; text-align: left; padding: 10px 10px 10px 10px">
+  <a href="http://lpod-project.org" title="LPOD Project Homepage">
+    <img src="{{pathto("_static/banner-lpod_en.png", 1) }}" border="0"/>
+  </a>
+</div>
+{{ super() }}
+{% endblock %}
+
+{% block rootrellink %}
+    <li><a href="http://lpod-project.org/">LPOD Homepage</a> &raquo;</li>
+    {{ super() }}
+{% endblock %}
+
