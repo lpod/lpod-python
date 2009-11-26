@@ -34,66 +34,66 @@ Navigation
 
 - Open an existing document::
 
-  >>> from lpod.document import odf_get_document
-  >>> document = odf_get_document('http://example.com/odf/cookbook')
+    >>> from lpod.document import odf_get_document
+    >>> document = odf_get_document('http://example.com/odf/cookbook')
 
 - Access the content of the document::
 
-  >>> body = document.get_body()
+    >>> body = document.get_body()
 
 - A list of all elements of a kind is accessible through "get_*_list"::
 
-  >>> body.get_heading_list()
-  [<lpod.heading.odf_heading object at 0x22a0090>, <lpod.heading.odf_head...
-  >>> body.get_paragraph_list()
-  [<lpod.paragraph.odf_paragraph object at 0x22a04d0>, <lpod.paragraph.od...
-  >>> body.get_list_list()
-  [<lpod.list.odf_list object at 0x7f2f6ce2c5d0>, <lpod.list.odf_list obj...
-  >>> body.get_table_list()
-  [<lpod.element.odf_element object at 0x7f2f6ce2c850>, <lpod.element.odf...
-  >>> body.get_draw_page_list()
-  [<lpod.element.odf_draw_page object at 0x7f23ba8e0c2f>, <lpod.element.od...
+    >>> body.get_heading_list()
+    [<lpod.heading.odf_heading object at 0x22a0090>, <lpod.heading.odf_head...
+    >>> body.get_paragraph_list()
+    [<lpod.paragraph.odf_paragraph object at 0x22a04d0>, <lpod.paragraph.od...
+    >>> body.get_list_list()
+    [<lpod.list.odf_list object at 0x7f2f6ce2c5d0>, <lpod.list.odf_list obj...
+    >>> body.get_table_list()
+    [<lpod.element.odf_element object at 0x7f2f6ce2c850>, <lpod.element.odf...
+    >>> body.get_draw_page_list()
+    [<lpod.element.odf_draw_page object at 0x7f23ba8e0c2f>, <lpod.element.od...
 
 - The list can be more finely grained::
 
-  >>> body.get_heading_list(level=1)
-  [<lpod.heading.odf_heading object at 0x7f2f6ce2cb10>]
-  >>> body.get_paragraph_list(regex=u"[Ll]ist")
-  [<lpod.paragraph.odf_paragraph object at 0x7f2f6ce2c6d0>, <lpod.paragrap...
+    >>> body.get_heading_list(level=1)
+    [<lpod.heading.odf_heading object at 0x7f2f6ce2cb10>]
+    >>> body.get_paragraph_list(regex=u"[Ll]ist")
+    [<lpod.paragraph.odf_paragraph object at 0x7f2f6ce2c6d0>, <lpod.paragrap...
 
 - No result returns an empty list::
 
-  >>> body.get_table_list(style=u"Invoice")
-  []
+    >>> body.get_table_list(style=u"Invoice")
+    []
 
 - To access a single element by name, position or a regular expression on the
   content, use "get_*_by_<criteria>"::
 
-  >>> body.get_heading_by_position(1)
-  <lpod.heading.odf_heading object at 0x7f2f6ce2cc50>
-  >>> body.get_paragraph_by_content(u"highlight")
-  <lpod.paragraph.odf_paragraph object at 0x7f2f6ce2cd90>
-  >>> body.get_table_by_name(u"Feuille1")
-  <lpod.element.odf_element object at 0x7f2f6ce2c850>
+    >>> body.get_heading_by_position(1)
+    <lpod.heading.odf_heading object at 0x7f2f6ce2cc50>
+    >>> body.get_paragraph_by_content(u"highlight")
+    <lpod.paragraph.odf_paragraph object at 0x7f2f6ce2cd90>
+    >>> body.get_table_by_name(u"Feuille1")
+    <lpod.element.odf_element object at 0x7f2f6ce2c850>
 
 - No result returns None::
 
-  >>> print body.get_draw_page_by_name(u"Page1")
-  None
+    >>> print body.get_draw_page_by_name(u"Page1")
+    None
 
 - Any element is a context for navigating inside it::
 
-  >>> l = body.get_list_by_position(1)
-  >>> print l
-  <lpod.list.odf_list object at 0x7f2f6ce2c890> "text:list"
-  >>> p = l.get_paragraph_by_position(1)
-  >>> print p
-  <lpod.paragraph.odf_paragraph object at 0x7f2f6ce2ca10> "text:p"
-  >>> a = p.get_link_by_path(u"example.com")
-  >>> print a
-  <lpod.element.odf_element object at 0x7f2f6ce2cb10> "text:a"
-  >>> a.serialize()
-  <text:a xlink:href="http://example.com">Example</a>
+    >>> l = body.get_list_by_position(1)
+    >>> print l
+    <lpod.list.odf_list object at 0x7f2f6ce2c890> "text:list"
+    >>> p = l.get_paragraph_by_position(1)
+    >>> print p
+    <lpod.paragraph.odf_paragraph object at 0x7f2f6ce2ca10> "text:p"
+    >>> a = p.get_link_by_path(u"example.com")
+    >>> print a
+    <lpod.element.odf_element object at 0x7f2f6ce2cb10> "text:a"
+    >>> a.serialize()
+    <text:a xlink:href="http://example.com">Example</a>
 
 
 Metadata
@@ -101,95 +101,96 @@ Metadata
 
 - Open an existing document::
 
-  >>> from lpod.document import odf_get_document
-  >>> document = odf_get_document('http://example.com/odf/cookbook')
+    >>> from lpod.document import odf_get_document
+    >>> document = odf_get_document('http://example.com/odf/cookbook')
 
 - Access the metadata part::
 
-  >>> meta = document.get_meta()
+    >>> meta = document.get_meta()
 
 You then get the list of getters and setters.
 
 - Most of them return unicode::
 
-  >>> meta.get_title()
-  Example Document for the Cookbook
-  >>> meta.get_description()
-  >>> meta.get_subject()
-  >>> meta.get_language()
-  >>> meta.get_initial_creator()
-  >>> meta.get_keyword()
-  >>> meta.get_generator()
-  LpOD Project v0.7-67-g24c08f4
+    >>> meta.get_title()
+    Example Document for the Cookbook
+    >>> meta.get_description()
+    >>> meta.get_subject()
+    >>> meta.get_language()
+    >>> meta.get_initial_creator()
+    >>> meta.get_keyword()
+    >>> meta.get_generator()
+    LpOD Project v0.7-67-g24c08f4
 
 - They accept unicode in return::
 
-  >>> meta.set_title(u"First Example of a Long Series")
+    >>> meta.set_title(u"First Example of a Long Series")
 
 - Some return int::
 
-  >>> meta.get_editing_cycles()
-  2
+    >>> meta.get_editing_cycles()
+    2
 
 - They accept int in return::
 
-  >>> meta.set_editing_cycles(3)
+    >>> meta.set_editing_cycles(3)
 
 - Some return dict::
 
-  >>> meta.get_statistic()
-  {'meta:word-count': 63, 'meta:image-count': 0, 'meta:object-count': 0,
-  'meta:page-count': 3, 'meta:character-count': 273, 'meta:paragraph-count':
-  25, 'meta:table-count': 2}
+    >>> meta.get_statistic()
+    {'meta:word-count': 63, 'meta:image-count': 0, 'meta:object-count': 0,
+    'meta:page-count': 3, 'meta:character-count': 273, 'meta:paragraph-count':
+    25, 'meta:table-count': 2}
 
 - They accept dict of the same form::
 
-  >>> stat = meta.get_statistic()
-  # ... update stat
-  >>> meta.set_statistic(stat)
+    >>> stat = meta.get_statistic()
+    # ... update stat
+    >>> meta.set_statistic(stat)
 
 - Some return datetime object::
 
-  >>> meta.get_modification_date()
-  datetime.datetime(2009, 8, 25, 15, 40, 28)
-  >>> meta.get_creation_date()
-  datetime.datetime(2009, 7, 11, 15, 21, 27)
+    >>> meta.get_modification_date()
+    datetime.datetime(2009, 8, 25, 15, 40, 28)
+    >>> meta.get_creation_date()
+    datetime.datetime(2009, 7, 11, 15, 21, 27)
 
 - So they need datetime object in return::
 
-  >>> from datetime import datetime
-  >>> metadata.set_modification_date(datetime.now())
+    >>> from datetime import datetime
+    >>> metadata.set_modification_date(datetime.now())
 
 - There is an helper for manipulating dates::
 
-  >>> from lpod.datatype import DateTime
-  >>> metadata.set_modification_date(DateTime.decode('2009-11-17T12:02:49'))
+    >>> from lpod.datatype import DateTime
+    >>> metadata.set_modification_date(DateTime.decode('2009-11-17T12:02:49'))
 
 - Other return timedelta object::
 
-  >>> meta.get_editing_duration()
-  >>> datetime.timedelta(0, 174)
+    >>> meta.get_editing_duration()
+    >>> datetime.timedelta(0, 174)
 
 - So they need timedelta object in return::
-  >>> from datetime import timedelta
-  >>> meta.set_editing_duration(timedelta(seconds=182))
+
+    >>> from datetime import timedelta
+    >>> meta.set_editing_duration(timedelta(seconds=182))
 
 - There is an helper for this too::
 
-  >>> from lpod.datatype import Duration
-  >>> meta.set_editing_duration(Duration.encode('PT00H03M02S')
+    >>> from lpod.datatype import Duration
+    >>> meta.set_editing_duration(Duration.encode('PT00H03M02S')
 
 - There are finally user-defined metadata (generally unused)::
 
-  >>> meta.get_user_defined_metadata()::
-  {}
+    >>> meta.get_user_defined_metadata()::
+    {}
 
 - Free for you to store str, unicode, bool, int, float, Decimal, date,
   datetime, timedelta::
 
-  >>> meta.set_user_defined_metadata('lpod-version', 'v0.7-67-g24c08f4')
-  >>> meta.get_user_defined_metadata()
-  {u'lpod-version': u'v0.7-67-g24c08f4'}
+    >>> meta.set_user_defined_metadata('lpod-version', 'v0.7-67-g24c08f4')
+    >>> meta.get_user_defined_metadata()
+    {u'lpod-version': u'v0.7-67-g24c08f4'}
 
 Strings are always decoded as unicode, numeric values are always decoded as
 Decimal.
