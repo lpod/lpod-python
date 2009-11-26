@@ -14,3 +14,10 @@
     {{ super() }}
 {% endblock %}
 
+{% block footer %}
+  <div class="footer">
+  {% trans copyright=copyright|e %}&copy; Copyright {{ copyright }}.{% endtrans %}
+  Hosted by <a href="http://www.itaapy.com/" title="e-Procurement, ECM, ERP, Mailing-lists, Websites, e-Commerce, e-Learning, e-Gouvernment, CRM">Itaapy</a>.
+  {% trans sphinx_version=sphinx_version|e %}Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> {{ sphinx_version }}.{% endtrans %}
+  </div>
+{% endblock %}
