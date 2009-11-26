@@ -221,6 +221,15 @@ The text content may be directly hold as the text of the paragraph element;
 however, a paragraph can contain sub-paragraph elements so-called *spans*
 (introduced later in this documentation).
 
+As soon as a piece of text is displayed somewhere in a document,
+whatever the context, this text belongs to a paragraph.
+
+In a text document, paragraphs may appear as top level elements, i.e.
+directly in the document body, as well as inside complex containers, such as
+lists, tables, text boxes. Paragraphs may be used as components of page headers
+or footers. In other documents, a paragraph can't appear as a top level element,
+knowing that any visible text is embedded in a structured container (table cell,
+text box, etc).
 
 Creation and attachment
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -969,8 +978,33 @@ structural list imbrication, not by item attributes.
 Data pilot (pivot) tables [todo]
 --------------------------------
 
-Sections [todo]
----------------
+Sections
+--------
+
+A section is a named region in a text document. It's a high level container that
+can include one or more content elements of any kind (including sections, that
+may be nested).
+
+The purpose of a section is either to assign certain formatting properties to a
+document region, or to include an external content.
+
+A section is created using ``odf_create_section()`` with a mandatory name
+as the first argument and the following optional parameters:
+
+- ``style``: the name of a section style, already existing or to be defined;
+- ``url`` : the URL of an external resource that will provide the content of the
+  section;
+- ``protected``: a boolean that, if true, means that the section should
+  be write-protected when the document is edited through a user-oriented,
+  interactive application (of course, such a protection doesn't prevent
+  an lpOD-based tool from modifying the table)(default is false);
+- ``protection key``: a (supposedly encrypted) string that represents
+  a password; if this parameter is set and if ``protected`` is true,
+  a end-user interactive application should ask for a password that matches
+  this string before removing the write-protection (beware, such a protection
+  is *not* a security feature);
+- ``display``: boolean, tells that the section should be visible (default is 
+  true).
 
 Draw pages
 ----------
