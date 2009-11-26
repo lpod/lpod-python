@@ -1,0 +1,48 @@
+@import url("default.css");
+
+body {
+  color: #000;
+  background-color: #fff;
+}
+
+div.related {
+  background-color: #444;
+}
+
+a,
+div.sphinxsidebar h3 a,
+div.sphinxsidebar a,
+div.footer a {
+  color: #444;
+}
+
+div.sphinxsidebar h4 {
+  color: #000;
+}
+
+div.sphinxsidebar ul {
+  color: #000;
+}
+
+div.sphinxsidebar input {
+  border-color: #444;
+}
+
+div.document {
+  background-color: #f5f8e4;
+}
+
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+  color: #000;
+  background-color: #f5f8e4;
+  border-bottom: 1px solid #444;
+}
+
+div.footer {
+  color: #000;
+}
