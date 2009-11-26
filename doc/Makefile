@@ -152,7 +152,7 @@ figures/%.png: figures-src/%.dia
 
 MODULES = bookmark container content datatype document draw_page element \
 					frame heading image link list meta note paragraph reference \
-					release section setup shapes smil span styles styles table toc \
+					release section setup shapes smil span style styles table toc \
 					tracked_changes utils variable vfs xmlpart
 
 
