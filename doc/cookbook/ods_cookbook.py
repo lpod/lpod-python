@@ -38,8 +38,39 @@ body = document.get_body()
 
 for id, filename in enumerate(glob('./files/*.csv')):
     table = import_from_csv(filename, u'Table %s' % (id + 1))
-    # Table is represented as a matrix in memory,
-    # so ask to reformat it to XML
+
+    # Some information
+    width = table.get_table_width()
+    height = table.get_table_height()
+
+    # In case the table was hit by a certain bug...
+    table.rstrip_table()
+
+    # Accessing rows
+    first_row = table.get_row(0)
+    first_row.set_row_style(u"Another style")
+
+    # Accessing cells from the row
+    first_cell = first_row.get_cell(0)
+    first_cell.set_cell_value(u"Hello")
+
+    # Modified cells must be pushed back
+    # Could be pushed to another position
+    first_row.set_cell(0, first_cell)
+
+    # Modified rows must be pushed back
+    # Could be pushed to another position
+    table.set_row(0, first_row)
+
+    # Accessing cells from the table
+    second_cell = table.get_cell("B1")
+    second_cell.set_cell_value(u"World!")
+
+    # Modified cells must be pushed back
+    # Could be pushed to another position
+    table.set_cell((1, 0), second_cell)
+
+    # The table is a regular element
     body.append_element(table)
 
 # Save
