@@ -27,8 +27,6 @@
 Level 1 Functional specification
 ################################
 
-**WORKING DRAFT**
-
 .. contents::
 
 Common features and conventions

@@ -24,30 +24,29 @@
       You may obtain a copy of the License at
       http://www.apache.org/licenses/LICENSE-2.0
 
-===================================
-Welcome to LPOD's documentation!
-===================================
+lpOD Architecture level 0
+===========================
+
+.. toctree::
+   :maxdepth: 3
+
+   level0.rst
+
+
+lpOD Architecture level 1
+===========================
 
 .. toctree::
    :maxdepth: 2
 
-   level0.rst
    level1.rst
 
-..
-    Slides Draft
-    =============
-
-    .. toctree::
-       :maxdepth: 1
-
-       slide_draft.rst
 
 lpOD Cookbook
 =============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    cookbook.rst
 

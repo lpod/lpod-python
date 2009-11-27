@@ -24,9 +24,9 @@
       You may obtain a copy of the License at
       http://www.apache.org/licenses/LICENSE-2.0
 
-#####################################
-Level 0 API reference (working draft)
-#####################################
+######################
+Level 0 API reference
+######################
 
 0.0 Physical access & persistence
 =================================
