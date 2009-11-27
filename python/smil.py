@@ -37,6 +37,7 @@ def odf_create_anim_par(presentation_node_type=None, smil_begin=None):
         presentation_node_type -- default, on-click, with-previous,
                                   after-previous, timing-root, main-sequence
                                   and interactive-sequence
+
         smil_begin -- indefinite, 10s, [id].click, [id].begin
     """
     element = odf_create_element('<anim:par/>')
@@ -74,13 +75,10 @@ def odf_create_anim_transitionFilter(smil_dur=None, smil_type=None,
     
     Arguments:
       smil_dur -- XXX complete me
-      smil_type and smil_subtype -- see http://www.w3.org/TR/SMIL20/smil-transitions.html#TransitionEffects-Appendix
-                                    to get a list of all types/subtypes
-      smil_direction -- *forward, reverse
+      smil_type and smil_subtype -- see http://www.w3.org/TR/SMIL20/smil-transitions.html#TransitionEffects-Appendix to get a list of all types/subtypes
+      smil_direction -- forward, reverse
       smil_fadeColor -- forward, reverse
-      smil_mode -- *in, out
-
-      * default value.
+      smil_mode -- in, out
     """
 
     element = odf_create_element('<anim:transitionFilter/>')
