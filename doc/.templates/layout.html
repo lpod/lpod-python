@@ -16,6 +16,13 @@ Hello world
 
 {% block sidebarrel %}{% endblock %}
 
+{% block sidebarsourcelink %}
+{% if show_source and has_source and sourcename %}
+<a href="{{ pathto('_sources/' + sourcename, true)|e }}"
+         rel="nofollow"><h6>Show the source of this page</h6></a></li>
+{% endif %}
+{% endblock %}
+
 {% block rootrellink %}
     <li><a href="http://lpod-project.org/">LPOD Homepage</a> &raquo;</li>
     {{ super() }}
