@@ -779,8 +779,8 @@ class odf_row(odf_element):
         width = self.get_row_width()
         if len(values) != width:
             raise ValueError, "row mismatch: %s cells expected" % width
-        for x in enumerate(values):
-            self.set_cell_value(x)
+        for x, value in enumerate(values):
+            self.set_cell_value(x, value)
 
 
     def rstrip_row(self):
@@ -999,6 +999,22 @@ class odf_table(odf_element):
         Return: list of lists
         """
         return [row.get_cell_values() for row in self.traverse_rows()]
+
+
+    def set_table_values(self, values):
+        """Set all Python values of all the cells.
+
+        A list of lists is expected, with as many lists as rows, and as many
+        items in each sublist as cells.
+
+        Arguments:
+
+            values -- list of lists
+        """
+        values = iter(values)
+        for y, row in enumerate(self.traverse_rows()):
+            row.set_cell_values(values.next())
+            self.set_row(y, row)
 
 
     def rstrip_table(self):

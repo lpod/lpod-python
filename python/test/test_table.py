@@ -656,6 +656,16 @@ class TestTable(TestCase):
                  [1, 2, 3, 4, 5, 6, 7]])
 
 
+    def  test_set_values(self):
+        table = self.table.clone()
+        values = [[u"a", u"b", u"c", u"d", u"e", u"f", u"g"],
+                  [u"h", u"i", u"j", u"k", u"l", u"m", u"n"],
+                  [u"o", u"p", u"q", u"r", u"s", u"t", u"u"],
+                  [u"v", u"w", u"x", u"y", u"z", u"aa", u"ab"]]
+        table.set_table_values(values)
+        self.assertEqual(table.get_table_values(), values)
+
+
     def test_rstrip(self):
         document = odf_get_document('samples/styled_table.ods')
         table = document.get_body().get_table_by_name(u'Feuille1').clone()
