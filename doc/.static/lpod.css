@@ -48,3 +48,11 @@ div.body h6 {
 div.footer {
   color: #000;
 }
+
+li.toctree-l2 {
+  font-size: 90%;
+}
+
+li.toctree-l3 {
+  font-size: 90%;
+}
