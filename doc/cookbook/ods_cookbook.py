@@ -40,7 +40,7 @@ for id, filename in enumerate(glob('./files/*.csv')):
     table = import_from_csv(filename, u'Table %s' % (id + 1))
     # Table is represented as a matrix in memory,
     # so ask to reformat it to XML
-    body.append_element(table.to_odf_element())
+    body.append_element(table)
 
 # Save
 filename = 'spreadsheet.ods'

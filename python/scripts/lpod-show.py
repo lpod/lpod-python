@@ -79,10 +79,11 @@ def dump(txt, to_file):
 
 
 def spreadsheet_to_stdout(document):
+    encoding = stdout.encoding
+    if encoding is None:
+        encoding = 'utf-8'
     body = document.get_body()
-    for table_element in body.get_table_list():
-        table = odf_table(odf_element=table_element)
-        encoding = stdout.encoding if stdout.encoding is not None else 'utf-8'
+    for table in body.get_table_list():
         table.export_to_csv(stdout, encoding=encoding)
         stdout.write("\n")
     stdout.flush()
@@ -91,9 +92,8 @@ def spreadsheet_to_stdout(document):
 
 def spreadsheet_to_csv(document, target):
     body = document.get_body()
-    for table_element in body.get_table_list():
-        table = odf_table(odf_element=table_element)
-        name = table.get_tagname()
+    for table in body.get_table_list():
+        name = table.get_table_name()
         filename = clean_filename(name) + '.csv'
         csv_file = target.open(filename, 'w')
         table.export_to_csv(csv_file)

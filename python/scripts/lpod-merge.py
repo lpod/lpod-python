@@ -96,7 +96,7 @@ def add_csv(filename, output_body):
     # XXX We must verify that the name doesn't exist yet
     name = splitext(basename(filename))[0]
     table = import_from_csv(filename, name)
-    output_body.append_element(table.to_odf_element())
+    output_body.append_element(table)
     print 'Add "%s"' % filename
 
 

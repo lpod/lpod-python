@@ -26,7 +26,7 @@ from lpod.variable import odf_create_page_count_variable
 from lpod.variable import odf_create_date_variable, odf_create_time_variable
 from lpod.variable import odf_create_chapter_variable
 from lpod.variable import odf_create_filename_variable
-from lpod.table import odf_table
+from lpod.table import odf_create_table
 from lpod.styles import rgb2hex
 from lpod import __version__, __installation_path__
 
@@ -92,8 +92,8 @@ data.append([u'lpOD library version', __version__])
 data.append([u'Python version', '%d.%d.%d' % version_info[:3]])
 
 # Creation / Insertion
-table = odf_table(name='table1', style=u"Standard", data=data)
-table = table.to_odf_element()
+table = odf_create_table(u'table1', width=2, height=2, style=u"Standard")
+table.set_table_values(data)
 body.append_element(table)
 
 

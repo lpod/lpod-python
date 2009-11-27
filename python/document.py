@@ -188,8 +188,7 @@ class odf_document(object):
         result = []
         for element in body.get_children():
             if element.get_tagname() == 'table:table':
-                table = odf_table(odf_element=element)
-                result.append(table.get_formated_text(context))
+                result.append(element.get_formated_text(context))
             else:
                 result.append(element.get_formated_text(context))
                 # Insert the notes
