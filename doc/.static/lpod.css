@@ -3,6 +3,7 @@
 body {
   color: #000;
   background-color: #fff;
+  margin-left: 28px;
 }
 
 div.related {
@@ -40,7 +41,7 @@ div.body h4,
 div.body h5,
 div.body h6 {
   color: #000;
-  background-color: #f5f8e4;
+  background-color: transparent;
   border-bottom: 1px solid #444;
 }
 
