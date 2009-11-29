@@ -24,10 +24,10 @@
       http://www.apache.org/licenses/LICENSE-2.0
 
 
-.. contents::
-
 Fields and forms
 ================
+
+.. contents::
 
 Declared fields and variables [todo]
 ------------------------------------

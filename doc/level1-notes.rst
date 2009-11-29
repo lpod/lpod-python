@@ -24,11 +24,11 @@
       http://www.apache.org/licenses/LICENSE-2.0
 
 
+Notes
+=========
+
 .. contents::
 
-
-Notes
-=======================
 Generally speaking, a note is an object whose main function is to allow the user
 to set some text content out of the main document body but to structurally
 associate this content to a specific location in the document body. The content

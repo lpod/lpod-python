@@ -28,6 +28,8 @@
 Level 0 API reference
 ######################
 
+.. contents::
+
 0.0 Physical access & persistence
 =================================
 

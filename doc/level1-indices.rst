@@ -24,8 +24,8 @@
       http://www.apache.org/licenses/LICENSE-2.0
 
 
-.. contents::
-
 Indices [todo]
 ===============
+
+.. contents::
 

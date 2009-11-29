@@ -25,10 +25,10 @@
       http://www.apache.org/licenses/LICENSE-2.0
 
 
-.. contents::
-
 Styles
 ======
+
+.. contents::
 
 A style controls the formatting and/or layout properties of a family of
 content objects. It's identified by its own name and its family.
