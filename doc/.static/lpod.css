@@ -82,8 +82,8 @@ div.body h3, div.body h4 {
   font-size: 100%;
 }
 
-#contents p.topic-title {
-  margin-bottom: 3px;
+div.body p.topic-title {
+  margin-bottom: 2px;
   font-size: 100%;
 }
 
