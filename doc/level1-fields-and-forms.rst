@@ -28,6 +28,7 @@ Fields and forms
 ================
 
 .. contents::
+   :local:
 
 Declared fields and variables [todo]
 ------------------------------------

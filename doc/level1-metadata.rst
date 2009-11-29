@@ -29,6 +29,7 @@ Metadata
 ========
 
 .. contents::
+   :local:
 
 Pre-defined [todo]
 ------------------

@@ -28,6 +28,7 @@ Notes
 =========
 
 .. contents::
+   :local:
 
 Generally speaking, a note is an object whose main function is to allow the user
 to set some text content out of the main document body but to structurally

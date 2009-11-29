@@ -27,4 +27,5 @@ Application settings [todo]
 ================================
 
 .. contents::
+   :local:
 

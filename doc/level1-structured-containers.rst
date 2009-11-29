@@ -28,6 +28,7 @@ Structured containers
 =====================
 
 .. contents::
+   :local:
 
 Tables
 -------

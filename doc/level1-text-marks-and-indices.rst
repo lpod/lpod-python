@@ -28,6 +28,7 @@ Text marks and indices
 ======================
 
 .. contents::
+   :local:
 
 Position bookmarks
 ------------------

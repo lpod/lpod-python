@@ -28,6 +28,7 @@ Cookbook
 ########
 
 .. contents::
+   :local:
 
 Navigation
 ==========

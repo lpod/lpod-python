@@ -28,4 +28,5 @@ Indices [todo]
 ===============
 
 .. contents::
+   :local:
 

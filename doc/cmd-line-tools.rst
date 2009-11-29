@@ -25,6 +25,7 @@
 
 
 .. contents:: Scripting
+   :local:
 
 lpod-show.py
 =============

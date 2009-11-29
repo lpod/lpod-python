@@ -27,6 +27,7 @@ Basic text containers
 =====================
 
 .. contents::
+   :local:
 
 Paragraphs
 -----------

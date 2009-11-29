@@ -28,4 +28,5 @@ Tables of content [todo]
 ========================
 
 .. contents::
+   :local:
 

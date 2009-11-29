@@ -28,6 +28,7 @@ Graphic content
 ===============
 
 .. contents::
+   :local:
 
 Frames
 ------

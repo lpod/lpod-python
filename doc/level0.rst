@@ -29,6 +29,8 @@ Level 0 API reference
 ######################
 
 .. contents::
+   :local:
+
 
 0.0 Physical access & persistence
 =================================

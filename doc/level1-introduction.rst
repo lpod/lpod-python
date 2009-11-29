@@ -29,6 +29,7 @@ Level 1 Functional specification
 ################################
 
 .. contents::
+   :local:
 
 Common features and conventions
 ===============================
