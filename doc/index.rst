@@ -24,6 +24,43 @@
       You may obtain a copy of the License at
       http://www.apache.org/licenses/LICENSE-2.0
 
+Introduction
+==============
+
+lpOD is primarily designed as an intermediate, document-oriented API. It's a set of access methods that allows the programmer to create, retrieve, update or delete document components selected according to their logical identifiers and/or their structural and semantic role in the document.
+
+While the lpOD API is XPath-based, it brings a large set of predefined objects with programmer-friendly, mnemonic names, available without technical coding (such as XPath), and associated accessors. The access syntax for these objects  hides the physical data model and reflects a typical user's view on the document. It's designed according to a top-down approach: while the implementation is fully ODF-compliant, the interface maps the conceptual data model of an ODF document more than the ODF XML schema.
+
+The present level 1 lpOD API will include and extend the same functional scope as the existing CPAN Perl OpenDocument Connector (http://search.cpan.org/OpenOffice-OODoc), and will cover the three target languages on the basis of a common specification.
+
+The full set of predefined document objects is not frozen, but it presently includes the following ones:
+
+- sections;
+
+- paragraphs and headings;
+
+- item lists and list items;
+
+- links to internal and external resources;
+
+- bookmarks;
+
+- notes and annotations;
+
+- bibliography entries;
+
+- various frames (including text boxes, presentation pages, image containers and so on);
+
+- infra-paragraph text spans;
+
+- variable fields and text fields;
+
+- styles (including master pages and page layouts).
+
+Any object corresponding to a predefined accessor is retrieved (and possibly removed or updated) through a single instruction regardless of its context. In addition, a single instruction is needed to create this kind of object. One of the main design guidelines is to provide the largest possible set of predefined objects according to the real or probable needs of the users' community.
+
+In addition, the present API will be the foundation for ``lpOD level 2`` (coming soon), i.e. the high level library that will bring a set of business-oriented components, dedicated to business intelligence reporting, content management, form processing, and accessibility.
+
 lpOD Architecture level 0
 ===========================
 
