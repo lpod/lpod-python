@@ -79,7 +79,7 @@ lpOD Architecture level 1
    level1-introduction.rst
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    level1-basic-text-containers.rst
 
@@ -92,7 +92,7 @@ lpOD Architecture level 1
    level1-notes.rst
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    level1-structured-containers.rst
 
@@ -105,7 +105,7 @@ lpOD Architecture level 1
    level1-metadata.rst
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    level1-styles.rst
 
