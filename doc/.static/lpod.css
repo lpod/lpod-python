@@ -6,6 +6,10 @@ body {
   margin-left: 28px;
 }
 
+ul {
+  margin: 0 0 0 0;
+}
+
 div.related {
   background-color: #444;
 }
@@ -55,4 +59,35 @@ li.toctree-l2 {
 
 li.toctree-l3 {
   font-size: 90%;
+}
+
+div.sphinxsidebarwrapper ul {
+  list-style-type: disc;
+  margin-top: 1px;
+  padding-left: 6px;
+}
+
+div.sphinxsidebarwrapper h3 {
+  font-size: 100%;
+  font-weight: bold;
+}
+
+div.body h1 {
+  font-size: 115%;
+}
+div.body h2 {
+  font-size: 105%;
+}
+div.body h3, div.body h4 {
+  font-size: 100%;
+}
+
+#contents p.topic-title {
+  margin-bottom: 3px;
+  font-size: 100%;
+}
+
+div.sphinxsidebar p {
+  color: #444;
+
 }

@@ -10,18 +10,39 @@
 {% endblock %}
 
 {% block sidebartoc %}
-Hello world
-{{ super() }}
+<h3><a href="{{ pathto(master_doc) }}">Table of Contents</a></h3>
+
+
+<ul>
+  <li><a href="{{pathto('level0') }}">Level 0</a></li>
+  <li><a href="{{pathto('level1-introduction') }}">Level 1</a></li>
+  <li><a href="{{pathto('level1-basic-text-containers') }}">Level1 Basic Text
+  Containers</a></li>
+  <li><a href="{{pathto('level1-text-marks-and-indices') }}">Level1 Marks and
+  Indices</a></li>
+  <li><a href="{{pathto('level1-tables-of-content') }}">Level1 TOCs</a></li>
+  <li><a href="{{pathto('level1-indices') }}">Level1 Indices</a></li>
+  <li><a href="{{pathto('level1-notes') }}">Level1 Notes</a></li>
+  <li><a href="{{pathto('level1-structured-containers') }}">Level1 Structured
+  Containers</a></li>
+  <li><a href="{{pathto('level1-fields-and-forms') }}">Level1 Fields & Forms</a></li>
+  <li><a href="{{pathto('level1-graphic-content') }}">Level1 Graphic Content</a></li>
+  <li><a href="{{pathto('level1-metadata') }}">Level1 Metadata</a></li>
+  <li><a href="{{pathto('level1-styles') }}">Level1 Styles</a></li>
+  <li><a href="{{pathto('level1-application-settings') }}">Level1 App Settings</a></li>
+  <li><a href="{{pathto('cookbook') }}">Cookbook</a></li>
+  <li><a href="{{pathto('scripting') }}">Cmd Line Tools</a></li>
+  <li><a href="{{pathto('autodocs') }}">Autogenarated Docs</a></li>
+</ul>
+{%- if display_toc %}
+  <h3><a href="{{ pathto(master_doc) }}">{{ _('Local TOC') }}</a></h3>
+  {{ toc }}
+{%- endif %}
 {% endblock %}
+
 
 {% block sidebarrel %}{% endblock %}
 
-{% block sidebarsourcelink %}
-{% if show_source and has_source and sourcename %}
-<a href="{{ pathto('_sources/' + sourcename, true)|e }}"
-         rel="nofollow"><h6>Show the source of this page</h6></a></li>
-{% endif %}
-{% endblock %}
 
 
 {% block footer %}
@@ -31,3 +52,12 @@ Hello world
   {% trans sphinx_version=sphinx_version|e %}Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> {{ sphinx_version }}.{% endtrans %}
   </div>
 {% endblock %}
+
+{% block sidebarsourcelink %}
+{% if show_source and has_source and sourcename %}
+<a href="{{ pathto('_sources/' + sourcename, true)|e }}"
+         rel="nofollow"><h6>Show the source of this page</h6></a></li>
+
+{% endif %}
+{% endblock %}
+
