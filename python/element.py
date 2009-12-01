@@ -390,9 +390,9 @@ class odf_element(object):
     def get_attribute(self, name):
         element = self.__element
         uri, name = _decode_qname(name)
-        if uri is None:
-            return element.get(name)
-        value = element.get('{%s}%s' % (uri, name))
+        if uri is not None:
+            name = '{%s}%s' % (uri, name)
+        value = element.get(name)
         if value is None:
             return None
         return unicode(value)
@@ -401,19 +401,23 @@ class odf_element(object):
     def set_attribute(self, name, value):
         element = self.__element
         uri, name = _decode_qname(name)
-        if uri is None:
-            element.set(name, value)
-        else:
-            element.set('{%s}%s' % (uri, name), value)
+        if uri is not None:
+            name = '{%s}%s' % (uri, name)
+        if value is None:
+            try:
+                del element.attrib[name]
+            except KeyError:
+                pass
+            return
+        element.set(name, value)
 
 
     def del_attribute(self, name):
         element = self.__element
         uri, name = _decode_qname(name)
-        if uri is None:
-            del element.attrib[name]
-        else:
-            del element.attrib['{%s}%s' % (uri, name)]
+        if uri is not None:
+            name = '{%s}%s' % (uri, name)
+        del element.attrib[name]
 
 
     def get_text(self, recursive=False):
