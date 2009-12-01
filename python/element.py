@@ -361,8 +361,8 @@ class odf_element(object):
         and the wrapping class won't change
         """
         element = self.__element
-        tag = '{%s}%s' % _decode_qname(qname)
-        element.tag = tag
+        element.tag = '{%s}%s' % _decode_qname(qname)
+        return _make_odf_element(element)
 
 
     def get_element_list(self, xpath_query):
