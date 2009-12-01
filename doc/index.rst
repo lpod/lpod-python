@@ -32,26 +32,20 @@ Definition of a Free Software API implementing the ISO/IEC 26300 standard.
 Development, for higher level use cases, in Python, Perl and Ruby languages.
 of a top-down oriented API.
 
-lpOD is design according **top-down** approche, the code follows the document
-semantics instad of the XML shemat [1]_. So from the programer viewpoint there is
-no need to know the ODF specification, lpOD insolate him from the low level XML
-concerns.
+lpOD is designed according to a **top-down** approach. The API is bound to the document
+functional structure and the user's point of view, instead of the XML schema [1]_. As a consequence, the knowledge of the ODF specification is not needed to use it. lpOD
+isolates the application developer from the low level XML concerns.
 
-This documentation describe the **fonctionnal architecture**, we define the
-:doc:`Level 0 <level0>` as the encapsulation of all the low-level data access logic
-(Packaging , Encoding and XML network). The :doc:`Level 1 <level1-introduction>` offers a
-document-oriented API who hides the physical data model and reflects a typical
-user's view and navigation on the document.
+This documentation describe the **functional specification** and the **general design**. We define the :doc:`Level 0 <level0>` as the encapsulation of all the low-level access logic to the ODF resources (local or remote file management, packaging, encoding and XML navigation). The :doc:`Level 1 <level1-introduction>` describess a document-oriented API who hides the physical data model and reflects a typical user's view on the documents.
 
-As a direct demonstration of the API we provide a :doc:`CookBook </cookbook>` and a set of
-:doc:`command line tools </cmd-line-tools>` to manipulate ODS, ODI and ODT Data.
+As a direct demonstration of the API we provide a :doc:`CookBook </cookbook>` and a set of :doc:`command line tools </cmd-line-tools>` to manipulate ODS, ODP and ODT Data.
 
 
-*Jean-Marie Gouarné [2], lpOD Architec.*
+*Jean-Marie Gouarné [2], lpOD Architect.*
 
 
-.. [1] At the opposit of implementations that start by a code generation from ODF RelaxNG shemat.
-.. [2] Jean-Marie Gouarné is the author of OODoc Perl toolkit which got an "OpenOffice.org Community Innovation Program award"
+.. [1] At the opposite of implementations based on a code generation from the ODF RelaxNG schema.
+.. [2] Jean-Marie Gouarné is the author of the Perl ODF Connector toolkit which got an "OpenOffice.org Community Innovation Program award"
 
 
 lpOD Cookbook
