@@ -24,8 +24,8 @@
       http://www.apache.org/licenses/LICENSE-2.0
 
 
-Fields and forms
-================
+Fields
+========
 
 .. contents::
    :local:
@@ -35,5 +35,4 @@ Declared fields and variables [todo]
 
 Text fields [todo]
 -------------------
-
 

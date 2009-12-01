@@ -30,8 +30,11 @@ Text marks and indices
 .. contents::
    :local:
 
+Bookmarks
+----------
+
 Position bookmarks
-------------------
+~~~~~~~~~~~~~~~~~~
 A position bookmark is a location mark somewhere in a text container, which is
 identified by a unique name, but without any content.
 
@@ -64,7 +67,7 @@ the paragraph (or heading) where the bookmark is located::
 Another method allows the user to get the offset of a given bookmark in the host ODF element. Beware: this offset is related to the text of the parent element (which could be a text span).
 
 Range bookmarks
-----------------
+~~~~~~~~~~~~~~~~
 A range bookmark is an identified text range which can spread across paragraph
 frontiers. It's a named content area, not dependant of the document tree
 structure. It starts somewhere in a paragraph and stops somewhere in the same
@@ -87,4 +90,11 @@ calling context. A context that is not the whole document can contain a bookmark
 start or a bookmark end but not both.  In addition, a bookmark spreading across
 several elements gets corrupt if the element containing its start point or its
 end point is later removed.
+
+Indices [todo]
+---------------
+
+Bibliography marks [todo]
+--------------------------
+
 
