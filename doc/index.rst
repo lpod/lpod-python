@@ -112,6 +112,7 @@ lpOD Architecture level 1
 .. toctree::
    :maxdepth: 2
 
+   level1-table.rst
    level1-structured-containers.rst
 
 .. toctree::
