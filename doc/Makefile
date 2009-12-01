@@ -61,9 +61,11 @@ latex: lpod-check pdf-figures autodocs
 	      "run these through (pdf)latex."
 
 pdf: latex
-	cd .build/latex && make all-pdf
+	cd .build/latex && make all-pdf && cp lpod.pdf ../../lpod-$(GIT_VERSION).pdf
+	rm -f lpod.pdf
+	ln -s lpod-$(GIT_VERSION).pdf lpod.pdf
 	@echo
-	@echo "Your PDF is available in .build/latex"
+	@echo "Your PDF is available in lpod.pdf"
 
 changes:
 	mkdir -p .build/changes .build/doctrees
@@ -78,15 +80,13 @@ linkcheck:
 	@echo "Link check complete; look for any errors in the above output " \
 	      "or in .build/linkcheck/output.txt."
 
-release: html pdf
+release: pdf html
 	cd .build; \
 	mv html lpod-docs-html-$(GIT_VERSION); \
 	tar czf ../lpod-docs-html-$(GIT_VERSION).tgz lpod-docs-html-$(GIT_VERSION); \
 	mv lpod-docs-html-$(GIT_VERSION) html
-	cd .build/latex && tar czf ../../lpod-docs-pdf-$(GIT_VERSION).tgz lpod.pdf
 	@echo
-	@echo "html doc is available ./lpod-docs-html-$(GIT_VERSION).tgz and"
-	@echo "pdf doc is available ./lpod-docs-pdf-$(GIT_VERSION).tgz"
+	@echo "doc is available ./lpod-docs-html-$(GIT_VERSION).tgz"
 
 
 # Figures conversion
