@@ -89,5 +89,24 @@ div.body p.topic-title {
 
 div.sphinxsidebar p {
   color: #444;
+}
 
+#introduction p > em {
+  text-align: right;
+  float: right;
+}
+
+#introduction p {
+  font-size: 90%;
+  margin-bottom: 3px;
+}
+
+#introduction #id2.docutils.footnote {
+  font-size: 70%;
+  margin-top: 25px;
+}
+
+#introduction table.docutils.footnote {
+  font-size: 70%;
+  margin-top: 5px;
 }

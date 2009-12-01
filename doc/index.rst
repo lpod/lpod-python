@@ -27,39 +27,32 @@
 Introduction
 ==============
 
-lpOD is primarily designed as an intermediate, document-oriented API. It's a set of access methods that allows the programmer to create, retrieve, update or delete document components selected according to their logical identifiers and/or their structural and semantic role in the document.
+lpOD -- languages & platforms OpenDocument.
+Definition of a Free Software API implementing the ISO/IEC 26300 standard.
+Development, for higher level use cases, in Python, Perl and Ruby languages.
+of a top-down oriented API.
 
-While the lpOD API is XPath-based, it brings a large set of predefined objects with programmer-friendly, mnemonic names, available without technical coding (such as XPath), and associated accessors. The access syntax for these objects  hides the physical data model and reflects a typical user's view on the document. It's designed according to a top-down approach: while the implementation is fully ODF-compliant, the interface maps the conceptual data model of an ODF document more than the ODF XML schema.
+lpOD is design according **top-down** approche, the code follows the document
+semantics instad of the XML shemat [1]_. So from the programer viewpoint there is
+no need to know the ODF specification, lpOD insolate him from the low level XML
+concerns.
 
-The present level1 lpOD API will include and extend the same functional scope as the existing CPAN Perl OpenDocument Connector (http://search.cpan.org/OpenOffice-OODoc), and will cover the three target languages on the basis of a common specification.
+This documentation describe the **fonctionnal architecture**, we define the
+:doc:`Level 0 <level0>` as the encapsulation of all the low-level data access logic
+(Packaging , Encoding and XML network). The :doc:`Level 1 <level1-introduction>` offers a
+document-oriented API who hides the physical data model and reflects a typical
+user's view and navigation on the document.
 
-The full set of predefined document objects is not frozen, but it presently includes the following ones:
+As a direct demonstration of the API we provide a :doc:`CookBook </cookbook>` and a set of
+:doc:`command line tools </cmd-line-tools>` to manipulate ODS, ODI and ODT Data.
 
-- sections;
 
-- paragraphs and headings;
+*Jean-Marie Gouarné [2], lpOD Architec.*
 
-- item lists and list items;
 
-- links to internal and external resources;
+.. [1] At the opposit of implementations that start by a code generation from ODF RelaxNG shemat.
+.. [2] Jean-Marie Gouarné is the author of OODoc Perl toolkit which got an "OpenOffice.org Community Innovation Program award"
 
-- bookmarks;
-
-- notes and annotations;
-
-- bibliography entries;
-
-- various frames (including text boxes, presentation pages, image containers and so on);
-
-- infra-paragraph text spans;
-
-- variable fields and text fields;
-
-- styles (including master pages and page layouts).
-
-Any object corresponding to a predefined accessor is retrieved (and possibly removed or updated) through a single instruction regardless of its context. In addition, a single instruction is needed to create this kind of object. One of the main design guidelines is to provide the largest possible set of predefined objects according to the real or probable needs of the users' community.
-
-In addition, the present API will be the foundation for ``lpOD level 2`` (coming soon), i.e. the high level library that will bring a set of business-oriented components, dedicated to business intelligence reporting, content management, form processing, and accessibility.
 
 lpOD Cookbook
 =============
