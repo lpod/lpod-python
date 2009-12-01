@@ -31,7 +31,7 @@ lpOD is primarily designed as an intermediate, document-oriented API. It's a set
 
 While the lpOD API is XPath-based, it brings a large set of predefined objects with programmer-friendly, mnemonic names, available without technical coding (such as XPath), and associated accessors. The access syntax for these objects  hides the physical data model and reflects a typical user's view on the document. It's designed according to a top-down approach: while the implementation is fully ODF-compliant, the interface maps the conceptual data model of an ODF document more than the ODF XML schema.
 
-The present level 1 lpOD API will include and extend the same functional scope as the existing CPAN Perl OpenDocument Connector (http://search.cpan.org/OpenOffice-OODoc), and will cover the three target languages on the basis of a common specification.
+The present level1 lpOD API will include and extend the same functional scope as the existing CPAN Perl OpenDocument Connector (http://search.cpan.org/OpenOffice-OODoc), and will cover the three target languages on the basis of a common specification.
 
 The full set of predefined document objects is not frozen, but it presently includes the following ones:
 
