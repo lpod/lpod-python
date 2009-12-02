@@ -93,7 +93,7 @@ def _decode_qname(qname):
         prefix, name = qname.split(':')
         try:
             uri = ODF_NAMESPACES[prefix]
-        except IndexError:
+        except KeyError:
             raise ValueError, "XML prefix '%s' is unknown" % prefix
         return uri, name
     return None, qname

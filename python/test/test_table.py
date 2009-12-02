@@ -819,6 +819,20 @@ class TestTable(TestCase):
         self.assertEqual(table.get_table_size(), (0, 0))
 
 
+    def test_get_table_width_after(self):
+        table = odf_create_table(u"Empty")
+        self.assertEqual(table.get_table_width(), 0)
+        self.assertEqual(table.get_table_height(), 0)
+        # The first row creates the columns
+        table.append_row(odf_create_row(width=5))
+        self.assertEqual(table.get_table_width(), 5)
+        self.assertEqual(table.get_table_height(), 1)
+        # The subsequent ones don't
+        table.append_row(odf_create_row(width=5))
+        self.assertEqual(table.get_table_width(), 5)
+        self.assertEqual(table.get_table_height(), 2)
+
+
     def test_get_values(self):
         self.assertEqual(self.table.get_table_values(),
                 [[1, 1, 1, 2, 3, 3, 3],

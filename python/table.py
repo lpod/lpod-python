@@ -1171,6 +1171,11 @@ class odf_table(odf_element):
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
         self.append_element(row)
+        # Initialize columns
+        if not self._get_columns():
+            repeated = row.get_row_width()
+            self.insert_element(odf_create_column(repeated=repeated),
+                    position=0)
 
 
     def delete_row(self, y):
@@ -1811,8 +1816,6 @@ def import_from_csv(file, name, style=None, delimiter=None, quotechar=None,
             cell = odf_create_cell(_get_python_value(value, encoding))
             row.append_cell(cell)
         table.append_row(row)
-    # Make the columns (FIXME by hand)
-    table.insert_element(odf_create_column(repeated=len(line)), position=0)
     return table
 
 
