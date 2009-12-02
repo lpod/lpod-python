@@ -55,8 +55,8 @@ class TestFrame(TestCase):
                                  anchor_type='page', page_number=1,
                                  position=('10mm', '10mm'), style='Graphics')
         expected = ('<draw:frame svg:width="10cm" svg:height="10cm" '
-                      'text:anchor-type="page" draw:name="Another Frame" '
-                      'text:anchor-page-number="1" svg:x="10mm" '
+                      'text:anchor-type="page" text:anchor-page-number="1" '
+                      'draw:name="Another Frame" svg:x="10mm" '
                       'svg:y="10mm" draw:style-name="Graphics"/>')
         self.assertEqual(frame.serialize(), expected)
 
@@ -175,24 +175,36 @@ class TestOdfFrame(TestCase):
         self.assert_(isinstance(frame, odf_frame))
 
 
-    def test_get_size(self):
-        self.assertEqual(self.frame.get_size(), self.size)
+    def test_get_frame_size(self):
+        self.assertEqual(self.frame.get_frame_size(), self.size)
 
 
     def test_set_size(self):
         frame = self.frame.clone()
-        frame.set_size(self.position)
-        self.assertEqual(frame.get_size(), self.position)
+        frame.set_frame_size(self.position)
+        self.assertEqual(frame.get_frame_size(), self.position)
 
 
-    def test_get_position(self):
-        self.assertEqual(self.frame.get_position(), self.position)
+    def test_get_frame_position(self):
+        self.assertEqual(self.frame.get_frame_position(), self.position)
 
 
-    def test_set_position(self):
+    def test_set_frame_position(self):
         frame = self.frame.clone()
-        frame.set_position(self.size)
-        self.assertEqual(frame.get_position(), self.size)
+        frame.set_frame_position(self.size)
+        self.assertEqual(frame.get_frame_position(), self.size)
+
+
+    def test_get_frame_anchor_type(self):
+        self.assertEqual(self.frame.get_frame_anchor_type(), 'paragraph')
+
+
+    def test_set_frame_anchor_type(self):
+        frame = self.frame.clone()
+        self.assertEqual(frame.get_frame_page_number(), None)
+        frame.set_frame_anchor_type('page', 3)
+        self.assertEqual(frame.get_frame_anchor_type(), 'page')
+        self.assertEqual(frame.get_frame_page_number(), 3)
 
 
 
