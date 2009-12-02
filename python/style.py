@@ -40,6 +40,9 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         master_page=None,
         # For family 'master-page'
         layout=None, next=None,
+        # For family 'table-cell'
+        data_style=None, border=None, border_top=None, border_right=None,
+        border_bottom=None, border_left=None, shadow=None,
         # For family 'table-row'
         row_height=None, use_optimal_row_height=None,
         # For family 'table-column'
@@ -88,6 +91,13 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         layout -- unicode
 
         next -- unicode
+
+    'table-cell' Properties:
+
+        border, border_top, border_right, border_bottom, border_left -- str,
+        e.g. "0.002cm solid #000000" or 'none'
+
+        shadow -- str, e.g. "#808080 0.176cm 0.176cm"
 
     'table-row' Properties:
 
@@ -143,6 +153,17 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
             kw['fo:font-weight'] = 'bold'
             kw['style:font-weight-asian'] = 'bold'
             kw['style:font-weight-complex'] = 'bold'
+    # Table cell
+    elif area == 'table-cell':
+        if border:
+            kw['fo:border'] = border
+        elif border_top or border_right or border_bottom or border_left:
+            kw['fo:border-top'] = border_top or 'none'
+            kw['fo:border-right'] = border_right or 'none'
+            kw['fo:border-bottom'] = border_bottom or 'none'
+            kw['fo:border-left'] = border_left or 'none'
+        if shadow:
+            kw['style:shadow'] = shadow
     # Table row
     elif area == 'table-row':
         if row_height:

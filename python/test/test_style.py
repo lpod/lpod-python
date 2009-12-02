@@ -404,14 +404,57 @@ class LevelStyleTestCase(TestCase):
 
 class TableStyleTestCase(TestCase):
 
-    def test_table_row(self):
+    def test_table_cell_border(self):
+        style = odf_create_style('table-cell', border="0.002cm")
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="0.002cm"/></style:style>'))
+
+
+    def test_table_cell_border_border_left(self):
+        style = odf_create_style('table-cell', border="0.002cm",
+                border_left="0.002cm")
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="0.002cm"/></style:style>'))
+
+
+    def test_table_cell_border_top(self):
+        style = odf_create_style('table-cell', border_top="0.002cm")
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border-top="0.002cm" fo:border-left="none" '
+            'fo:border-right="none" fo:border-bottom="none"/>'
+            '</style:style>'))
+
+
+    def test_table_cell_border_all(self):
+        style = odf_create_style('table-cell', border_top="0.001cm",
+                border_right="0.002cm", border_bottom="0.003cm",
+                border_left="0.004cm")
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border-top="0.001cm" fo:border-left="0.004cm" '
+            'fo:border-right="0.002cm" fo:border-bottom="0.003cm"/>'
+            '</style:style>'))
+
+
+    def test_table_cell_shadow(self):
+        style = odf_create_style('table-cell',
+                shadow="#808080 0.176cm 0.176cm")
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'style:shadow="#808080 0.176cm 0.176cm"/></style:style>'))
+
+
+    def test_table_row_height(self):
         style = odf_create_style('table-row', row_height="5cm")
         self.assertEqual(style.serialize(), ('<style:style '
             'style:family="table-row"><style:table-row-properties '
             'style:row-height="5cm"/></style:style>'))
 
 
-    def test_table_column(self):
+    def test_table_column_width(self):
         style = odf_create_style('table-column', column_width="5cm")
         self.assertEqual(style.serialize(), ('<style:style '
             'style:family="table-column"><style:table-column-properties '
