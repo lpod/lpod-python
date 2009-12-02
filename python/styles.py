@@ -122,7 +122,11 @@ class odf_styles(odf_xmlpart):
                    'master-page': '//office:master-styles',
                    'font-face': '//office:font-face-decls',
                    'outline': '//office:styles',
-                   'date': '//office:automatic-styles'}
+                   'date': '//office:automatic-styles',
+                   # FIXME Do they?
+                   'table-cell': '//office:automatic-styles',
+                   'table-row': '//office:automatic-styles',
+                   'table-column': '//office:automatic-styles'}
         if family not in mapping:
             raise ValueError, "unknown family: " + family
         return self.get_element(mapping[family])
