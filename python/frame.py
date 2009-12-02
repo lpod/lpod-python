@@ -154,6 +154,14 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
 
 class odf_frame(odf_element):
 
+    def get_frame_name(self):
+        return self.get_attribute('draw:name')
+
+
+    def set_frame_name(self, name):
+        self.set_attribute('draw:name', name)
+
+
     def get_frame_size(self):
         """Get the size of the frame.
 
