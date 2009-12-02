@@ -25,20 +25,27 @@
 #
 
 # Import from lpod
+from datatype import Boolean
 from element import register_element_class, odf_create_element, odf_element
 from utils import _get_style_tagname, _expand_properties, _merge_dicts
 from utils import _get_element
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
-                     # For family 'text':
-                     color=None, background_color=None, italic=False,
-                     bold=False,
-                     # For family 'paragraph'
-                     master_page=None,
-                     # For family 'master-page
-                     layout=None, next=None,
-                     area=None, **kw):
+        # Where properties apply
+        area=None,
+        # For family 'text':
+        color=None, background_color=None, italic=False, bold=False,
+        # For family 'paragraph'
+        master_page=None,
+        # For family 'master-page'
+        layout=None, next=None,
+        # For family 'table-row'
+        row_height=None, use_optimal_row_height=None,
+        # For family 'table-column'
+        column_width=None, break_before=None, break_after=None,
+        # Every other property
+        **kw):
     """Create a style of the given family. The name is not mandatory at this
     point but will become required when inserting in a document as a common
     style.
@@ -66,21 +73,33 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
         area -- str
 
-    Text Arguments:
+    'text' Properties:
 
         italic -- bool
 
         bold -- bool
 
-    Paragraph Arguments:
+    'paragraph' Properties:
 
         master_page -- unicode
 
-    Master Page Arguments:
+    'master-page' Properties:
 
         layout -- unicode
 
         next -- unicode
+
+    'table-row' Properties:
+
+        row_height -- str, e.g. '5cm'
+
+    'table-column' Properties:
+
+        column_width -- str, e.g. '5cm'
+
+        break_before -- 'page', 'column' or 'auto'
+
+        break_after -- 'page', 'column' or 'auto'
 
     Return: odf_style
     """
@@ -122,6 +141,21 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
             kw['fo:font-weight'] = 'bold'
             kw['style:font-weight-asian'] = 'bold'
             kw['style:font-weight-complex'] = 'bold'
+    # Table row
+    elif area == 'table-row':
+        if row_height:
+            kw['style:row-height'] = row_height
+        if use_optimal_row_height is not None:
+            kw['style:use-optimal-row-height'] = Boolean.encode(
+                    use_optimal_row_height)
+    # Table column
+    elif area == 'table-column':
+        if column_width:
+            kw['style:column-width']  = column_width
+        if break_before:
+            kw['fo:break-before'] = break_before
+        if break_after:
+            kw['fo:break-after'] = break_after
     if kw:
         element.set_style_properties(kw, area=area)
     return element
