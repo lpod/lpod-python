@@ -1324,6 +1324,42 @@ class odf_table(odf_element):
         self.set_cell(coordinates, odf_create_cell(value))
 
 
+    def set_cell_image(self, coordinates, image_frame):
+        """Do all the magic to display an image in the cell at the given
+        coordinates.
+
+        They are either a 2-uplet of (x, y) starting from 0, or a
+        human-readable position like "C4".
+
+        The frame element must contain the expected image position and
+        dimensions.
+
+        Arguments:
+
+            coordinates -- (int, int) or str
+
+            image_frame -- odf_frame including an image
+        """
+        x, y = _get_cell_coordinates(coordinates)
+        x = _digit_to_alpha(self.__check_x(x))
+        y = self.__check_y(y) + 1
+        # FIXME what happens when the address changes?
+        address = u"%s.%s%s" % (self.get_table_name(), x, y)
+        # Naive approach: duplicate attributes
+        image_frame = image_frame.clone()
+        image_frame.set_frame_anchor_type(None)
+        width, height = image_frame.get_frame_size()
+        image_frame.set_attribute('table:end-x', width)
+        image_frame.set_attribute('table:end-y', height)
+        image_frame.set_attribute('table:end-cell-address', address)
+        # Remove any previous paragraph, frame, etc.
+        cell = self.get_cell(coordinates)
+        for child in cell.get_children():
+            cell.delete_element(child)
+        cell.append_element(image_frame)
+        self.set_cell(coordinates, cell)
+
+
     def insert_cell(self, coordinates, cell):
         """Insert the given cell at the given coordinates.
 
