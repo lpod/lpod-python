@@ -29,17 +29,6 @@
 from element import odf_element, odf_create_element, register_element_class
 
 
-class odf_shape(odf_element):
-
-    def get_formated_text(self, context):
-        result = []
-        for child in self.get_children():
-            result.append(child.get_formated_text(context))
-        result.append(u"\n")
-        return u"".join(result)
-
-
-
 def _odf_create_shape(type, style=None, text_style=None, shape_id=None,
                      layer=None):
     """Create a shape element.
@@ -211,6 +200,17 @@ def odf_create_connector(style=None, text_style=None, shape_id=None,
         element.set_attribute('svg:x2', p2[0])
         element.set_attribute('svg:y2', p2[1])
     return element
+
+
+
+class odf_shape(odf_element):
+
+    def get_formated_text(self, context):
+        result = []
+        for child in self.get_children():
+            result.append(child.get_formated_text(context))
+        result.append(u"\n")
+        return u"".join(result)
 
 
 
