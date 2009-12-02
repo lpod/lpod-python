@@ -37,7 +37,7 @@ from lpod.document import odf_get_document
 from lpod.table import _alpha_to_digit, _digit_to_alpha
 from lpod.table import _get_cell_coordinates
 from lpod.table import odf_create_cell, odf_create_row, odf_create_column
-from lpod.table import odf_create_table, import_from_csv
+from lpod.table import odf_create_table, import_from_csv, odf_column
 
 
 csv_data = '"A float","3.14"\n"A date","1975-05-07"\n'
@@ -1188,6 +1188,8 @@ class TestTableColumn(TestCase):
         table.append_column(odf_create_column())
         self.assertEqual(table.get_table_width(), 8)
         self.assertEqual(table.get_row(0).get_row_width(),  8)
+        # The column must be inserted between the columns and the rows
+        self.assert_(type(table.get_children()[-1]) is not odf_column)
 
 
     def test_delete_column(self):

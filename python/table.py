@@ -1570,7 +1570,8 @@ class odf_table(odf_element):
 
             column -- odf_column
         """
-        self.append_element(column)
+        last_column = self._get_columns()[-1]
+        self.insert_element(column, position=self.index(last_column) + 1)
         # Update width if not done
         width = self.get_table_width()
         for row in self._get_rows():
