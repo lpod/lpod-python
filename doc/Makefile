@@ -172,5 +172,3 @@ $(AUTODOCS_FILES):
 	echo "   :members:" >> $$module.rst; \
 	echo "   :undoc-members:" >> $$module.rst; \
 	done;
-
-
