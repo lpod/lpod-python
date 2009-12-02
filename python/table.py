@@ -1324,7 +1324,7 @@ class odf_table(odf_element):
         self.set_cell(coordinates, odf_create_cell(value))
 
 
-    def set_cell_image(self, coordinates, image_frame):
+    def set_cell_image(self, coordinates, image_frame, type=None):
         """Do all the magic to display an image in the cell at the given
         coordinates.
 
@@ -1334,29 +1334,53 @@ class odf_table(odf_element):
         The frame element must contain the expected image position and
         dimensions.
 
+        Image insertion depends on the document type, so the type must be
+        provided or the table element must be already attached to a document.
+
         Arguments:
 
             coordinates -- (int, int) or str
 
             image_frame -- odf_frame including an image
+
+            type -- 'spreadsheet' or 'text'
         """
+        # Test document type
+        if type is None:
+            body = self.get_body()
+            if body is None:
+                raise ValueError, "document type not found"
+            type = {'office:spreadsheet': 'spreadsheet',
+                    'office:text': 'text'}.get(body.get_tagname())
+            if type is None:
+                raise ValueError, "document type not supported for images"
+        # We need the end address of the image
         x, y = _get_cell_coordinates(coordinates)
-        x = _digit_to_alpha(self.__check_x(x))
-        y = self.__check_y(y) + 1
-        # FIXME what happens when the address changes?
-        address = u"%s.%s%s" % (self.get_table_name(), x, y)
-        # Naive approach: duplicate attributes
+        x = self.__check_x(x)
+        y = self.__check_y(y)
+        cell = self.get_cell((x, y))
         image_frame = image_frame.clone()
-        image_frame.set_frame_anchor_type(None)
-        width, height = image_frame.get_frame_size()
-        image_frame.set_attribute('table:end-x', width)
-        image_frame.set_attribute('table:end-y', height)
-        image_frame.set_attribute('table:end-cell-address', address)
         # Remove any previous paragraph, frame, etc.
-        cell = self.get_cell(coordinates)
         for child in cell.get_children():
             cell.delete_element(child)
-        cell.append_element(image_frame)
+        # Now it all depends on the document type
+        if type == 'spreadsheet':
+            image_frame.set_frame_anchor_type(None)
+            # The frame needs end coordinates
+            width, height = image_frame.get_frame_size()
+            image_frame.set_attribute('table:end-x', width)
+            image_frame.set_attribute('table:end-y', height)
+            # FIXME what happens when the address changes?
+            address = u"%s.%s%s" % (self.get_table_name(),
+                    _digit_to_alpha(x), y + 1)
+            image_frame.set_attribute('table:end-cell-address', address)
+            # The frame is directly in the cell
+            cell.append_element(image_frame)
+        elif type == 'text':
+            # The frame must be in a paragraph
+            cell.set_cell_value(u"")
+            paragraph = cell.get_element('text:p')
+            paragraph.append_element(image_frame)
         self.set_cell(coordinates, cell)
 
 
