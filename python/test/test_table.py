@@ -34,7 +34,8 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.table import _get_cell_coordinates, _alpha_to_base10
+from lpod.table import _alpha_to_digit, _digit_to_alpha
+from lpod.table import _get_cell_coordinates
 from lpod.table import odf_create_cell, odf_create_row, odf_create_column
 from lpod.table import odf_create_table, import_from_csv
 
@@ -45,16 +46,25 @@ csv_data = '"A float","3.14"\n"A date","1975-05-07"\n'
 
 class TestCoordinates(TestCase):
 
-    def test_alpha_to_base10(self):
-        self.assertEqual(_alpha_to_base10('ABC'), 730)
+    def test_digit_to_alpha_to_digit(self):
+        for i in range(1024):
+            self.assertEqual(_alpha_to_digit(_digit_to_alpha(i)), i)
 
 
-    def test_base10_to_base10(self):
-        self.assertEqual(_alpha_to_base10(730), 730)
+    def test_alpha_to_digit_digit(self):
+        self.assertEqual(_alpha_to_digit(730), 730)
 
 
-    def test_digit_to_base10(self):
-        self.assertRaises(ValueError, _alpha_to_base10, '730')
+    def test_alpha_to_digit_digit_alphanum(self):
+        self.assertRaises(ValueError, _alpha_to_digit, '730')
+
+
+    def test_digit_to_alpha_digit(self):
+        self.assertEqual(_digit_to_alpha('ABC'), 'ABC')
+
+
+    def test_digit_to_alpha_alphanum(self):
+        self.assertRaises(ValueError, _digit_to_alpha, '730')
 
 
     def test_get_cell_coordinates_tuple(self):

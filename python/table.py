@@ -36,7 +36,7 @@ from utils import get_value, _set_value_and_type
 from vfs import vfs
 
 
-def _alpha_to_base10(alpha):
+def _alpha_to_digit(alpha):
     """Translates A to 0, B to 1, etc. So "AB" is value 27.
     """
     if type(alpha) is int:
@@ -48,6 +48,21 @@ def _alpha_to_base10(alpha):
         v = ord(c) - ord('a') + 1
         column = column * 26 + v
     return column - 1
+
+
+
+def _digit_to_alpha(digit):
+    if type(digit) is str and digit.isalpha():
+        return digit
+    if not type(digit) is int:
+        raise ValueError, 'column number "%s" is invalid' % digit
+    digit += 1
+    column = ''
+    while digit:
+        column = chr(65 + ((digit - 1) % 26)) + column
+        digit = (digit - 1) / 26
+    return column
+
 
 
 def _get_cell_coordinates(obj):
@@ -67,7 +82,7 @@ def _get_cell_coordinates(obj):
         else:
             break
     try:
-        column = _alpha_to_base10(alpha)
+        column = _alpha_to_digit(alpha)
     except ValueError:
         raise ValueError, 'cell name "%s" is malformed' % obj
     # Then "3"
@@ -545,7 +560,7 @@ class odf_row(odf_element):
     # Private API
 
     def __check_x(self, x):
-        x = _alpha_to_base10(x)
+        x = _alpha_to_digit(x)
         width = self.get_row_width()
         if x < 0:
             x = width + x
