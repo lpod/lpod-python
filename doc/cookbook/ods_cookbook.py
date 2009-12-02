@@ -45,7 +45,7 @@ for id, filename in enumerate(glob('./files/*.csv')):
     width = table.get_table_width()
     height = table.get_table_height()
 
-    # In case the table was hit by a certain bug...
+    # Remove empty rows and cells on the edge
     table.rstrip_table()
 
     # Accessing rows
@@ -77,15 +77,19 @@ for id, filename in enumerate(glob('./files/*.csv')):
     # Could be pushed to another position
     table.set_cell((1, 0), second_cell)
 
-    # Add an image in the document
-    image_uri = document.add_file('../../doc/.static/banner-lpod_en.png')
-
     # Append a column (and adjust the table size)
     table.append_column(odf_create_column())
 
-    # Displaying an image in a cell is tricky
-    table.set_cell_image((-1, 0), odf_create_image_frame(image_uri,
-        size=('11.87cm', '1.75cm'), position=('0cm', '0cm')))
+    # Add an image in the document
+    image_uri = document.add_file('../../doc/.static/banner-lpod_en.png')
+
+    # Images are in frame
+    frame = odf_create_image_frame(image_uri, size=('11.87cm', '1.75cm'),
+            position=('0cm', '0cm'))
+
+    # Displaying an image in a cell is tricky: the document type must be
+    # given or the table attached to the document
+    table.set_cell_image((-1, 0), frame, type=document.get_type())
 
     # The table is a regular element
     body.append_element(table)
