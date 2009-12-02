@@ -27,18 +27,17 @@
 Introduction
 ==============
 
-lpOD -- languages & platforms OpenDocument.
-Definition of a Free Software API implementing the ISO/IEC 26300 standard.
-Development, for higher level use cases, in Python, Perl and Ruby languages.
-of a top-down oriented API.
+lpOD -- languages & platforms OpenDocument,
+is a Free Software project that offers, for high level use cases, an application programming interface dedicated to document processing with the `Python`, `Perl` and `Ruby` languages. It's complying with the `Open Document Format` (ODF), i.e. the
+`ISO/IEC 26300` international standard.
 
-lpOD is designed according to a **top-down** approach. The API is bound to the document
-functional structure and the user's point of view, instead of the XML schema [1]_. As a consequence, the knowledge of the ODF specification is not needed to use it. lpOD
-isolates the application developer from the low level XML concerns.
+lpOD is designed according to a `top-down` approach. The API is bound to the document
+functional structure and the user's point of view, instead of the ODF XML schema [1]_. As a consequence, it may be used without knowledge of the ODF specification, and
+allows the application developer to be focused on the business needs instead of the low level storage concerns.
 
-This documentation describe the **functional specification** and the **general design**. We define the :doc:`Level 0 <level0>` as the encapsulation of all the low-level access logic to the ODF resources (local or remote file management, packaging, encoding and XML navigation). The :doc:`Level 1 <level1-introduction>` describess a document-oriented API who hides the physical data model and reflects a typical user's view on the documents.
+This documentation describes the `functional specification` and the `general design`. We define the :doc:`Level 0 <level0>` as an encapsulation of all the low-level access logic to ODF resources (local or remote file management, packaging, encoding and XML navigation). The :doc:`Level 1 <level1-introduction>` describes a document-oriented API that hides the physical data model and reflects a typical user's view on the documents.
 
-As a direct demonstration of the API we provide a :doc:`CookBook </cookbook>` and a set of :doc:`command line tools </cmd-line-tools>` to manipulate ODS, ODP and ODT Data.
+In order to illustrate some typical features of the API, we provide a :doc:`CookBook </cookbook>` and a set of :doc:`command line tools </cmd-line-tools>` to manipulate various spreadsheet (ODS), presentation (ODP), and text (ODT) document contents.
 
 
 *Jean-Marie Gouarné [2], lpOD Architect.*
