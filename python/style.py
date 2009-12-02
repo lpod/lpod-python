@@ -93,6 +93,8 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
         row_height -- str, e.g. '5cm'
 
+        use_optimal_row_height -- bool
+
     'table-column' Properties:
 
         column_width -- str, e.g. '5cm'
