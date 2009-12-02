@@ -315,7 +315,7 @@ Create a ods from multiples csv files
    document = odf_new_document_from_type('spreadsheet')
    body = document.get_body()
 
-- Transform each CSV into a matrix in memory::
+- Transform each CSV into a table element::
 
    for id, filename in enumerate(glob('./files/*.csv')):
        table = import_from_csv(filename, u'Table %s' % (id + 1))
@@ -330,12 +330,16 @@ Create a ods from multiples csv files
     table.rstrip_table()
 
 - Accessing rows::
+
     first_row = table.get_row(0)
     first_row.set_row_style(u"Another style")
 
 - Accessing cells from the row::
 
     first_cell = first_row.get_cell(0)
+
+- Change a cell easily from a Python type::
+
     first_cell.set_cell_value(u"Hello")
 
 - Modified cells must be pushed back::
@@ -351,12 +355,29 @@ Create a ods from multiples csv files
 - Accessing cells from the table::
 
     second_cell = table.get_cell("B1")
-    second_cell.set_cell_value(u"World!")
+
+- Cells are XML elements::
+
+    second_cell.clear()
+    second_cell.append_element(odf_create_paragraph(u"World"))
 
 - Modified cells must be pushed back::
 
     # Could be pushed to another position
     table.set_cell((1, 0), second_cell)
+
+- Add an image in the document::
+
+    image_uri = document.add_file('../../doc/.static/banner-lpod_en.png')
+
+- Append a column (and adjust the table size)::
+
+    table.append_column(odf_create_column())
+
+- Displaying an image in a cell is tricky::
+
+    table.set_cell_image((-1, 0), odf_create_image_frame(image_uri,
+        size=('11.87cm', '1.75cm'), position=('0cm', '0cm')))
 
 - The table is a regular element::
 

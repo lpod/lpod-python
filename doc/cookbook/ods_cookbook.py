@@ -30,7 +30,9 @@ from glob import glob
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
-from lpod.table import import_from_csv
+from lpod.frame import odf_create_image_frame
+from lpod.paragraph import odf_create_paragraph
+from lpod.table import import_from_csv, odf_create_column
 
 # Get elements
 document = odf_new_document_from_type('spreadsheet')
@@ -52,6 +54,8 @@ for id, filename in enumerate(glob('./files/*.csv')):
 
     # Accessing cells from the row
     first_cell = first_row.get_cell(0)
+
+    # Change a cell easily from a Python type
     first_cell.set_cell_value(u"Hello")
 
     # Modified cells must be pushed back
@@ -64,11 +68,24 @@ for id, filename in enumerate(glob('./files/*.csv')):
 
     # Accessing cells from the table
     second_cell = table.get_cell("B1")
-    second_cell.set_cell_value(u"World!")
+
+    # Cells are XML elements
+    second_cell.clear()
+    second_cell.append_element(odf_create_paragraph(u"World"))
 
     # Modified cells must be pushed back
     # Could be pushed to another position
     table.set_cell((1, 0), second_cell)
+
+    # Add an image in the document
+    image_uri = document.add_file('../../doc/.static/banner-lpod_en.png')
+
+    # Append a column (and adjust the table size)
+    table.append_column(odf_create_column())
+
+    # Displaying an image in a cell is tricky
+    table.set_cell_image((-1, 0), odf_create_image_frame(image_uri,
+        size=('11.87cm', '1.75cm'), position=('0cm', '0cm')))
 
     # The table is a regular element
     body.append_element(table)
