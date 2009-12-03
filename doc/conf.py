@@ -136,6 +136,9 @@ html_static_path = ['.static']
 # template names.
 #html_additional_pages = {}
 
+# A list of ignored prefixes names for module index sorting.
+modindex_common_prefix = ['lpod.']
+
 # If false, no module index is generated.
 #html_use_modindex = True
 
