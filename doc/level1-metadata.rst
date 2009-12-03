@@ -82,6 +82,16 @@ Knowing that a document may be "tagged" by one or more keywords, ``odf_meta`` pr
 
 Document statistic metadata may be get or set using ``get_statistics()`` or ``set_statistics()``. The first one returns a hash table whose keys are ODF attribute names of statistic data, as defined in §3.1.18 of the ODF 1.1 specification (for example, ``meta:page-count``, ``meta-character-count``, and so on). The second one must be provided with a similar data structure. The application is responsible for the accuracy of the values provides through ``set_statistics()``; there is no consistency check in the lpOD API between these values and the statistical data of the real document content.
 
-User defined metadata [todo]
-----------------------------
+User defined metadata
+---------------------
+
+Each user-defined metadata element has a unique name (or key), a value and a datatype.
+
+The ``odf_meta`` API provides a ``get_user_fields()`` method that returns a hash array whose each element is a key-value pair and whose value is associated with a datatype.
+
+When used from language with typed values, the data type is just the type of the value in the host language, so the stored datatype may be safely ignored. For non-typed languages, the record structure of the returned array is: ``key``, ``value`` and ``type``.
+
+The ``set_user_fields()`` allows the applications to set or change all the user-defined items. Its argument is an array with the same structure as the result of ``ger_user_fields()``.
+
+In order to individually process user defined metadata, ``get_user_field()`` and ``set_user_field()`` are provided, too. The first one requires the key as its argument; it returns the value and (optionnally and according to the host language) the datatype. Symmetrically, ``set_user_field()``, which requires a key and a value (and optionnally a datatype), creates or replaces user-defined individal item. When used without value, or with a null value, ``set_user_field()`` just removes the field (if any) corresponding to the given key.
 
