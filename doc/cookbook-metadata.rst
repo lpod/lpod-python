@@ -27,98 +27,85 @@
 Metadata Cookbook
 #################
 
-- Open an existing document::
+.. contents::
+
+To illustrate metadata introspection, let's open an existing document::
 
     >>> from lpod.document import odf_get_document
     >>> document = odf_get_document('http://example.com/odf/cookbook')
 
-- Access the metadata part::
+Metadata are accessible through the `meta` part::
 
     >>> meta = document.get_meta()
 
-You then get the list of getters and setters.
+You then get access to various getters and setters.
 
-- Most of them return unicode::
+The getters return Python types and the respective setters take the same
+Python type as a parameter.
+
+Accessing properties
+====================
+
+The API has the form `get_xxx` and `set_xxx(value)`.
+
+Example of getting the title::
 
     >>> meta.get_title()
     Example Document for the Cookbook
-    >>> meta.get_description()
-    >>> meta.get_subject()
-    >>> meta.get_language()
-    >>> meta.get_initial_creator()
-    >>> meta.get_keyword()
-    >>> meta.get_generator()
-    LpOD Project v0.7-67-g24c08f4
+    >>> type(meta.get_title())
+    <type 'unicode'>
 
-- They accept unicode in return::
+Example of setting the title::
 
     >>> meta.set_title(u"First Example of a Long Series")
 
-- Some return int::
+Notice that LpOD doesn't increment editing cycles nor statistics when saving
+the document.
 
-    >>> meta.get_editing_cycles()
-    2
+Properties helpers
+==================
 
-- They accept int in return::
+For the metadata using dates or durations, lpOD provides datatypes that
+decode from and serialize back to strings.
 
-    >>> meta.set_editing_cycles(3)
-
-- Some return dict::
-
-    >>> meta.get_statistic()
-    {'meta:word-count': 63, 'meta:image-count': 0, 'meta:object-count': 0,
-    'meta:page-count': 3, 'meta:character-count': 273, 'meta:paragraph-count':
-    25, 'meta:table-count': 2}
-
-- They accept dict of the same form::
-
-    >>> stat = meta.get_statistic()
-    # ... update stat
-    >>> meta.set_statistic(stat)
-
-- Some return datetime object::
-
-    >>> meta.get_modification_date()
-    datetime.datetime(2009, 8, 25, 15, 40, 28)
-    >>> meta.get_creation_date()
-    datetime.datetime(2009, 7, 11, 15, 21, 27)
-
-- So they need datetime object in return::
-
-    >>> from datetime import datetime
-    >>> metadata.set_modification_date(datetime.now())
-
-- There is an helper for manipulating dates::
+Example for dates::
 
     >>> from lpod.datatype import DateTime
-    >>> metadata.set_modification_date(DateTime.decode('2009-11-17T12:02:49'))
+    >>> modification_date = DateTime.decode('2009-11-17T12:02:49')
+    >>> type(modification_date)
+    <type 'datetime.datetime'>
+    >>> metadata.set_modification_date(modification_date)
 
-- Other return timedelta object::
-
-    >>> meta.get_editing_duration()
-    >>> datetime.timedelta(0, 174)
-
-- So they need timedelta object in return::
-
-    >>> from datetime import timedelta
-    >>> meta.set_editing_duration(timedelta(seconds=182))
-
-- There is an helper for this too::
+Example for durations::
 
     >>> from lpod.datatype import Duration
-    >>> meta.set_editing_duration(Duration.encode('PT00H03M02S')
+    >>> duration = Duration.decode('PT00H03M02S')
+    >>> type(duration)
+    <type 'datetime.timedelta'>
+    >>> meta.set_editing_duration(duration)
 
-- There are finally user-defined metadata (generally unused)::
+Of course you can use the datetime and timedelta constructors instead.
+
+User-defined metadata
+=====================
+
+The ODF specification reserved place for free-form metadata for the user to
+fill in.
+
+They are loaded as a dict::
 
     >>> meta.get_user_defined_metadata()::
     {}
 
-- Free for you to store str, unicode, bool, int, float, Decimal, date,
-  datetime, timedelta::
+You are allowed to store the following Python types: str, unicode, bool, int,
+float, Decimal, date, datetime, timedelta::
 
-    >>> meta.set_user_defined_metadata('lpod-version', 'v0.7-67-g24c08f4')
+    >>> meta.set_user_defined_metadata(u"lpOD Version", 'v0.7-67-g24c08f4')
     >>> meta.get_user_defined_metadata()
-    {u'lpod-version': u'v0.7-67-g24c08f4'}
+    {u'lpOD Version': u'v0.7-67-g24c08f4'}
 
 Strings are always decoded as unicode, numeric values are always decoded as
-Decimal.
+Decimal (as they offer the best precision).
+
+For the whole list of metadata, consult the :doc:`lpod.meta module
+<autodocs/meta>`.
