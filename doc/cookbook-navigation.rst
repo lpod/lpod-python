@@ -27,42 +27,96 @@
 Navigation Cookbook
 ###################
 
-- Open an existing document::
+.. contents::
+
+In this first tutorial we will learn the basics of navigating through the
+document and find the element we are looking for.
+
+Let's first open a document::
 
     >>> from lpod.document import odf_get_document
     >>> document = odf_get_document('http://example.com/odf/cookbook')
 
-- Access the content of the document::
+As lpOD is built upon a Virtual File System, we can transparently open
+documents through different URIs.
+
+The `document` object is the central point of the API. From it you can
+access parts of the document. The following parts are common:
+
+  - `meta`: Specification-defined and user-defined metadata;
+  - `content`: The content the user is typing and some automatic styles;
+  - `styles`: Library of styles and the headers and footers of page layouts;
+
+There are other optional parts like images and other media the document is
+embedding.
+
+See :doc:`Metadata Cookbook <cookbook-metadata>` or :doc:`Styles Cookbook
+<cookbook-styles>` for specific information.
+
+Accessing the content
+=====================
+
+For the navigation purpose, we need to access the body::
+
+    >>> content = document.get_content()
+    >>> body = content.get_body()
+
+The `content` object is a part object from where you can access the XML tree
+and the automatic styles stored in this part.
+
+This frequent usage can be shortened from the document::
 
     >>> body = document.get_body()
 
-- A list of all elements of a kind is accessible through "get_*_list"::
+The `body` object is an XML element from which we can access one or several
+other elements we are looking for.
+
+Accessing a list of elements
+============================
+
+Should you need to access all elements of a kind, there are the
+`get_xxx_list` methods, where `xxx` can be `paragraph`, `heading`, `list`,
+`table`, etc.
+
+Some examples::
 
     >>> body.get_heading_list()
-    [<lpod.heading.odf_heading object at 0x22a0090>, <lpod.heading.odf_head...
+    [<lpod.heading.odf_heading object at 0x22a0090>, <lpod.heading.odf_hea...
     >>> body.get_paragraph_list()
-    [<lpod.paragraph.odf_paragraph object at 0x22a04d0>, <lpod.paragraph.od...
+    [<lpod.paragraph.odf_paragraph object at 0x22a04d0>, <lpod.paragraph.o...
     >>> body.get_list_list()
-    [<lpod.list.odf_list object at 0x7f2f6ce2c5d0>, <lpod.list.odf_list obj...
+    [<lpod.list.odf_list object at 0x7f2f6ce2c5d0>, <lpod.list.odf_list ob...
     >>> body.get_table_list()
-    [<lpod.element.odf_element object at 0x7f2f6ce2c850>, <lpod.element.odf...
+    [<lpod.element.odf_element object at 0x7f2f6ce2c850>, <lpod.element.od...
     >>> body.get_draw_page_list()
-    [<lpod.element.odf_draw_page object at 0x7f23ba8e0c2f>, <lpod.element.od...
+    [<lpod.element.odf_draw_page object at 0x7f23ba8e0c2f>, <lpod.element....
 
-- The list can be more finely grained::
+
+Each `get_xxx_list` method provides parameters for filtering the results. For
+example headings can be listed by level, annotations by creator, etc. Almost
+all of them accept filtering by style and content using a regular
+expressions.
+
+Some examples::
 
     >>> body.get_heading_list(level=1)
     [<lpod.heading.odf_heading object at 0x7f2f6ce2cb10>]
     >>> body.get_paragraph_list(regex=u"[Ll]ist")
-    [<lpod.paragraph.odf_paragraph object at 0x7f2f6ce2c6d0>, <lpod.paragrap...
+    [<lpod.paragraph.odf_paragraph object at 0x7f2f6ce2c6d0>, <lpod.paragr...
 
-- No result returns an empty list::
+A miss returns an empty list::
 
     >>> body.get_table_list(style=u"Invoice")
     []
 
-- To access a single element by name, position or a regular expression on the
-  content, use "get_*_by_<criteria>"::
+Accessing a single element
+==========================
+
+To access a single element by name, position or a regular expression on the
+content, use `get_xxx_by_<criteria>`, where criteria can be `position`,
+`content`, or for some of them `name`, `id` `title`, `description`.
+
+Some examples::
 
     >>> body.get_heading_by_position(1)
     <lpod.heading.odf_heading object at 0x7f2f6ce2cc50>
@@ -71,21 +125,51 @@ Navigation Cookbook
     >>> body.get_table_by_name(u"Feuille1")
     <lpod.element.odf_element object at 0x7f2f6ce2c850>
 
-- No result returns None::
+A miss returns None::
 
     >>> print body.get_draw_page_by_name(u"Page1")
     None
 
-- Any element is a context for navigating inside it::
+Accessing other elements from an element
+========================================
 
-    >>> l = body.get_list_by_position(1)
-    >>> print l
+Any element is a context for navigating but only on the subtree it contains.
+Just like the body was, but since the body contains all content, we didn't
+see the difference.
+
+Let's get the first list of the document::
+
+    >>> mylist = body.get_list_by_position(1)
+    >>> print mylist
     <lpod.list.odf_list object at 0x7f2f6ce2c890> "text:list"
-    >>> p = l.get_paragraph_by_position(1)
-    >>> print p
+
+Notice that positions start at 0, just like in XPath (it calls an XPath query
+actually). This may change in the future.
+
+We can now access only the first paragraph contained in the list::
+    >>> mypara = mylist.get_paragraph_by_position(1)
+    >>> print mypara
     <lpod.paragraph.odf_paragraph object at 0x7f2f6ce2ca10> "text:p"
-    >>> a = p.get_link_by_path(u"example.com")
-    >>> print a
+
+The paragraph itself contains an link on `http://example.com`::
+
+    >>> mylink = mypara.get_link_by_path(u"example.com")
+    >>> print mylink
     <lpod.element.odf_element object at 0x7f2f6ce2cb10> "text:a"
-    >>> a.serialize()
+
+Introspecting elements
+======================
+
+Should you be lost, remember elements are part of an XML tree::
+
+  >>> mypara.get_children()
+  >>> mypara.get_parent()
+
+And so on.
+
+And you can introspect any element as serialized XML::
+
+    >>> mylink.serialize()
     <text:a xlink:href="http://example.com">Example</a>
+
+See the :doc:`level 0 API <level0>` for details.
