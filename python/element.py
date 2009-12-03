@@ -598,6 +598,21 @@ class odf_element(object):
 
 
     def insert_element(self, element, xmlposition=None, position=None):
+        """Insert an element relatively to ourself.
+
+        Insert either using DOM vocabulary or by numeric position.
+
+        Position start at 0.
+
+        Arguments:
+
+            element -- odf_element
+
+            xmlposition -- FIRST_CHILD, LAST_CHILD, NEXT_SIBLING
+                           or PREV_SIBLING
+
+            position -- int
+        """
         current = self.__element
         element = element.__element
         if position is not None:
@@ -615,11 +630,11 @@ class odf_element(object):
             index = parent.index(current)
             parent.insert(index, element)
         else:
-            raise ValueError, "xmlposition must be defined"
+            raise ValueError, "(xml)position must be defined"
 
 
     def append_element(self, element):
-        """Shortcut to insert at the end.
+        """Shortcut to insert as the last child.
         """
         self.insert_element(element, xmlposition=LAST_CHILD)
 
