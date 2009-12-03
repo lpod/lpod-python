@@ -205,16 +205,12 @@ odf_xmlpart(part_name, container)
   depends on the packaging type of the container. The return value is
   an odf_xmlpart instance, or null if case of failure for any reason.
 
-General I/O Methods
+General I/O Method
 ~~~~~~~~~~~~~~~~~~~
 
 container()
   Returns the odf_container object from which the current instance has
   been extracted.
-
-events()
-  **TBD**
-
 
 odf_xmlpart
 -----------
