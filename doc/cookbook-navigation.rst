@@ -28,6 +28,7 @@ Navigation Cookbook
 ###################
 
 .. contents::
+   :local:
 
 In this first tutorial we will learn the basics of navigating through the
 document and find the element we are looking for.
@@ -53,7 +54,7 @@ embedding.
 See :doc:`Metadata Cookbook <cookbook-metadata>` or :doc:`Styles Cookbook
 <cookbook-styles>` for specific information.
 
-Accessing the content
+Accessing the Content
 =====================
 
 For the navigation purpose, we need to access the body::
@@ -71,7 +72,7 @@ This frequent usage can be shortened from the document::
 The `body` object is an XML element from which we can access one or several
 other elements we are looking for.
 
-Accessing a list of elements
+Accessing a List of Elements
 ============================
 
 Should you need to access all elements of a kind, there are the
@@ -109,7 +110,7 @@ A miss returns an empty list::
     >>> body.get_table_list(style=u"Invoice")
     []
 
-Accessing a single element
+Accessing a Single Element
 ==========================
 
 To access a single element by name, position or a regular expression on the
@@ -130,7 +131,7 @@ A miss returns None::
     >>> print body.get_draw_page_by_name(u"Page1")
     None
 
-Accessing other elements from an element
+Accessing Other Elements from an Element
 ========================================
 
 Any element is a context for navigating but only on the subtree it contains.
@@ -157,7 +158,13 @@ The paragraph itself contains an link on `http://example.com`::
     >>> print mylink
     <lpod.element.odf_element object at 0x7f2f6ce2cb10> "text:a"
 
-Introspecting elements
+Navigation Through Styles
+=========================
+
+Styles are a complex subject that deserves its own :doc:`cookbook
+<cookbook-styles>`.
+
+Introspecting Elements
 ======================
 
 Should you be lost, remember elements are part of an XML tree::

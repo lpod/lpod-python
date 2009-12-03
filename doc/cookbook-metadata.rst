@@ -28,6 +28,7 @@ Metadata Cookbook
 #################
 
 .. contents::
+   :local:
 
 To illustrate metadata introspection, let's open an existing document::
 
