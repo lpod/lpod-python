@@ -27,104 +27,258 @@
 Text Cookbook
 #############
 
-- Create a text document::
+.. contents::
+   :local:
 
-    # Import from lpod
-    from lpod.document import odf_new_document_from_type
-    from lpod.document import odf_create_paragraph, odf_create_heading
+We will demonstrate how to generate OpenDocument Text (ODT) documents from
+scratch.
 
-    document = odf_new_document_from_type('text')
+Creating Text Document
+======================
 
-- Contents go into the body::
+Use the `odf_new_document_from_type` function with 'text' as the type::
 
-    body = document.get_body()
+    >>> from lpod.document import odf_new_document_from_type
+    >>> document = odf_new_document_from_type('text')
 
-- Add a table of content (TOC)::
+Now `document` is an empty text document issued from a template. It's a bit
+like creating a new text document in your office application, except lpOD
+templates don't create a default paragraph.
 
-    toc = odf_create_toc()
-    body.append_element(toc)
+Adding Content
+==============
 
-- Add a paragraph::
+Contents go into the body::
 
-    paragraph = odf_create_paragraph(u'lpOD generated Document')
-    body.append_element(paragraph)
+    >>> body = document.get_body()
 
-- Add an heading of level 1::
+Now we have a context to attach new elements to. In a text document, we
+generally want to write paragraphs, lists, headings, and a table of content
+to show the document hierarchy at first.
 
-    heading = odf_create_heading(1, text=u'Lists')
-    body.append_element(heading)
+Adding Table of Content (TOC)
+=============================
 
-- Add a list::
+The TOC element comes from the `toc` module::
 
-    my_list = odf_create_list([u'chocolat', u'café'])
+    >>> from lpod.toc import odf_create_toc
+    >>> toc = odf_create_toc()
+    >>> body.append_element(toc)
 
-- Add an item with a sublist::
+Adding Paragraph
+================
 
-    item = odf_create_list_item(u'Du thé')
-    item.append_element(odf_create_list([u'thé vert', u'thé rouge']))
-    my_list.append_item(item)
+For a smoother start, let's add a simple element::
 
-- Insert item by position::
+    >>> from lpod.paragraph import odf_create_paragraph
+    >>> paragraph = odf_create_paragraph(u"lpOD generated Document")
+    >>> body.append_element(paragraph)
 
-    my_list.insert_item(u'Chicorée', position=1)
+Adding Title
+============
 
-- Insert item by relative position::
+Titles are organised by level, starting from 1.
 
-    the = my_list.get_item_by_content(u'thé')
-    my_list.insert_item(u'Chicorée', before=the)
-    my_list.insert_item(u'Chicorée', after=the)
+So let's add the main title of our document::
 
-    body.append_element(my_list)
+    >>> from lpod.heading import odf_create_heading
+    >>> title1 = odf_create_heading(1, u"Lists")
+    >>> body.append_element(title1)
 
-- Add a footnote::
+Adding List
+===========
 
-    body.append_element(odf_create_heading(1, u"Footnotes"))
-    paragraph = odf_create_paragraph(u'A paragraph with a footnote '
-                                          u'about references in it.')
-    note = odf_create_note(note_id='note1', citation=u"1",
-                           body=u'Author, A. (2007). "How to cite references", '
-                                u'New York: McGraw-Hill.')
-    paragraph.insert_note(note, after=u"graph")
-    body.append_element(paragraph)
+Lists are a dedicated object::
 
-- Add an annotation::
+    >>> from lpod.list import odf_create_list
+    >>> my_list = odf_create_list([u'chocolat', u'café'])
 
-    body.append_element(odf_create_heading(1, u"Annotations"))
-    paragraph = odf_create_paragraph(u"A paragraph with an annotation "
-                                     u"in the middle.")
-    annotation = odf_create_annotation(u"It's so easy!", creator=u"Luis")
-    paragraph.insert_annotation(annotation, after=u"annotation")
-    body.append_element(paragraph)
+The list factory accepts a Python list of unicode strings and list items.
 
-- Add a table::
+The list can be written even though we will modify it afterwards::
 
-    body.append_element(odf_create_heading(1, u"Tables"))
-    body.append_element(odf_create_paragraph(u"A table:"))
-    table = odf_create_table(u"Table 1", width=3, height=3)
-    body.append_element(table)
+    >>> body.append_element(my_list)
 
-- Applying styles::
+Adding List Item
+================
 
-    body.append_element(odf_create_heading(1, u"Applying Styles"))
+List items also have their factory::
 
-- Copying a style from another document::
+    >>> from lpod.list import odf_create_list_item
+    >>> item = odf_create_list_item(u"thé")
+    >>> my_list.append_item(item)
 
-    lpod_styles = odf_get_document('../../python/templates/lpod_styles.odt')
-    highlight = lpod_styles.get_style('text', u"Yellow Highlight",
-                                      display_name=True)
-    assert highlight is not None
-    document.insert_style(highlight)
+Adding Sublist
+==============
 
-- Apply this style to a pattern::
+A sublist is simply a list as an item of another list::
 
-    paragraph = odf_create_paragraph(u'Highlighting the word "highlight".')
-    paragraph.set_span(highlight, u"highlight")
-    body.append_element(paragraph)
+    >>> item.append_element(odf_create_list([u"thé vert", u"thé rouge"]))
 
-' And Auto fill the TOC::
+Inserting List Item
+===================
 
-    toc.auto_fill(document)
+In case your forgot to insert an important item::
 
-- Save::
+    >>> my_list.insert_item(u"Chicorée", position=1)
 
-    document.save('text.odt', pretty=True)
+Or you can insert it before another item::
+
+    >>> cafe = my_list.get_item_by_content(u"café")
+    >>> my_list.insert_item(u'Chicorée', before=cafe)
+
+Or after::
+
+    >>> my_list.insert_item(u"Chicorée", after=cafe)
+
+Adding Footnote
+===============
+
+Let's first start a new section in the document::
+
+    >>> body.append_element(odf_create_heading(1, u"Footnotes"))
+    >>> paragraph = odf_create_paragraph(u"A paragraph with a footnote "
+            u"about references in it.")
+    >>> body.append_element(paragraph)
+
+Notes are quite complex so they deserve a dedicated API on paragraphs::
+
+    >>> paragraph.insert_note(after=u"graph", note_id='note1', citation=u"1",
+            body=(u'Author, A. (2007). "How to cite references", '
+                  u'New York: McGraw-Hill.'))
+
+That looks complex so we detail the arguments:
+
+======== ==================================================
+after    The word after what the "¹" citation is inserted.
+note_id  The unique identifier of the note in the document.
+citation The symbol the user sees to follow the footnote.
+body     The footnote itself, at the end of the page.
+======== ==================================================
+
+LpOD creates footnotes by default. To create endnotes -- notes that appear
+at the end of the document --, give the `note_class='endnote'` parameter.
+
+Adding Annotation
+=================
+
+Annotations are notes that don't appear in the document but typically on a
+side bar in a desktop application. So they are not printed.
+
+Another section to make our document clear::
+
+    >>> body.append_element(odf_create_heading(1, u"Annotations"))
+    >>> paragraph = odf_create_paragraph(u"A paragraph with an annotation "
+            u"in the middle.")
+    >>> body.append_element(paragraph)
+
+Annotations are inserted like notes but they are simpler::
+
+    >>> paragraph.insert_annotation(after=u"annotation",
+            body=u"It's so easy!", creator=u"Luis")
+
+Annotation arguments are quite different:
+
+======= ==================================================
+after   The word after what the annotation is inserted.
+body    The annotation itself, at the end of the page.
+creator The author of the annotation.
+date    A `datetime` value, by default `datetime.now()`.
+======= ==================================================
+
+Adding Table
+============
+
+Another section to make our document clear::
+
+    >>> body.append_element(odf_create_heading(1, u"Tables"))
+    >>> body.append_element(odf_create_paragraph(u"A 3x3 table:"))
+
+Creating a table is not complicated::
+
+    >>> from lpod.table import odf_create_table
+    >>> table = odf_create_table(u"Table 1", width=3, height=3)
+    >>> body.append_element(table)
+
+But manipulating the table itself is another matter detailed in the
+:doc:`Spreadsheet Cookbook <cookbook-spreadsheet>` (applicable to text tables
+for the most part).
+
+Applying Styles
+===============
+
+Styles probably are the most complex subject, detailed in the :doc:`Styles
+Cookbook <cookbook-styles>` but the following information may suit your
+immediate needs.
+
+Another section to make our document clear::
+
+    >>> body.append_element(odf_create_heading(1, u"Applying Styles"))
+
+We add the paragraph we'll play with::
+
+    >>> body.append_element(odf_create_paragraph(u'Highlighting the word '
+            u'"highlight".')
+
+Copying Style from Another Document
+-----------------------------------
+
+We know the `lpod_styles.odt` document contains an interesting style.
+
+So let's first fetch the style::
+
+    >>> lpod_styles = odf_get_document('lpod_styles.odt')
+    >>> highlight = lpod_styles.get_style('text', u"Yellow Highlight",
+            display_name=True)
+
+We made some assumptions here:
+
+=================== ========================================================
+'text'              The family of the style, text styles apply on individual
+                    characters.
+u"Yellow Highlight" The name of the style as we see it in a desktop
+                    application.
+display_name        Styles have an internal name ("Yellow_20_Highlight" in
+                    this example) but we gave the display_name instead.
+=================== ========================================================
+
+We hopefully have a style object that we add to our own collection::
+
+    >>> document.insert_style(highlight)
+
+Apply Style to a Pattern
+========================
+
+Styling individual characters requires wrapping them into a span element, and
+applying the style to it.
+
+LpOD does it in a single convenient method::
+
+    >>> paragraph.set_span(highlight, u"highlight")
+
+Now each occurence of the "highlight" pattern will appear in a yellow
+background.
+
+Updating Table of Content (TOC)
+===============================
+
+We added a TOC at first but it's empty. Now the titles are known, we can
+generate its structure::
+
+    >>> toc.auto_fill(document)
+
+As the document is passed to find the titles, the TOC doesn't need to be
+attached to the document to be generated. It could even be attached to another
+document (think of generating a document compiling TOCs from a pool of
+documents).
+
+Saving the Document
+===================
+
+Last but not least, don't lose our hard work::
+
+    >>> document.save('text.odt', pretty=True)
+
+The `pretty` parameter asks for writing an indented serialized XML. The cost
+in space in negligible and greatly helps debugging, so don't hesitate to use
+it.
