@@ -74,7 +74,7 @@ def get_git_files():
 
 def get_release():
     date = get_date()
-    date = date.strftime('%Y%m%d-%H%M')
+    date = date.strftime('%Y%m%d%H%M')
     return '%s-%s' % (get_branch(), date)
 
 
