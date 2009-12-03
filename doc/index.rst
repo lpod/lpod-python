@@ -47,8 +47,8 @@ In order to illustrate some typical features of the API, we provide a :doc:`Cook
 .. [2] Jean-Marie Gouarné is the author of the Perl ODF Connector toolkit which got an "OpenOffice.org Community Innovation Program award"
 
 
-lpOD Cookbook
-=============
+lpOD Cookbooks
+==============
 
 .. toctree::
    :maxdepth: 3
