@@ -272,8 +272,8 @@ attached to the document to be generated. It could even be attached to another
 document (think of generating a document compiling TOCs from a pool of
 documents).
 
-Saving the Document
-===================
+Saving Document
+===============
 
 Last but not least, don't lose our hard work::
 
