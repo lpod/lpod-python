@@ -24,6 +24,11 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
+"""Implementation of SMIL
+
+We can find more informations here: http://www.w3.org/TR/SMIL20/
+"""
+
 # Import from lpod
 from element import odf_create_element
 
@@ -72,7 +77,7 @@ def odf_create_anim_transitionFilter(smil_dur=None, smil_type=None,
                                      smil_fadeColor=None, smil_mode=None):
     """
     Used to make a beautiful transition between two frames.
-    
+
     Arguments:
       smil_dur -- XXX complete me
       smil_type and smil_subtype -- see http://www.w3.org/TR/SMIL20/smil-transitions.html#TransitionEffects-Appendix to get a list of all types/subtypes
