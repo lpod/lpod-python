@@ -203,13 +203,18 @@ autodoc_member_order = 'groupwise'
 
 
 # LPOD specific parts
-# XXX clean
-from os import mkdir, listdir
+# The global namespace must stay clean => all in a function
+def lpod_configuration():
+    # Imports
+    from os import mkdir, listdir
+    try:
+        import lpod
+    except ImportError:
+        print "\nError: You must first install lpod on your python"
+        exit(1)
 
-if "autodocs" not in listdir("."):
-    mkdir("autodocs")
-
-template_module = """:mod:`lpod.{module}`
+    # This template is used to make the files in autodocs/
+    template_module = """:mod:`lpod.{module}`
 ##############################################
 .. automodule:: lpod.{module}
    :synopsis: {synopsis}
@@ -218,20 +223,39 @@ template_module = """:mod:`lpod.{module}`
    :undoc-members:
 """
 
+    # Make the autodocs directory
+    if "autodocs" not in listdir("."):
+        mkdir("autodocs")
 
-# XXX TODO
-# - List of modules
-# - Not a new when already exists
-# - Just for html and latex
-# - Synopsis
-import lpod
-for module in listdir(lpod.__installation_path__):
-    if module.endswith(".py") and module != "__init__.py":
-        module = module[:-3]
-        print 'Make "%s" module autodoc' % module
-        synopsis = "LPOD %s module" % module
-        rst_file = open("autodocs/%s.rst" % module, "w")
-        rst_file.write(template_module.format(module=module,
-                                              synopsis=synopsis))
-        rst_file.close()
+    # Go!
+    autodocs = listdir("autodocs/")
+    for module in listdir(lpod.__installation_path__):
+        if module.endswith(".py") and module != "__init__.py":
+            module = module[:-3]
+
+            # Already save ?
+            if (module + ".rst") in autodocs:
+                continue
+
+            # Try to catch its __doc__
+            doc = None
+            try:
+                __import__("lpod.%s" % module)
+                doc = lpod.__dict__[module].__doc__
+            except (ImportError, KeyError):
+                pass
+
+            # Make the Synopsis
+            if doc is not None:
+                synopsis = doc.split('\n\n')[0]
+            else:
+                synopsis = "LPOD %s module" % module
+
+            # And the save the file
+            print 'Make "%s" module autodoc' % module
+            rst_file = open("autodocs/%s.rst" % module, "w")
+            rst_file.write(template_module.format(module=module,
+                                                  synopsis=synopsis))
+            rst_file.close()
+lpod_configuration()
 
