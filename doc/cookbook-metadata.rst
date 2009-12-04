@@ -110,3 +110,10 @@ Decimal (as they offer the best precision).
 
 For the whole list of metadata, consult the :doc:`lpod.meta module
 <autodocs/meta>`.
+
+Saving Metadata
+===============
+
+We can't write the document over HTTP::
+
+  >>> document.save('/tmp/metadata.odt')
