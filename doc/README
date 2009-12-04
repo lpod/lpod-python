@@ -20,30 +20,24 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-
-
 Build the doc
 -------------
-Before attempting to build the documentation, you should install the python
-part of the lpOD project. For more information see the INSTALL file located in
-lpod_dir/python/INSTALL.
 
-Then, run the Makefile to build the doc with one of the following target:
+Before attempting to build the documentation, you should::
 
-  html
-  latex
-  pdf
-  changes
-  linkcheck
-  release
+- install the python part of the lpOD project[1]. 
+- install Sphinx http://sphinx.pocoo.org 
+- install texlive http://www.tug.org/texlive/ 
 
-TODO
-----
-specify which version of the ODF standard we comply to.
+Makefile
+---------
+::
 
-How to insert a new doc
------------------------
-
-1. Create a new file with the ".rst" extension.
-2. Add it in a "toctree" directive. (by example in index.rst)
-
+  luis@spinoza ~/lpod/sandbox/lpod/doc $ make
+  Please use `make <target>' where <target> is one of
+    html      to make standalone HTML files
+    latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter
+    pdf       to make PDF files, you can set PAPER=a4 or PAPER=letter
+    changes   to make an overview over all changed/added/deprecated items
+    linkcheck to check all external links for integrity
+    release   to make html/pdf and store the files in two tar.gz
