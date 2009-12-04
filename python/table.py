@@ -509,8 +509,9 @@ class odf_cell(odf_element):
 
 
     def get_cell_repeated(self):
-        """Get the integer value of the cell repetition attribute, or None if
-        undefined.
+        """Get the number of times the cell is repeated.
+
+        Always None when using the table API.
 
         Return: int or None
         """
@@ -521,7 +522,8 @@ class odf_cell(odf_element):
 
 
     def set_cell_repeated(self, repeated):
-        """Set the cell repetition attribute, or None to delete it.
+        """Set the numnber of times the cell is repeated, or None to delete
+        it.
 
         Arguments:
 
@@ -576,7 +578,7 @@ class odf_row(odf_element):
     # Public API
 
     def get_row_repeated(self):
-        """Get the number of times the "real" row is repeated.
+        """Get the number of times the row is repeated.
 
         Always None when using the table API.
 
@@ -589,9 +591,8 @@ class odf_row(odf_element):
 
 
     def set_row_repeated(self, repeated):
-        """Set the number of times the "real" row is repeated.
-
-        Useless and even dangerous when using the table API.
+        """Set the numnber of times the row is repeated, or None to delete
+        it.
 
         Arguments:
 
@@ -844,6 +845,12 @@ class odf_column(odf_element):
 
 
     def get_column_repeated(self):
+        """Get the number of times the column is repeated.
+
+        Always None when using the table API.
+
+        Return: int or None
+        """
         repeated = self.get_attribute('table:number-columns-repeated')
         if repeated is None:
             return None
@@ -851,6 +858,13 @@ class odf_column(odf_element):
 
 
     def set_column_repeated(self, repeated):
+        """Set the numnber of times the column is repeated, or None to delete
+        it.
+
+        Arguments:
+
+            repeated -- int or None
+        """
         if repeated is None or repeated < 2:
             try:
                 self.del_attribute('table:number-columns-repeated')
@@ -1008,7 +1022,7 @@ class odf_table(odf_element):
         return u''.join(result)
 
 
-    def get_table_values(self):
+    def get_cell_values(self):
         """Get a matrix of all Python values of the cells.
 
         Return: list of lists
