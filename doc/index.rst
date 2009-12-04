@@ -89,7 +89,7 @@ lpOD Architecture level 1
    level1-structured-containers.rst
 ..   level1-fields-and-forms.rst
    level1-graphic-content.rst
-..   level1-metadata.rst
+   level1-metadata.rst
    level1-styles.rst
 ..   level1-application-settings.rst
 
