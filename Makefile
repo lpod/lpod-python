@@ -23,7 +23,7 @@ dist:
 	@cp -r perl $(DEST)
 	# Copy Ruby
 	@cp -r ruby $(DEST)
-	@tar zcf $(DEST).tar.gz $(DEST)
+	@tar zcf $(DEST).tgz $(DEST)
 	@rm $(DEST) -rf
 	@echo
 	@echo "  $(DEST).tar.gz generated."
