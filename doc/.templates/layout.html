@@ -1,5 +1,6 @@
 {% extends "!layout.html" %}
 
+
 {% block relbar1 %}
 <div style="background-color: white; text-align: left; padding: 0 10px 10px 1px">
   <a href="http://lpod-project.org" title="LPOD Project Homepage">
@@ -8,6 +9,7 @@
 </div>
 {{ super() }}
 {% endblock %}
+
 
 {% block sidebartoc %}
 <h3><a href="{{ pathto(master_doc) }}">Table of Contents</a></h3>
@@ -48,12 +50,13 @@
 {% block sidebarrel %}{% endblock %}
 
 
-
 {% block footer %}
   <div class="footer">
   {% trans copyright=copyright|e %}&copy; Copyright {{ copyright }}.{% endtrans %}
   Hosted by <a href="http://www.itaapy.com/" title="e-Procurement, ECM, ERP, Mailing-lists, Websites, e-Commerce, e-Learning, e-Gouvernment, CRM">Itaapy</a>.
   {% trans sphinx_version=sphinx_version|e %}Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> {{ sphinx_version }}.{% endtrans %}
+  <br/>
+  {% trans last_updated=last_updated|e %}{{ last_updated }}{% endtrans %}
   </div>
 {% endblock %}
 

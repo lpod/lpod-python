@@ -50,32 +50,15 @@ def has_git():
 
 
 
-def get_date():
-    date = _run_command(['git', 'log', '--pretty=format:%at', '-n1'])
-    return datetime.fromtimestamp(int(date))
-
-
-
-def get_branch():
-    branches = _run_command(['git', 'branch'])
-    for line in branches.splitlines():
-        if line.startswith('*'):
-            return line[2:].rstrip()
-    else:
-        raise ValueError
+def get_release():
+    output = _run_command(['git', 'describe',  '--tags', '--long'])
+    return output.strip()
 
 
 
 def get_git_files():
     files = _run_command(['git', 'ls-files'])
     return [ name.strip() for name in files.splitlines() ]
-
-
-
-def get_release():
-    date = get_date()
-    date = date.strftime('%Y%m%d%H%M')
-    return '%s-%s' % (get_branch(), date)
 
 
 
