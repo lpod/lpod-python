@@ -952,6 +952,10 @@ class odf_table(odf_element):
         return self.get_table_width(), self.get_table_height()
 
 
+    def set_table_name(self, name):
+        self.set_attribute('table:name', name)
+
+
     def get_table_name(self):
         return self.get_attribute('table:name')
 
