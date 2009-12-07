@@ -81,11 +81,28 @@ def add_odt(filename, output_body):
 
 
 
+def _get_table_name(name, output_body):
+    already_names = set([ table.get_table_name()
+                          for table in output_body.get_table_list() ])
+    if name in already_names:
+        i = 1
+        while True:
+            new_name = u"%s_%d" % (name, i)
+            if new_name not in already_names:
+                return new_name
+            i += 1
+    else:
+        return name
+
+
+
 def add_ods(filename, output_body):
     ods_body = odf_get_document(filename).get_body()
-    # XXX Only children tables ?
-    # XXX We must verify that the name doesn't exist yet
     for table in ods_body.get_table_list():
+        name = table.get_table_name()
+        name = _get_table_name(name, output_body)
+        table.set_table_name(name)
+
         output_body.append_element(table)
     print 'Add "%s"' % filename
 
@@ -93,9 +110,11 @@ def add_ods(filename, output_body):
 
 def add_csv(filename, output_body):
     # Make the name
-    # XXX We must verify that the name doesn't exist yet
     name = splitext(basename(filename))[0]
+    name = _get_table_name(name, output_body)
+
     table = import_from_csv(filename, name)
+
     output_body.append_element(table)
     print 'Add "%s"' % filename
 
