@@ -124,9 +124,28 @@ def add_csv(filename, output_body):
 
 
 def add_odp(filename, output_body):
+    # TODO embedded objects and links?
+    already_names = set([ page.get_page_name()
+                          for page in output_body.get_draw_page_list() ])
+
+    odp_body = odf_get_document(filename).get_body()
+    for page in odp_body.get_draw_page_list():
+        name = page.get_page_name()
+
+        if name in already_names:
+            i = 1
+            while True:
+                new_name = u"%s_%d" % (name, i)
+                if new_name not in already_names:
+                    name = new_name
+                    break
+                i += 1
+            page.set_page_name(name)
+
+        already_names.add(name)
+
+        output_body.append_element(page)
     print 'Add "%s"' % filename
-    print "Sorry, not yet implemented"
-    exit(1)
 
 
 
