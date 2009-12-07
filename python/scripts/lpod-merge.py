@@ -48,10 +48,13 @@ def init_doc(mimetype):
         # Begin with a TOC
         output_body = output_doc.get_body()
         output_body.append_element(odf_create_toc())
-
     # Spreadsheet mode
-    else:
+    elif mimetype in ("application/vnd.oasis.opendocument.spreadsheet",
+                      "text/csv"):
         output_doc = odf_new_document_from_type("spreadsheet")
+    # Presentation mode
+    else:
+        output_doc = odf_new_document_from_type("presentation")
 
     return output_doc
 
@@ -120,6 +123,13 @@ def add_csv(filename, output_body):
 
 
 
+def add_odp(filename, output_body):
+    print 'Add "%s"' % filename
+    print "Sorry, not yet implemented"
+    exit(1)
+
+
+
 if  __name__ == '__main__':
     # Options initialisation
     usage = "%prog <file1> [<file2> ...]"
@@ -153,7 +163,8 @@ if  __name__ == '__main__':
         mimetype = vfs.get_mimetype(filename)
         if mimetype not in ("application/vnd.oasis.opendocument.text",
                             "application/vnd.oasis.opendocument.spreadsheet",
-                            "text/csv"):
+                            "text/csv",
+                            "application/vnd.oasis.opendocument.presentation"):
             print 'Skip "%s" with mimetype "%s"' % (filename, mimetype)
             continue
 
@@ -173,20 +184,27 @@ if  __name__ == '__main__':
 
         # Add a text doc
         if mimetype == "application/vnd.oasis.opendocument.text":
-            if output_mimetype == "spreadsheet":
-                print "We cannot merge a mix of text and spreadsheet!"
+            if output_mimetype != "text":
+                print "We cannot merge a mix of text/spreadsheet/presentation!"
                 exit(1)
             add_odt(filename, output_body)
         # Add a spreadsheet doc
-        else:
-            if output_mimetype == "text":
-                print "We cannot merge a mix of text and spreadsheet!"
+        elif mimetype in ("application/vnd.oasis.opendocument.spreadsheet",
+                          "text/csv"):
+            if output_mimetype != "spreadsheet":
+                print "We cannot merge a mix of text/spreadsheet/presentation!"
                 exit(1)
             # CSV ?
             if mimetype == "text/csv":
                 add_csv(filename, output_body)
             else:
                 add_ods(filename, output_body)
+        # Add a presentation doc
+        else:
+            if output_mimetype != "presentation":
+                print "We cannot merge a mix of text/spreadsheet/presentation!"
+                exit(1)
+            add_odp(filename, output_body)
 
 
     # Save
