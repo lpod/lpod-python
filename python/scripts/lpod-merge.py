@@ -60,18 +60,7 @@ def init_doc(mimetype):
 
 
 
-def add_odt(filename, output_body):
-    document = odf_get_document(filename)
-
-    # Copy content
-    src_body = document.get_body()
-    for element in src_body.get_children():
-        tagname = element.get_tagname()
-        # Skip TOC, etc.
-        if tagname in ('text:sequence-decls', 'text:table-of-content'):
-            continue
-        # Copy the rest recursively
-        output_body.append_element(element.clone())
+def _add_pictures(document, output_doc):
     # Copy extra parts (images...)
     container = document.container
     for partname in container._odf_container__get_contents():
@@ -79,7 +68,27 @@ def add_odt(filename, output_body):
             data = container.get_part(partname)
             # Suppose uniqueness
             output_doc.container.set_part(partname, data)
-        # TODO embedded objects
+
+
+
+def add_odt(filename, output_doc):
+    document = odf_get_document(filename)
+
+    # Copy content
+    src_body = document.get_body()
+    output_body = output_doc.get_body()
+    for element in src_body.get_children():
+        tagname = element.get_tagname()
+        # Skip TOC, etc.
+        if tagname in ('text:sequence-decls', 'text:table-of-content'):
+            continue
+        # Copy the rest recursively
+        output_body.append_element(element.clone())
+
+    # Add pictures/
+    _add_pictures(document, output_doc)
+
+    # TODO embedded objects
     print 'Add "%s"' % filename
 
 
@@ -99,19 +108,29 @@ def _get_table_name(name, output_body):
 
 
 
-def add_ods(filename, output_body):
-    ods_body = odf_get_document(filename).get_body()
+def add_ods(filename, output_doc):
+    document = odf_get_document(filename)
+
+    # Add the sheets
+    output_body = output_doc.get_body()
+    ods_body = document.get_body()
     for table in ods_body.get_table_list():
         name = table.get_table_name()
         name = _get_table_name(name, output_body)
         table.set_table_name(name)
 
         output_body.append_element(table)
+
+    # Add pictures/
+    _add_pictures(document, output_doc)
+
     print 'Add "%s"' % filename
 
 
 
-def add_csv(filename, output_body):
+def add_csv(filename, output_doc):
+    output_body = output_doc.get_body()
+
     # Make the name
     name = splitext(basename(filename))[0]
     name = _get_table_name(name, output_body)
@@ -123,12 +142,14 @@ def add_csv(filename, output_body):
 
 
 
-def add_odp(filename, output_body):
-    # TODO embedded objects and links?
+def add_odp(filename, output_doc):
+    document = odf_get_document(filename)
+
+    # Add the pages
+    output_body = output_doc.get_body()
     already_names = set([ page.get_page_name()
                           for page in output_body.get_draw_page_list() ])
-
-    odp_body = odf_get_document(filename).get_body()
+    odp_body = document.get_body()
     for page in odp_body.get_draw_page_list():
         name = page.get_page_name()
 
@@ -143,8 +164,11 @@ def add_odp(filename, output_body):
             page.set_page_name(name)
 
         already_names.add(name)
-
         output_body.append_element(page)
+
+    # Add pictures/
+    _add_pictures(document, output_doc)
+
     print 'Add "%s"' % filename
 
 
@@ -191,7 +215,6 @@ if  __name__ == '__main__':
         if output_doc is None:
             # Create an empty doc
             output_doc = init_doc(mimetype)
-            output_body = output_doc.get_body()
             output_mimetype = output_doc.get_type()
             print '%s documents detected' % output_mimetype.title()
 
@@ -206,7 +229,7 @@ if  __name__ == '__main__':
             if output_mimetype != "text":
                 print "We cannot merge a mix of text/spreadsheet/presentation!"
                 exit(1)
-            add_odt(filename, output_body)
+            add_odt(filename, output_doc)
         # Add a spreadsheet doc
         elif mimetype in ("application/vnd.oasis.opendocument.spreadsheet",
                           "text/csv"):
@@ -215,15 +238,15 @@ if  __name__ == '__main__':
                 exit(1)
             # CSV ?
             if mimetype == "text/csv":
-                add_csv(filename, output_body)
+                add_csv(filename, output_doc)
             else:
-                add_ods(filename, output_body)
+                add_ods(filename, output_doc)
         # Add a presentation doc
         else:
             if output_mimetype != "presentation":
                 print "We cannot merge a mix of text/spreadsheet/presentation!"
                 exit(1)
-            add_odp(filename, output_body)
+            add_odp(filename, output_doc)
 
 
     # Save
