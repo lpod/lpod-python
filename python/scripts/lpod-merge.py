@@ -248,6 +248,11 @@ if  __name__ == '__main__':
                 exit(1)
             add_odp(filename, output_doc)
 
+    # Extra for odt
+    if output_mimetype == 'text':
+        output_body = output_doc.get_body()
+        toc= output_body.get_toc()
+        toc.auto_fill(output_doc)
 
     # Save
     if output_doc is not None:
