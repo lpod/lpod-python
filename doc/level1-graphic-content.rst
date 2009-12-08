@@ -116,8 +116,70 @@ with the needed text container as argument.
 An image should be incorporated in a document through a *frame* (see above).
 
 
-Shapes [todo]
--------------
+Drawing Shapes
+--------------
+
+Common Drawing Shape Attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The currently covered shapes are ``line``, ``rectangle``, ``ellipse``, and ``connector``.
+
+A shape is created using an ``odf_create_xxx()`` constructor, where ``xxx`` is of course replaced by a shape name from the list above, that returns an ``odf_shape`` object.
+
+The common properties that may be set through shape constructor named parameters are:
+
+- ``name``: an optional name, that should be unique;
+- ``id``: an optional identifier, that must be unique;
+- ``style``: the name of the graphic style of the shape;
+- ``text style``: the style that is used to format the text that can be added
+  to this shape, if any (if defined, must be a paragraph style);
+- ``layer``: the optional name of the layer in the layer set of the document, if
+  the graphics are layered.
+
+Note that, while the ``name`` property is not specified as unique in the standard, OpenOffice.org prevents the end-user from providing non-unique names to drawing shapes. On the other hand, OpenOffice.org doesn't currently neither uses nor preserves the ``id`` property in text documents, but needs it to implement the connectors in presentation documents. So, we presently recommend the use of ``name``, with unique values, as soon as the applications need persistent shape identifiers.
+
+A shape may be provided with a title and a description (which are non-displayed but persistent metadata), through the ``set_title()`` and ``set_description()`` methods. These informative data may be retrieved using ``get_title()`` and ``get_description()``.
+
+For some shapes, the following properties must be provided:
+
+- ``position``, the coordinates of the frame, as a list of 2 strings
+   containing the X and Y positions (each string specifies the number
+   and the unit, ex. "1cm", "2pt"), knowing that the default values are 0;
+
+- ``size``: the size, provided using the same format and rules as the position,
+  knowing that the default values are "1cm".
+
+However, the ``position`` and ``size`` properties don't apply to some particular shapes, such as lines (see below).
+
+A shape becomes visible when it's inserted somewhere using the generic ``insert_element()`` method.
+
+In a text document, a frame may be attached at the document level, as long as
+it's anchored to a page; as an consequence, a ``page`` parameter must be
+provided with the page number. Without this ``page`` property, lpOD anchors the shape to the first page by default.
+
+Simply put, with the exception above, a shpe is anchored to the calling
+context element.
+
+Optionally, a regular text paragraph may be embedded in a shape. Unlike the name, the title and the description, this paragraph will be visible. There is no shape-specific method for that; the generic ``insert_element()`` method, called from the ``odf_shape`` object, allows the user to insert a paragraph in a shape. The given paragraph may have its own style, whose properties override those of the shape
+``text style``.
+
+Rectangles and Ellipses
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Rectangles and ellipses are created with ``odf_create_rectangle()`` and ``odf_create_ellipse()``, respectively, using the common properties described above, including ``size`` and ``position``.
+
+Lines and Connectors
+~~~~~~~~~~~~~~~~~~~~
+
+A line is created using ``odf_create_line()``, with the standard shape parameters with the exception of ``size`` and ``position``.
+
+The size and the position are defined by line-specific ``start`` and ``end`` properties, each one representing the coordinates of an extremity, in the same format as the ``position`` property of some other shapes.
+
+A connector is created using ``odf_create-connector()``. It may be defined with the same parameters as a line, but can support a more sophisticated configuration, through the following specific properties:
+
+- ``connected shapes``: the name of the start and end shapes that are linked
+  through the connector (as a pair of strings);
+- ``glue points``: the numbers of the glue points in the start and end shapes, respectively (glue points are designated points on the area of a drawing object to which a connector shape can connect, see ODF 1.1 §9.2.19).
 
 
 Animations [todo]
