@@ -1289,3 +1289,16 @@ class odf_element(object):
         # Deletion changes
         xpath_query += ' | descendant::text:change/@text:change-id'
         return self.xpath(xpath_query)
+
+    #
+    # Table Of Content
+    #
+
+    def get_toc_list(self):
+        return _get_element_list(self, 'text:table-of-content')
+
+
+    def get_toc(self):
+        return _get_element(self, 'text:table-of-content')
+
+
