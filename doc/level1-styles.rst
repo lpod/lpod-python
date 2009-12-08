@@ -561,8 +561,24 @@ allowed to specify if a page or column break must be inserted before or after
 any column using the style, legal values are ``page``, ``column``, ``auto``;
 default is ``auto``.
 
-Row styles [todo]
-~~~~~~~~~~~~~~~~~
+Row styles
+~~~~~~~~~~
+
+A row style is created using ``odf_create_style()`` with ``table row`` as
+the family. It may be customized using ``set_properties()``.
+
+The most necessary property is ``height``, knowing that, according the standard,
+the default height is the height of the tallest item in the row. The content of
+this property must be an absolute height, provided as a string containing the
+number and the length unit. If the length unit is omitted, it's automatically
+set to "cm" by the lpOD API.
+
+The ``break xxx`` parameters (where ``xxx`` is ``before`` or ``after``), are
+allowed to specify if a page or column break must be inserted before or after
+any row using the style, legal values are ``page``, ``column``, ``auto``;
+default is ``auto``.
+
+The row style supports the common ``set_background()`` method.
 
 Graphic styles [todo]
 ---------------------
