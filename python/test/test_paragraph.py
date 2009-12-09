@@ -61,7 +61,7 @@ class TestParagraph(TestCase):
 
     def test_get_paragraph_list_context(self):
         body = self.body
-        section2 = body.get_section_by_position(2)
+        section2 = body.get_section_by_position(1)
         paragraphs = section2.get_paragraph_list()
         self.assertEqual(len(paragraphs), 2)
         paragraph = paragraphs[0]
@@ -79,7 +79,7 @@ class TestParagraph(TestCase):
 
     def test_get_paragraph_by_content_context(self):
         body = self.body
-        section2 = body.get_section_by_position(2)
+        section2 = body.get_section_by_position(1)
         regex = ur'([Ff]irst|second|a) paragraph'
         paragraph = section2.get_paragraph_by_content(regex)
         text = paragraph.get_text()
@@ -88,13 +88,13 @@ class TestParagraph(TestCase):
 
     def test_odf_paragraph(self):
         body = self.body
-        paragraph = body.get_paragraph_by_position(1)
+        paragraph = body.get_paragraph_by_position(0)
         self.assert_(isinstance(paragraph, odf_paragraph))
 
 
     def test_get_paragraph(self):
         body = self.body
-        paragraph = body.get_paragraph_by_position(4)
+        paragraph = body.get_paragraph_by_position(3)
         text = paragraph.get_text()
         expected = 'This is the first paragraph of the second title.'
         self.assertEqual(text, expected)

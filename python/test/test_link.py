@@ -39,7 +39,7 @@ class TestLinks(TestCase):
     def setUp(self):
         document = odf_get_document('samples/base_text.odt')
         self.body = body = document.get_body().clone()
-        self.paragraph = body.get_paragraph_by_position(1)
+        self.paragraph = body.get_paragraph_by_position(0)
 
 
     def test_create_link1(self):
@@ -156,7 +156,7 @@ class TestLinks(TestCase):
 
     def test_get_link_by_path_context(self):
         body = self.body
-        section2 = body.get_section_by_position(2)
+        section2 = body.get_section_by_position(1)
         link = section2.get_link_by_path(ur'\.org')
         href = link.get_attribute('xlink:href')
         self.assertEqual(href, u'http://lpod-project.org/')

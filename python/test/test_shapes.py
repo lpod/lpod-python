@@ -120,35 +120,35 @@ class TestShapes(TestCase):
 
     def test_get_draw_line_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         lines = page.get_draw_line_list()
         self.assertEqual(len(lines), 2)
 
 
     def test_get_draw_line_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         lines = page.get_draw_line_list(regex=ur'èche*')
         self.assertEqual(len(lines), 1)
 
 
     def test_get_draw_line_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         lines = page.get_draw_line_list(draw_style=ur'gr2')
         self.assertEqual(len(lines), 1)
 
 
     def test_get_draw_line_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         lines = page.get_draw_line_list(draw_text_style=ur'P1')
         self.assertEqual(len(lines), 2)
 
 
     def test_get_draw_line_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         line = page.get_draw_line_by_content(ur'Ligne')
         expected = ('<draw:line draw:style-name="gr1" '
                     'draw:text-style-name="P1" draw:layer="layout" '
@@ -161,7 +161,7 @@ class TestShapes(TestCase):
 
     def test_get_draw_line_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         line = odf_create_line(shape_id=u'an id')
         page.append_element(line)
         line = page.get_draw_line_by_id(ur'an id')
@@ -174,35 +174,35 @@ class TestShapes(TestCase):
 
     def test_get_draw_rectangle_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         rectangles = page.get_draw_rectangle_list()
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         rectangles = page.get_draw_rectangle_list(regex=ur'angle')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         rectangles = page.get_draw_rectangle_list(draw_style=ur'gr1')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         rectangles = page.get_draw_rectangle_list(draw_text_style=ur'P1')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         rectangle = page.get_draw_rectangle_by_content(ur'Rect')
         expected = ('<draw:rect draw:style-name="gr1" '
                     'draw:text-style-name="P1" draw:id="id1" '
@@ -215,7 +215,7 @@ class TestShapes(TestCase):
 
     def test_get_draw_rectangle_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         rectangle = odf_create_rectangle(shape_id=u'an id')
         page.append_element(rectangle)
         rectangle = page.get_draw_rectangle_by_id(ur'an id')
@@ -229,35 +229,35 @@ class TestShapes(TestCase):
 
     def test_get_draw_ellipse_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         ellipses = page.get_draw_ellipse_list()
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         ellipses = page.get_draw_ellipse_list(regex=ur'rcle')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         ellipses = page.get_draw_ellipse_list(draw_style=ur'gr1')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         ellipses = page.get_draw_ellipse_list(draw_text_style=ur'P1')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         ellipse = page.get_draw_ellipse_by_content(ur'Cerc')
         expected = ('<draw:ellipse draw:style-name="gr1" '
                     'draw:text-style-name="P1" draw:id="id2" '
@@ -270,7 +270,7 @@ class TestShapes(TestCase):
 
     def test_get_draw_ellipse_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         ellipse = odf_create_ellipse(shape_id=u'an id')
         page.append_element(ellipse)
         ellipse = page.get_draw_ellipse_by_id(ur'an id')
@@ -284,35 +284,35 @@ class TestShapes(TestCase):
 
     def test_get_draw_connector_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         connectors = page.get_draw_connector_list()
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         connectors = page.get_draw_connector_list(regex=ur'Con')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         connectors = page.get_draw_connector_list(draw_style=ur'gr4')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         connectors = page.get_draw_connector_list(draw_text_style=ur'P1')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         connector = page.get_draw_connector_by_content(ur'ecteur')
         expected = ('<draw:connector draw:style-name="gr4" '
                     'draw:text-style-name="P1" draw:layer="layout" '
@@ -328,7 +328,7 @@ class TestShapes(TestCase):
 
     def test_get_draw_connector_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         connector = odf_create_connector(shape_id=u'an id')
         page.append_element(connector)
         connector = page.get_draw_connector_by_id(ur'an id')
@@ -338,7 +338,7 @@ class TestShapes(TestCase):
 
     def test_get_draw_orphans_connector(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(1)
+        page = body.get_draw_page_by_position(0)
         orphan_connector = odf_create_connector()
         orphan_connector.append_element(odf_create_paragraph(u'Orphan c'))
         body.append_element(orphan_connector)

@@ -71,7 +71,7 @@ class TestSpan(TestCase):
 
     def test_get_span(self):
         body = self.body
-        span = body.get_span_by_position(2)
+        span = body.get_span_by_position(1)
         expected = ('<text:span text:style-name="T2">'
                       'rouge'
                     '</text:span>')
@@ -81,7 +81,7 @@ class TestSpan(TestCase):
     def test_insert_span(self):
         body = self.body.clone()
         span = odf_create_span('my_style', u'my text')
-        paragraph = body.get_paragraph_by_position(1)
+        paragraph = body.get_paragraph_by_position(0)
         paragraph.append_element(span)
 
 

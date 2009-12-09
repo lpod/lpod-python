@@ -82,7 +82,7 @@ class TestFrame(TestCase):
 
     def test_get_frame_by_position(self):
         body = self.body
-        frame = body.get_frame_by_position(4)
+        frame = body.get_frame_by_position(3)
         self.assertEqual(frame.get_attribute('presentation:class'), u'notes')
 
 
@@ -171,7 +171,7 @@ class TestOdfFrame(TestCase):
 
     def test_get_frame(self):
         body = self.body
-        frame = body.get_frame_by_position(1)
+        frame = body.get_frame_by_position(0)
         self.assert_(isinstance(frame, odf_frame))
 
 

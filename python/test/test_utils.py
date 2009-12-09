@@ -59,20 +59,20 @@ class GenerateXPathTestCase(TestCase):
 
 
     def test_position(self):
-        query = _make_xpath_query('descendant::text:h', position=2)
+        query = _make_xpath_query('descendant::text:h', position=1)
         self.assertEqual(query, '(descendant::text:h)[2]')
 
 
     def test_attribute_position(self):
         query = _make_xpath_query('descendant::text:p',
-                text_style=u"Standard", position=2)
+                text_style=u"Standard", position=1)
         self.assertEqual(query,
                 '(descendant::text:p[@text:style-name="Standard"])[2]')
 
 
     def test_two_attributes_position(self):
         query = _make_xpath_query('descendant::text:h',
-                text_style=u"Standard", outline_level=1, position=2)
+                text_style=u"Standard", outline_level=1, position=1)
         expected = ('(descendant::text:h[@text:outline-level="1"]'
                     '[@text:style-name="Standard"])[2]')
         self.assertEqual(query, expected)

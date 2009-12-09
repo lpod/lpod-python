@@ -66,7 +66,7 @@ class TestImage(TestCase):
 
     def test_get_image_by_position(self):
         body = self.body
-        element = body.get_image_by_position(1)
+        element = body.get_image_by_position(0)
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
@@ -83,10 +83,10 @@ class TestImage(TestCase):
         frame = odf_create_frame(u"Image Frame", size=('0cm', '0cm'),
                                  style='Graphics')
         frame.append_element(image)
-        body.get_frame_by_position(1).insert_element(frame, NEXT_SIBLING)
+        body.get_frame_by_position(0).insert_element(frame, NEXT_SIBLING)
         element = body.get_image_by_name(u"Image Frame")
         self.assertEqual(element.get_attribute('xlink:href'), path)
-        element = body.get_image_by_position(2)
+        element = body.get_image_by_position(1)
         self.assertEqual(element.get_attribute('xlink:href'), path)
 
 
