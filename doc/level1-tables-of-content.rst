@@ -24,9 +24,40 @@
       http://www.apache.org/licenses/LICENSE-2.0
 
 
-Tables of content [todo]
-========================
+Tables of contents
+==================
 
 .. contents::
    :local:
+
+A table of contents (TOC) is represented by an ``odf_toc`` object, which is
+created using the ``odf_create_toc()`` constructor.
+
+TOC constructor parameters
+--------------------------
+
+- ``name``: the internal name of the TOC (default="Table of contents");
+- ``title``: an optional title (to be displayed at the TOC head);
+- ``style``: the name of a section style applying to the TOC;
+- ``protected``: a boolean flag that tells the editing applications if the
+  section is write-protected (default=``true``);
+- ``outline level``: specifies the last outline level to be used used when
+  generating the TOC from headings; if this parameter is omitted, all the
+  outline levels are used by default.
+- ``use outline``: a boolean flag that specifies if the TOC must be generated
+  from headings (default=``true``), knowing that, if ``false``, the TOC is
+  generated from TOC marks.
+
+TOC methods
+-----------
+
+The ``odf_toc`` elements provide the following methods:
+
+- ``get_title()`` and ``set_title()`` to get or change the display TOC title;
+- ``get_outline_level()`` and ``set_outline_level()`` to get or change the
+  current outline level property;
+- ``get_formatted_text()``: returns the plain text content of the TOC, with some
+  formatting features;
+- ``fill``: builds the body of the TOC (beware, this method is far less rich
+  the TOC generation feature of a typical interactive text processor).
 
