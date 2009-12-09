@@ -135,6 +135,10 @@ The common properties that may be set through shape constructor named parameters
   to this shape, if any (if defined, must be a paragraph style);
 - ``layer``: the optional name of the layer in the layer set of the document, if
   the graphics are layered.
+- ``transform``: a list of transformations that can be applied to a shape,
+  provided as a string where the transform definitions are separated by commas
+  or spaces (ex.: ``rotate(45), scale(10, 12)``); see ODF 1.1 §9.2.15 for the
+  supported transformations.
 
 Note that, while the ``name`` property is not specified as unique in the standard, OpenOffice.org prevents the end-user from providing non-unique names to drawing shapes. On the other hand, OpenOffice.org doesn't currently neither uses nor preserves the ``id`` property in text documents, but needs it to implement the connectors in presentation documents. So, we presently recommend the use of ``name``, with unique values, as soon as the applications need persistent shape identifiers.
 
