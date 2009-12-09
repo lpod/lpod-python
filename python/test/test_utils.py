@@ -30,11 +30,11 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.document import odf_get_document
 from lpod.table import odf_create_cell
-from lpod.variable import odf_create_variable_set, odf_create_user_field_decl
 from lpod.utils import _make_xpath_query
 from lpod.utils import get_value, set_value, convert_unicode
-
+from lpod.variable import odf_create_variable_set, odf_create_user_field_decl
 
 class GenerateXPathTestCase(TestCase):
 
@@ -133,6 +133,32 @@ class Set_Get_ValueTestCase(TestCase):
                        'office:string-value="%s" text:name="%s"/>') %
                             ((convert_unicode(u'你好 Zoé'),) * 2))
         self.assertEqual(user_field_decl.serialize(), expected)
+
+
+
+class get_by_position_TestCase(TestCase):
+
+    def setUp(self):
+        doc = odf_get_document("samples/example.odt")
+        self.body = doc.get_body()
+
+
+    def test_first(self):
+        last_paragraph = self.body.get_paragraph_by_position(0)
+        expected = u"This is the first paragraph."
+        self.assertEqual(last_paragraph.get_text(recursive=True), expected)
+
+
+    def test_next_to_last(self):
+        last_paragraph = self.body.get_paragraph_by_position(-2)
+        expected = u"This is an annotation."
+        self.assertEqual(last_paragraph.get_text(recursive=True), expected)
+
+
+    def test_last(self):
+        last_paragraph = self.body.get_paragraph_by_position(-1)
+        expected = u"With diacritical signs: éè"
+        self.assertEqual(last_paragraph.get_text(recursive=True), expected)
 
 
 
