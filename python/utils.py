@@ -133,8 +133,14 @@ def _make_xpath_query(element_name, family=None, text_style=None,
                 value=unicode(value)))
     query = ''.join(query)
     if position is not None:
-        query = u'({query})[{position}]'.format(query=query,
-                position=str(position + 1))
+        # A position argument that mimics the behaviour of a python's list
+        if position >= 0:
+            position = str(position + 1)
+        elif position == -1:
+            position = 'last()'
+        else:
+            position = 'last()-%d' % (abs(position) - 1)
+        query = u'({query})[{position}]'.format(query=query, position=position)
     return query
 
 
