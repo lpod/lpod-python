@@ -134,7 +134,7 @@ def _make_xpath_query(element_name, family=None, text_style=None,
     query = ''.join(query)
     if position is not None:
         query = u'({query})[{position}]'.format(query=query,
-                position=str(position))
+                position=str(position + 1))
     return query
 
 
