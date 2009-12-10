@@ -99,7 +99,7 @@ span as well as a paragraph or a heading).
 
 The ``remove_bookmark()`` method may be used from any context above the
 container or the target bookmark, including the whole document, in order to
-delete a bookmark whatever its container. The only required argument is the
+delete a bookmark whatever its container. The only required parameter is the
 bookmark name. Alternatively, a ``remove()`` method (without argument) may be
 called from the ``odf_bookmark`` object.
 
@@ -126,6 +126,13 @@ the two different values of ``role``. Example::
 
 The sequence above creates a range bookmark starting at a given position in a
 paragraph and ending at another position in another paragraph.
+
+Knowing that the default position is 0, and the last position in a string is -1,
+the following example creates a range bookmark that just covers the full content
+of a single paragraph::
+
+  paragraph.set_bookmark("AnotherBookmark", role="start")
+  paragraph.set_bookmark("AnotherBookmark", role="end", position=-1)
 
 The balance of ``start`` and ``end`` marks for a given range bookmark is not
 automatically checked. However, any ``set_bookmark()`` call with the same name
@@ -202,12 +209,26 @@ of text. It's represented in the lpOD API by an ``odf_index_mark`` object.
 
 An index mark is created in place using the ``set_index_mark()`` context based
 method, with the same parameters and rules as a bookmark is created through
-``set_bookmark()``, with the following exceptions:
+``set_bookmark()``, with the following differences:
 
-- a text mark don't have a visible name, but requires an internal identifier
-  (not displayed by the interactive editors), so a ``id`` parameter provided
-  with an arbitrary but unique value is required instead of the ``name``
-  parameter required for bookmarks;
+- a text mark don't have a name, so the first argument of ``set_index_mark()``
+  can't be a name; ``set_index_mark()`` uses named parameters only;
+
+- when ``set_index_mark()`` is used in order to create a range index mark, the
+  general behaviour is the same as ``set_bookmark()`` for a range bookmark;
+  however, due to the lack of index mark name, an additional identifier is
+  required in order to link the start point and the end point, knowing that
+  each one is created through a separate instruction; this identifier may be
+  provided through an ``id`` named parameter; note that this ``id`` is a
+  technical key only, and that its value should not be used for a later
+  retrieval, knowing that it could be silently changed by another application;
+
+- a ``text`` parameter is required with ``set_index_mark()`` if the entry to
+  be created is a position index mark (without enclosed text) and not a range
+  index mark; this parameter contains the substitution text, to be displayed
+  in the target index; on the other hand, the ``text`` parameter is not required
+  for a range index mark, because the text of the index entry is automatically
+  the text running from the start point to the end point;
 
 - an additional ``type`` option whose possible values are ``lexical``, ``toc``,
   and ``user`` specifies the functional type; the default is ``lexical``;
@@ -220,6 +241,12 @@ method, with the same parameters and rules as a bookmark is created through
 - if the ``index name`` argument is provided, the mandatory value of ``type``
   is ``user``; as a consequence, if ``index name`` is set, the default ``type``
   becomes ``user`` and the ``type`` parameter is not required.
+
+According to the ODF 1.1 specification, the start and end points of an index
+entry must belong to the same paragraph. This additional constraint is not
+automatically checked by ``set_index_mark()``; however it may be explicitly
+checked (as other constraints) with the ``check()`` method, called from the
+``odf_index_mark`` object and that is similar to the bookmark ``check()`` method.
 
 Once created in a document, an ``odf_index_mark`` object brings the same methods
 as an ``odf_bookmark``; these methods are introduced in the Text Bookmarks
