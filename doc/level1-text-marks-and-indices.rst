@@ -44,14 +44,24 @@ identified by a unique name, but without any content.
 
 A bookmark is created "in place", in a given element at a given position, using
 the ``set_bookmark()`` context based method.  The bookmark name is a mandatory
-argument. By default, the bookmark is put before the first character of the
-content in the calling element (which may be a paragraph, a heading, or a text
-span).
+argument and should be unique for the document. By default, the bookmark is put
+before the first character of the content in the calling element (which may be a 
+paragraph, a heading, or a text span).
 
 The position can be explicitly provided by the user. Alternatively, the user can provide a regular expression, so the bookmark is set before the first substring that matches the expression::
 
   paragraph.set_bookmark("BM1", text="xyz")
   paragraph.set_bookmark("BM2", position=4)
+
+This method returns an ``odf_bookmark`` object in case of success, or a null
+value otherwise.
+
+For performance reasons, the uniqueness of the given name is not checked. If
+needed, this check should be done by the applications, by calling
+``get_bookmark()`` (with the same name and from the document context) just
+before ``set_bookmark()``; as long as ``get_bookmark()`` returns a null value,
+the given bookmark name is not in use.
+
 
 There is no need to specify the creation of a position bookmark;
 ``set_bookmark()`` creates a position bookmark by default; an additional
@@ -62,20 +72,30 @@ the given expression (here ``xyz``), which is processed as a regular expression.
 
 In order to put a bookmark according to a regexp that could be matched more than
 once in the same paragraph, it's possible to combine the position and text
-options, so the search area begins at the given position.
+options, so the search area begins at the given position. The following example
+puts a bookmark before the first substring that matches a given expression after
+a given position::
 
-A bookmark can be retrieved by its unique name. The ODF element then can be
-obtained as the parent of the bookmark element. However, if the bookmark is
-located inside a span, its parent is the span element instead of a regular
-paragraph. So another method is provided, that returns the main text container
-of the bookmark. In the following example, the first line returns the parent of
-a given bookmark (whatever the kind of element), while the second one returns
-the paragraph (or heading) where the bookmark is located::
+  paragraph.set_bookmark("BM3", position=4, text="xyz")
 
-  context.get_bookmark("BM1").parent
-  context.get_paragraph_by_bookmark("BM1")
+In order to retrieve the position of a bookmark relatively to the containing
+text, use the ``get_offset()`` bookmark method introduced below.
 
-The ``get_bookmark_offset()`` context method allows the user to get the offset of a given bookmark in the host ODF element. Beware: this offset is related to the text of the parent element (which could be a text span).
+A bookmark can be retrieved by its unique name using ``get_bookmark()``.
+The ODF element that contains the bookmark then can be obtained as the parent of
+the bookmark element. However, if the bookmark is located inside a span, its
+parent is the span element instead of a regular paragraph. So another method is
+provided, that returns the main text container of the bookmark. In the following 
+example, the two lines return the text container (whatever its type, paragraph,
+heading or text span) where the bookmark is located::
+
+  element = context.get_bookmark("BM1").parent
+  element = context.get_element_by_bookmark("BM1")
+
+The ``odf_bookmark`` object provides a ``get_offset()`` method that allows the
+user to get the offset of the calling bookmark in the host ODF element. Beware:
+this offset is related to the text of the parent element (which could be a text
+span as well as a paragraph or a heading).
 
 The ``remove_bookmark()`` method may be used from any context above the
 container or the target bookmark, including the whole document, in order to
@@ -130,13 +150,16 @@ range bookmark. Note that is ``check()`` returns ``false`` while both
 ``start_parent()`` and ``end_parent()`` return something, we know that the end
 point is located somewhere before the start point.
 
+The context-based ``get_element_by_bookmark()``, when the given name designates
+a range bookmark, returns the parent element of the start point.
+
 A ``get_text()`` method returns the text content of the bookmark as a flat
 string, without the structure; this string is just a concatenation of all the
 pieces of text occurring in the range, whatever the style and the type of their
 respective containers; however, the paragraph boundaries are replaced by blank
 spaces. Note that, when called from a position bookmark or an inconsistent range
 bookmark, ``get_text()`` just returns an null value, while it always returns a
-string (possibly empty) when called from a range bookmark.
+string (possibly empty) when called from a regular range bookmark.
 
 A range bookmark (consistent or not) may be safely removed through the
 ``remove_bookmark()`` method (which deletes the start point and the end point).
@@ -159,8 +182,8 @@ moves in the document structure or any other reason, the applications are
 responsible for preventing any bookmark end point to be located before the
 corresponding start point.
 
-Index marks [tbc]
------------------
+Index marks
+-----------
 
 Index marks are bookmarks with particular roles. There are three kind of index
 marks, namely:
@@ -169,8 +192,58 @@ marks, namely:
   order to use them as entries for a lexical (or alphabetical) index;
 - ``toc`` marks, created to become the source for tables of contents (as soon
   as these tables of contents are generated from TOC marks instead of headings);
-- ``user`` marks, which allow the user to associate sets text positions or
-  ranges with arbitrary categories.
+- ``user`` marks, which allow the user to create custom indices (which could be
+  ignored by the typical TOC or lexical index generation features of the
+  office applications).
+
+An index mark, just like a text bookmark, is either a mark associated to a
+position in a text, or a pair of location marks that defines a delimited range
+of text. It's represented in the lpOD API by an ``odf_index_mark`` object.
+
+An index mark is created in place using the ``set_index_mark()`` context based
+method, with the same parameters and rules as a bookmark is created through
+``set_bookmark()``, with the following exceptions:
+
+- a text mark don't have a visible name, but requires an internal identifier
+  (not displayed by the interactive editors), so a ``id`` parameter provided
+  with an arbitrary but unique value is required instead of the ``name``
+  parameter required for bookmarks;
+
+- an additional ``type`` option whose possible values are ``lexical``, ``toc``,
+  and ``user`` specifies the functional type; the default is ``lexical``;
+
+- when the ``user`` type is selected, an additional ``index name`` parameter is
+  required; its value is the name of the user-defined index that will (or could)
+  be associated to the current index entry; this name could be regarded as the
+  arbitrary name of an arbitrary collection of text marks;
+
+- if the ``index name`` argument is provided, the mandatory value of ``type``
+  is ``user``; as a consequence, if ``index name`` is set, the default ``type``
+  becomes ``user`` and the ``type`` parameter is not required.
+
+Once created in a document, an ``odf_index_mark`` object brings the same methods
+as an ``odf_bookmark``; these methods are introduced in the Text Bookmarks
+section.
+
+In addition, there is a ``get_index_marks()`` context-based method that allows
+the applications to retrieve a list of index entries present in a document or in
+a more restricted context. This method needs a ``type`` parameter, whose
+possible values are the same as with ``set_index_mark()``, in order to select
+the kind of index entries; the ``lexical`` type is the default. If the ``user``
+type is selected, the name of the user-defined index must be provided too,
+through a ``index name`` parameter. However, if ``index name`` is provided,
+the ``user`` type is automatically selected and the ``type`` parameter is not
+required.
+
+The following example successively produces three lists of index marks, the
+first one containing the entries for a table of contents, the second one the
+entries of a standard lexical index, and the third one the entries dedicated
+to an arbitrary user-defined index:: 
+
+  toc = document.get_index_marks(type="toc")
+  alphabetical_index = document.get_index_marks()
+  foo_index = document.get_index_marks(index_name="foo")
+
 
 Bibliography marks [todo]
 --------------------------
