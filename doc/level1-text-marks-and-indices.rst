@@ -36,9 +36,9 @@ Text Bookmarks
 A text bookmark can either mark a text position or a text range. It's either a
 mark associated to a position in a text, or a pair of location marks that
 defines a delimited range of text. Both are created "in place" using a
-``set_bookmark()`` document- or context-based method, whose first argument is
-the unique name of the bookmark, and which takes named parameters that depend
-on the type of bookmark.
+``set_bookmark()`` context-based method, whose first argument is the unique name
+of the bookmark, and which takes named parameters that depend on the type of
+bookmark. The calling element should be a paragraph, a heading or a text span.
 
 Position bookmarks
 ~~~~~~~~~~~~~~~~~~
@@ -148,10 +148,8 @@ of a single paragraph::
 
 The balance of ``start`` and ``end`` marks for a given range bookmark is not
 automatically checked. However, any ``set_bookmark()`` call with the same name
-and the same ``role`` value fails with an error message, so the user can't
-incidentally create redundant ``start`` or ``end`` marks. In addition,
-``get_bookmark()`` will trigger a warning if the target is a non-balanced range
-bookmark.
+and the same ``role`` value as a previous one fails, so the user can't
+incidentally create redundant ``start`` or ``end`` marks.
 
 If the created object is a range bookmark, ``set_bookmark()`` returns an ODF
 elements, representing the start point or the end point, according to the
@@ -320,7 +318,13 @@ important differences:
 - according to the ODF 1.1 specification, the range of an index mark can't
   spread across paragraph boundaries, i.e. the start en end points must be
   contained in the same paragraph; as a consequence, a range index mark may
-  (and should) be always created using a single ``set_index_mark()``
+  (and should) be always created using a single ``set_index_mark()``;
+
+- like ``set_bookmark()``, ``set_index_mark()`` returns a pair of ODF elements
+  when it creates a range index mark; if the application needs to set particular
+  properties (using the ``set_attribute()`` generic method or otherwise) to the
+  index mark, the first element of the pair (i.e. the start point element) must
+  be used.
 
 The example hereafter successively creates, in the same paragraph, a range TOC
 mark, two range index marks associated to the same user-defined index, and a
@@ -375,7 +379,72 @@ there is no level 1 method to selectively remove an individual index entry
 according to its identifier (of course, a lot of workarounds are available for
 ODF-aware progammers with the XPath-based level 0 methods).
 
-Bibliography marks [todo]
---------------------------
+Bibliography marks
+------------------
 
+A bibliography mark is a particular index mark. It may be used in order to
+store anywhere in a text a data structure which contains multiple attributes but
+whose only one particular attribute, so-called the "identifier" is visible at
+the place of the mark. All the other attributes, or some of them, may appear in
+a bibliography index, when such an index is generated (according to index
+format).
+
+A bibliography mark is created using the ``set_bibliography_mark()`` method from
+a paragraph, a heading or a text span element. Its placement is controlled with
+the same arguments as a position bookmark, i.e. ``position``, ``before`` or
+``after`` (look at the Text Bookmarks section for details). Without explicit
+placement parameters, the bibliography mark is inserted at the beginning of the
+calling container.
+
+Unlike ``set_bookmark()``, ``set_bibliography_mark()`` doesn't require a name as
+its first argument, but it requires a named ``type`` parameter whose value
+is one of the publication types listed in the §7.1.4 of the ODF 1.1
+specification (examples: ``article``, ``book``, ``conference``, ``techreport``,
+``masterthesis``, ``email``, ``manual``, ``www``, etc). This predefined set of
+types is questionable, knowing that, for example, the standard doesn't tell us
+if the right type is ``www`` or ``manual`` for, say, a manual that is published
+through the web, but 
+
+Beside the ``type`` parameter, a ``identifier`` parameter (that is not a real
+identifier in spite of its name) is supported. This so-called ``identifier``,
+unlike a real identifier, is a label that will be displayed in the document at
+the position of the bibliography entry by a typical ODF compliant viewer or
+editor and that will provide the end-user with a visible link between the
+bibliography mark in the document body and a bibliography index later generated
+elsewhere. Nothing in the ODF 1.1 specification prevents the applications from
+creating the same bibliography mark repeatedly, and from inserting different
+bibliography marks with the same ``identifier``.
+
+The full set of supported parameters correspond to the list of possible
+attributes of the bibliography mark element, defined in the §7.1.4 of the
+ODF 1.1 specification. All them are ``text:`` attributes, but
+``set_bibliography_mark()`` allows the use of named parameters without the
+``text:`` prefix (examples: ``author``, ``title``, ``editor``, ``year``,
+``isbn``, ``url``, etc). The instruction below inserts in a paragraph,
+immediately after the first occurrence of the "lpOD documentation" substring, a
+bibliography entry that represents the lpOD documentation, and whose visible
+label at the insertion point could be something like "[lpOD2009]" in a typical
+document viewer::
+
+  paragraph.set_bibliography_mark(
+    identifier="lpOD2009",
+    type="manual",
+    after="lpOD",
+    year="2009",
+    month="december",
+    url="http://docs.lpod-project.org",
+    editor="The lpOD Team"
+    )	
+ 
+``set_bibliography_mark()`` returns an ODF element whose any property may be
+set or changed later through the element-based ``set_attribute()`` method.
+
+Knowing that there is no persistent unique name for this class of objects, there
+is a context-based ``get_bibliography_marks()`` method that returns the list of
+all the the bibliography marks. If this method is called with a string argument
+(which may be a regexp), the search is restricted to the entries whose so-called
+``identifier`` property is defined and matches this argument. Each element of
+the returned list (if any) may be then checked or updated using the generic
+``get_attribute()``, ``get_attributes()``, ``set_attribute()`` and
+``set_attributes()`` methods.
 
