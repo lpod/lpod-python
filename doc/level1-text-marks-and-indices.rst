@@ -323,7 +323,7 @@ important differences:
   (and should) be always created using a single ``set_index_mark()``
 
 The example hereafter successively creates, in the same paragraph, a range TOC
-mark, two range index marks associated to the same user-define index, and a
+mark, two range index marks associated to the same user-defined index, and a
 lexical position index mark at the default position (i.e. before the first
 character of the paragraph)::
 
