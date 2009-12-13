@@ -403,7 +403,7 @@ specification (examples: ``article``, ``book``, ``conference``, ``techreport``,
 ``masterthesis``, ``email``, ``manual``, ``www``, etc). This predefined set of
 types is questionable, knowing that, for example, the standard doesn't tell us
 if the right type is ``www`` or ``manual`` for, say, a manual that is published
-through the web, but 
+through the web, but the user is responsible for the choice.
 
 Beside the ``type`` parameter, a ``identifier`` parameter (that is not a real
 identifier in spite of its name) is supported. This so-called ``identifier``,
