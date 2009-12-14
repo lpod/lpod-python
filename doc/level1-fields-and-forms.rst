@@ -43,8 +43,8 @@ content of a text paragraph.
 Common field-related features [tbc]
 -----------------------------------
 
-Field creation
-~~~~~~~~~~~~~~
+Field creation and retrieval
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A text field is created "in place" using the ``set_field()`` element-based
 method from a text container that may be a paragraph, a heading or a span.
@@ -87,6 +87,32 @@ and only if these substrings are contiguous and in the right order.
 ``set_field()`` returns the created ODF element in case of success, or null if
 (due to the given parameters and the content of the target container) the field
 can't be created.
+
+A text field can't be identified by a unique name or ID attribute and can't be
+selected by coordinates in the same way as a cell in a table. However, there is
+a context-based ``get_fields()`` that returns, by default, all the text
+field elements in the calling context. This method, when called with a single
+argument, that is the kind of field (as it's specified as the first argument for
+``set_field()``), returns the fields that match the given kind only, if any.
+For example, this instruction returns all the page number fields in the document
+body::
+
+  document.get_fields("page number")
+
+Common field properties
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A text field may be created with an optional ``fixed`` boolean parameter, that
+is ``false`` by default but, if ``true``, means that the content of the field
+should not be automatically updated by the editing applications. For example,
+a ``date`` field, that is (by default) automatically set to the current date by
+a typical ODF editor each time the document is updated is no longer changed as
+long as its ``fixed`` attribute is ``true``. This option is allowed for some
+kinds of text fields.
+
+A numeric text field (ex: date, number) may be associated with a display format,
+that is identified by a unique name and described elsewhere through a numeric
+style; this style is set using the ``style`` parameter with ``set_field()``.
 
 Document fields [todo]
 ----------------------
