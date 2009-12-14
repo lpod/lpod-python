@@ -95,7 +95,7 @@ expression after a given position::
   paragraph.set_bookmark("BM3", position=4, after="xyz")
 
 In order to retrieve the position of a bookmark relatively to the containing
-text, use the ``get_offset()`` bookmark method introduced below.
+text, use the ``get_bookmark_position()`` method from the host element.
 
 A bookmark can be retrieved by its unique name using ``get_bookmark()``.
 The ODF element that contains the bookmark then can be obtained as the parent of
