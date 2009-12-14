@@ -127,10 +127,9 @@ def _make_xpath_query(element_name, family=None, text_style=None,
     for qname in sorted(attributes):
         value = attributes[qname]
         if value is True:
-            query.append(u'[@{qname}]'.format(qname=qname))
+            query.append(u'[@%s]' % qname)
         else:
-            query.append(u'[@{qname}="{value}"]'.format(qname=qname,
-                value=unicode(value)))
+            query.append(u'[@%s="%s"]' % (qname, unicode(value)))
     query = ''.join(query)
     if position is not None:
         # A position argument that mimics the behaviour of a python's list
@@ -140,7 +139,7 @@ def _make_xpath_query(element_name, family=None, text_style=None,
             position = 'last()'
         else:
             position = 'last()-%d' % (abs(position) - 1)
-        query = u'({query})[{position}]'.format(query=query, position=position)
+        query = u'(%s)[%s]' % (query, position)
     return query
 
 

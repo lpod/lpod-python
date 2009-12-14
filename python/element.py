@@ -81,8 +81,9 @@ ns_stripper = compile(' xmlns:\w*="[\w:\-\/\.#]*"')
 
 # An empty XML document with all namespaces declared
 ns_document_path = _get_abspath('templates/namespaces.xml')
-with open(ns_document_path, 'rb') as file:
-    ns_document_data = file.read()
+file = open(ns_document_path, 'rb')
+ns_document_data = file.read()
+file.close()
 
 
 
@@ -153,7 +154,7 @@ def odf_create_element(element_data):
         raise TypeError, "element data is not str or unicode"
     if not element_data.strip():
         raise ValueError, "element data is empty"
-    data = ns_document_data.format(element=element_data)
+    data = ns_document_data % element_data
     root = fromstring(data)
     return _make_odf_element(root[0])
 
