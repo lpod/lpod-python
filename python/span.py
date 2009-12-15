@@ -25,7 +25,9 @@
 #
 
 # Import from lpod
-from element import odf_create_element
+from element import odf_create_element, register_element_class
+from paragraph import odf_paragraph
+
 
 
 def odf_create_span(text=None, style=None):
@@ -46,3 +48,12 @@ def odf_create_span(text=None, style=None):
     if style:
         element.set_attribute('text:style-name', style)
     return element
+
+
+
+class odf_span(odf_paragraph):
+    pass
+
+
+
+register_element_class('text:span', odf_span)

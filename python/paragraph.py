@@ -30,10 +30,10 @@
 from re import compile, escape
 
 # Import from lpod
-from element import register_element_class, odf_element, odf_create_element
+from bookmark import odf_create_bookmark
 from element import FIRST_CHILD, odf_text
+from element import register_element_class, odf_element, odf_create_element
 from note import odf_create_note, odf_create_annotation
-from span import odf_create_span
 from style import odf_style
 
 
@@ -179,6 +179,9 @@ class odf_paragraph(odf_element):
 
             length -- int
         """
+        # XXX FIX ME cyclic import
+        from span import odf_create_span
+
         if isinstance(style, odf_style):
             style = style.get_style_name()
         if offset:
@@ -227,6 +230,23 @@ class odf_paragraph(odf_element):
         arguments.
         """
         raise NotImplementedError
+
+
+    def set_bookmark(self, name, before=None, position=None):
+        """By default, insert a bookmark before the first character of the
+        content.
+
+        Arguments:
+
+            name -- string
+
+            before -- unicode
+
+            postion -- int
+        """
+        bookmark = odf_create_bookmark(name)
+        # XXX BAD: The bookmark must be inserted before the first character
+        self.insert_element(bookmark, xmlposition=FIRST_CHILD)
 
 
 
