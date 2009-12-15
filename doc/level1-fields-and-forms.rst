@@ -75,7 +75,7 @@ to insert the new field just before of after the first substring that
 matches a given filter ``set_field()``. The next example inserts the name of
 the initial creator of the document after a given string::
 
-  paragraph.set_field("initial creator", after="and the winner is ")
+  paragraph.set_field("subject", after="this paper is related to ")
 
 If ``position`` is provided with ``after`` or ``before``, any substring before
 the given position is ignored, even if it matches the string filter, so the
@@ -99,6 +99,20 @@ body::
 
   document.get_fields("page number")
 
+Field datatypes
+~~~~~~~~~~~~~~~
+
+The value of a field has a data type. The default data type is ``string``, but
+it's possible to set any ODF-compliant data type as well, using the optional
+parameter ``type``. According to ODF 1.1, §6.7.1, possible types are ``float``,
+``percentage``, ``currency``, ``date``, ``time``, ``boolean`` and, of course,
+``string``.
+
+Note that for some kinds of fields, the data type is implicit and can't be
+selected by the applications; in such a situation, the ``type`` parameter, if
+provided, is just ignored. For example, a ``title`` or ``subject`` field is
+always a string, so its data type is implicit and can't be set.
+
 Common field properties
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -114,11 +128,21 @@ A numeric text field (ex: date, number) may be associated with a display format,
 that is identified by a unique name and described elsewhere through a numeric
 style; this style is set using the ``style`` parameter with ``set_field()``.
 
+While a field is often inserted in order to allow a viewer or editor to set an
+automatically calculated value, it's possible to force an initial content (that
+may be persistent if ``fixed`` is true) using the optional ``value`` and/or
+``text`` parameters. If the data type is ``string``, the ``value`` is the same
+as the ``text``. For a ``date`` or a ``time``, the value is stored in ISO-8601
+date format. For other types, the ``value`` is the numeric computable value
+of the cell. The ``text``, if provided, is a conventional representation of
+the value according to a display format.
+
 Document fields [todo]
 ----------------------
 
 
-Declared fields and variables [todo]
+
+Declared variable fields [todo]
 ------------------------------------
 
 
