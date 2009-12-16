@@ -32,7 +32,7 @@ Text Fields
 
 A `text field` is a special text area, generally short-sized, whose content may
 be automatically set, changed or checked by an interactive editor or viewer
-according to a calculation formula and/or an information coming from somewhere
+according to a calculation formula and/or a content coming from somewhere
 in the environment.
 
 A table cell may be regarded as an example of field, according to such a
@@ -47,16 +47,20 @@ Field creation and retrieval
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A text field is created "in place" using the ``set_field()`` element-based
-method from a text container that may be a paragraph, a heading or a span.
-This method works in a similar way as ``set_bookmark()`` or ``set_index_mark()``
-introduced in the Text Marks and Indices section.
+method from a text container that may be a paragraph, a heading or a span;
+``set_field()`` requires a ``content`` parameter that specifies the kind of
+information to be associated (and possibly displayed) with the field.
+
+Regarding the positioning, this method works in a similar way as
+``set_bookmark()`` or ``set_index_mark()`` introduced in the `Text Marks and
+Indices` section.
 
 By default, the field is created and inserted  before the first character of
 the content in the calling element. As an example, this instruction creates
 a ``title`` field (whose role is to display the title of the document) before
 the first character of a paragraph::
 
-  paragraph.set_field("title")
+  paragraph.set_field(content="title")
 
 A field may be positioned at any place in the text of the host container; to do
 so, an optional ``position`` parameter, whose value is offset of the target,
@@ -65,8 +69,8 @@ zero-based and counted from the beginning, or a negative position counted from
 the end. The following example puts a ``title`` field at the fifth position and
 a ``subject`` field 5 characters before the end::
 
-  paragraph.set_field("title", 4)
-  paragraph.set_field("subject", -5)
+  paragraph.set_field(content="title", 4)
+  paragraph.set_field(content="subject", -5)
 
 The ``set_field()`` method allows field positioning at a position that depends
 on the content of the target, instead of a position. Thanks to a ``before`` or
@@ -75,7 +79,7 @@ to insert the new field just before of after the first substring that
 matches a given filter ``set_field()``. The next example inserts the name of
 the initial creator of the document after a given string::
 
-  paragraph.set_field("subject", after="this paper is related to ")
+  paragraph.set_field(content="subject", after="this paper is related to ")
 
 If ``position`` is provided with ``after`` or ``before``, any substring before
 the given position is ignored, even if it matches the string filter, so the
@@ -108,13 +112,19 @@ parameter ``type``. According to ODF 1.1, §6.7.1, possible types are ``float``,
 ``percentage``, ``currency``, ``date``, ``time``, ``boolean`` and, of course,
 ``string``.
 
+If the selected ``type`` is ``currency``, then a ``currency`` additional
+parameter is required, in order to provide the conventional currency unit
+identifier (ex: EUR, USD). As soon as a ``currency`` parameter is set,
+``set_field()`` automatically selects ``currency`` as the field type (so the
+``type`` parameter may be omitted).
+
 Note that for some kinds of fields, the data type is implicit and can't be
 selected by the applications; in such a situation, the ``type`` parameter, if
 provided, is just ignored. For example, a ``title`` or ``subject`` field is
 always a string, so its data type is implicit and can't be set.
 
-Common field properties
-~~~~~~~~~~~~~~~~~~~~~~~
+Common field properties and methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A text field may be created with an optional ``fixed`` boolean parameter, that
 is ``false`` by default but, if ``true``, means that the content of the field
@@ -137,6 +147,16 @@ date format. For other types, the ``value`` is the numeric computable value
 of the cell. The ``text``, if provided, is a conventional representation of
 the value according to a display format.
 
+Text fields use a particular implementation of the generic ``get_text()``
+method. When called from a text field element, this method returns the text of
+the element (as it could have been set using the ``text`` property), if any.
+If the element doesn't contain any text, this method returns the value "as is",
+i.e. without formatting.
+
+The generic ``set_text()`` method allows the applications to change the ``text``
+content of the element at any time, while ``set_properties()`` can set or change
+any other parameter later.
+
 Document fields [todo]
 ----------------------
 
@@ -145,6 +165,31 @@ Document fields [todo]
 Declared variable fields [todo]
 ------------------------------------
 
+A text field may be associated to a so-called "variable", that is, according to
+ODF 1.1 (§6.3) a particular user-defined field declared once with an unique name
+and used at one or several places in the document. However, the behavior of such
+a variable is a bit complex knowing that its content is not set once for all.
+
+A variable may appear with a content at one place, and with a different content
+at another place. It should always appear with the same data type. However, the
+ODF 1.1 specification is self-contradictory about this question; it tells:
+
+`A simple variable should not contain different value types at different places
+in a document. However, an implementation may allow the use of different value
+types for different instances of the same variable.`
+
+In order to insert the content of an existing variable, the ``content``
+parameter must be set to ``user``, and an additional ``name`` parameter, that
+specifies the name of the user-defined variable, is needed. Without ``value``,
+``type`` and/or ``text`` parameter, the field is just supposed to display
+a content that is defined elsewere.
+
+If the lpOD-based application needs to install a variable that doesn't exist,
+it must use the document-based ``set_variable()`` method, that takes a mandatory
+``name`` parameter, a ``type`` (whose default is ``string``) and of course a
+``currency`` parameter if ``type`` is ``currency``. Because ``set_variable()``
+doesn't set anything visible in the document, it doesn't take any positioning or
+formatting parameter.
 
 Text fields [todo]
 -------------------
