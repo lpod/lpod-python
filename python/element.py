@@ -213,6 +213,32 @@ class odf_element(object):
                             self.get_tagname())
 
 
+    def _insert_before(self, element, before=None, position=None):
+        """Insert an element before the characters in the text which match the
+        regexp before. When the regexp matches more as one part of the text,
+        position can be used to choice before which part must be inserted
+        element.
+
+        Arguments:
+
+        element -- odf_element
+
+        before -- regexp (unicode)
+
+        position -- int
+        """
+
+        current = self.__element
+        element = element.__element
+
+        if before is None and position is None:
+            element.tail = current.text
+            current.text = None
+            current.insert(0, element)
+            return
+        raise NotImplementedError
+
+
     def _insert_after(self, element, after):
         """Insert the given element after the text snippet. Typically for
         inserting a footnote after a word.

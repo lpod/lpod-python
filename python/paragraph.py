@@ -240,13 +240,12 @@ class odf_paragraph(odf_element):
 
             name -- string
 
-            before -- unicode
+            before -- regexp (unicode)
 
-            postion -- int
+            position -- int
         """
         bookmark = odf_create_bookmark(name)
-        # XXX BAD: The bookmark must be inserted before the first character
-        self.insert_element(bookmark, xmlposition=FIRST_CHILD)
+        self._insert_before(bookmark, before, position)
 
 
 
