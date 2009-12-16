@@ -44,7 +44,7 @@ def _run_command(command):
 def has_git():
     try:
         probe = _run_command(['git', 'branch'])
-    except ValueError:
+    except (ValueError, OSError):
         return False
     return True
 
