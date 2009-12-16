@@ -120,6 +120,15 @@ class BookmarkTest(TestCase):
         self.assertEqual(get.serialize(), expected)
 
 
+    def test_set_bookmark(self):
+        body = self.body
+        paragraph = body.get_paragraph_by_position(-1)
+        paragraph.set_bookmark("A bookmark")
+
+        bookmark = paragraph.get_bookmark_by_name("A bookmark")
+        self.assertNotEqual(bookmark, None)
+
+
 
 if __name__ == '__main__':
     main()
