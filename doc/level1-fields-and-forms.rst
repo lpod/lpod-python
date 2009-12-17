@@ -96,12 +96,11 @@ A text field can't be identified by a unique name or ID attribute and can't be
 selected by coordinates in the same way as a cell in a table. However, there is
 a context-based ``get_fields()`` that returns, by default, all the text
 field elements in the calling context. This method, when called with a single
-argument, that is the kind of field (as it's specified as the first argument for
-``set_field()``), returns the fields that match the given kind only, if any.
-For example, this instruction returns all the page number fields in the document
-body::
+``content`` parameter, that specifies the associated content, returns the fields
+that match the given kind of content only, if any. For example, this instruction
+returns all the page number fields in the document body::
 
-  document.get_fields("page number")
+  document.get_fields(content="page number")
 
 Field datatypes
 ~~~~~~~~~~~~~~~
@@ -162,8 +161,8 @@ Document fields [todo]
 
 
 
-Declared variable fields [todo]
-------------------------------------
+Declared variable fields
+------------------------
 
 A text field may be associated to a so-called "variable", that is, according to
 ODF 1.1 (§6.3) a particular user-defined field declared once with an unique name
@@ -178,18 +177,50 @@ ODF 1.1 specification is self-contradictory about this question; it tells:
 in a document. However, an implementation may allow the use of different value
 types for different instances of the same variable.`
 
-In order to insert the content of an existing variable, the ``content``
-parameter must be set to ``user``, and an additional ``name`` parameter, that
-specifies the name of the user-defined variable, is needed. Without ``value``,
-``type`` and/or ``text`` parameter, the field is just supposed to display
-a content that is defined elsewere.
+More precisely, ODF allows several kinds of variables, including so-called
+`simple`, `user` and `sequence` variables. The present lpOD level 1 API supports
+the two first categories. While a `simple` variable may have different values
+(and, practically, different types) according to its display fields, a `user`
+variable displays the same content everywhere in the document.
+
+In order to associate a field with an existing variable, ``set_field()`` must be
+used with the ``content`` parameter set to ``variable``, and an additional
+``name`` parameter, set to the unique name of the variable, is required. If
+the associated variable is a `user` variable, the ``value`` and ``type``
+parameters are not allowed. If the variable is `simple`, then it's possible to
+set a specific value and/or type, with the effects described hereafter.
+
+When a field associated to a `simple` variable is inserted using
+``set_field()``, its content is set, by default, to the existing content and
+type of the variable. If a ``value`` and/or ``text`` parameter is provided, the
+field takes this new content, which becomes the default content for subsequent
+fields associated to the same variable, but the previous fields keep their
+values. The same apply to the field type, if a new ``type`` is provided. Beware,
+by `subsequent` and `previous` we mean the fields that precede or follow the
+field that is created with a changed content in the order of the document, not
+in the order of their creation.
+
+On the other hand, all the fields associated to a `user` variable take the same
+value. Each time the content of the variable is changed, all the associated
+fields change accordingly. The API doesn't allow the application to change this
+content through the insertion of an associated field. If needed, the variable
+content may be changed explicitly using another method.
 
 If the lpOD-based application needs to install a variable that doesn't exist,
 it must use the document-based ``set_variable()`` method, that takes a mandatory
-``name`` parameter, a ``type`` (whose default is ``string``) and of course a
-``currency`` parameter if ``type`` is ``currency``. Because ``set_variable()``
-doesn't set anything visible in the document, it doesn't take any positioning or
-formatting parameter.
+first argument that is its unique name, a ``type`` (whose default is ``string``)
+and of course a ``currency`` parameter if ``type`` is ``currency``. Because
+``set_variable()`` doesn't set anything visible in the document, it doesn't take
+any positioning or formatting parameter. A ``value`` parameter is needed in
+order to set the initial content of the variable.
+
+A declared variable may be retrieved thanks to its unique name, using the
+``get_variable()`` document-based method with the name as argument. The returned
+object, if any, supports the generic ``get_properties()`` and
+``set_properties()`` method, that allow to get or change its ``value``, ``type``
+and ``currency`` parameters. In addition, the variable-specific ``get_value()``
+and ``set_value()`` methods are allowed as syntax shortcuts avoiding the use
+of ``get_properties()`` and ``set_properties()`` to access the stored values.
 
 Text fields [todo]
 -------------------
