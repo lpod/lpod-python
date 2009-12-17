@@ -213,7 +213,7 @@ class odf_element(object):
                             self.get_tagname())
 
 
-    def _insert_before(self, element, before=None, position=None):
+    def _insert_before(self, element, before=None, position=0):
         """Insert an element before the characters in the text which match the
         regexp before. When the regexp matches more as one part of the text,
         position can be used to choice before which part must be inserted
@@ -236,7 +236,39 @@ class odf_element(object):
             current.text = None
             current.insert(0, element)
             return
-        raise NotImplementedError
+        elif before is not None:
+            regexp = compile(before)
+
+            # Found the text
+            count = 0
+            for text in current.xpath("//text()"):
+                found_nb = len(regexp.findall(text))
+                if found_nb + count >= position + 1:
+                    break
+                count += found_nb
+            else:
+                raise ValueError, "before/position not found"
+
+            # Compute before and after
+            sre = list(regexp.finditer(text))[position - count]
+            start = sre.start()
+            text_before = text[:start] if text[:start] else None
+            text_after  = text[start:] if text[start:] else None
+
+            # Insert!
+            parent = text.getparent()
+            if text.is_text:
+                parent.text = text_before
+                element.tail = text_after
+                parent.insert(0, element)
+            else:
+                parent.addnext(element)
+                parent.tail = text_before
+                element.tail = text_after
+            return
+
+        else:
+            raise ValueError, "bad combination of arguments"
 
 
     def _insert_after(self, element, after):
