@@ -232,9 +232,13 @@ class odf_paragraph(odf_element):
         raise NotImplementedError
 
 
-    def set_bookmark(self, name, before=None, position=None):
-        """By default, insert a bookmark before the first character of the
-        content.
+    def set_bookmark(self, name, before=None, after=None, position=0):
+        """Insert the bookmark before or after the characters in the text which
+        match the regexp before/after. When the regexp matches more of one part
+        of the text, position can be set to choice which part must be used. If
+        before and after are None, we use only position that is the number of
+        characters. So, by default, this function inserts a bookmark before the
+        first character of the content.
 
         Arguments:
 
@@ -242,10 +246,12 @@ class odf_paragraph(odf_element):
 
             before -- regexp (unicode)
 
+            after -- regexp (unicode)
+
             position -- int
         """
         bookmark = odf_create_bookmark(name)
-        self._insert_before(bookmark, before, position)
+        self._insert(bookmark, before=before, after=after, position=position)
 
 
 

@@ -213,11 +213,12 @@ class odf_element(object):
                             self.get_tagname())
 
 
-    def _insert_before(self, element, before=None, position=0):
-        """Insert an element before the characters in the text which match the
-        regexp before. When the regexp matches more as one part of the text,
-        position can be used to choice before which part must be inserted
-        element.
+    def _insert(self, element, before=None, after=None, position=0):
+        """Insert an element before or after the characters in the text which
+        match the regexp before/after. When the regexp matches more of one part
+        of the text, position can be set to choice which part must be used. If
+        before and after are None, we use only position that is the number of
+        characters.
 
         Arguments:
 
@@ -225,19 +226,17 @@ class odf_element(object):
 
         before -- regexp (unicode)
 
+        after -- regexp (unicode)
+
         position -- int
         """
 
         current = self.__element
         element = element.__element
 
-        if before is None and position is None:
-            element.tail = current.text
-            current.text = None
-            current.insert(0, element)
-            return
-        elif before is not None:
-            regexp = compile(before)
+        # 1) before xor after is not None
+        if (before is not None) ^ (after is not None):
+            regexp = compile(before) if before is not None else compile(after)
 
             # Found the text
             count = 0
@@ -247,28 +246,42 @@ class odf_element(object):
                     break
                 count += found_nb
             else:
-                raise ValueError, "before/position not found"
+                raise ValueError, "text not found"
 
-            # Compute before and after
+            # Compute pos
             sre = list(regexp.finditer(text))[position - count]
-            start = sre.start()
-            text_before = text[:start] if text[:start] else None
-            text_after  = text[start:] if text[start:] else None
-
-            # Insert!
-            parent = text.getparent()
-            if text.is_text:
-                parent.text = text_before
-                element.tail = text_after
-                parent.insert(0, element)
+            pos = sre.start() if before is not None else sre.end()
+        # 2) before=after=None => only with position
+        elif before is None and after is None:
+            # Found the text
+            count = 0
+            for text in current.xpath("//text()"):
+                found_nb = len(text)
+                if found_nb + count >= position:
+                    break
+                count += found_nb
             else:
-                parent.addnext(element)
-                parent.tail = text_before
-                element.tail = text_after
-            return
+                raise ValueError, "text not found"
 
+            # We insert before the character
+            pos = position - count
         else:
             raise ValueError, "bad combination of arguments"
+
+        # Compute new texts
+        text_before = text[:pos] if text[:pos] else None
+        text_after  = text[pos:] if text[pos:] else None
+
+        # Insert!
+        parent = text.getparent()
+        if text.is_text:
+            parent.text = text_before
+            element.tail = text_after
+            parent.insert(0, element)
+        else:
+            parent.addnext(element)
+            parent.tail = text_before
+            element.tail = text_after
 
 
     def _insert_after(self, element, after):
