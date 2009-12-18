@@ -31,6 +31,7 @@ from unittest import TestCase, main
 from lpod.document import odf_get_document
 from lpod.bookmark import odf_create_bookmark, odf_create_bookmark_start
 from lpod.bookmark import odf_create_bookmark_end
+from lpod.paragraph import odf_create_paragraph
 from lpod.utils import convert_unicode
 
 
@@ -120,13 +121,70 @@ class BookmarkTest(TestCase):
         self.assertEqual(get.serialize(), expected)
 
 
-    def test_set_bookmark(self):
+    def test_set_bookmark_simple(self):
         body = self.body
         paragraph = body.get_paragraph_by_position(-1)
         paragraph.set_bookmark("A bookmark")
-
         bookmark = paragraph.get_bookmark_by_name("A bookmark")
         self.assertNotEqual(bookmark, None)
+
+
+    def test_set_bookmark_with_after_without_position(self):
+        paragraph = odf_create_paragraph(u"aa bb aa aa cc aa dd")
+        paragraph.set_span(style="style", regex="bb aa aa")
+        paragraph.set_span(style="style", regex="dd")
+        paragraph.set_bookmark("bookmark", after="aa")
+        expected = ('<text:p>aa<text:bookmark text:name="bookmark"/> '
+                      '<text:span text:style-name="style">bb aa aa'
+                      '</text:span>'
+                    ' cc aa <text:span text:style-name="style">dd</text:span>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_set_bookmark_with_before(self):
+        paragraph = odf_create_paragraph(u"aa bb aa aa cc aa dd")
+        paragraph.set_span(style="style", regex="bb aa aa")
+        paragraph.set_span(style="style", regex="dd")
+        paragraph.set_bookmark("bookmark", before="aa", position=1)
+        expected = ('<text:p>aa '
+                      '<text:span text:style-name="style">bb '
+                      '<text:bookmark text:name="bookmark"/>aa aa'
+                      '</text:span>'
+                    ' cc aa <text:span text:style-name="style">dd</text:span>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_set_bookmark_with_after(self):
+        paragraph = odf_create_paragraph(u"aa bb aa aa cc aa dd")
+        paragraph.set_span(style="style", regex="bb aa aa")
+        paragraph.set_span(style="style", regex="dd")
+        paragraph.set_bookmark("bookmark", after="aa", position=1)
+        expected = ('<text:p>aa '
+                      '<text:span text:style-name="style">bb '
+                      'aa<text:bookmark text:name="bookmark"/> aa'
+                      '</text:span>'
+                    ' cc aa <text:span text:style-name="style">dd</text:span>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
+    def test_set_bookmark_with_position(self):
+        paragraph = odf_create_paragraph(u"aa bb aa aa cc aa dd")
+        paragraph.set_span(style="style", regex="bb aa aa")
+        paragraph.set_span(style="style", regex="dd")
+        paragraph.set_bookmark("bookmark1", position=0)
+        paragraph.set_bookmark("bookmark2", position=2)
+        paragraph.set_bookmark("bookmark3",
+                               position=len(u"aa bb aa aa cc aa dd"))
+        expected = ('<text:p><text:bookmark text:name="bookmark1"/>aa'
+                      '<text:bookmark text:name="bookmark2"/> '
+                      '<text:span text:style-name="style">bb aa aa</text:span>'
+                      ' cc aa <text:span text:style-name="style">dd'
+                      '<text:bookmark text:name="bookmark3"/></text:span>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
 
 
 
