@@ -204,6 +204,18 @@ class BookmarkTest(TestCase):
         self.assertEqual(paragraph.serialize(), expected)
 
 
+    def test_set_bookmark_with_role(self):
+        paragraph = odf_create_paragraph(u"aa")
+        paragraph.set_bookmark("bookmark", role="start")
+        paragraph.set_bookmark("bookmark", role="end", position=-1)
+        expected = ('<text:p>'
+                      '<text:bookmark-start text:name="bookmark"/>'
+                      'aa'
+                      '<text:bookmark-end text:name="bookmark"/>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
 
 if __name__ == '__main__':
     main()
