@@ -218,7 +218,9 @@ class odf_element(object):
         match the regexp before/after. When the regexp matches more of one part
         of the text, position can be set to choice which part must be used. If
         before and after are None, we use only position that is the number of
-        characters.
+        characters. If position is positive and before=after=None, we insert
+        before the position character. But if position=-1, we insert after last
+        the character.
 
         Arguments:
 
@@ -238,21 +240,37 @@ class odf_element(object):
         if (before is not None) ^ (after is not None):
             regexp = compile(before) if before is not None else compile(after)
 
-            # Found the text
-            count = 0
-            for text in current.xpath("//text()"):
-                found_nb = len(regexp.findall(text))
-                if found_nb + count >= position + 1:
-                    break
-                count += found_nb
+            # position = -1
+            if position < 0:
+                # Found the last text that matches the regexp
+                text = None
+                for a_text in current.xpath("//text()"):
+                    if regexp.search(a_text) is not None:
+                        text = a_text
+                if text is None:
+                    raise ValueError, "text not found"
+                sre = list(regexp.finditer(text))[-1]
+            # position >= 0
             else:
-                raise ValueError, "text not found"
+                count = 0
+                for text in current.xpath("//text()"):
+                    found_nb = len(regexp.findall(text))
+                    if found_nb + count >= position + 1:
+                        break
+                    count += found_nb
+                else:
+                    raise ValueError, "text not found"
+                sre = list(regexp.finditer(text))[position - count]
 
             # Compute pos
-            sre = list(regexp.finditer(text))[position - count]
             pos = sre.start() if before is not None else sre.end()
         # 2) before=after=None => only with position
         elif before is None and after is None:
+            # Hack if position is negative => quickly
+            if position < 0:
+                current.append(element)
+                return
+
             # Found the text
             count = 0
             for text in current.xpath("//text()"):
