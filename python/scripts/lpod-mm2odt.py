@@ -114,9 +114,12 @@ if  __name__ == '__main__':
     # Remove the default paragraph
     body.clear()
     # Begin with a TOC
-    body.append_element(odf_create_toc())
+    toc = odf_create_toc()
+    body.append_element(toc)
     # Make the document from the structure
     make_document([mm_structure], body)
+    # Fill the TOC
+    toc.auto_fill(document)
 
     # Save the document
     document.save(odt_file_url, pretty=True)

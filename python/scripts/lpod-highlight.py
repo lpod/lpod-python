@@ -27,7 +27,7 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from sys import exit
+from sys import exit, stdin
 
 # Import from lpod
 from lpod import __version__
@@ -106,6 +106,7 @@ if  __name__ == '__main__':
         parser.print_help()
         exit(1)
     odf_file_url, pattern = args
+    pattern = unicode(pattern, stdin.encoding)
     document = odf_get_document(odf_file_url)
     highlight(document, pattern, options.color, options.background,
             options.italic, options.bold)

@@ -123,7 +123,9 @@ class odf_styles(odf_xmlpart):
                    'font-face': '//office:font-face-decls',
                    'outline': '//office:styles',
                    'date': '//office:automatic-styles',
+                   'list': '//office:styles',
                    # FIXME Do they?
+                   'table': '//office:automatic-styles',
                    'table-cell': '//office:automatic-styles',
                    'table-row': '//office:automatic-styles',
                    'table-column': '//office:automatic-styles'}
