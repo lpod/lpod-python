@@ -131,7 +131,7 @@ class odf_paragraph(odf_element):
                 note_element.set_note_body(body)
         note_element.check_validity()
         if type(after) is unicode:
-            self._insert_after(note_element, after)
+            self._insert(note_element, after=after)
         elif isinstance(after, odf_element):
             after.insert_element(note_element, FIRST_CHILD)
         else:
@@ -154,7 +154,7 @@ class odf_paragraph(odf_element):
                 annotation_element.set_dc_date(date)
         annotation_element.check_validity()
         if type(after) is unicode:
-            self._insert_after(annotation_element, after)
+            self._insert(annotation_element, after=after)
         elif isinstance(after, odf_element):
             after.insert_element(annotation_element, FIRST_CHILD)
         else:
@@ -162,7 +162,7 @@ class odf_paragraph(odf_element):
 
 
     def insert_variable(self, variable_element,  after):
-        self._insert_after(variable_element, after)
+        self._insert(variable_element, after=after)
 
 
     def set_span(self, style, regex=None, offset=None, length=0):

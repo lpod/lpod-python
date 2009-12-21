@@ -284,39 +284,6 @@ class odf_element(object):
             element.tail = text_after
 
 
-    def _insert_after(self, element, after):
-        """Insert the given element after the text snippet. Typically for
-        inserting a footnote after a word.
-
-        Example: '<p>toto<span>titi</span>tata</p>'
-
-        We are in the context of a paragraph, we know it contains "titi", and
-        we want to insert the footnote after it without having to know it is
-        in a span.
-        """
-        current = self.__element
-        element = element.__element
-        for text in current.xpath('descendant::text()'):
-            if not after in text:
-                continue
-            index = text.index(after) + len(after)
-            text_before = text[:index]
-            text_after = text[index:]
-            container = text.getparent()
-            if text.is_text:
-                container.text = text_before
-                element.tail = text_after
-                container.insert(0, element)
-            else:
-                container.tail = text_before
-                element.tail = text_after
-                parent = container.getparent()
-                index = parent.index(container)
-                parent.insert(index + 1, element)
-            return
-        raise ValueError, "text not found"
-
-
     def _insert_between(self, element, from_, to):
         """Insert the given empty element to wrap the text beginning with
         "from_" and ending with "to".
