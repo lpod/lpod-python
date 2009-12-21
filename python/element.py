@@ -219,8 +219,8 @@ class odf_element(object):
         of the text, position can be set to choice which part must be used. If
         before and after are None, we use only position that is the number of
         characters. If position is positive and before=after=None, we insert
-        before the position character. But if position=-1, we insert after last
-        the character.
+        before the position character. But if position=-1, we insert after the
+        last character.
 
         Arguments:
 

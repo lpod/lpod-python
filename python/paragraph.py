@@ -30,7 +30,8 @@
 from re import compile, escape
 
 # Import from lpod
-from bookmark import odf_create_bookmark
+from bookmark import odf_create_bookmark, odf_create_bookmark_start
+from bookmark import odf_create_bookmark_end
 from element import FIRST_CHILD, odf_text
 from element import register_element_class, odf_element, odf_create_element
 from note import odf_create_note, odf_create_annotation
@@ -232,13 +233,16 @@ class odf_paragraph(odf_element):
         raise NotImplementedError
 
 
-    def set_bookmark(self, name, before=None, after=None, position=0):
+    def set_bookmark(self, name, before=None, after=None, position=0,
+                     role=None):
         """Insert the bookmark before or after the characters in the text which
         match the regexp before/after. When the regexp matches more of one part
         of the text, position can be set to choice which part must be used. If
         before and after are None, we use only position that is the number of
         characters. So, by default, this function inserts a bookmark before the
-        first character of the content.
+        first character of the content. Role can be None, "start" or "end", we
+        insert respectively a simple bookmark a bookmark-start and a
+        bookmark-end.
 
         Arguments:
 
@@ -249,8 +253,21 @@ class odf_paragraph(odf_element):
             after -- regexp (unicode)
 
             position -- int
+
+            role -- None, "start" or "end"
         """
-        bookmark = odf_create_bookmark(name)
+
+        # Role
+        if role is None:
+            bookmark = odf_create_bookmark(name)
+        elif role == "start":
+            bookmark = odf_create_bookmark_start(name)
+        elif role == "end":
+            bookmark = odf_create_bookmark_end(name)
+        else:
+            raise ValueError, "bad arguments"
+
+        # Insert
         self._insert(bookmark, before=before, after=after, position=position)
 
 
