@@ -234,7 +234,7 @@ class odf_paragraph(odf_element):
 
 
     def set_bookmark(self, name, before=None, after=None, position=0,
-                     role=None):
+                     role=None, content=None):
         """Insert the bookmark before or after the characters in the text which
         match the regexp before/after. When the regexp matches more of one part
         of the text, position can be set to choice which part must be used. If
@@ -242,7 +242,15 @@ class odf_paragraph(odf_element):
         characters. So, by default, this function inserts a bookmark before the
         first character of the content. Role can be None, "start" or "end", we
         insert respectively a simple bookmark a bookmark-start and a
-        bookmark-end.
+        bookmark-end. If content is None theses 2 calls are equivalent::
+
+          paragraph.set_bookmark("bookmark", content="xyz")
+
+        ::
+
+          paragraph.set_bookmark("bookmark", before="xyz", role="start")
+          paragraph.set_bookmark("bookmark", after="xyz", role="end")
+
 
         Arguments:
 
@@ -255,7 +263,30 @@ class odf_paragraph(odf_element):
             position -- int
 
             role -- None, "start" or "end"
+
+            content -- regexp (unicode)
         """
+
+        # With "content" => automatically insert a "start" and an "end"
+        # bookmark
+        if (before is None and
+            after is None and
+            role is None and
+            content is not None):
+
+            # Start
+            bookmark = odf_create_bookmark_start(name)
+            self._insert(bookmark, before=content, position=position)
+
+            # End
+            bookmark = odf_create_bookmark_end(name)
+            self._insert(bookmark, after=content, position=position)
+
+            return
+
+        # Without "content"
+        if content is not None:
+            raise ValueError, "bad arguments"
 
         # Role
         if role is None:
