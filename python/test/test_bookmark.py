@@ -187,6 +187,23 @@ class BookmarkTest(TestCase):
         self.assertEqual(paragraph.serialize(), expected)
 
 
+    def test_set_bookmark_with_end(self):
+        paragraph = odf_create_paragraph(u"aa bb aa aa cc aa dd")
+        paragraph.set_span(style="style", regex="bb aa aa")
+        paragraph.set_span(style="style", regex="dd")
+        paragraph.set_bookmark("bookmark1", after="cc", position=-1)
+        paragraph.set_bookmark("bookmark2", position=-1)
+        expected = ('<text:p>aa '
+                      '<text:span text:style-name="style">'
+                      'bb aa aa'
+                      '</text:span>'
+                    ' cc<text:bookmark text:name="bookmark1"/> aa '
+                    '<text:span text:style-name="style">dd</text:span>'
+                    '<text:bookmark text:name="bookmark2"/>'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
 
 if __name__ == '__main__':
     main()
