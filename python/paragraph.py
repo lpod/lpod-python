@@ -275,14 +275,14 @@ class odf_paragraph(odf_element):
             content is not None):
 
             # Start
-            bookmark = odf_create_bookmark_start(name)
-            self._insert(bookmark, before=content, position=position)
+            start = odf_create_bookmark_start(name)
+            self._insert(start, before=content, position=position)
 
             # End
-            bookmark = odf_create_bookmark_end(name)
-            self._insert(bookmark, after=content, position=position)
+            end = odf_create_bookmark_end(name)
+            self._insert(end, after=content, position=position)
 
-            return
+            return start, end
 
         # Without "content"
         if content is not None:
@@ -300,6 +300,8 @@ class odf_paragraph(odf_element):
 
         # Insert
         self._insert(bookmark, before=before, after=after, position=position)
+
+        return bookmark
 
 
 
