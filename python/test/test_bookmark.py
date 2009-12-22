@@ -228,6 +228,18 @@ class BookmarkTest(TestCase):
         self.assertEqual(paragraph.serialize(), expected)
 
 
+    def test_set_bookmark_with_interval(self):
+        paragraph = odf_create_paragraph(u"aa bb bb aa")
+        paragraph.set_bookmark("bookmark", interval=(6, 8))
+        expected = ('<text:p>aa bb '
+                      '<text:bookmark-start text:name="bookmark"/>'
+                      'bb'
+                      '<text:bookmark-end text:name="bookmark"/>'
+                      ' aa'
+                    '</text:p>')
+        self.assertEqual(paragraph.serialize(), expected)
+
+
 
 if __name__ == '__main__':
     main()
