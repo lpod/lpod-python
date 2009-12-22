@@ -176,10 +176,13 @@ Date fields
 Content key: ``date``. Supports ``fixed`` (that should preserve the stored date
 from automatic change each time the document is edited).
 
-A date field may be adjusted by a certain time period, which is specified usin
-the ``date adjust`` parameter. If the time period is negative, it gets
+A date field may contain either the current date or, if "fixed", an arbitrary
+other date.
+
+A date field may be adjusted by a certain time period, which is specified using
+the ``adjust`` parameter. If the time period is negative, it gets
 subtracted from the value of the date field, yielding a date before the current
-date. The value of ``date adjust`` must be a valid duration.
+date. The value of ``adjust`` must be a valid duration.
 
 This example inserts a field that displays the date of the day before
 yesterday, due to a ``date adjust`` value that specified a negative value of
@@ -188,18 +191,91 @@ yesterday, due to a ``date adjust`` value that specified a negative value of
   paragraph.set_field(
     content="date",
     style="DateStyle",
-    date_adjust="-PT48H00M00S"
+    adjust="-PT48H00M00S"
     )
 
 Note that the display format is controlled by the given style (that is, of
 course, a date style), and that a date field may be more precise than the date
-of the day.
+of the day; whatever the displayed information, a date field is able to store
+a full date and time value.
 
 Time fields
 ~~~~~~~~~~~
 
 Content key: ``time``. Supports ``fixed``.
 
+A time field behaves like a date field, but it stores the current time or an
+arbitrary fixed time only. The ``adjust`` parameter, if provided, must be set
+with a valid time duration, like with a date field.
+
+Page number fields
+~~~~~~~~~~~~~~~~~~
+
+Content key: ``page number``. Supports ``fixed``.
+
+This field displays, by default, the current page number. If ``fixed``, it can
+contain an arbitrary other page number. It allows an ``adjust``, telling the
+editing applications to display the number of another page, if this page exists.
+In addition, it supports a ``select`` argument that may be set to ``current``
+(the default), ``previous``, or ``next``, and that specifies if the value is
+the number of the current, the previous or the next page.
+
+Page continuation fields
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Content key: ``page continuation``.
+
+This field conditionally displays a continuation string if the current page is
+preceded or followed by another page. It requires a ``text`` parameter, that is
+the continuation text to display, and a ``select`` parameter, that specifies
+what is the page whose existence must be checked.
+
+The example below creates a field that displays "See next page" if and only if
+the current page is not the last one::
+
+  paragraph.set_field(
+    content="page continuation",
+    select="next"
+    )
+
+Sender and Author fields
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Content key: various (see below). Supports ``fixed``.
+
+The API allows to set various fields whose purpose is to display in the document
+body or in the page headers or footers some informations whose source is not
+precisely specified but which regard the so-called "sender" and "author" of the
+document. Some of these informations may come from the document metadata.
+
+The general form of the corresponding content keys is ``sender xxx`` or
+``author yyy``, where "xxx" may be ``firstname``, ``lastname``, ``initials``,
+``title``, ``position``, ``email``, ``private phone``, ``fax``, ``company``,
+``office phone``, ``street``, ``city``, ``postal code``, ``country``,
+``state or province``, and "yyy" may be ``name`` or ``initials``.
+
+Every sender and author field is created with the appropriate content key and
+the optional ``fixed`` flag only.
+
+The following example tells the editing applications to print the initials
+of the document sender (if such an information is available) immediately after
+a given string::
+
+  paragraph.set_field(content="sender initials", after="Issued by ")
+
+Of course, every ``sender-`` or ``author-`` field may be ``fixed`` and can
+display a given value provided using the ``text`` optional parameter.
+
+Chapter and sheet name fields [tbc]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Content key: ``chapter`` or ``sheet`.
+
+A chapter field displays the name and/or the number of the current heading in
+a document where chapters make sense, while sheet name fields, in spreadsheet
+documents, display the name of the current sheet (or table).
+
+For a chapter field, ``set_field()`` allows two parameters.
 
 Declared variable fields
 ------------------------
