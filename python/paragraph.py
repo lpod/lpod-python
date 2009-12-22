@@ -234,15 +234,15 @@ class odf_paragraph(odf_element):
 
 
     def set_bookmark(self, name, before=None, after=None, position=0,
-                     role=None, content=None):
-        """Insert the bookmark before or after the characters in the text which
+                     role=None, content=None, interval=None):
+        """Insert a bookmark before or after the characters in the text which
         match the regexp before/after. When the regexp matches more of one part
         of the text, position can be set to choice which part must be used. If
         before and after are None, we use only position that is the number of
         characters. So, by default, this function inserts a bookmark before the
         first character of the content. Role can be None, "start" or "end", we
-        insert respectively a position bookmark a bookmark-start and a
-        bookmark-end. If content is None theses 2 calls are equivalent::
+        insert respectively a position bookmark a bookmark-start or a
+        bookmark-end. If content is not None these 2 calls are equivalent::
 
           paragraph.set_bookmark("bookmark", content="xyz")
 
@@ -251,6 +251,14 @@ class odf_paragraph(odf_element):
           paragraph.set_bookmark("bookmark", before="xyz", role="start")
           paragraph.set_bookmark("bookmark", after="xyz", role="end")
 
+        If interval is not None these 2 calls are equivalent::
+
+          paragraph.set_bookmark("bookmark", interval=(10, 20))
+
+        ::
+
+          paragraph.set_bookmark("bookmark", position=10, role="start")
+          paragraph.set_bookmark("bookmark", position=20, role="end")
 
         Arguments:
 
@@ -265,6 +273,8 @@ class odf_paragraph(odf_element):
             role -- None, "start" or "end"
 
             content -- regexp (unicode)
+
+            interval -- (int, int)
         """
 
         # With "content" => automatically insert a "start" and an "end"
@@ -272,7 +282,8 @@ class odf_paragraph(odf_element):
         if (before is None and
             after is None and
             role is None and
-            content is not None):
+            content is not None and
+            interval is None):
 
             # Start
             start = odf_create_bookmark_start(name)
@@ -284,8 +295,27 @@ class odf_paragraph(odf_element):
 
             return start, end
 
-        # Without "content"
-        if content is not None:
+        # With "interval" =>  automatically insert a "start" and an "end"
+        # bookmark
+        if (before is None and
+            after is None and
+            role is None and
+            content is None and
+            position == 0 and
+            interval is not None):
+
+            # Start
+            start = odf_create_bookmark_start(name)
+            self._insert(start, position=interval[0])
+
+            # End
+            end = odf_create_bookmark_end(name)
+            self._insert(end, position=interval[1])
+
+            return start, end
+
+        # Without "content" and "interval"
+        if content is not None or interval is not None:
             raise ValueError, "bad arguments"
 
         # Role
