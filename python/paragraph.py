@@ -241,7 +241,7 @@ class odf_paragraph(odf_element):
         before and after are None, we use only position that is the number of
         characters. So, by default, this function inserts a bookmark before the
         first character of the content. Role can be None, "start" or "end", we
-        insert respectively a simple bookmark a bookmark-start and a
+        insert respectively a position bookmark a bookmark-start and a
         bookmark-end. If content is None theses 2 calls are equivalent::
 
           paragraph.set_bookmark("bookmark", content="xyz")

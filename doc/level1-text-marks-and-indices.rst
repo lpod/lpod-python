@@ -48,7 +48,7 @@ identified by a unique name, but without any content. Its just a named location
 somewhere in a text container.
 
 By default, the bookmark is created and inserted using ``set_bookmark()``
-before the first character of the content in the calling element (which may be a 
+before the first character of the content in the calling element (which may be a
 paragraph, a heading, or a text span). As an example, this instruction creates
 a position bookmark before the first character of a paragraph::
 
@@ -66,8 +66,8 @@ parameter. Alternatively, the user can provide a regular expression using a
 after the first substring that matches the expression. The code below
 illustrates these possibilities::
 
-  paragraph.set_bookmark("BM2", position=4)
   paragraph.set_bookmark("BM1", before="xyz")
+  paragraph.set_bookmark("BM2", position=4)
 
 This method returns something in case of success (the returned value is just
 the ``odf_element`` corresponding to the new bookmark), or a null value
@@ -101,7 +101,7 @@ A bookmark can be retrieved by its unique name using ``get_bookmark()``.
 The ODF element that contains the bookmark then can be obtained as the parent of
 the bookmark element. However, if the bookmark is located inside a span, its
 parent is the span element instead of a regular paragraph. So another method is
-provided, that returns the main text container of the bookmark. In the following 
+provided, that returns the main text container of the bookmark. In the following
 example, the two lines return the text container (whatever its type, paragraph,
 heading or text span) where the bookmark is located::
 
@@ -294,7 +294,7 @@ important differences:
 - for a position index mark (which, by definition, has no text content), the
   first argument is a text string that is displayed in the associated index
   (when this index is generated);
-  
+
 - for a range index mark (which, by definition, has a text content), the first
   argument is only a meaningless but unique key that is internally used in order
   to associate the two ODF elements that represent the start point and the end
@@ -363,7 +363,7 @@ required.
 The following example successively produces three lists of index marks, the
 first one containing the entries for a table of contents, the second one the
 entries of a standard lexical index, and the third one the entries dedicated
-to an arbitrary user-defined index:: 
+to an arbitrary user-defined index::
 
   toc = document.get_index_marks(type="toc")
   alphabetical_index = document.get_index_marks()
@@ -434,8 +434,8 @@ document viewer::
     month="december",
     url="http://docs.lpod-project.org",
     editor="The lpOD Team"
-    )	
- 
+    )
+
 ``set_bibliography_mark()`` returns an ODF element whose any property may be
 set or changed later through the element-based ``set_attribute()`` method.
 
