@@ -125,7 +125,7 @@ always a string, so its data type is implicit and can't be set.
 Common field properties and methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A text field may be created with an optional ``fixed`` boolean parameter, that
+Some fields may be created with an optional ``fixed`` boolean parameter, that
 is ``false`` by default but, if ``true``, means that the content of the field
 should not be automatically updated by the editing applications. For example,
 a ``date`` field, that is (by default) automatically set to the current date by
@@ -154,11 +154,51 @@ i.e. without formatting.
 
 The generic ``set_text()`` method allows the applications to change the ``text``
 content of the element at any time, while ``set_properties()`` can set or change
-any other parameter later.
+any other parameter.
 
-Document fields [todo]
-----------------------
+Document fields
+---------------
 
+Document fields are (according to the ODF vocabulary) "can display information
+about the current document or about a specific part of the current document".
+This definition could be extended knowing that some so-called document fields
+may host contents that are not really informations about the document.
+
+The kind of document field is selected using the mandatory ``content`` argument.
+
+The whole set of allowed document fields is described in the section 6.2 of the
+ODF 1.1 specification. Some of them are introduced here with their associated
+properties.
+
+Date fields
+~~~~~~~~~~~
+
+Content key: ``date``. Supports ``fixed`` (that should preserve the stored date
+from automatic change each time the document is edited).
+
+A date field may be adjusted by a certain time period, which is specified usin
+the ``date adjust`` parameter. If the time period is negative, it gets
+subtracted from the value of the date field, yielding a date before the current
+date. The value of ``date adjust`` must be a valid duration.
+
+This example inserts a field that displays the date of the day before
+yesterday, due to a ``date adjust`` value that specified a negative value of
+48 hours, 0 minutes and 0 seconds::
+
+  paragraph.set_field(
+    content="date",
+    style="DateStyle",
+    date_adjust="-PT48H00M00S"
+    )
+
+Note that the display format is controlled by the given style (that is, of
+course, a date style), and that a date field may be more precise than the date
+of the day.
+
+Time fields
+~~~~~~~~~~~
+
+Content key: ``time``. Supports ``fixed``.
 
 
 Declared variable fields
@@ -199,6 +239,11 @@ values. The same apply to the field type, if a new ``type`` is provided. Beware,
 by `subsequent` and `previous` we mean the fields that precede or follow the
 field that is created with a changed content in the order of the document, not
 in the order of their creation.
+
+It's possible to insert a variable-based field somewhere without displaying its
+value through a text viewer. An optional ``display`` parameter may be set to
+``none``, that makes the field invisible, or to ``value`` (the default) to allow
+the GUI-based applications to display the value.
 
 On the other hand, all the fields associated to a `user` variable take the same
 value. Each time the content of the variable is changed, all the associated
