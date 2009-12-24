@@ -37,7 +37,9 @@ from lpod.styles import rgb2hex
 
 
 def highlight(odf_file_url, pattern, color=None, background_color=None,
-        italic=False, bold=False, pretty=True):
+              italic=False, bold=False, pretty=True):
+
+    # Make display_name and name
     display_name = [u"Highlight"]
     if color and color != 'none':
         display_name.append(unicode(color).capitalize())
@@ -49,20 +51,23 @@ def highlight(odf_file_url, pattern, color=None, background_color=None,
         display_name.append(u"Bold")
     display_name = u" ".join(display_name)
     name = display_name.replace(u" ", u"_20_")
+
     # Is our style already installed?
     style = document.get_style('text', name)
     if style is None:
         color = rgb2hex(color) if color != 'none' else None
         background_color = (rgb2hex(background_color)
                 if background_color != 'none' else None)
-        style = odf_create_style('text', name, display_name=display_name,
+        style = odf_create_style('text', name,
                 italic=italic, bold=bold, color=color,
                 background_color=background_color)
-        document.insert_style(style)
+        document.insert_style(style, automatic=True)
+
+    # Patch!
     body = document.get_body()
     i = -1
-    for i, paragraph in enumerate(body.get_paragraph_list(regex=pattern)
-            + body.get_heading_list(regex=pattern)):
+    for i, paragraph in enumerate(body.get_paragraph_list(regex=pattern) +
+                                  body.get_heading_list(regex=pattern)):
         # Don't colour the table of content
         if paragraph.get_parent().get_tagname() in ('text:index-title',
                 'text:index-body'):

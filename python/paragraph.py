@@ -200,7 +200,6 @@ class odf_paragraph(odf_element):
                 container = text.get_parent()
                 wrapper = container.get_parent()
                 is_text = text.is_text()
-                is_tail = text.is_tail()
                 # Group positions are calculated and static, so apply in
                 # reverse order to preserve positions
                 for group in reversed(list(pattern.finditer(text))):
