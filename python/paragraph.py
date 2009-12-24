@@ -234,7 +234,7 @@ class odf_paragraph(odf_element):
 
 
     def set_bookmark(self, name, before=None, after=None, position=0,
-                     role=None, content=None, interval=None):
+                     role=None, content=None, limits=None):
         """Insert a bookmark before or after the characters in the text which
         match the regexp before/after. When the regexp matches more of one part
         of the text, position can be set to choice which part must be used. If
@@ -251,9 +251,9 @@ class odf_paragraph(odf_element):
           paragraph.set_bookmark("bookmark", before="xyz", role="start")
           paragraph.set_bookmark("bookmark", after="xyz", role="end")
 
-        If interval is not None these 2 calls are equivalent::
+        If limits is not None these 2 calls are equivalent::
 
-          paragraph.set_bookmark("bookmark", interval=(10, 20))
+          paragraph.set_bookmark("bookmark", limits=(10, 20))
 
         ::
 
@@ -274,7 +274,7 @@ class odf_paragraph(odf_element):
 
             content -- regexp (unicode)
 
-            interval -- (int, int)
+            limits -- (int, int)
         """
 
         # With "content" => automatically insert a "start" and an "end"
@@ -283,7 +283,7 @@ class odf_paragraph(odf_element):
             after is None and
             role is None and
             content is not None and
-            interval is None):
+            limits is None):
 
             # Start
             start = odf_create_bookmark_start(name)
@@ -295,27 +295,27 @@ class odf_paragraph(odf_element):
 
             return start, end
 
-        # With "interval" =>  automatically insert a "start" and an "end"
+        # With "limits" =>  automatically insert a "start" and an "end"
         # bookmark
         if (before is None and
             after is None and
             role is None and
             content is None and
             position == 0 and
-            interval is not None):
+            limits is not None):
 
             # Start
             start = odf_create_bookmark_start(name)
-            self._insert(start, position=interval[0])
+            self._insert(start, position=limits[0])
 
             # End
             end = odf_create_bookmark_end(name)
-            self._insert(end, position=interval[1])
+            self._insert(end, position=limits[1])
 
             return start, end
 
-        # Without "content" and "interval"
-        if content is not None or interval is not None:
+        # Without "content" and "limits"
+        if content is not None or limits is not None:
             raise ValueError, "bad arguments"
 
         # Role
