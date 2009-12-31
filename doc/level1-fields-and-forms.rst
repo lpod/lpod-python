@@ -40,8 +40,8 @@ definition. However, while a table cell is always part of a table row that is in
 turn an element in a table, a `text field` may be inserted anywhere in the
 content of a text paragraph.
 
-Common field-related features [tbc]
------------------------------------
+Common field-related features
+-----------------------------
 
 Field creation and retrieval
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -159,15 +159,17 @@ any other parameter.
 Document fields
 ---------------
 
-Document fields are (according to the ODF vocabulary) "can display information
-about the current document or about a specific part of the current document".
+According to the ODF vocabulary, document fields are text fields that "can
+display information about the current document or about a specific part of the
+current document".
+
 This definition could be extended knowing that some so-called document fields
 may host contents that are not really informations about the document.
 
 The kind of document field is selected using the mandatory ``content`` argument.
 
 The whole set of allowed document fields is described in the section 6.2 of the
-ODF 1.1 specification. Some of them are introduced here with their associated
+ODF 1.1 specification. Some of them are introduced below with their associated
 properties.
 
 Date fields
@@ -266,8 +268,8 @@ a given string::
 Of course, every ``sender-`` or ``author-`` field may be ``fixed`` and can
 display a given value provided using the ``text`` optional parameter.
 
-Chapter and sheet name fields [tbc]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Chapter and sheet name fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Content key: ``chapter`` or ``sheet`.
 
@@ -275,7 +277,32 @@ A chapter field displays the name and/or the number of the current heading in
 a document where chapters make sense, while sheet name fields, in spreadsheet
 documents, display the name of the current sheet (or table).
 
-For a chapter field, ``set_field()`` allows two parameters.
+For a chapter field, ``set_field()`` allows two parameters, namely ``display``
+and ``level``:
+
+- ``display`` specifies the kind of information related to the current chapter
+  that the field should display; possible values are ``number``, ``name``,
+  ``number-and-name``, ``plain-number``, ``plain-number-and-name`` (see ODF 1.1
+  §6.2.7);
+- ``level`` is an integer value that specifies the level of the heading that is
+  referred to by the field; default is 1.
+
+This examples inserts a field that displays the name of the current level 1
+heading::
+
+  paragraph.set_field(
+    content="chapter",
+    level=1,
+    display="name"
+    )
+
+For a sheet name field, no parameter but ``content`` is needed; the field just
+displays the name of the current sheet. Note that this field makes sense for
+spreadsheet documents only but that the calling element for ``set_field()``
+should be a paragraph attached to a cell and not a cell, knowing that a text
+fields belongs to a paragraph. Example::
+
+  paragraph.set_field(content="sheet")
 
 Declared variable fields
 ------------------------
@@ -306,6 +333,14 @@ the associated variable is a `user` variable, the ``value`` and ``type``
 parameters are not allowed. If the variable is `simple`, then it's possible to
 set a specific value and/or type, with the effects described hereafter.
 
+The following example sets a field that displays the content of a declared
+variable whose name is supposed to be "Amount"::
+
+  paragraph.set_field(
+    content="variable",
+    name="Amount"
+    )
+
 When a field associated to a `simple` variable is inserted using
 ``set_field()``, its content is set, by default, to the existing content and
 type of the variable. If a ``value`` and/or ``text`` parameter is provided, the
@@ -335,6 +370,14 @@ and of course a ``currency`` parameter if ``type`` is ``currency``. Because
 any positioning or formatting parameter. A ``value`` parameter is needed in
 order to set the initial content of the variable.
 
+The example below "declares" the variable that is used by a text field in the
+previous example::
+
+  document.set_variable("Count", name="Amount", type="float", value=123)
+
+A ``class`` parameter may be provided to select the ``user`` or ``simple`` kind
+of variables; the default is ``user``.
+
 A declared variable may be retrieved thanks to its unique name, using the
 ``get_variable()`` document-based method with the name as argument. The returned
 object, if any, supports the generic ``get_properties()`` and
@@ -342,7 +385,4 @@ object, if any, supports the generic ``get_properties()`` and
 and ``currency`` parameters. In addition, the variable-specific ``get_value()``
 and ``set_value()`` methods are allowed as syntax shortcuts avoiding the use
 of ``get_properties()`` and ``set_properties()`` to access the stored values.
-
-Text fields [todo]
--------------------
 
