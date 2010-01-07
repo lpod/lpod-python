@@ -258,17 +258,16 @@ class odf_container(object):
         self.__parts[part_name] = None
 
 
-    def save(self, uri=None, packaging=None):
-        """Save the container to the given URI (if supported).
+    def save(self, target=None, packaging=None):
+        """Save the container to the given URI (target) or into this file like
+        object (if supported).
         """
         parts = self.__parts
         # Get all parts
         for part in self.__get_contents():
             if part not in parts:
                 self.get_part(part)
-        # Uri / Packaging
-        if uri is None:
-            uri = self.uri
+        # Packaging
         if packaging is None:
             packaging = ('flat' if self.mimetype == 'application/xml' else
                          'zip')
@@ -280,9 +279,13 @@ class odf_container(object):
         else:
             raise ValueError, '"%s" packaging type not supported' % packaging
         # Save it
-        container = vfs.open(uri, WRITE)
+        if target is None:
+            container = vfs.open(self.uri, WRITE)
+        elif isinstance(target, str):
+            container = vfs.open(target, WRITE)
+        else:
+            container = target
         container.write(data)
-        container.close()
 
 
 

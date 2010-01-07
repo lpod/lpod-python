@@ -293,14 +293,14 @@ class odf_document(object):
         return clone
 
 
-    def save(self, uri=None, packaging=None, pretty=False):
+    def save(self, target=None, packaging=None, pretty=False):
         """Save the document, at the same place it was opened or at the given
-        URI. It can be saved as a Zip file or as a plain XML file. The XML
-        can be pretty printed.
+        URI (target). Target can also be a file like object. It can be saved as
+        a Zip file or as a plain XML file. The XML can be pretty printed.
 
         Arguments:
 
-            uri -- str
+            target -- str -or- file like object
 
             packaging -- 'zip' or 'flat'
 
@@ -312,7 +312,7 @@ class odf_document(object):
                 self.container.set_part(part_name, part.serialize(pretty))
 
         # Save the container
-        self.container.save(uri, packaging)
+        self.container.save(target, packaging)
 
 
     #
