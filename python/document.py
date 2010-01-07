@@ -39,7 +39,6 @@ from content import odf_content
 from meta import odf_meta
 from style import odf_style, odf_master_page
 from styles import odf_styles
-from table import odf_table
 from utils import _get_style_family
 from vfs import vfs
 from xmlpart import odf_xmlpart
