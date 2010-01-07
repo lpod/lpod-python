@@ -28,19 +28,41 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from sys import exit
+from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
+from lpod.document import odf_new_document_from_type
+from lpod.paragraph import odf_create_paragraph
 
 
-if  __name__ == '__main__':
+
+def convert(rst_txt):
+    # Create a new document
+    doc = odf_new_document_from_type('text')
+    body = doc.get_body()
+
+    # Convert
+    paragraph = odf_create_paragraph(text=u"It works!")
+    body.append_element(paragraph)
+
+    return doc
+
+
+
+if  __name__ == "__main__":
 
     # Options initialisation
-    usage = "%prog <file>"
+    usage = "%prog [-o output] <filename>"
     description = "Convert a rst file into an odt file"
     parser = OptionParser(usage, version=__version__,
             description=description)
+
+    # --output
+    parser.add_option("-o", "--output", action="store", type="string",
+            dest="output", metavar="FILE",
+            help="dump the output into the file FILE instead of the standard "
+                 "output.")
 
     # Parse !
     opts, args = parser.parse_args()
@@ -51,4 +73,15 @@ if  __name__ == '__main__':
         exit(1)
     source = args[0]
 
-    print "-> %s" % source
+    # Convert
+    document = convert(open(source).read())
+
+    # Save
+    if opts.output is not None:
+        document.save(target=opts.output)
+    else:
+        document.save(target=stdout)
+
+
+
+
