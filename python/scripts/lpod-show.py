@@ -34,7 +34,6 @@ from sys import exit, stdout, stdin
 from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.vfs import vfs
-from lpod.table import odf_table
 
 
 
