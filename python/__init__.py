@@ -44,7 +44,9 @@ import heading
 import list
 import note
 import paragraph
+import shapes
+import span
 import style
+import table
 import toc
 import tracked_changes
-import shapes
