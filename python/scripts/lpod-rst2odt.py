@@ -25,7 +25,6 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-
 # Import from the standard library
 from optparse import OptionParser
 from sys import exit, stdout
@@ -33,18 +32,52 @@ from sys import exit, stdout
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_new_document_from_type
-from lpod.paragraph import odf_create_paragraph
+from lpod.heading import odf_create_heading
+
+# Import from docutils
+from docutils.readers.standalone import Reader
+from docutils.core import publish_doctree
+
+
+
+def find_convert(node, context):
+    tagname = node.tagname
+    if tagname == "section":
+        convert_section(node, context)
+    else:
+        print "Warning node not supported: %s" % tagname
+
+
+
+def convert_section(node, context):
+    context["heading-level"] += 1
+    for children in node:
+        if children.tagname == "title":
+            title = children.astext()
+            heading = odf_create_heading(level=context["heading-level"],
+                                         text=title)
+            context["body"].append_element(heading)
+        else:
+            find_convert(children, context)
+    context["heading-level"] -= 1
 
 
 
 def convert(rst_txt):
     # Create a new document
-    doc = odf_new_document_from_type('text')
+    doc = odf_new_document_from_type("text")
     body = doc.get_body()
 
     # Convert
-    paragraph = odf_create_paragraph(text=u"It works!")
-    body.append_element(paragraph)
+    reader = Reader(parser_name="restructuredtext")
+    domtree = publish_doctree(rst_txt, reader=reader)
+
+    context = {"body": body, "heading-level": 0}
+    for children in domtree:
+        if children.tagname == "title":
+            print "global title:", children.astext()
+        else:
+            find_convert(children, context)
 
     return doc
 
@@ -81,7 +114,5 @@ if  __name__ == "__main__":
         document.save(target=opts.output)
     else:
         document.save(target=stdout)
-
-
 
 
