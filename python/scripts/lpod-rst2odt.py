@@ -33,8 +33,10 @@ from sys import exit, stdout
 from lpod import __version__
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
-from lpod.paragraph import odf_create_paragraph
 from lpod.list import odf_create_list, odf_create_list_item
+from lpod.paragraph import odf_create_paragraph
+from lpod.toc import odf_create_toc
+
 
 # Import from docutils
 from docutils.readers.standalone import Reader
@@ -52,6 +54,8 @@ def find_convert(node, context):
         convert_list(node, context, "enumerated")
     elif tagname == "bullet_list":
         convert_list(node, context, "bullet")
+    elif tagname == "topic":
+        convert_topic(node, context)
     else:
         print "Warning node not supported: %s" % tagname
 
@@ -116,6 +120,21 @@ def convert_list(node, context, list_type):
 
 
 
+def convert_topic(node, context):
+    # Reset the top to body
+    context["top"] = context["body"]
+
+    # Yet an other TOC ?
+    if context["toc"] is not None:
+        print "Warning: a TOC is already inserted"
+        return
+
+    toc = odf_create_toc()
+    context["body"].append_element(toc)
+    context["toc"] = toc
+
+
+
 def convert(rst_txt):
     # Create a new document
     doc = odf_new_document_from_type("text")
@@ -126,7 +145,7 @@ def convert(rst_txt):
     domtree = publish_doctree(rst_txt, reader=reader)
 
     # Init a context
-    context = {"body": body, "top": body, "heading-level": 0}
+    context = {"body": body, "top": body, "toc": None, "heading-level": 0}
 
     # Go!
     for children in domtree:
@@ -134,6 +153,11 @@ def convert(rst_txt):
             print "global title:", children.astext()
         else:
             find_convert(children, context)
+
+    # Finish
+    toc = context["toc"]
+    if toc is not None:
+        toc.auto_fill(doc)
 
     return doc
 
