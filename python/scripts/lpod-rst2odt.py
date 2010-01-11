@@ -33,6 +33,7 @@ from sys import exit, stdout
 from lpod import __version__
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
+from lpod.paragraph import odf_create_paragraph
 
 # Import from docutils
 from docutils.readers.standalone import Reader
@@ -44,6 +45,8 @@ def find_convert(node, context):
     tagname = node.tagname
     if tagname == "section":
         convert_section(node, context)
+    elif tagname == "paragraph":
+        convert_paragraph(node, context)
     else:
         print "Warning node not supported: %s" % tagname
 
@@ -60,6 +63,12 @@ def convert_section(node, context):
         else:
             find_convert(children, context)
     context["heading-level"] -= 1
+
+
+
+def convert_paragraph(node, context):
+    paragraph = odf_create_paragraph(text=node.astext())
+    context["body"].append_element(paragraph)
 
 
 
