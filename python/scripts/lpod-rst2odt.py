@@ -34,6 +34,7 @@ from lpod import __version__
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
 from lpod.paragraph import odf_create_paragraph
+from lpod.list import odf_create_list, odf_create_list_item
 
 # Import from docutils
 from docutils.readers.standalone import Reader
@@ -47,13 +48,22 @@ def find_convert(node, context):
         convert_section(node, context)
     elif tagname == "paragraph":
         convert_paragraph(node, context)
+    elif tagname == "enumerated_list":
+        convert_list(node, context, "enumerated")
+    elif tagname == "bullet_list":
+        convert_list(node, context, "bullet")
     else:
         print "Warning node not supported: %s" % tagname
 
 
 
 def convert_section(node, context):
+    # Inc the heading level
     context["heading-level"] += 1
+
+    # Reset the top to body
+    context["top"] = context["body"]
+
     for children in node:
         if children.tagname == "title":
             title = children.astext()
@@ -62,13 +72,47 @@ def convert_section(node, context):
             context["body"].append_element(heading)
         else:
             find_convert(children, context)
+
+    # Restore the heading level
     context["heading-level"] -= 1
 
 
 
 def convert_paragraph(node, context):
     paragraph = odf_create_paragraph(text=node.astext())
-    context["body"].append_element(paragraph)
+    context["top"].append_element(paragraph)
+
+
+
+def convert_list(node, context, list_type):
+    # XXX unused
+    enumtype = node.get("enumtype") #enumerated
+    bullet = node.get("bullet") #bullet
+
+    odf_list = odf_create_list()
+    context["top"].append_element(odf_list)
+
+    # Save the current top
+    old_top = context["top"]
+
+    for item in node:
+
+        if item.tagname != "list_item":
+            print "Warning node not supported: %s" % item.tagname
+            continue
+
+        # Create a new item
+        odf_item = odf_create_list_item()
+        odf_list.append_element(odf_item)
+
+        # A new top
+        context["top"] = odf_item
+
+        for children in item:
+            find_convert(children, context)
+
+    # And restore the top
+    context["top"] = old_top
 
 
 
@@ -81,7 +125,10 @@ def convert(rst_txt):
     reader = Reader(parser_name="restructuredtext")
     domtree = publish_doctree(rst_txt, reader=reader)
 
-    context = {"body": body, "heading-level": 0}
+    # Init a context
+    context = {"body": body, "top": body, "heading-level": 0}
+
+    # Go!
     for children in domtree:
         if children.tagname == "title":
             print "global title:", children.astext()
