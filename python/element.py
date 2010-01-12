@@ -690,10 +690,36 @@ class odf_element(object):
             raise ValueError, "(xml)position must be defined"
 
 
-    def append_element(self, element):
-        """Shortcut to insert as the last child.
+    def append_element(self, unicode_or_element):
+        """Insert element or text in the last position.
         """
-        self.insert_element(element, xmlposition=LAST_CHILD)
+        current = self.__element
+
+        # Unicode ?
+        if isinstance(unicode_or_element, unicode):
+
+            # Has children ?
+            children = current.getchildren()
+            if children:
+                # Append to tail of the last child
+                last_child = children[-1]
+
+                text = last_child.tail
+                text = text if text is not None else u""
+                text += unicode_or_element
+
+                last_child.tail = text
+            else:
+                # Append to text of the element
+                text = current.text
+
+                text = text if text is not None else u""
+                text += unicode_or_element
+
+                current.text = text
+        # Element ?
+        else:
+            current.append(unicode_or_element.__element)
 
 
     def delete_element(self, child):
