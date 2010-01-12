@@ -306,6 +306,16 @@ class ElementTraverseTestCase(TestCase):
         self.assertEqual(child.get_tagname(), 'text:p')
 
 
+    def test_append_element(self):
+        element = odf_create_element("<root/>")
+        element.append_element(u"f")
+        element.append_element(u"oo1")
+        element.append_element(odf_create_element("<a/>"))
+        element.append_element(u"f")
+        element.append_element(u"oo2")
+        self.assertEqual(element.serialize(), "<root>foo1<a/>foo2</root>")
+
+
 
 class SearchTestCase(TestCase):
 
