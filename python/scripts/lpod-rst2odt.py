@@ -34,6 +34,7 @@ from lpod import __version__
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
 from lpod.list import odf_create_list, odf_create_list_item
+from lpod.note import odf_create_note
 from lpod.paragraph import odf_create_paragraph
 from lpod.toc import odf_create_toc
 
@@ -56,6 +57,10 @@ def find_convert(node, context):
         convert_list(node, context, "bullet")
     elif tagname == "topic":
         convert_topic(node, context)
+    elif tagname == "footnote":
+        convert_footnote(node, context)
+    elif tagname == "footnote_reference":
+        convert_footnote_reference(node, context)
     else:
         print "Warning node not supported: %s" % tagname
 
@@ -83,8 +88,21 @@ def convert_section(node, context):
 
 
 def convert_paragraph(node, context):
-    paragraph = odf_create_paragraph(text=node.astext())
+    paragraph = odf_create_paragraph()
     context["top"].append_element(paragraph)
+
+    # Save the current top
+    old_top = context["top"]
+
+    context["top"] = paragraph
+    for children in node:
+        if children.tagname == "#text":
+            paragraph.append_element(children.astext())
+            continue
+        find_convert(children, context)
+
+    # And restore the top
+    context["top"] = old_top
 
 
 
@@ -135,6 +153,44 @@ def convert_topic(node, context):
 
 
 
+def convert_footnote(node, context):
+    # XXX ids is a list ??
+    refid = node.get("ids")[0]
+
+    # Find the footnote
+    footnotes = context["footnotes"]
+    if refid not in footnotes:
+        print 'Warning: unknown footnote "%s"' % refid
+        return
+    footnote_body = footnotes[refid].get_element("text:note-body")
+
+    # Save the current top
+    old_top = context["top"]
+
+    # Fill the note
+    context["top"] = footnote_body
+    for children in node:
+        # We skip the label (already added)
+        if children.tagname == "label":
+            continue
+        find_convert(children, context)
+
+    # And restore the top
+    context["top"] = old_top
+
+
+
+def convert_footnote_reference(node, context):
+    refid = node.get("refid")
+    citation = node.astext()
+
+    footnote = odf_create_note(note_id=refid, citation=citation)
+    context["top"].append_element(footnote)
+
+    context["footnotes"][refid] = footnote
+
+
+
 def convert(rst_txt):
     # Create a new document
     doc = odf_new_document_from_type("text")
@@ -145,7 +201,8 @@ def convert(rst_txt):
     domtree = publish_doctree(rst_txt, reader=reader)
 
     # Init a context
-    context = {"body": body, "top": body, "toc": None, "heading-level": 0}
+    context = {"body": body, "top": body, "heading-level": 0, "toc": None,
+               "footnotes": {}}
 
     # Go!
     for children in domtree:
@@ -154,7 +211,7 @@ def convert(rst_txt):
         else:
             find_convert(children, context)
 
-    # Finish
+    # Finish the work
     toc = context["toc"]
     if toc is not None:
         toc.auto_fill(doc)
