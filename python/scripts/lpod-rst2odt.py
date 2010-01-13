@@ -36,6 +36,8 @@ from lpod.heading import odf_create_heading
 from lpod.list import odf_create_list, odf_create_list_item
 from lpod.note import odf_create_note
 from lpod.paragraph import odf_create_paragraph
+from lpod.span import odf_create_span
+from lpod.style import odf_create_style
 from lpod.toc import odf_create_toc
 
 
@@ -47,7 +49,9 @@ from docutils.core import publish_doctree
 
 def find_convert(node, context):
     tagname = node.tagname
-    if tagname == "section":
+    if tagname == "#text":
+        convert_text(node, context)
+    elif tagname == "section":
         convert_section(node, context)
     elif tagname == "paragraph":
         convert_paragraph(node, context)
@@ -61,8 +65,17 @@ def find_convert(node, context):
         convert_footnote(node, context)
     elif tagname == "footnote_reference":
         convert_footnote_reference(node, context)
+    elif tagname == "emphasis":
+        convert_emphasis(node, context)
+    elif tagname == "strong":
+        convert_strong(node, context)
     else:
         print "Warning node not supported: %s" % tagname
+
+
+
+def convert_text(node, context):
+    context["top"].append_element(node.astext())
 
 
 
@@ -73,6 +86,7 @@ def convert_section(node, context):
     # Reset the top to body
     context["top"] = context["body"]
 
+    # Convert
     for children in node:
         if children.tagname == "title":
             title = children.astext()
@@ -94,11 +108,9 @@ def convert_paragraph(node, context):
     # Save the current top
     old_top = context["top"]
 
+    # Convert
     context["top"] = paragraph
     for children in node:
-        if children.tagname == "#text":
-            paragraph.append_element(children.astext())
-            continue
         find_convert(children, context)
 
     # And restore the top
@@ -191,6 +203,59 @@ def convert_footnote_reference(node, context):
 
 
 
+def convert_emphasis(node, context):
+    # Yet an emphasis style ?
+    styles = context["styles"]
+    if "emphasis" in styles:
+        emphasis = styles["emphasis"]
+    else:
+        emphasis = odf_create_style("text", italic=True)
+        styles["emphasis"] = emphasis
+        context["doc"].insert_style(emphasis, automatic=True)
+
+    # Create the span
+    span = odf_create_span(style=emphasis.get_style_name())
+    context["top"].append_element(span)
+
+    # Save the current top
+    old_top = context["top"]
+
+    # Convert
+    context["top"] = span
+    for children in node:
+        find_convert(children, context)
+
+    # And restore the top
+    context["top"] = old_top
+
+
+def convert_strong(node, context):
+    # Yet an strong style ?
+    styles = context["styles"]
+    if "strong" in styles:
+        strong = styles["strong"]
+    else:
+        strong = odf_create_style("text", bold=True)
+        styles["strong"] = strong
+        context["doc"].insert_style(strong, automatic=True)
+
+    # Create the span
+    span = odf_create_span(style=strong.get_style_name())
+    context["top"].append_element(span)
+
+    # Save the current top
+    old_top = context["top"]
+
+    # Convert
+    context["top"] = span
+    for children in node:
+        find_convert(children, context)
+
+    # And restore the top
+    context["top"] = old_top
+
+
+
 def convert(rst_txt):
     # Create a new document
     doc = odf_new_document_from_type("text")
@@ -201,8 +266,8 @@ def convert(rst_txt):
     domtree = publish_doctree(rst_txt, reader=reader)
 
     # Init a context
-    context = {"body": body, "top": body, "heading-level": 0, "toc": None,
-               "footnotes": {}}
+    context = {"doc": doc, "body": body, "top": body, "styles": {},
+               "heading-level": 0, "toc": None, "footnotes": {}}
 
     # Go!
     for children in domtree:
