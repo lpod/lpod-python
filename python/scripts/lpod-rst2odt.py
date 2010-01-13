@@ -33,6 +33,7 @@ from sys import exit, stdout
 from lpod import __version__
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
+from lpod.link import odf_create_link
 from lpod.list import odf_create_list, odf_create_list_item
 from lpod.note import odf_create_note
 from lpod.paragraph import odf_create_paragraph
@@ -69,6 +70,12 @@ def find_convert(node, context):
         convert_emphasis(node, context)
     elif tagname == "strong":
         convert_strong(node, context)
+    elif tagname == "literal":
+        convert_literal(node, context)
+    elif tagname == "literal_block":
+        convert_literal_block(node, context)
+    elif tagname == "reference":
+        convert_reference(node, context)
     else:
         print "Warning node not supported: %s" % tagname
 
@@ -203,6 +210,24 @@ def convert_footnote_reference(node, context):
 
 
 
+def _convert_style_like(node, context, style):
+    # Create the span
+    span = odf_create_span(style=style.get_style_name())
+    context["top"].append_element(span)
+
+    # Save the current top
+    old_top = context["top"]
+
+    # Convert
+    context["top"] = span
+    for children in node:
+        find_convert(children, context)
+
+    # And restore the top
+    context["top"] = old_top
+
+
+
 def convert_emphasis(node, context):
     # Yet an emphasis style ?
     styles = context["styles"]
@@ -213,24 +238,13 @@ def convert_emphasis(node, context):
         styles["emphasis"] = emphasis
         context["doc"].insert_style(emphasis, automatic=True)
 
-    # Create the span
-    span = odf_create_span(style=emphasis.get_style_name())
-    context["top"].append_element(span)
-
-    # Save the current top
-    old_top = context["top"]
-
     # Convert
-    context["top"] = span
-    for children in node:
-        find_convert(children, context)
+    _convert_style_like(node, context, emphasis)
 
-    # And restore the top
-    context["top"] = old_top
 
 
 def convert_strong(node, context):
-    # Yet an strong style ?
+    # Yet a strong style ?
     styles = context["styles"]
     if "strong" in styles:
         strong = styles["strong"]
@@ -239,20 +253,56 @@ def convert_strong(node, context):
         styles["strong"] = strong
         context["doc"].insert_style(strong, automatic=True)
 
-    # Create the span
-    span = odf_create_span(style=strong.get_style_name())
-    context["top"].append_element(span)
+    # Convert
+    _convert_style_like(node, context, strong)
 
-    # Save the current top
-    old_top = context["top"]
+
+
+def _get_literal_style(context):
+    FONT = "FreeMono"
+
+    # Yet a literal style ?
+    styles = context["styles"]
+    if "literal" in styles:
+        return styles["literal"]
+
+    # A monospace font
+    font = odf_create_style("font-face", name=FONT)
+    font.set_attribute("svg:font-family", FONT)
+    font.set_attribute("style:font-family-generic", "modern")
+    font.set_attribute("style:font-pitch", "fixed")
+    context["doc"].insert_style(font)
+
+    # And the style
+    literal = odf_create_style("text")
+    literal.set_style_properties(properties={"style:font-name": FONT})
+    context["doc"].insert_style(literal, automatic=True)
+
+    # Save it
+    styles["literal"] = literal
+    return literal
+
+
+
+def convert_literal(node, context):
+    literal = _get_literal_style(context)
 
     # Convert
-    context["top"] = span
-    for children in node:
-        find_convert(children, context)
+    _convert_style_like(node, context, literal)
 
-    # And restore the top
-    context["top"] = old_top
+
+def convert_literal_block(node, context):
+    #TODO print node
+    pass
+
+
+def convert_reference(node, context):
+    refuri = node.get("refuri")
+    text = node.astext()
+
+    link = odf_create_link(refuri)
+    link.set_text(text)
+    context["top"].append_element(link)
 
 
 
