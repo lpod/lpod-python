@@ -65,8 +65,8 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         family -- 'paragraph', 'text', 'section', 'table', 'table-column',
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'drawing-page', 'graphic', 'presentation',
-                  'control', 'ruby', 'list', 'number', 'page-layout' or
-                  'master-page'
+                  'control', 'ruby', 'list', 'number', 'page-layout'
+                  'font-face', or 'master-page'
 
         name -- unicode
 
