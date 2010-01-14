@@ -83,6 +83,17 @@ def _get_formated_text(element, context, with_text=True):
 
 
 
+def odf_create_line_break():
+    return odf_create_element('<text:line-break/>')
+
+
+
+def odf_create_undividable_space(number=1):
+    # XXX Maybe number = 1 => no text:c ?
+    return odf_create_element('<text:s text:c="%d"/>' % number)
+
+
+
 def odf_create_paragraph(text=None, style=None):
     """Create a paragraph element of the given style containing the optional
     given text.
