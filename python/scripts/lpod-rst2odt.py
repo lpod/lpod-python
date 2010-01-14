@@ -36,7 +36,8 @@ from lpod.heading import odf_create_heading
 from lpod.link import odf_create_link
 from lpod.list import odf_create_list, odf_create_list_item
 from lpod.note import odf_create_note
-from lpod.paragraph import odf_create_paragraph
+from lpod.paragraph import odf_create_paragraph, odf_create_line_break
+from lpod.paragraph import odf_create_undividable_space
 from lpod.span import odf_create_span
 from lpod.style import odf_create_style
 from lpod.toc import odf_create_toc
@@ -258,42 +259,90 @@ def convert_strong(node, context):
 
 
 
-def _get_literal_style(context):
+def _get_literal_style(context, family):
+    # family = "text" or "paragraph"
+
     FONT = "FreeMono"
 
     # Yet a literal style ?
     styles = context["styles"]
-    if "literal" in styles:
-        return styles["literal"]
+    style_name = "%s-literal" % family
+    if  style_name in styles:
+        return styles[style_name]
 
     # A monospace font
-    font = odf_create_style("font-face", name=FONT)
-    font.set_attribute("svg:font-family", FONT)
-    font.set_attribute("style:font-family-generic", "modern")
-    font.set_attribute("style:font-pitch", "fixed")
-    context["doc"].insert_style(font)
+    if not ("text-literal" in styles or "paragraph-literal" in styles):
+        font = odf_create_style("font-face", name=FONT)
+        font.set_attribute("svg:font-family", FONT)
+        font.set_attribute("style:font-family-generic", "modern")
+        font.set_attribute("style:font-pitch", "fixed")
+        context["doc"].insert_style(font)
 
     # And the style
-    literal = odf_create_style("text")
-    literal.set_style_properties(properties={"style:font-name": FONT})
-    context["doc"].insert_style(literal, automatic=True)
+    style = odf_create_style(family)
+    style.set_style_properties(properties={"style:font-name": FONT})
+    context["doc"].insert_style(style, automatic=True)
 
     # Save it
-    styles["literal"] = literal
-    return literal
+    styles[style_name] = style
+    return style
 
 
 
 def convert_literal(node, context):
-    literal = _get_literal_style(context)
+    literal = _get_literal_style(context, "text")
 
     # Convert
     _convert_style_like(node, context, literal)
 
 
 def convert_literal_block(node, context):
-    #TODO print node
-    pass
+    literal = _get_literal_style(context, "paragraph")
+    paragraph = odf_create_paragraph(style=literal.get_style_name())
+    context["top"].append_element(paragraph)
+
+    # Convert
+    for children in node:
+        # Only text
+        if children.tagname != "#text":
+            print 'node "%s" not supported in literal block' % children.tagname
+            continue
+        text = children.astext()
+
+        tmp = []
+        spaces = 0
+        for c in text:
+            if c == '\n':
+                if tmp:
+                    tmp = u"".join(tmp)
+                    paragraph.append_element(tmp)
+                    tmp = []
+                spaces = 0
+                paragraph.append_element(odf_create_line_break())
+            elif c == '\r':
+                continue
+            elif c == ' ':
+                spaces += 1
+            elif c == '\t':
+                # Tab = 4 spaces
+                spaces += 4
+            else:
+                if spaces >= 2:
+                    if tmp:
+                        tmp = u"".join(tmp)
+                        paragraph.append_element(tmp)
+                        tmp = []
+                    paragraph.append_element(
+                              odf_create_undividable_space(spaces))
+                    spaces = 0
+                elif spaces == 1:
+                    tmp.append(' ')
+                    spaces = 0
+                tmp.append(c)
+        if tmp:
+            tmp = u"".join(tmp)
+            paragraph.append_element(tmp)
+
 
 
 def convert_reference(node, context):
