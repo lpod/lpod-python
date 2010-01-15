@@ -77,6 +77,10 @@ def find_convert(node, context):
         convert_literal_block(node, context)
     elif tagname == "reference":
         convert_reference(node, context)
+    elif tagname == "definition_list":
+        convert_definition_list(node, context)
+    elif tagname == "block_quote":
+        convert_block_quote(node, context)
     else:
         print "Warning node not supported: %s" % tagname
 
@@ -356,6 +360,34 @@ def convert_reference(node, context):
     link = odf_create_link(refuri)
     link.set_text(text)
     context["top"].append_element(link)
+
+
+
+def convert_definition_list(node, context):
+    # TODO Add the style
+    for item in node:
+        if item.tagname != "definition_list_item":
+            print 'node "%s" not supported in definition_list' % item.tagname
+            continue
+
+        for children in item:
+            tagname = children.tagname
+            if tagname == "term":
+                paragraph = odf_create_paragraph(text=children.astext())
+                context["top"].append_element(paragraph)
+            elif tagname == "definition":
+                for subchildren in children:
+                    find_convert(subchildren, context)
+            else:
+                print ('node "%s" not supported in definition_list_item' %
+                       item.tagname)
+
+
+
+def convert_block_quote(node, context):
+    # TODO Add the style
+    for children in node:
+        find_convert(children, context)
 
 
 
