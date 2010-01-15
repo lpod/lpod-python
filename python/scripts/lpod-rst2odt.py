@@ -407,7 +407,15 @@ def convert(rst_txt):
     # Go!
     for children in domtree:
         if children.tagname == "title":
-            print "global title:", children.astext()
+            title =  children.astext()
+
+            # Meta info
+            meta = doc.get_meta()
+            meta.set_title(title)
+
+            # XXX Add style
+            paragraph = odf_create_paragraph(text=title)
+            body.append_element(paragraph)
         else:
             find_convert(children, context)
 
