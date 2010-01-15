@@ -279,8 +279,12 @@ def _get_literal_style(context, family):
         context["doc"].insert_style(font)
 
     # And the style
-    style = odf_create_style(family)
-    style.set_style_properties(properties={"style:font-name": FONT})
+    if family == "paragraph":
+        style = odf_create_style(family, parent="Standard")
+    else:
+        style = odf_create_style(family)
+    style.set_style_properties(properties={"style:font-name": FONT},
+                               area="text")
     context["doc"].insert_style(style, automatic=True)
 
     # Save it
