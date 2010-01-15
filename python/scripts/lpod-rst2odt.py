@@ -31,7 +31,7 @@ from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
-from lpod.document import odf_new_document_from_type
+from lpod.document import odf_new_document_from_type, odf_get_document
 from lpod.heading import odf_create_heading
 from lpod.link import odf_create_link
 from lpod.list import odf_create_list, odf_create_list_item
@@ -391,10 +391,19 @@ def convert_block_quote(node, context):
 
 
 
-def convert(rst_txt):
-    # Create a new document
-    doc = odf_new_document_from_type("text")
-    body = doc.get_body()
+def convert(rst_txt, styles_from):
+    # From styles ?
+    if styles_from is not None:
+        doc = odf_get_document(styles_from)
+        doc = doc.clone()
+        body = doc.get_body()
+
+        # Clean the body
+        body.clear()
+    # Or create a new document
+    else:
+        doc = odf_new_document_from_type("text")
+        body = doc.get_body()
 
     # Convert
     reader = Reader(parser_name="restructuredtext")
@@ -440,7 +449,12 @@ if  __name__ == "__main__":
     parser.add_option("-o", "--output", action="store", type="string",
             dest="output", metavar="FILE",
             help="dump the output into the file FILE instead of the standard "
-                 "output.")
+                 "output")
+
+    # --styles
+    parser.add_option("-s", "--styles", action="store", type="string",
+            dest="styles", metavar="FILE",
+            help="import the styles from the given file")
 
     # Parse !
     opts, args = parser.parse_args()
@@ -452,7 +466,7 @@ if  __name__ == "__main__":
     source = args[0]
 
     # Convert
-    document = convert(open(source).read())
+    document = convert(open(source).read(), styles_from=opts.styles)
 
     # Save
     if opts.output is not None:
