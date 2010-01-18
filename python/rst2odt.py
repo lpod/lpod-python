@@ -37,6 +37,7 @@ from PIL import Image
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.document import odf_document
 from lpod.frame import odf_create_image_frame, odf_create_text_frame
 from lpod.heading import odf_create_heading
 from lpod.link import odf_create_link
@@ -451,14 +452,15 @@ def convert_figure(node, context):
 
 
 
-def convert(rst_txt, styles_from):
+def convert(rst_txt, styles_from=None):
     # From styles ?
     if styles_from is not None:
-        # XXX Must be a text!
-        doc = odf_get_document(styles_from)
+        if isinstance(styles_from, odf_document):
+            doc = styles_from.clone()
+        else:
+            doc = odf_get_document(styles_from)
         doc = doc.clone()
         body = doc.get_body()
-
         # Clean the body
         body.clear()
     # Or create a new document
