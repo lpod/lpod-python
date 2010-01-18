@@ -603,11 +603,12 @@ class odf_document(object):
 #
 
 def odf_get_document(uri):
-    """Return an "odf_document" instance of the ODF document stored at the
-    given URI.
+    """Return an "odf_document" instance of the ODF document stored in the
+    given file-like object or at the given URI.
 
     Example::
 
+        >>> document = odf_get_document(stringio)
         >>> uri = 'uri://of/a/document.odt'
         >>> document = odf_get_document(uri)
     """

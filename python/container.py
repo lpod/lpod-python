@@ -80,23 +80,29 @@ ODF_PARTS = ['content', 'meta', 'mimetype', 'settings', 'styles']
 class odf_container(object):
     """Representation of the ODF file.
     """
-    def __init__(self, uri):
-        if not vfs.exists(uri):
-            raise ValueError, 'URI "%s" is not found' % uri
-        if vfs.is_folder(uri):
-            raise NotImplementedError, ("reading uncompressed ODF "
-                                        "is not supported")
-
-        mimetype = vfs.get_mimetype(uri)
-        if not mimetype in ODF_MIMETYPES:
-            raise ValueError, 'mimetype "%s" is unknown' % mimetype
-
-        self.uri = uri
-        self.mimetype = mimetype
+    def __init__(self, uri_or_file):
         # Internal state
-        self.__data = None
         self.__zipfile = None
         self.__parts = {}
+        # URI
+        if type(uri_or_file) is str:
+            self.uri = uri_or_file
+            if not vfs.exists(uri_or_file):
+                raise ValueError, 'URI "%s" is not found' % uri_or_file
+            if vfs.is_folder(uri_or_file):
+                raise NotImplementedError, ("reading uncompressed ODF "
+                                            "is not supported")
+            mimetype = vfs.get_mimetype(uri_or_file)
+            if not mimetype in ODF_MIMETYPES:
+                raise ValueError, 'mimetype "%s" is unknown' % mimetype
+            self.mimetype = mimetype
+            self.__data = None
+        # File-like assumed
+        else:
+            self.uri = None
+            self.__data = uri_or_file.read()
+            # FIXME Zip format assumed
+            self.mimetype = self.__get_part_zip('mimetype')
 
 
     #
