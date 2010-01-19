@@ -72,7 +72,7 @@ def convert_section(node, context):
                                          text=title)
             context["body"].append_element(heading)
         else:
-            find_convert(children, context)
+            convert_node(children, context)
 
     # Restore the heading level
     context["heading-level"] -= 1
@@ -89,7 +89,7 @@ def convert_paragraph(node, context):
     # Convert
     context["top"] = paragraph
     for children in node:
-        find_convert(children, context)
+        convert_node(children, context)
 
     # And restore the top
     context["top"] = old_top
@@ -121,7 +121,7 @@ def convert_list(node, context, list_type):
         context["top"] = odf_item
 
         for children in item:
-            find_convert(children, context)
+            convert_node(children, context)
 
     # And restore the top
     context["top"] = old_top
@@ -173,7 +173,7 @@ def convert_footnote(node, context):
         # We skip the label (already added)
         if children.tagname == "label":
             continue
-        find_convert(children, context)
+        convert_node(children, context)
 
     # And restore the top
     context["top"] = old_top
@@ -202,7 +202,7 @@ def _convert_style_like(node, context, style):
     # Convert
     context["top"] = span
     for children in node:
-        find_convert(children, context)
+        convert_node(children, context)
 
     # And restore the top
     context["top"] = old_top
@@ -353,7 +353,7 @@ def convert_definition_list(node, context):
                 context["top"].append_element(paragraph)
             elif tagname == "definition":
                 for subchildren in children:
-                    find_convert(subchildren, context)
+                    convert_node(subchildren, context)
             else:
                 print ('node "%s" not supported in definition_list_item' %
                        item.tagname)
@@ -363,7 +363,7 @@ def convert_definition_list(node, context):
 def convert_block_quote(node, context):
     # TODO Add the style
     for children in node:
-        find_convert(children, context)
+        convert_node(children, context)
 
 
 
@@ -442,7 +442,7 @@ convert_methods = {'#text': convert_text,
 
 
 
-def find_convert(node, context):
+def convert_node(node, context):
     tagname = node.tagname
     convert_method = convert_methods.get(tagname)
     if convert_method is not None:
@@ -469,8 +469,7 @@ def convert(rst_txt, styles_from=None):
         body = doc.get_body()
 
     # Convert
-    reader = Reader(parser_name="restructuredtext")
-    domtree = publish_doctree(rst_txt, reader=reader)
+    domtree = publish_doctree(rst_txt)
 
     # Init a context
     context = {"doc": doc, "body": body, "top": body, "styles": {},
@@ -480,16 +479,14 @@ def convert(rst_txt, styles_from=None):
     for children in domtree:
         if children.tagname == "title":
             title =  children.astext()
-
             # Meta info
             meta = doc.get_meta()
             meta.set_title(title)
-
             # XXX Add style
             paragraph = odf_create_paragraph(text=title)
             body.append_element(paragraph)
         else:
-            find_convert(children, context)
+            convert_node(children, context)
 
     # Finish the work
     toc = context["toc"]
