@@ -52,45 +52,6 @@ from lpod.vfs import vfs, Error
 
 
 
-def find_convert(node, context):
-    tagname = node.tagname
-    if tagname == "#text":
-        convert_text(node, context)
-    elif tagname == "section":
-        convert_section(node, context)
-    elif tagname == "paragraph":
-        convert_paragraph(node, context)
-    elif tagname == "enumerated_list":
-        convert_list(node, context, "enumerated")
-    elif tagname == "bullet_list":
-        convert_list(node, context, "bullet")
-    elif tagname == "topic":
-        convert_topic(node, context)
-    elif tagname == "footnote":
-        convert_footnote(node, context)
-    elif tagname == "footnote_reference":
-        convert_footnote_reference(node, context)
-    elif tagname == "emphasis":
-        convert_emphasis(node, context)
-    elif tagname == "strong":
-        convert_strong(node, context)
-    elif tagname == "literal":
-        convert_literal(node, context)
-    elif tagname == "literal_block":
-        convert_literal_block(node, context)
-    elif tagname == "reference":
-        convert_reference(node, context)
-    elif tagname == "definition_list":
-        convert_definition_list(node, context)
-    elif tagname == "block_quote":
-        convert_block_quote(node, context)
-    elif tagname == "figure":
-        convert_figure(node, context)
-    else:
-        print "Warning node not supported: %s" % tagname
-
-
-
 def convert_text(node, context):
     context["top"].append_element(node.astext())
 
@@ -164,6 +125,16 @@ def convert_list(node, context, list_type):
 
     # And restore the top
     context["top"] = old_top
+
+
+
+def convert_list_enumerated(node, context):
+    return convert_list(node, context, "enumerated")
+
+
+
+def convert_list_bullet(node, context):
+    return convert_list(node, context, "bullet")
 
 
 
@@ -449,6 +420,35 @@ def convert_figure(node, context):
         paragraph.append_element(caption)
     else:
         container.append_element(image_frame)
+
+
+
+convert_methods = {'#text': convert_text,
+                   'section': convert_section,
+                   'paragraph': convert_paragraph,
+                   'enumerated_list': convert_list_enumerated,
+                   'bullet_list': convert_list_bullet,
+                   'topic': convert_topic,
+                   'footnote': convert_footnote,
+                   'footnote_reference': convert_footnote_reference,
+                   'emphasis': convert_emphasis,
+                   'strong': convert_strong,
+                   'literal': convert_literal,
+                   'literal_block': convert_literal_block,
+                   'reference': convert_reference,
+                   'definition_list': convert_definition_list,
+                   'block_quote': convert_block_quote,
+                   'figure': convert_figure}
+
+
+
+def find_convert(node, context):
+    tagname = node.tagname
+    convert_method = convert_methods.get(tagname)
+    if convert_method is not None:
+        convert_method(node, context)
+    else:
+        print "Warning node not supported: %s" % tagname
 
 
 
