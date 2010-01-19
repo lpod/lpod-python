@@ -28,7 +28,6 @@
 # Import from the Standard Library
 from subprocess import Popen, PIPE
 from sys import stderr, argv
-from datetime import datetime
 from os.path import basename
 
 
