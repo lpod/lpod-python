@@ -117,7 +117,7 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
 
     Size is a (width, height) tuple and position is a (left, top) tuple; items
     are strings including the unit, e.g. ('21cm', '29.7cm').
-    
+
     Arguments:
 
         text_or_element -- unicode or odf_element
