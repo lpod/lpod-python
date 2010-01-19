@@ -32,7 +32,7 @@ from sys import exit, stdout
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_new_document_from_type, odf_get_document
-from lpod.frame import odf_create_image_frame
+from lpod.frame import odf_create_image_frame, odf_create_text_frame
 from lpod.heading import odf_create_heading
 from lpod.link import odf_create_link
 from lpod.list import odf_create_list, odf_create_list_item
@@ -431,15 +431,27 @@ def convert_figure(node, context):
 
     # Add the image
     local_uri = context["doc"].add_file(image)
-    odf_image = odf_create_image_frame(local_uri, size=size)
+    # image_frame is the frame that contains the image
+    image_frame = odf_create_image_frame(local_uri, size=size)
 
     # XXX An image must be inserted in a paragraph ??
     if context["top"].get_tagname() == "office:text":
-        paragraph = odf_create_paragraph()
-        paragraph.append_element(odf_image)
-        context["top"].append_element(paragraph)
+        container = odf_create_paragraph()
+        context["top"].append_element(container)
     else:
-        context["top"].append(odf_image)
+        container = context["top"]
+
+    if caption:
+        paragraph = odf_create_paragraph()
+        # A new frame, we fix only the width
+        text_frame = odf_create_text_frame(paragraph, size=(size[0], None))
+        container.append_element(text_frame)
+
+        paragraph.append_element(image_frame)
+        paragraph.append_element(caption)
+    else:
+        container.append_element(image_frame)
+
 
 
 def convert(rst_txt, styles_from):

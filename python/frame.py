@@ -179,7 +179,7 @@ class odf_frame(odf_element):
         """Set the size of the frame.
 
         Size is a (width, height) tuple with items including the unit,
-        e.g. ('10cm', '15cm').
+        e.g. ('10cm', '15cm'). The dimensions can be None.
 
         Arguments:
 
