@@ -32,6 +32,7 @@ from sys import exit, stdout
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.frame import odf_create_image_frame
 from lpod.heading import odf_create_heading
 from lpod.link import odf_create_link
 from lpod.list import odf_create_list, odf_create_list_item
@@ -41,11 +42,15 @@ from lpod.paragraph import odf_create_undividable_space
 from lpod.span import odf_create_span
 from lpod.style import odf_create_style
 from lpod.toc import odf_create_toc
+from lpod.vfs import vfs, Error
 
 
 # Import from docutils
 from docutils.readers.standalone import Reader
 from docutils.core import publish_doctree
+
+# Import from PIL
+from PIL import Image
 
 
 
@@ -81,6 +86,8 @@ def find_convert(node, context):
         convert_definition_list(node, context)
     elif tagname == "block_quote":
         convert_block_quote(node, context)
+    elif tagname == "figure":
+        convert_figure(node, context)
     else:
         print "Warning node not supported: %s" % tagname
 
@@ -391,9 +398,54 @@ def convert_block_quote(node, context):
 
 
 
+def convert_figure(node, context):
+    DPI = 72
+
+    image = None
+    caption = None
+
+    for children in node:
+        tagname = children.tagname
+        if tagname == "image":
+            if image is not None:
+                print "unexpected image (just a image / figure) for a figure"
+                continue
+            image = children.get("uri")
+        elif tagname == "caption":
+            if caption is not None:
+                print ("unexpected caption (just a caption / figure) for a "
+                       "figure")
+                continue
+            caption = children.astext()
+
+    # Load the image to find its size
+    encoding = stdout.encoding if stdout.encoding is not None else "utf-8"
+    try:
+        image_file = vfs.open(image.encode(encoding))
+        image_object = Image.open(image_file)
+    except (Error, UnicodeEncodeError, IOError, OverflowError):
+        print 'Warning, unable to insert the image "%s"' % image
+        return
+    size = image_object.size
+    size = (str(float(size[0]) / DPI)+"in", str(float(size[1]) / DPI)+"in")
+
+    # Add the image
+    local_uri = context["doc"].add_file(image)
+    odf_image = odf_create_image_frame(local_uri, size=size)
+
+    # XXX An image must be inserted in a paragraph ??
+    if context["top"].get_tagname() == "office:text":
+        paragraph = odf_create_paragraph()
+        paragraph.append_element(odf_image)
+        context["top"].append_element(paragraph)
+    else:
+        context["top"].append(odf_image)
+
+
 def convert(rst_txt, styles_from):
     # From styles ?
     if styles_from is not None:
+        # XXX Must be a text!
         doc = odf_get_document(styles_from)
         doc = doc.clone()
         body = doc.get_body()
