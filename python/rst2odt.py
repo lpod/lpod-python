@@ -398,8 +398,8 @@ def convert_figure(node, context):
     try:
         image_file = vfs.open(image.encode(encoding))
         image_object = Image.open(image_file)
-    except (Error, UnicodeEncodeError, IOError, OverflowError):
-        warn('unable to insert the image "%s"' % image)
+    except (Error, UnicodeEncodeError, IOError, OverflowError), e:
+        warn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size
     size = (str(float(size[0]) / DPI)+"in", str(float(size[1]) / DPI)+"in")
