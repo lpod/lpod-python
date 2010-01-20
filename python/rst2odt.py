@@ -461,8 +461,18 @@ def convert_node(node, context):
 
 
 
-def convert(document, rst_txt, heading_level=0):
+def convert(document, rst_body, heading_level=0):
     """Convert a reStructuredText source into an existing document.
+
+    Arguments:
+
+        document -- odf_document
+
+        rst_body -- str or docutils node
+
+        heading_level -- int
+
+    Return: odf_document
     """
     # Init a context
     body = document.get_body()
@@ -470,8 +480,9 @@ def convert(document, rst_txt, heading_level=0):
             "heading-level": heading_level, "toc": None, "footnotes": {}}
 
     # Go!
-    domtree = publish_doctree(rst_txt)
-    for child in domtree:
+    if isinstance(rst_body, str):
+        rst_body = publish_doctree(rst_body)
+    for child in rst_body:
         convert_node(child, context)
 
     # Finish the work
@@ -483,12 +494,15 @@ def convert(document, rst_txt, heading_level=0):
 
 
 
-def rst2odt(rst_txt, template=None):
+def rst2odt(rst_body, template=None):
     """Convert a reStructuredText source to a new document.
+
+    The template is a document to reuse instead of the default lpOD template.
 
     Arguments:
 
-        rst_txt -- str
+        rst_body -- str or docutils node
+
         template -- odf_document
 
     Return: odf_document
@@ -502,4 +516,4 @@ def rst2odt(rst_txt, template=None):
     else:
         document = odf_new_document_from_type("text")
 
-    return convert(document, rst_txt)
+    return convert(document, rst_body)
