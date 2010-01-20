@@ -65,17 +65,21 @@ def convert_section(node, context):
     context["top"] = context["body"]
 
     # Convert
-    for children in node:
-        if children.tagname == "title":
-            title = children.astext()
-            heading = odf_create_heading(level=context["heading-level"],
-                                         text=title)
-            context["body"].append_element(heading)
-        else:
-            convert_node(children, context)
+    for child in node:
+        convert_node(child, context)
 
     # Restore the heading level
     context["heading-level"] -= 1
+
+
+
+def convert_title(node, context):
+    level = context["heading-level"]
+    if level == 0:
+        # The document did not start with a section
+        level = 1
+    heading = odf_create_heading(level=level, text=node.astext())
+    context["body"].append_element(heading)
 
 
 
@@ -423,22 +427,25 @@ def convert_figure(node, context):
 
 
 
-convert_methods = {'#text': convert_text,
-                   'section': convert_section,
-                   'paragraph': convert_paragraph,
-                   'enumerated_list': convert_list_enumerated,
-                   'bullet_list': convert_list_bullet,
-                   'topic': convert_topic,
-                   'footnote': convert_footnote,
-                   'footnote_reference': convert_footnote_reference,
-                   'emphasis': convert_emphasis,
-                   'strong': convert_strong,
-                   'literal': convert_literal,
-                   'literal_block': convert_literal_block,
-                   'reference': convert_reference,
-                   'definition_list': convert_definition_list,
-                   'block_quote': convert_block_quote,
-                   'figure': convert_figure}
+convert_methods = {
+        'block_quote': convert_block_quote,
+        'bullet_list': convert_list_bullet,
+        'definition_list': convert_definition_list,
+        'emphasis': convert_emphasis,
+        'enumerated_list': convert_list_enumerated,
+        'figure': convert_figure,
+        'footnote': convert_footnote,
+        'footnote_reference': convert_footnote_reference,
+        'literal_block': convert_literal_block,
+        'literal': convert_literal,
+        'paragraph': convert_paragraph,
+        'reference': convert_reference,
+        'section': convert_section,
+        'strong': convert_strong,
+        '#text': convert_text,
+        'title': convert_title,
+        'topic': convert_topic,
+}
 
 
 
