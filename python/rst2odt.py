@@ -26,18 +26,16 @@
 #
 
 # Import from the Standard Library
-from sys import stdout
+from sys import stdout, stderr
 
 # Import from docutils
-from docutils.readers.standalone import Reader
 from docutils.core import publish_doctree
 
 # Import from imaging
 from PIL import Image
 
 # Import from lpod
-from lpod.document import odf_new_document_from_type, odf_get_document
-from lpod.document import odf_document
+from lpod.document import odf_new_document_from_type
 from lpod.frame import odf_create_image_frame, odf_create_text_frame
 from lpod.heading import odf_create_heading
 from lpod.link import odf_create_link
@@ -49,6 +47,10 @@ from lpod.span import odf_create_span
 from lpod.style import odf_create_style
 from lpod.toc import odf_create_toc
 from lpod.vfs import vfs, Error
+
+
+def warn(message):
+    print >> stderr, "Warning:", message
 
 
 
@@ -92,8 +94,8 @@ def convert_paragraph(node, context):
 
     # Convert
     context["top"] = paragraph
-    for children in node:
-        convert_node(children, context)
+    for child in node:
+        convert_node(child, context)
 
     # And restore the top
     context["top"] = old_top
@@ -114,7 +116,7 @@ def convert_list(node, context, list_type):
     for item in node:
 
         if item.tagname != "list_item":
-            print "Warning node not supported: %s" % item.tagname
+            warn("node not supported: %s" % item.tagname)
             continue
 
         # Create a new item
@@ -124,8 +126,8 @@ def convert_list(node, context, list_type):
         # A new top
         context["top"] = odf_item
 
-        for children in item:
-            convert_node(children, context)
+        for child in item:
+            convert_node(child, context)
 
     # And restore the top
     context["top"] = old_top
@@ -148,7 +150,7 @@ def convert_topic(node, context):
 
     # Yet an other TOC ?
     if context["toc"] is not None:
-        print "Warning: a TOC is already inserted"
+        warn("a TOC is already inserted")
         return
 
     toc = odf_create_toc()
@@ -164,7 +166,7 @@ def convert_footnote(node, context):
     # Find the footnote
     footnotes = context["footnotes"]
     if refid not in footnotes:
-        print 'Warning: unknown footnote "%s"' % refid
+        warn('unknown footnote "%s"' % refid)
         return
     footnote_body = footnotes[refid].get_element("text:note-body")
 
@@ -173,11 +175,11 @@ def convert_footnote(node, context):
 
     # Fill the note
     context["top"] = footnote_body
-    for children in node:
+    for child in node:
         # We skip the label (already added)
-        if children.tagname == "label":
+        if child.tagname == "label":
             continue
-        convert_node(children, context)
+        convert_node(child, context)
 
     # And restore the top
     context["top"] = old_top
@@ -205,8 +207,8 @@ def _convert_style_like(node, context, style):
 
     # Convert
     context["top"] = span
-    for children in node:
-        convert_node(children, context)
+    for child in node:
+        convert_node(child, context)
 
     # And restore the top
     context["top"] = old_top
@@ -290,12 +292,12 @@ def convert_literal_block(node, context):
     context["top"].append_element(paragraph)
 
     # Convert
-    for children in node:
+    for child in node:
         # Only text
-        if children.tagname != "#text":
-            print 'node "%s" not supported in literal block' % children.tagname
+        if child.tagname != "#text":
+            warn('node "%s" not supported in literal block' % child.tagname)
             continue
-        text = children.astext()
+        text = child.astext()
 
         tmp = []
         spaces = 0
@@ -347,27 +349,27 @@ def convert_definition_list(node, context):
     # TODO Add the style
     for item in node:
         if item.tagname != "definition_list_item":
-            print 'node "%s" not supported in definition_list' % item.tagname
+            warn('node "%s" not supported in definition_list' % item.tagname)
             continue
 
-        for children in item:
-            tagname = children.tagname
+        for child in item:
+            tagname = child.tagname
             if tagname == "term":
-                paragraph = odf_create_paragraph(text=children.astext())
+                paragraph = odf_create_paragraph(text=child.astext())
                 context["top"].append_element(paragraph)
             elif tagname == "definition":
-                for subchildren in children:
+                for subchildren in child:
                     convert_node(subchildren, context)
             else:
-                print ('node "%s" not supported in definition_list_item' %
-                       item.tagname)
+                warn('node "%s" not supported in definition_list_item' %
+                        item.tagname)
 
 
 
 def convert_block_quote(node, context):
     # TODO Add the style
-    for children in node:
-        convert_node(children, context)
+    for child in node:
+        convert_node(child, context)
 
 
 
@@ -377,19 +379,19 @@ def convert_figure(node, context):
     image = None
     caption = None
 
-    for children in node:
-        tagname = children.tagname
+    for child in node:
+        tagname = child.tagname
         if tagname == "image":
             if image is not None:
-                print "unexpected image (just a image / figure) for a figure"
+                warn("unexpected image (just a image / figure) for a figure")
                 continue
-            image = children.get("uri")
+            image = child.get("uri")
         elif tagname == "caption":
             if caption is not None:
-                print ("unexpected caption (just a caption / figure) for a "
-                       "figure")
+                warn("unexpected caption (just a caption / figure) for a "
+                        "figure")
                 continue
-            caption = children.astext()
+            caption = child.astext()
 
     # Load the image to find its size
     encoding = stdout.encoding if stdout.encoding is not None else "utf-8"
@@ -397,7 +399,7 @@ def convert_figure(node, context):
         image_file = vfs.open(image.encode(encoding))
         image_object = Image.open(image_file)
     except (Error, UnicodeEncodeError, IOError, OverflowError):
-        print 'Warning, unable to insert the image "%s"' % image
+        warn('unable to insert the image "%s"' % image)
         return
     size = image_object.size
     size = (str(float(size[0]) / DPI)+"in", str(float(size[1]) / DPI)+"in")
