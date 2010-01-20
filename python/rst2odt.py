@@ -448,49 +448,49 @@ def convert_node(node, context):
     if convert_method is not None:
         convert_method(node, context)
     else:
-        print "Warning node not supported: %s" % tagname
+        warn("node not supported: %s" % tagname)
 
 
 
-def convert(rst_txt, styles_from=None):
-    # From styles ?
-    if styles_from is not None:
-        if isinstance(styles_from, odf_document):
-            doc = styles_from.clone()
-        else:
-            doc = odf_get_document(styles_from)
-        doc = doc.clone()
-        body = doc.get_body()
-        # Clean the body
-        body.clear()
-    # Or create a new document
-    else:
-        doc = odf_new_document_from_type("text")
-        body = doc.get_body()
-
-    # Convert
-    domtree = publish_doctree(rst_txt)
-
+def convert(document, rst_txt, heading_level=0):
+    """Convert a reStructuredText source into an existing document.
+    """
     # Init a context
-    context = {"doc": doc, "body": body, "top": body, "styles": {},
-               "heading-level": 0, "toc": None, "footnotes": {}}
+    body = document.get_body()
+    context = {"doc": document, "body": body, "top": body, "styles": {},
+            "heading-level": heading_level, "toc": None, "footnotes": {}}
 
     # Go!
-    for children in domtree:
-        if children.tagname == "title":
-            title =  children.astext()
-            # Meta info
-            meta = doc.get_meta()
-            meta.set_title(title)
-            # XXX Add style
-            paragraph = odf_create_paragraph(text=title)
-            body.append_element(paragraph)
-        else:
-            convert_node(children, context)
+    domtree = publish_doctree(rst_txt)
+    for child in domtree:
+        convert_node(child, context)
 
     # Finish the work
     toc = context["toc"]
     if toc is not None:
-        toc.auto_fill(doc)
+        toc.auto_fill(document)
 
-    return doc
+    return document
+
+
+
+def rst2odt(rst_txt, template=None):
+    """Convert a reStructuredText source to a new document.
+
+    Arguments:
+
+        rst_txt -- str
+        template -- odf_document
+
+    Return: odf_document
+    """
+    # Use an existing document structure
+    if template is not None:
+        document = template.clone()
+        # Clean the body
+        document.get_body().clear()
+    # Or create a new document
+    else:
+        document = odf_new_document_from_type("text")
+
+    return convert(document, rst_txt)

@@ -31,7 +31,8 @@ from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
-from lpod.rst2odt import convert
+from lpod.document import odf_get_document
+from lpod.rst2odt import rst2odt
 
 
 
@@ -62,8 +63,12 @@ if  __name__ == "__main__":
         exit(1)
     source = args[0]
 
+    template = None
+    if opts.styles_from:
+        template = odf_get_document(opts.styles_from)
+
     # Convert
-    document = convert(open(source).read(), styles_from=opts.styles)
+    document = rst2odt(open(source).read(), template=template)
 
     # Save
     if opts.output is not None:
