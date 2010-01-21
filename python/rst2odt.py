@@ -373,9 +373,65 @@ def convert_block_quote(node, context):
 
 
 
-def convert_figure(node, context):
+def _add_image(image, caption, context):
     DPI = 72
 
+    # Load the image to find its size
+    encoding = stdout.encoding if stdout.encoding is not None else "utf-8"
+    try:
+        image_file = vfs.open(image.encode(encoding))
+        image_object = Image.open(image_file)
+    except (Error, UnicodeEncodeError, IOError, OverflowError), e:
+        warn('unable to insert the image "%s": %s' % (image, e))
+        return
+    size = image_object.size
+    size = (str(float(size[0]) / DPI)+"in", str(float(size[1]) / DPI)+"in")
+
+    # Add the image
+    local_uri = context["doc"].add_file(image)
+
+    # Add a style
+    styles = context["styles"]
+    if "image_frame" in styles:
+        frame_style = styles["image_frame"]
+    else:
+        frame_style = odf_create_style("graphic", parent="Frame")
+        frame_style.set_style_properties(properties={"style:wrap": "none"})
+        context["doc"].insert_style(frame_style, automatic=True)
+        styles["image_frame"] = frame_style
+
+    # XXX An image must be inserted in a paragraph ??
+    if context["top"].get_tagname() == "office:text":
+        container = odf_create_paragraph()
+        context["top"].append_element(container)
+    else:
+        container = context["top"]
+
+    if caption:
+        paragraph = odf_create_paragraph()
+        image_frame = odf_create_image_frame(local_uri, size=size)
+
+        # A new frame, we fix only the width
+        text_frame = odf_create_text_frame(paragraph, size=(size[0], None),
+                                           style=frame_style.get_style_name())
+        container.append_element(text_frame)
+
+        paragraph.append_element(image_frame)
+        paragraph.append_element(caption)
+    else:
+        image_frame = odf_create_image_frame(local_uri, size=size,
+                                          style=frame_style.get_style_name())
+        container.append_element(image_frame)
+
+
+
+def convert_image(node, context):
+    image = node.get("uri")
+    _add_image(image, None, context)
+
+
+
+def convert_figure(node, context):
     image = None
     caption = None
 
@@ -393,51 +449,7 @@ def convert_figure(node, context):
                 continue
             caption = child.astext()
 
-    # Load the image to find its size
-    encoding = stdout.encoding if stdout.encoding is not None else "utf-8"
-    try:
-        image_file = vfs.open(image.encode(encoding))
-        image_object = Image.open(image_file)
-    except (Error, UnicodeEncodeError, IOError, OverflowError), e:
-        warn('unable to insert the image "%s": %s' % (image, e))
-        return
-    size = image_object.size
-    size = (str(float(size[0]) / DPI)+"in", str(float(size[1]) / DPI)+"in")
-
-    # Add the image
-    local_uri = context["doc"].add_file(image)
-    # image_frame is the frame that contains the image
-    image_frame = odf_create_image_frame(local_uri, size=size)
-
-    # Add a style
-    styles = context["styles"]
-    if "image" in styles:
-        image_style = styles["images"]
-    else:
-        image_style = odf_create_style("graphic", parent="Frame")
-        image_style.set_style_properties(properties={"style:wrap": "none"})
-        context["doc"].insert_style(image_style, automatic=True)
-        styles["image"] = image_style
-
-    # XXX An image must be inserted in a paragraph ??
-    if context["top"].get_tagname() == "office:text":
-        container = odf_create_paragraph()
-        context["top"].append_element(container)
-    else:
-        container = context["top"]
-
-    if caption:
-        paragraph = odf_create_paragraph()
-        # A new frame, we fix only the width
-        text_frame = odf_create_text_frame(paragraph, size=(size[0], None),
-                                           style=image_style.get_style_name())
-        container.append_element(text_frame)
-
-        paragraph.append_element(image_frame)
-        paragraph.append_element(caption)
-    else:
-        image_frame.set_style_name(image_style.get_style_name())
-        container.append_element(image_frame)
+    _add_image(image, caption, context)
 
 
 
@@ -447,6 +459,7 @@ convert_methods = {
         'definition_list': convert_definition_list,
         'emphasis': convert_emphasis,
         'enumerated_list': convert_list_enumerated,
+        'image': convert_image,
         'figure': convert_figure,
         'footnote': convert_footnote,
         'footnote_reference': convert_footnote_reference,
