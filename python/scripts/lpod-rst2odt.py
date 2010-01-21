@@ -51,7 +51,7 @@ if  __name__ == "__main__":
 
     # --styles
     parser.add_option("-s", "--styles", action="store", type="string",
-            dest="styles", metavar="FILE",
+            dest="styles_from", metavar="FILE",
             help="import the styles from the given file")
 
     # Parse !
