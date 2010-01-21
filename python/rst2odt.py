@@ -80,7 +80,8 @@ def convert_title(node, context):
     if level == 0:
         # The document did not start with a section
         level = 1
-    heading = odf_create_heading(level=level, text=node.astext())
+    heading = odf_create_heading(level, node.astext(),
+            style='Heading_20_%s' % level)
     context["body"].append_element(heading)
 
 
