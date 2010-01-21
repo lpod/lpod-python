@@ -409,6 +409,16 @@ def convert_figure(node, context):
     # image_frame is the frame that contains the image
     image_frame = odf_create_image_frame(local_uri, size=size)
 
+    # Add a style
+    styles = context["styles"]
+    if "image" in styles:
+        image_style = styles["images"]
+    else:
+        image_style = odf_create_style("graphic", parent="Frame")
+        image_style.set_style_properties(properties={"style:wrap": "none"})
+        context["doc"].insert_style(image_style, automatic=True)
+        styles["image"] = image_style
+
     # XXX An image must be inserted in a paragraph ??
     if context["top"].get_tagname() == "office:text":
         container = odf_create_paragraph()
@@ -419,12 +429,14 @@ def convert_figure(node, context):
     if caption:
         paragraph = odf_create_paragraph()
         # A new frame, we fix only the width
-        text_frame = odf_create_text_frame(paragraph, size=(size[0], None))
+        text_frame = odf_create_text_frame(paragraph, size=(size[0], None),
+                                           style=image_style.get_style_name())
         container.append_element(text_frame)
 
         paragraph.append_element(image_frame)
         paragraph.append_element(caption)
     else:
+        image_frame.set_style_name(image_style.get_style_name())
         container.append_element(image_frame)
 
 
