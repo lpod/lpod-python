@@ -45,6 +45,8 @@ from lpod.paragraph import odf_create_paragraph, odf_create_line_break
 from lpod.paragraph import odf_create_undividable_space
 from lpod.span import odf_create_span
 from lpod.style import odf_create_style
+from lpod.table import odf_create_cell, odf_create_table, odf_create_row
+from lpod.table import odf_create_column
 from lpod.toc import odf_create_toc
 from lpod.vfs import vfs, Error
 
@@ -454,25 +456,99 @@ def convert_figure(node, context):
 
 
 
+def _convert_table_rows(odf_table, node, context):
+    for row in node:
+        if row.tagname != "row":
+            warn('node "%s" not supported in thead/tbody' % row.tagname)
+            continue
+
+        odf_row = odf_create_row()
+        odf_table.append_element(odf_row)
+
+        for entry in row:
+            if entry.tagname != "entry":
+                warn('node "%s" not supported in row' % entry.tagname)
+                continue
+
+            # XXX Support me!
+            morecols = entry.get("morecols")
+            morerows = entry.get("morerows")
+            if morerows is not None or morecols is not None:
+                warn("Merged cells in table is not yet supported")
+                return False
+
+            # Create a new odf_cell
+            odf_cell = odf_create_cell(cell_type="string")
+            odf_row.append_element(odf_cell)
+
+            # Save the current top
+            old_top = context["top"]
+
+            # Convert
+            context["top"] = odf_cell
+            for child in entry:
+                convert_node(child, context)
+
+            # And restore the top
+            context["top"] = old_top
+    return True
+
+
+
+def convert_table(node, context):
+    for tgroup in node:
+        if tgroup.tagname != "tgroup":
+            warn('node "%s" not supported in table' % tgroup.tagname)
+            continue
+
+        columns_number = 0
+        odf_table = None
+        for child in tgroup:
+            tagname = child.tagname
+
+            if tagname == "thead" or tagname == "tbody":
+                # Create a new table with the info columns_number
+                if odf_table is None:
+                    context["tables_number"] += 1
+                    # TODO Make it possible directly with odf_create_table
+                    odf_table = odf_create_table(name="table%d" %
+                                                 context["tables_number"])
+                    columns = odf_create_column(repeated=columns_number)
+                    odf_table.append_element(columns)
+
+                # Convert!
+                if not _convert_table_rows(odf_table, child, context):
+                    return
+            elif tagname == "colspec":
+                columns_number += 1
+            else:
+                warn('node "%s" not supported in tgroup' % child.tagname)
+                continue
+
+        context["top"].append_element(odf_table)
+
+
+
 convert_methods = {
+        '#text': convert_text,
         'block_quote': convert_block_quote,
         'bullet_list': convert_list_bullet,
         'definition_list': convert_definition_list,
         'emphasis': convert_emphasis,
         'enumerated_list': convert_list_enumerated,
-        'image': convert_image,
         'figure': convert_figure,
         'footnote': convert_footnote,
         'footnote_reference': convert_footnote_reference,
-        'literal_block': convert_literal_block,
+        'image': convert_image,
         'literal': convert_literal,
+        'literal_block': convert_literal_block,
         'paragraph': convert_paragraph,
         'reference': convert_reference,
         'section': convert_section,
         'strong': convert_strong,
-        '#text': convert_text,
+        'table': convert_table,
         'title': convert_title,
-        'topic': convert_topic,
+        'topic': convert_topic
 }
 
 
@@ -503,7 +579,8 @@ def convert(document, rst_body, heading_level=0):
     # Init a context
     body = document.get_body()
     context = {"doc": document, "body": body, "top": body, "styles": {},
-            "heading-level": heading_level, "toc": None, "footnotes": {}}
+            "heading-level": heading_level, "toc": None, "footnotes": {},
+            "tables_number": 0}
 
     # Go!
     if isinstance(rst_body, str):
