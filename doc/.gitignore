@@ -1,9 +1,0 @@
-.build/
-autodocs/
-figures/
-images/
-cookbook/*.odt
-cookbook/*.ods
-cookbook/*.odp
-lpod-docs-*.tgz
-lpod.pdf
