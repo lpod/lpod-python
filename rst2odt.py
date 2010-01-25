@@ -46,7 +46,7 @@ from lpod.paragraph import odf_create_undividable_space
 from lpod.span import odf_create_span
 from lpod.style import odf_create_style
 from lpod.table import odf_create_cell, odf_create_table, odf_create_row
-from lpod.table import odf_create_column
+from lpod.table import odf_create_column, odf_create_header_rows
 from lpod.toc import odf_create_toc
 from lpod.vfs import vfs, Error
 
@@ -456,14 +456,14 @@ def convert_figure(node, context):
 
 
 
-def _convert_table_rows(odf_table, node, context):
+def _convert_table_rows(container, node, context):
     for row in node:
         if row.tagname != "row":
             warn('node "%s" not supported in thead/tbody' % row.tagname)
             continue
 
         odf_row = odf_create_row()
-        odf_table.append_element(odf_row)
+        container.append_element(odf_row)
 
         for entry in row:
             if entry.tagname != "entry":
@@ -497,7 +497,6 @@ def _convert_table_rows(odf_table, node, context):
 
             # And restore the top
             context["top"] = old_top
-    return True
 
 
 
@@ -523,8 +522,14 @@ def convert_table(node, context):
                     odf_table.append_element(columns)
 
                 # Convert!
-                if not _convert_table_rows(odf_table, child, context):
-                    return
+                if tagname == "thead":
+                    header = odf_create_header_rows()
+                    odf_table.append_element(header)
+
+                    _convert_table_rows(header, child, context)
+                else:
+                    _convert_table_rows(odf_table, child, context)
+
             elif tagname == "colspec":
                 columns_number += 1
             else:
