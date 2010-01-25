@@ -251,7 +251,7 @@ def convert_strong(node, context):
 def _get_literal_style(context, family):
     # family = "text" or "paragraph"
 
-    FONT = "FreeMono"
+    FONT = "Bitstream Vera Sans Mono"
 
     # Yet a literal style ?
     styles = context["styles"]
