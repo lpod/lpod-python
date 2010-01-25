@@ -353,6 +353,11 @@ def odf_create_column(default_cell_style=None, repeated=None, style=None):
 
 
 
+def odf_create_header_rows():
+    return odf_create_element('<table:table-header-rows/>')
+
+
+
 def odf_create_table(name, width=None, height=None, protected=False,
         protection_key=None, display=True, printable=True, print_ranges=None,
         style=None):
