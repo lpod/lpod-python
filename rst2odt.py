@@ -200,9 +200,9 @@ def convert_footnote_reference(node, context):
 
 
 
-def _convert_style_like(node, context, style):
+def _convert_style_like(node, context, style_name):
     # Create the span
-    span = odf_create_span(style=style.get_style_name())
+    span = odf_create_span(style=style_name)
     context["top"].append_element(span)
 
     # Save the current top
@@ -229,7 +229,7 @@ def convert_emphasis(node, context):
         context["doc"].insert_style(emphasis, automatic=True)
 
     # Convert
-    _convert_style_like(node, context, emphasis)
+    _convert_style_like(node, context, emphasis.get_style_name())
 
 
 
@@ -244,54 +244,18 @@ def convert_strong(node, context):
         context["doc"].insert_style(strong, automatic=True)
 
     # Convert
-    _convert_style_like(node, context, strong)
-
-
-
-def _get_literal_style(context, family):
-    # family = "text" or "paragraph"
-
-    FONT = "Bitstream Vera Sans Mono"
-
-    # Yet a literal style ?
-    styles = context["styles"]
-    style_name = "%s-literal" % family
-    if  style_name in styles:
-        return styles[style_name]
-
-    # A monospace font
-    if not ("text-literal" in styles or "paragraph-literal" in styles):
-        font = odf_create_style("font-face", name=FONT)
-        font.set_attribute("svg:font-family", FONT)
-        font.set_attribute("style:font-family-generic", "modern")
-        font.set_attribute("style:font-pitch", "fixed")
-        context["doc"].insert_style(font)
-
-    # And the style
-    if family == "paragraph":
-        style = odf_create_style(family, parent="Standard")
-    else:
-        style = odf_create_style(family)
-    style.set_style_properties(properties={"style:font-name": FONT},
-                               area="text")
-    context["doc"].insert_style(style, automatic=True)
-
-    # Save it
-    styles[style_name] = style
-    return style
+    _convert_style_like(node, context, strong.get_style_name())
 
 
 
 def convert_literal(node, context):
-    literal = _get_literal_style(context, "text")
-
     # Convert
-    _convert_style_like(node, context, literal)
+    _convert_style_like(node, context, "Example")
+
 
 
 def convert_literal_block(node, context):
-    literal = _get_literal_style(context, "paragraph")
-    paragraph = odf_create_paragraph(style=literal.get_style_name())
+    paragraph = odf_create_paragraph(style="Preformatted_20_Text")
     context["top"].append_element(paragraph)
 
     # Convert
