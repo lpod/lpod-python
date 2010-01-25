@@ -470,16 +470,22 @@ def _convert_table_rows(odf_table, node, context):
                 warn('node "%s" not supported in row' % entry.tagname)
                 continue
 
-            # XXX Support me!
-            morecols = entry.get("morecols")
-            morerows = entry.get("morerows")
-            if morerows is not None or morecols is not None:
-                warn("Merged cells in table is not yet supported")
-                return False
-
             # Create a new odf_cell
             odf_cell = odf_create_cell(cell_type="string")
             odf_row.append_element(odf_cell)
+
+            # XXX We don't add table:covered-table-cell !
+            #     It's bad but OO can nevertheless load the file
+            morecols = entry.get("morecols")
+            if morecols is not None:
+                morecols = int(morecols) + 1
+                odf_cell.set_attribute('table:number-columns-spanned',
+                                       str(morecols))
+            morerows = entry.get("morerows")
+            if morerows is not None:
+                morerows = int(morerows) + 1
+                odf_cell.set_attribute('table:number-rows-spanned',
+                                       str(morerows))
 
             # Save the current top
             old_top = context["top"]
