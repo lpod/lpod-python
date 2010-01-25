@@ -106,11 +106,13 @@ def convert_paragraph(node, context):
 
 
 def convert_list(node, context, list_type):
-    # XXX unused
-    enumtype = node.get("enumtype") #enumerated
-    bullet = node.get("bullet") #bullet
+    # Predefined styles
+    if list_type == "enumerated":
+        style_name = "Numbering_20_1"
+    else:
+        style_name = "List_20_1"
 
-    odf_list = odf_create_list()
+    odf_list = odf_create_list(style=style_name)
     context["top"].append_element(odf_list)
 
     # Save the current top
