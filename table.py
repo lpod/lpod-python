@@ -819,14 +819,22 @@ class odf_row(odf_element):
 
 
     def is_row_empty(self):
-        """Wether all cells in the row are empty.
-
-        Return: bool
+        """For the moment, a row is said empty when:
+        1- It has only a cell
+        2- This cell has no child
         """
-        for cell in self._get_cells():
-            if (cell.get_cell_style() is not None
-                    or cell.get_cell_value() is not None):
-                return False
+        cells = self._get_cells()
+
+        if len(cells) == 0:
+            return True
+        elif len(cells) > 1:
+            return False
+
+        # If here we have only a cell
+        cell = cells[0]
+        if len(cell.get_element_list('*')) > 0:
+            return False
+
         return True
 
 
