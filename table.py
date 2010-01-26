@@ -698,9 +698,18 @@ class odf_row(odf_element):
         Return: odf_cell
         """
         x = self.__check_x(x)
-        for w, cell in enumerate(self.traverse_cells()):
-            if w == x:
-                return cell
+
+        cell_number = 0
+        for cell in self._get_cells():
+            repeated = cell.get_cell_repeated() or 1
+            for i in xrange(repeated):
+                if cell_number == x:
+                    # Return a copy without the now obsolete repetition
+                    cell = cell.clone()
+                    cell.set_cell_repeated(None)
+
+                    return cell
+                cell_number += 1
 
 
     def get_cell_value(self, x):
@@ -709,7 +718,6 @@ class odf_row(odf_element):
         See ``get_cell`` and ``odf_cell.get_cell_value``.
         """
         return self.get_cell(x).get_cell_value()
-
 
 
     def set_cell(self, x, cell):
@@ -832,13 +840,12 @@ class odf_row(odf_element):
         if len(cells) == 0:
             return True
         elif len(cells) > 1:
-            if aggressive:
-                for cell in cells:
-                    if cell.get_cell_value() is not None:
-                        return False
-                return True
-            else:
-                return False
+            for cell in cells:
+                if cell.get_cell_value() is not None:
+                    return False
+                if not aggressive and cell.get_cell_style() is not None:
+                    return False
+            return True
 
         # If here we have only a cell
         cell = cells[0]
@@ -1089,11 +1096,11 @@ class odf_table(odf_element):
                 break
         # Step 2: remove empty columns of cells for remaining rows
         for x in xrange(self.get_table_width() - 1, -1, -1):
-            if self.is_column_empty(x, aggressive):
+            # XXX if aggressive=True => very slow
+            if self.is_column_empty(x, False):
                 self.delete_column(x)
             else:
                 break
-
 
 
     #
@@ -1267,7 +1274,7 @@ class odf_table(odf_element):
         self.set_row(y, row)
 
 
-    def is_row_empty(self, y, aggresive):
+    def is_row_empty(self, y, aggresive=False):
         """Wether all the cells of the row at the given "y" position are
         undefined.
 
@@ -1687,7 +1694,12 @@ class odf_table(odf_element):
 
         Return: list of odf_cell
         """
-        return [row.get_cell(x) for row in self.traverse_rows()]
+        result = []
+        for row in self._get_rows():
+            repeated = row.get_row_repeated() or 1
+            for i in xrange(repeated):
+                result.append(row.get_cell(x))
+        return result
 
 
     def get_column_cell_values(self, x):
