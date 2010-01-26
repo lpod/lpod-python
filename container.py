@@ -183,15 +183,6 @@ class odf_container(object):
         return result
 
 
-    def __get_contents(self):
-        """Get the list of members.
-        """
-        if self.mimetype == 'application/xml':
-            return self.__get_xml_contents()
-        else:
-            return self.__get_zip_contents()
-
-
     def __make_xml(self):
         """Make an XML-only ODF from the available parts.
         """
@@ -216,6 +207,15 @@ class odf_container(object):
     #
     # Public API
     #
+
+    def get_contents(self):
+        """Get the list of members.
+        """
+        if self.mimetype == 'application/xml':
+            return self.__get_xml_contents()
+        else:
+            return self.__get_zip_contents()
+
 
     def clone(self):
         """Make a copy of this container with no URI.
@@ -270,7 +270,7 @@ class odf_container(object):
         """
         parts = self.__parts
         # Get all parts
-        for part in self.__get_contents():
+        for part in self.get_contents():
             if part not in parts:
                 self.get_part(part)
         # Packaging

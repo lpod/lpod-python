@@ -171,6 +171,14 @@ class odf_document(object):
         return self.__body
 
 
+    def get_files(self):
+        return self.container.get_contents()
+
+
+    def get_file_data(self, filename):
+        return self.container.get_part(filename)
+
+
     def get_formated_text(self):
         # For the moment, only "type='text'"
         type = self.get_type()
