@@ -818,17 +818,27 @@ class odf_row(odf_element):
                 return
 
 
-    def is_row_empty(self):
+    def is_row_empty(self, aggressive=False):
         """For the moment, a row is said empty when:
         1- It has only a cell
         2- This cell has no child
+
+        - or -
+
+        When aggressive is True, when it contains only cells without data.
         """
         cells = self._get_cells()
 
         if len(cells) == 0:
             return True
         elif len(cells) > 1:
-            return False
+            if aggressive:
+                for cell in cells:
+                    if cell.get_cell_value() is not None:
+                        return False
+                return True
+            else:
+                return False
 
         # If here we have only a cell
         cell = cells[0]
@@ -1063,19 +1073,23 @@ class odf_table(odf_element):
             self.set_row(y, row)
 
 
-    def rstrip_table(self):
+    def rstrip_table(self, aggressive=False):
         """Remove *in-place* empty rows below and empty cells at the right of
-        the table.
+        the table. If aggressive is True, only cells with data are kept.
+
+        Argument:
+
+            aggressive -- boolean
         """
         # Step 1: remove empty rows below the table
         for row in reversed(self._get_rows()):
-            if row.is_row_empty():
+            if row.is_row_empty(aggressive):
                 row.get_parent().delete_element(row)
             else:
                 break
         # Step 2: remove empty columns of cells for remaining rows
         for x in xrange(self.get_table_width() - 1, -1, -1):
-            if self.is_column_empty(x):
+            if self.is_column_empty(x, aggressive):
                 self.delete_column(x)
             else:
                 break
@@ -1253,7 +1267,7 @@ class odf_table(odf_element):
         self.set_row(y, row)
 
 
-    def is_row_empty(self, y):
+    def is_row_empty(self, y, aggresive):
         """Wether all the cells of the row at the given "y" position are
         undefined.
 
@@ -1263,7 +1277,7 @@ class odf_table(odf_element):
 
             y -- int
         """
-        return self.get_row(y).is_row_empty()
+        return self.get_row(y).is_row_empty(aggresive)
 
 
     #
@@ -1732,17 +1746,19 @@ class odf_table(odf_element):
         self.set_column_cells(x, cells)
 
 
-    def is_column_empty(self, x):
+    def is_column_empty(self, x, aggressive=False):
         """Wether all the cells at the given position are empty.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
-        like "C" is accepted.
+        like "C" is accepted. If aggressive is True, the cells without data are
+        said empty.
 
         Return: bool
         """
         for cell in self.get_column_cells(x):
-            if (cell.get_cell_style() is not None
-                    or cell.get_cell_value() is not None):
+            if cell.get_cell_value() is not None:
+                return False
+            if not aggressive and cell.get_cell_style() is not None:
                 return False
         return True
 
