@@ -108,7 +108,7 @@ def spreadsheet_to_csv(document, target):
         filename = clean_filename(name) + '.csv'
         csv_file = target.open(filename, 'w')
 
-        table.rstrip_table()
+        table.rstrip_table(aggressive=True)
         table.export_to_csv(csv_file)
         csv_file.close()
 
