@@ -77,6 +77,18 @@ def dump(txt, to_file):
 
 
 
+def dump_pictures(document, target):
+    for part in document.get_files():
+        if part.startswith('Pictures/'):
+            if not target.exists('Pictures'):
+                target.make_folder('Pictures')
+            data = document.get_file_data(part)
+            encoding = stdout.encoding if stdout.encoding else 'utf-8'
+            to_file = target.open(part.encode(encoding), 'w')
+            to_file.write(data)
+
+
+
 def spreadsheet_to_stdout(document):
     encoding = stdout.encoding
     if encoding is None:
@@ -117,6 +129,10 @@ if  __name__ == '__main__':
     parser.add_option('-m', '--meta', dest='meta', action='store_true',
                       default=False,
                       help='dump metadata (if -d DIR add DIR/meta.txt)')
+    # --pictures
+    parser.add_option('-p', '--pictures', dest='pictures', action='store_true',
+                      default=False,
+                      help='dump the pictures in DIR/Pictures')
     # --styles
     parser.add_option('-s', '--styles', dest='styles', action='store_true',
                       default=False,
@@ -141,6 +157,8 @@ if  __name__ == '__main__':
         if opts.styles:
             to_file = target.open('styles.txt', 'w')
             dump(document.show_styles(), to_file)
+        if opts.pictures:
+            dump_pictures(document, target)
     else:
         if opts.meta:
             dump(document.get_formated_meta(), stdout)
