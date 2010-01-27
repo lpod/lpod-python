@@ -289,8 +289,8 @@ def _get_element(context, element_name, family=None, text_style=None,
 
 
 
-def _set_value_and_type(element, value=None, value_type=None,
-                        representation=None, currency=None):
+def _set_value_and_type(element, value=None, value_type=None, text=None,
+        currency=None):
     # Remove possible previous value and type
     for name in ('office:value-type', 'office:boolean-value',
             'office:value', 'office:date-value', 'office:string-value',
@@ -302,42 +302,42 @@ def _set_value_and_type(element, value=None, value_type=None,
     if type(value) is bool:
         if value_type is None:
             value_type = 'boolean'
-        if representation is None:
-            representation = u'true' if value else u'false'
+        if text is None:
+            text = u'true' if value else u'false'
         value = Boolean.encode(value)
     elif isinstance(value, (int, float, dec)):
         if value_type is None:
             value_type = 'float'
-        if representation is None:
-            representation = unicode(value)
+        if text is None:
+            text = unicode(value)
         value = str(value)
     elif type(value) is date:
         if value_type is None:
             value_type = 'date'
-        if representation is None:
-            representation = unicode(Date.encode(value))
+        if text is None:
+            text = unicode(Date.encode(value))
         value = Date.encode(value)
     elif type(value) is datetime:
         if value_type is None:
             value_type = 'date'
-        if representation is None:
-            representation = unicode(DateTime.encode(value))
+        if text is None:
+            text = unicode(DateTime.encode(value))
         value = DateTime.encode(value)
     elif type(value) is str:
         if value_type is None:
             value_type = 'string'
-        if representation is None:
-            representation = unicode(value)
+        if text is None:
+            text = unicode(value)
     elif type(value) is unicode:
         if value_type is None:
             value_type = 'string'
-        if representation is None:
-            representation = value
+        if text is None:
+            text = value
     elif type(value) is timedelta:
         if value_type is None:
             value_type = 'time'
-        if representation is None:
-            representation = unicode(Duration.encode(value))
+        if text is None:
+            text = unicode(Duration.encode(value))
         value = Duration.encode(value)
     elif value is not None:
         raise TypeError, 'type "%s" is unknown' % type(value)
@@ -359,7 +359,7 @@ def _set_value_and_type(element, value=None, value_type=None,
     elif value_type == 'time':
         element.set_attribute('office:time-value', value)
 
-    return representation
+    return text
 
 
 
@@ -416,19 +416,19 @@ def set_value(element, value):
     # A table:cell ?
     if tag == 'table:table-cell':
         element.clear()
-        representation = _set_value_and_type(element, value=value)
-        element.set_text_content(representation)
+        text = _set_value_and_type(element, value=value)
+        element.set_text_content(text)
         return
     # A text:variable-set ?
     if tag == 'text:variable-set':
         name = element.get_attribute('text:name')
         display = element.get_attribute('text:display')
         element.clear()
-        representation = _set_value_and_type(element, value=value)
+        text = _set_value_and_type(element, value=value)
         element.set_attribute('text:name', name)
         if display is not None:
             element.set_attribute('text:display', display)
-        element.set_text(representation)
+        element.set_text(text)
         return
     # A text:user-field-decl ?
     if tag == 'text:user-field-decl':

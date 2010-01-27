@@ -42,30 +42,28 @@ def odf_create_variable_decl(name, value_type):
 
 
 def odf_create_variable_set(name, value, value_type=None, display=False,
-                            representation=None, style=None):
+        text=None, style=None):
     data = u'<text:variable-set text:name="%s" />'
     element = odf_create_element(data % name)
-    representation = _set_value_and_type(element, value=value,
-                                         value_type=value_type,
-                                         representation=representation)
+    text = _set_value_and_type(element, value=value, value_type=value_type,
+            text=text)
     if not display:
         element.set_attribute('text:display', 'none')
     else:
-        element.set_text(representation)
+        element.set_text(text)
     if style is not None:
         element.set_attribute('style:data-style-name', style)
     return element
 
 
 
-def odf_create_variable_get(name, value, value_type=None,
-                            representation=None, style=None):
+def odf_create_variable_get(name, value, value_type=None, text=None,
+        style=None):
     data = u'<text:variable-get text:name="%s" />'
     element = odf_create_element(data % name)
-    representation = _set_value_and_type(element, value=value,
-                                         value_type=value_type,
-                                         representation=representation)
-    element.set_text(representation)
+    text = _set_value_and_type(element, value=value, value_type=value_type,
+            text=text)
+    element.set_text(text)
     if style is not None:
         element.set_attribute('style:data-style-name', style)
     return element
@@ -85,14 +83,13 @@ def odf_create_user_field_decl(name, value, value_type=None):
 
 
 
-def odf_create_user_field_get(name, value, value_type=None,
-                              representation=None, style=None):
+def odf_create_user_field_get(name, value, value_type=None, text=None,
+        style=None):
     data = u'<text:user-field-get text:name="%s" />'
     element = odf_create_element(data % name)
-    representation = _set_value_and_type(element, value=value,
-                                         value_type=value_type,
-                                         representation=representation)
-    element.set_text(representation)
+    text = _set_value_and_type(element, value=value, value_type=value_type,
+            text=text)
+    element.set_text(text)
     if style is not None:
         element.set_attribute('style:data-style-name', style)
     return element
@@ -121,17 +118,17 @@ def odf_create_page_count_variable():
 
 
 
-def odf_create_date_variable(date, fixed=False, data_style=None,
-                             representation=None, date_adjust=None):
+def odf_create_date_variable(date, fixed=False, data_style=None, text=None,
+        date_adjust=None):
     data = '<text:date text:date-value="%s"/>'
     element = odf_create_element(data % DateTime.encode(date))
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
         element.set_attribute('style:data-style-name', data_style)
-    if representation is None:
-        representation = Date.encode(date)
-    element.set_text(representation)
+    if text is None:
+        text = Date.encode(date)
+    element.set_text(text)
     if date_adjust is not None:
         element.set_attribute('text:date-adjust',
                                Duration.encode(date_adjust))
@@ -139,17 +136,17 @@ def odf_create_date_variable(date, fixed=False, data_style=None,
 
 
 
-def odf_create_time_variable(time, fixed=False, data_style=None,
-                             representation=None, time_adjust=None):
+def odf_create_time_variable(time, fixed=False, data_style=None, text=None,
+        time_adjust=None):
     data = '<text:time text:time-value="%s"/>'
     element = odf_create_element(data % DateTime.encode(time))
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
         element.set_attribute('style:data-style-name', data_style)
-    if representation is None:
-        representation = time.strftime('%H:%M:%S')
-    element.set_text(representation)
+    if text is None:
+        text = time.strftime('%H:%M:%S')
+    element.set_text(text)
     if time_adjust is not None:
         element.set_attribute('text:time-adjust',
                                Duration.encode(time_adjust))

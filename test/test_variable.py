@@ -209,9 +209,9 @@ class TestDate(TestCase):
         self.assertEqual(date_elt.serialize(), expected)
 
 
-    def test_create_date_representation(self):
+    def test_create_date_text(self):
         date_elt =  odf_create_date_variable(datetime(2009, 7, 20),
-                                             representation=u'20 juil. 09')
+                text=u'20 juil. 09')
         expected = ('<text:date text:date-value="2009-07-20T00:00:00">'
                       '20 juil. 09'
                     '</text:date>')
@@ -238,9 +238,8 @@ class TestTime(TestCase):
         self.assertEqual(time_elt.serialize(), expected)
 
 
-    def test_create_time_representation(self):
-        time_elt =  odf_create_time_variable(time(19, 30),
-                                    representation=u'19h30')
+    def test_create_time_text(self):
+        time_elt =  odf_create_time_variable(time(19, 30), text=u'19h30')
         expected = ('<text:time text:time-value="1900-01-01T19:30:00">'
                       '19h30'
                     '</text:time>')

@@ -235,8 +235,8 @@ def _delete_element(position, real_elements, get_repeated, set_repeated):
 
 
 
-def odf_create_cell(value=None, representation=None, cell_type=None,
-                    currency=None, repeated=None, style=None):
+def odf_create_cell(value=None, text=None, cell_type=None, currency=None,
+        repeated=None, style=None):
     """Create a cell element containing the given value. The textual
     representation is automatically formatted but can be provided. Cell type
     can be deduced as well, unless the number is a percentage or currency. If
@@ -248,7 +248,7 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
         value -- bool, int, float, Decimal, date, datetime, str, unicode,
                  timedelta
 
-        representation -- unicode
+        text -- unicode
 
         cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
                      'string' or 'time'
@@ -263,8 +263,8 @@ def odf_create_cell(value=None, representation=None, cell_type=None,
     """
 
     element = odf_create_element('<table:table-cell/>')
-    element.set_cell_value(value, representation=representation,
-            cell_type=cell_type, currency=currency)
+    element.set_cell_value(value, text=text, cell_type=cell_type,
+            currency=currency)
     if repeated and repeated > 1:
         element.set_cell_repeated(repeated)
     if style is not None:
@@ -449,11 +449,10 @@ class odf_cell(odf_element):
         return get_value(self)
 
 
-    def set_cell_value(self, value, representation=None, cell_type=None,
-            currency=None):
+    def set_cell_value(self, value, text=None, cell_type=None, currency=None):
         """Set the cell state from the Python value type.
 
-        Representation is how the cell is displayed. Cell type is guessed,
+        Text is how the cell is displayed. Cell type is guessed,
         unless provided.
 
         For monetary values, provide the name of the currency.
@@ -462,17 +461,16 @@ class odf_cell(odf_element):
 
             value -- Python type
 
-            representation -- unicode
+            text -- unicode
 
             cell_type -- 'boolean', 'float', 'date', 'string' or 'time'
 
             currency -- unicode
         """
-        representation = _set_value_and_type(self, value=value,
-                representation=representation, value_type=cell_type,
-                currency=currency)
-        if representation is not None:
-            self.set_text_content(representation)
+        text = _set_value_and_type(self, value=value, text=text,
+                value_type=cell_type, currency=currency)
+        if text is not None:
+            self.set_text_content(text)
 
 
     def get_cell_type(self):
@@ -487,10 +485,6 @@ class odf_cell(odf_element):
         """Set the type ofthe cell manually.
 
         Arguments:
-
-            value -- Python type
-
-            representation -- unicode
 
             cell_type -- 'boolean', 'float', 'date', 'string' or 'time'
         """

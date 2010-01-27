@@ -91,7 +91,7 @@ class TestCreateCell(TestCase):
 
 
     def test_bool_repr(self):
-        cell = odf_create_cell(True, representation=u"VRAI")
+        cell = odf_create_cell(True, text=u"VRAI")
         expected = ('<table:table-cell office:value-type="boolean" '
                       'office:boolean-value="true">'
                       '<text:p>VRAI</text:p>'
@@ -109,7 +109,7 @@ class TestCreateCell(TestCase):
 
 
     def test_int_repr(self):
-        cell = odf_create_cell(23, representation=u"00023")
+        cell = odf_create_cell(23, text=u"00023")
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="23">'
                       '<text:p>00023</text:p>'
@@ -127,7 +127,7 @@ class TestCreateCell(TestCase):
 
 
     def test_float_repr(self):
-        cell = odf_create_cell(3.141592654, representation=u"3,14")
+        cell = odf_create_cell(3.141592654, text=u"3,14")
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="3.141592654">'
                       '<text:p>3,14</text:p>'
@@ -145,8 +145,7 @@ class TestCreateCell(TestCase):
 
 
     def test_decimal_repr(self):
-        cell = odf_create_cell(dec('2.718281828'),
-                               representation=u"2,72")
+        cell = odf_create_cell(dec('2.718281828'), text=u"2,72")
         expected = ('<table:table-cell office:value-type="float" '
                       'office:value="2.718281828">'
                       '<text:p>2,72</text:p>'
@@ -164,8 +163,7 @@ class TestCreateCell(TestCase):
 
 
     def test_date_repr(self):
-        cell = odf_create_cell(date(2009, 6, 30),
-                               representation=u"30/6/2009")
+        cell = odf_create_cell(date(2009, 6, 30), text=u"30/6/2009")
         expected = ('<table:table-cell office:value-type="date" '
                       'office:date-value="2009-06-30">'
                       '<text:p>30/6/2009</text:p>'
@@ -184,7 +182,7 @@ class TestCreateCell(TestCase):
 
     def test_datetime_repr(self):
         cell = odf_create_cell(datetime(2009, 6, 30, 17, 33, 18),
-                               representation=u"30/6/2009 17:33")
+                text=u"30/6/2009 17:33")
         expected = ('<table:table-cell office:value-type="date" '
                 'office:date-value="2009-06-30T17:33:18">'
                       '<text:p>30/6/2009 17:33</text:p>'
@@ -202,7 +200,7 @@ class TestCreateCell(TestCase):
 
 
     def test_str_repr(self):
-        cell = odf_create_cell('red', representation=u"Red")
+        cell = odf_create_cell('red', text=u"Red")
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="red">'
                       '<text:p>Red</text:p>'
@@ -220,7 +218,7 @@ class TestCreateCell(TestCase):
 
 
     def test_unicode_repr(self):
-        cell = odf_create_cell(u"Plato", representation=u"P.")
+        cell = odf_create_cell(u"Plato", text=u"P.")
         expected = ('<table:table-cell office:value-type="string" '
                       'office:string-value="Plato">'
                       '<text:p>P.</text:p>'
@@ -238,7 +236,7 @@ class TestCreateCell(TestCase):
 
 
     def test_timedelta_repr(self):
-        cell = odf_create_cell(timedelta(0, 8), representation=u"00:00:08")
+        cell = odf_create_cell(timedelta(0, 8), text=u"00:00:08")
         expected = ('<table:table-cell office:value-type="time" '
                       'office:time-value="PT00H00M08S">'
                       '<text:p>00:00:08</text:p>'
@@ -256,8 +254,7 @@ class TestCreateCell(TestCase):
 
 
     def test_percentage_repr(self):
-        cell = odf_create_cell(90, representation=u"90 %",
-                               cell_type='percentage')
+        cell = odf_create_cell(90, text=u"90 %", cell_type='percentage')
         expected = ('<table:table-cell office:value-type="percentage" '
                       'office:value="90">'
                       '<text:p>90 %</text:p>'
@@ -275,8 +272,8 @@ class TestCreateCell(TestCase):
 
 
     def test_currency_repr(self):
-        cell = odf_create_cell(1.54, representation=u"1,54 €",
-                               cell_type='currency', currency='EUR')
+        cell = odf_create_cell(1.54, text=u"1,54 €", cell_type='currency',
+                currency='EUR')
         expected = ('<table:table-cell office:value-type="currency" '
                       'office:value="1.54" office:currency="EUR">'
                       '<text:p>1,54 &#8364;</text:p>'
