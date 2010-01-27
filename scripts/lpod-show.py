@@ -121,9 +121,9 @@ if  __name__ == '__main__':
                    "output, optionally styles and meta.")
     parser = OptionParser(usage, version=__version__,
             description=description)
-    # --dirname
-    parser.add_option('-d', '--dirname', action='store', type='string',
-            dest='dirname', metavar='DIRNAME',
+    # --output
+    parser.add_option('-o', '--output', action='store', type='string',
+            dest='output', metavar='DIRNAME',
             help="dump output in files in the given directory.")
     # --meta
     parser.add_option('-m', '--meta', dest='meta', action='store_true',
@@ -147,10 +147,10 @@ if  __name__ == '__main__':
     # Open it!
     document = odf_get_document(container_url)
     doc_type = document.get_type()
-    if opts.dirname:
-        target = get_target_directory(opts.dirname)
+    if opts.output:
+        target = get_target_directory(opts.output)
     # Meta & Styles
-    if opts.dirname:
+    if opts.output:
         if opts.meta:
             to_file = target.open('meta.txt', 'w')
             dump(document.get_formated_meta(), to_file)
@@ -167,14 +167,14 @@ if  __name__ == '__main__':
     # text
     if doc_type in ('text', 'text-template', 'presentation',
             'presentation-template'):
-        if opts.dirname:
+        if opts.output:
             to_file = target.open('content.txt', 'w')
             dump(document.get_formated_text(), to_file)
         else:
             dump(document.get_formated_text(), stdout)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
-        if opts.dirname:
+        if opts.output:
             spreadsheet_to_csv(document, target)
         else:
             spreadsheet_to_stdout(document)
