@@ -179,7 +179,7 @@ class odf_document(object):
         return self.container.get_part(filename)
 
 
-    def get_formated_text(self):
+    def get_formated_text(self, rst_mode=False):
         # For the moment, only "type='text'"
         type = self.get_type()
         if type not in ('text', 'text-template', 'presentation',
@@ -189,7 +189,8 @@ class odf_document(object):
         # Initialize an empty context
         context = {'footnotes': [],
                    'endnotes': [],
-                   'annotations': []}
+                   'annotations': [],
+                   'rst_mode': rst_mode}
         body = self.get_body()
         # Get the text
         result = []
@@ -202,9 +203,13 @@ class odf_document(object):
                 footnotes = context['footnotes']
                 # Separate text from notes
                 if footnotes:
-                    result.append(u'---\n')
+                    if not rst_mode:
+                        result.append(u'----\n')
                     for citation, body in footnotes:
-                        result.append(u'[%s] %s\n' % (citation, body))
+                        if rst_mode:
+                            result.append(u'.. [#] %s\n' % body)
+                        else:
+                            result.append(u'[%s] %s\n' % (citation, body))
                     # Append a \n after the notes
                     result.append(u'\n')
                     # Reset for the next paragraph
@@ -213,18 +218,25 @@ class odf_document(object):
                 annotations = context['annotations']
                 # With a separation
                 if annotations:
-                    result.append(u'---\n')
+                    if not rst_mode:
+                        result.append(u'----\n')
                     for annotation in annotations:
-                        result.append('[*] %s\n' % annotation)
+                        if rst_mode:
+                            result.append('.. [#] %s\n' % annotation)
+                        else:
+                            result.append('[*] %s\n' % annotation)
                     context['annotations'] = []
         # Append the end notes
         endnotes = context['endnotes']
         if endnotes:
-            result.append(u'\n------\n')
+            if not rst_mode:
+                result.append(u'\n========\n')
             for citation, body in endnotes:
-                result.append(u'(%s) %s\n' % (citation, body))
+                if rst_mode:
+                    result.append(u'.. [*] %s\n' % body)
+                else:
+                    result.append(u'(%s) %s\n' % (citation, body))
         return u''.join(result)
-
 
 
     def get_formated_meta(self):

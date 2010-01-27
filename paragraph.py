@@ -39,6 +39,8 @@ from style import odf_style
 
 
 def _get_formated_text(element, context, with_text=True):
+    rst_mode = context['rst_mode']
+
     result = []
     if with_text:
         objects = element.xpath('*|text()')
@@ -64,13 +66,20 @@ def _get_formated_text(element, context, with_text=True):
                     citation = len(container)
                 body = obj.get_note_body()
                 container.append((citation, body))
-                marker = {'footnote': u"[%s]",
-                          'endnote': u"(%s)"}[note_class]
-                result.append(marker % citation)
+                if rst_mode:
+                    marker = {'footnote': u" [#]_",
+                              'endnote': u" [*]_"}[note_class]
+                else:
+                    marker = {'footnote': u"[{citation}]",
+                              'endnote': u"({citation})"}[note_class]
+                result.append(marker.format(citation=citation))
             # Annotations
             elif tag == 'office:annotation':
                 context['annotations'].append(obj.get_annotation_body())
-                result.append('[*]')
+                if rst_mode:
+                    result.append(' [#]_ ')
+                else:
+                    result.append('[*]')
             # Tabulation
             elif tag == 'text:tab':
                 result.append(u'\t')

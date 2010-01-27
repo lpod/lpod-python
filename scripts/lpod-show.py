@@ -141,7 +141,10 @@ if  __name__ == '__main__':
     parser.add_option('-n', '--no-content', dest='no_content',
                       action='store_true', default=False,
                       help='do not dump content in stdout')
-
+    # --rst
+    parser.add_option('-r', '--rst', dest='rst',
+                      action='store_true', default=False,
+                      help='Dump the content file with a reST syntax')
     # Parse !
     opts, args = parser.parse_args()
     # Container
@@ -172,9 +175,9 @@ if  __name__ == '__main__':
             'presentation-template'):
         if opts.output:
             to_file = target.open('content.txt', 'w')
-            dump(document.get_formated_text(), to_file)
+            dump(document.get_formated_text(rst_mode=opts.rst), to_file)
         elif not opts.no_content:
-            dump(document.get_formated_text(), stdout)
+            dump(document.get_formated_text(rst_mode=opts.rst), stdout)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
         if opts.output:
