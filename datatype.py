@@ -91,13 +91,14 @@ class Duration(object):
 
     @staticmethod
     def decode(data):
-        if data.startswith('PT'):
+        if data.startswith('P'):
             sign = 1
-        elif data.startswith('-PT'):
+        elif data.startswith('-P'):
             sign = -1
         else:
-            raise ValueError, "duration is not '%s" % DURATION_FORMAT
+            raise ValueError, "duration not valid"
 
+        days = 0
         hours = 0
         minutes = 0
         seconds = 0
@@ -106,6 +107,9 @@ class Duration(object):
         for c in data:
             if c.isdigit():
                 buffer += c
+            elif c == 'D':
+                days = int(buffer)
+                buffer = ''
             elif c == 'H':
                 hours = int(buffer)
                 buffer = ''
@@ -116,9 +120,10 @@ class Duration(object):
                 seconds = int(buffer)
                 break
         else:
-            raise ValueError, "duration is not '%s" % DURATION_FORMAT
+            raise ValueError, "duration not valid"
 
-        return timedelta(hours=sign*hours,
+        return timedelta(days=sign*days,
+                         hours=sign*hours,
                          minutes=sign*minutes,
                          seconds=sign*seconds)
 
