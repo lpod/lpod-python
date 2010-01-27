@@ -67,8 +67,8 @@ def _get_formated_text(element, context, with_text=True):
                 body = obj.get_note_body()
                 container.append((citation, body))
                 if rst_mode:
-                    marker = {'footnote': u" [#]_",
-                              'endnote': u" [*]_"}[note_class]
+                    marker = {'footnote': u" [#]_ ",
+                              'endnote': u" [*]_ "}[note_class]
                 else:
                     marker = {'footnote': u"[{citation}]",
                               'endnote': u"({citation})"}[note_class]
