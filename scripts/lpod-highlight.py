@@ -83,7 +83,8 @@ if  __name__ == '__main__':
     # Options initialisation
     usage = '%prog <file> <pattern>'
     description = ("highlight the text matching the given regular "
-                   "expression (Python syntax)")
+                   "expression (Python syntax). May not display in some "
+                   "office suites.")
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --color
