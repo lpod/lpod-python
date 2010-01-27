@@ -165,6 +165,8 @@ if  __name__ == '__main__':
         # Styles
         to_file = target.open('styles.txt', 'w')
         dump(document.show_styles(), to_file)
+        # Pictures
+        dump_pictures(document, target)
     else:
         if opts.meta:
             dump(document.get_formated_meta(), stdout)

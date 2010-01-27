@@ -272,8 +272,12 @@ class odf_frame(odf_element):
         for element in self.get_children():
             tag = element.get_tagname()
             if tag == 'draw:image':
-                result.append(u'[Image %s]\n' %
-                              element.get_attribute('xlink:href'))
+                if context['rst_mode']:
+                    result.append(u'.. image:: %s\n' %
+                                  element.get_attribute('xlink:href'))
+                else:
+                    result.append(u'[Image %s]\n' %
+                                  element.get_attribute('xlink:href'))
             elif tag == 'draw:text-box':
                 subresult = [u'  ']
                 for element in element.get_children():
