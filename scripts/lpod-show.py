@@ -123,20 +123,25 @@ if  __name__ == '__main__':
             description=description)
     # --output
     parser.add_option('-o', '--output', action='store', type='string',
-            dest='output', metavar='DIRNAME',
-            help="dump output in files in the given directory.")
+                      dest='output', metavar='DIRNAME',
+                      help="dump output the files in the given directory.")
     # --meta
     parser.add_option('-m', '--meta', dest='meta', action='store_true',
                       default=False,
-                      help='dump metadata (if -d DIR add DIR/meta.txt)')
+                      help='dump metadata in stdout')
     # --pictures
     parser.add_option('-p', '--pictures', dest='pictures', action='store_true',
                       default=False,
-                      help='dump the pictures in DIR/Pictures')
+                      help='dump the pictures in DIRNAME/Pictures')
     # --styles
     parser.add_option('-s', '--styles', dest='styles', action='store_true',
                       default=False,
-                      help='dump styles (if -d DIR add DIR/styles.txt)')
+                      help='dump styles in stdout')
+    # --no-content
+    parser.add_option('-n', '--no-content', dest='no_content',
+                      action='store_true', default=False,
+                      help='do not dump content in stdout')
+
     # Parse !
     opts, args = parser.parse_args()
     # Container
@@ -151,14 +156,12 @@ if  __name__ == '__main__':
         target = get_target_directory(opts.output)
     # Meta & Styles
     if opts.output:
-        if opts.meta:
-            to_file = target.open('meta.txt', 'w')
-            dump(document.get_formated_meta(), to_file)
-        if opts.styles:
-            to_file = target.open('styles.txt', 'w')
-            dump(document.show_styles(), to_file)
-        if opts.pictures:
-            dump_pictures(document, target)
+        # Meta
+        to_file = target.open('meta.txt', 'w')
+        dump(document.get_formated_meta(), to_file)
+        # Styles
+        to_file = target.open('styles.txt', 'w')
+        dump(document.show_styles(), to_file)
     else:
         if opts.meta:
             dump(document.get_formated_meta(), stdout)
@@ -170,7 +173,7 @@ if  __name__ == '__main__':
         if opts.output:
             to_file = target.open('content.txt', 'w')
             dump(document.get_formated_text(), to_file)
-        else:
+        elif not opts.no_content:
             dump(document.get_formated_text(), stdout)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):

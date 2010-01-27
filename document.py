@@ -265,7 +265,7 @@ class odf_document(object):
         # And the description
         print_info("Description", meta.get_description())
 
-        return u"\n".join(result)
+        return u"\n".join(result) + '\n'
 
 
     def add_file(self, uri_or_file):
