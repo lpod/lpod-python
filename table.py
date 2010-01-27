@@ -743,8 +743,10 @@ class odf_row(odf_element):
         self.set_cell(x, odf_create_cell(value))
 
 
-    def insert_cell(self, x, cell):
-        """Insert the given cell at position "x" starting from 0.
+    def insert_cell(self, x, cell=None):
+        """Insert the given cell at position "x" starting from 0. If no cell
+        is given, an empty one is created.
+
         Alphabetical positions like "D" are accepted.
 
         Do not use when working on a table, use ``odf_table.insert_cell``.
@@ -755,15 +757,18 @@ class odf_row(odf_element):
 
             cell -- odf_cell
         """
+        if cell is None:
+            cell = odf_create_cell()
         x = self.__check_x(x)
         # Inserting a repeated cell accepted
         _insert_element(x, cell, self._get_cells(),
                 odf_cell.get_cell_repeated, odf_cell.set_cell_repeated)
+        return cell
 
 
-    def append_cell(self, cell):
+    def append_cell(self, cell=None):
         """Append the given cell at the end of the row. Repeated cells are
-        accepted.
+        accepted. If no cell is given, an empty one is created.
 
         Do not use when working on a table, use ``odf_table.append_cell``.
 
@@ -771,7 +776,10 @@ class odf_row(odf_element):
 
             cell -- odf_cell
         """
+        if cell is None:
+            cell = odf_create_cell()
         self.append_element(cell)
+        return cell
 
 
     def delete_cell(self, x):
@@ -1191,9 +1199,9 @@ class odf_table(odf_element):
                 odf_row.set_row_repeated)
 
 
-    def insert_row(self, y, row):
+    def insert_row(self, y, row=None):
         """Insert the row before the given "y" position. It must have the
-        same number of cells.
+        same number of cells. If no row is given, an empty one is created.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -1203,15 +1211,20 @@ class odf_table(odf_element):
 
             row -- odf_row
         """
+        if row is None:
+            row = odf_create_row(width=self.get_table_width())
+        else:
+            self.__check_width(row)
         y = self.__check_y(y)
-        self.__check_width(row)
         # Inserting a repeated row accepted
         _insert_element(y, row, self._get_rows(), odf_row.get_row_repeated,
                 odf_row.set_row_repeated)
+        return row
 
 
-    def append_row(self, row):
-        """Append the row at the end of the table.
+    def append_row(self, row=None):
+        """Append the row at the end of the table. If no row is given, an
+        empty one is created.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -1219,7 +1232,10 @@ class odf_table(odf_element):
 
             row -- odf_row
         """
-        self.__check_width(row)
+        if row is None:
+            row = odf_create_row(self.get_table_width())
+        else:
+            self.__check_width(row)
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
         self.append_element(row)
@@ -1228,6 +1244,7 @@ class odf_table(odf_element):
             repeated = row.get_row_width()
             self.insert_element(odf_create_column(repeated=repeated),
                     position=0)
+        return row
 
 
     def delete_row(self, y):
@@ -1441,8 +1458,9 @@ class odf_table(odf_element):
         self.set_cell(coordinates, cell)
 
 
-    def insert_cell(self, coordinates, cell):
-        """Insert the given cell at the given coordinates.
+    def insert_cell(self, coordinates, cell=None):
+        """Insert the given cell at the given coordinates. If no cell is
+        given, an empty one is created.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
         human-readable position like "C4".
@@ -1458,6 +1476,8 @@ class odf_table(odf_element):
         x, y = _get_cell_coordinates(coordinates)
         x = self.__check_x(x)
         y = self.__check_y(y)
+        if cell is None:
+            cell = odf_create_cell()
         # Repetited cells are accepted
         repeated = cell.get_cell_repeated()
         stub = odf_create_cell(repeated=repeated)
@@ -1470,11 +1490,12 @@ class odf_table(odf_element):
             if h == y:
                 row.set_cell(x, cell)
                 self.set_row(h, row)
+        return cell
 
 
-    def append_cell(self, y, cell):
+    def append_cell(self, y, cell=None):
         """Append the given cell at the "y" coordinate. Repeated cells are
-        accepted.
+        accepted. If no cell is given, an empty one is created.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -1487,6 +1508,8 @@ class odf_table(odf_element):
             cell -- odf_cell
         """
         y = self.__check_y(y)
+        if cell is None:
+            cell = odf_create_cell()
         # Repetited cells are accepted
         repeated = cell.get_cell_repeated()
         stub = odf_create_cell(repeated=repeated)
@@ -1499,7 +1522,7 @@ class odf_table(odf_element):
             if h == y:
                 row.set_cell(future_width - 1, cell)
                 self.set_row(h, row)
-                return
+                return cell
 
 
     def delete_cell(self, coordinates):
@@ -1614,8 +1637,9 @@ class odf_table(odf_element):
 
 
 
-    def insert_column(self, x, column):
-        """Insert the column before the given "x" position.
+    def insert_column(self, x, column=None):
+        """Insert the column before the given "x" position. If no column is
+        given, an empty one is created.
 
         ODF columns don't contain cells, only style information.
 
@@ -1629,6 +1653,8 @@ class odf_table(odf_element):
             column -- odf_column
         """
         x = self.__check_x(x)
+        if column is None:
+            column = odf_create_column()
         _insert_element(x, column, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
@@ -1637,10 +1663,12 @@ class odf_table(odf_element):
         for row in self._get_rows():
             if row.get_row_width() != width:
                 row.insert_cell(x, odf_create_cell())
+        return column
 
 
-    def append_column(self, column):
-        """Append the column at the end of the table.
+    def append_column(self, column=None):
+        """Append the column at the end of the table. If no column is given,
+        an empty one is created.
 
         ODF columns don't contain cells, only style information.
 
@@ -1651,6 +1679,8 @@ class odf_table(odf_element):
 
             column -- odf_column
         """
+        if column is None:
+            column = odf_create_column()
         last_column = self._get_columns()[-1]
         self.insert_element(column, position=self.index(last_column) + 1)
         # Update width if not done
@@ -1658,6 +1688,7 @@ class odf_table(odf_element):
         for row in self._get_rows():
             if row.get_row_width() != width:
                 row.append_cell(odf_create_cell())
+        return column
 
 
     def delete_column(self, x):

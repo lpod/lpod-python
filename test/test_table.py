@@ -35,7 +35,7 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.document import odf_get_document
 from lpod.table import _alpha_to_digit, _digit_to_alpha
-from lpod.table import _get_cell_coordinates
+from lpod.table import _get_cell_coordinates, odf_cell, odf_row
 from lpod.table import odf_create_cell, odf_create_row, odf_create_column
 from lpod.table import odf_create_table, import_from_csv, odf_column
 
@@ -660,6 +660,12 @@ class TestRowCell(TestCase):
         self.assertEqual(row.get_row_width(), 7)
 
 
+    def test_insert(self):
+        row = self.row.clone()
+        cell = row.insert_cell(3)
+        self.assert_(type(cell) is odf_cell)
+
+
     def test_insert_cell(self):
         row = self.row.clone()
         row.insert_cell(3, odf_create_cell(u"Inserted"))
@@ -686,6 +692,12 @@ class TestRowCell(TestCase):
                 [1, 1, 1, 2, 3, 3, u"Inserted", u"Inserted", u"Inserted", 3])
         # Test repetitions are synchronized
         self.assertEqual(row.get_row_width(), 10)
+
+
+    def test_append(self):
+        row = self.row.clone()
+        cell = row.append_cell()
+        self.assert_(type(cell) is odf_cell)
 
 
     def test_append_cell(self):
@@ -949,6 +961,12 @@ class TestTableRow(TestCase):
         self.assertRaises(ValueError, table.set_row, 0, big_row)
 
 
+    def test_insert(self):
+        table = self.table.clone()
+        row = table.insert_row(2)
+        self.assert_(type(row) is odf_row)
+
+
     def test_insert_row(self):
         table = self.table.clone()
         row = table.get_row(3)
@@ -991,6 +1009,12 @@ class TestTableRow(TestCase):
         table = self.table.clone()
         big_row = odf_create_row(width=table.get_table_width() + 1)
         self.assertRaises(ValueError, table.insert_row, 0, big_row)
+
+
+    def test_append(self):
+        table = self.table.clone()
+        row = table.append_row()
+        self.assert_(type(row) is odf_row)
 
 
     def test_append_row(self):
@@ -1115,6 +1139,12 @@ class TestTableCell(TestCase):
         self.assertEqual(coordinates, expected)
 
 
+    def test_insert(self):
+        table = self.table.clone()
+        cell = table.insert_cell('B3')
+        self.assert_(type(cell) is odf_cell)
+
+
     def test_insert_cell(self):
         table = self.table.clone()
         table.insert_cell('B3', odf_create_cell(u"Inserted"))
@@ -1125,6 +1155,12 @@ class TestTableCell(TestCase):
                  [1,        None, 2, 3, 4, 5, 6, 7]])
         # Test columns are synchronized
         self.assertEqual(table.get_table_width(), 8)
+
+
+    def test_append(self):
+        table = self.table.clone()
+        cell = table.append_cell(1)
+        self.assert_(type(cell) is odf_cell)
 
 
     def test_append_cell(self):
@@ -1190,11 +1226,23 @@ class TestTableColumn(TestCase):
         self.assertEqual(column.get_column_style(), u"co2")
 
 
+    def test_insert(self):
+        table = self.table.clone()
+        column = table.insert_column(3)
+        self.assert_(type(column) is odf_column)
+
+
     def test_insert_column(self):
         table = self.table.clone()
         table.insert_column(3, odf_create_column())
         self.assertEqual(table.get_table_width(), 8)
         self.assertEqual(table.get_row(0).get_row_width(), 8)
+
+
+    def test_append(self):
+        table = self.table.clone()
+        column = table.append_column()
+        self.assert_(type(column) is odf_column)
 
 
     def test_append_column(self):
