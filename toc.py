@@ -77,6 +77,9 @@ class odf_toc(odf_element):
         if index_body is None:
             return u''
 
+        if context["rst_mode"]:
+            return u"\n.. contents::\n"
+
         result = []
         for element in index_body.get_children():
             if element.get_tagname() == 'text:index-title':

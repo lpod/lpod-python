@@ -72,6 +72,24 @@ class odf_heading(odf_paragraph):
     paragraphs.
     """
 
+    def get_formated_text(self, context):
+        # 5 levels of heading
+        level_styles = u"=-+~."
+
+        # Get the title
+        title = odf_paragraph.get_formated_text(self, context)
+        title = title.strip()
+
+        # Get the level
+        level = self.get_outline_level()
+        if level > 5:
+            raise ValueError, "Too many levels of heading"
+
+        # And return the result
+        result = ['\n', title, u'\n', level_styles[level - 1] * len(title),
+                  '\n']
+        return u''.join(result)
+
 
     def set_outline_level(self, level):
         self.set_attribute('text:outline-level', unicode(level))
