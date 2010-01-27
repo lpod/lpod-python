@@ -3,6 +3,7 @@
 # Copyright (c) 2009 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
+#          David Versmisse <david.versmisse@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.org).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -24,10 +25,9 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-# Import from the Standard Library
-
 # Import from lpod
-from element import odf_create_element
+from element import register_element_class, odf_element, odf_create_element
+
 
 
 def odf_create_section(style=None):
@@ -43,3 +43,21 @@ def odf_create_section(style=None):
     if style:
         element.set_attribute('text:style-name', style)
     return element
+
+
+
+class odf_section(odf_element):
+    """Specialised element for sections.
+    """
+
+    def get_formated_text(self, context):
+        result = []
+        for element in self.get_children():
+            result.append(element.get_formated_text(context))
+        result.append(u'\n')
+        return u''.join(result)
+
+
+
+register_element_class('text:section', odf_section)
+

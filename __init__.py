@@ -44,6 +44,7 @@ import heading
 import list
 import note
 import paragraph
+import section
 import shapes
 import span
 import style
