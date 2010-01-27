@@ -44,9 +44,9 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         data_style=None, border=None, border_top=None, border_right=None,
         border_bottom=None, border_left=None, shadow=None,
         # For family 'table-row'
-        row_height=None, use_optimal_row_height=None,
+        height=None, use_optimal_height=None,
         # For family 'table-column'
-        column_width=None, break_before=None, break_after=None,
+        width=None, break_before=None, break_after=None,
         # Every other property
         **kw):
     """Create a style of the given family. The name is not mandatory at this
@@ -101,13 +101,13 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
     'table-row' Properties:
 
-        row_height -- str, e.g. '5cm'
+        height -- str, e.g. '5cm'
 
-        use_optimal_row_height -- bool
+        use_optimal_height -- bool
 
     'table-column' Properties:
 
-        column_width -- str, e.g. '5cm'
+        width -- str, e.g. '5cm'
 
         break_before -- 'page', 'column' or 'auto'
 
@@ -166,15 +166,15 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
             kw['style:shadow'] = shadow
     # Table row
     elif area == 'table-row':
-        if row_height:
-            kw['style:row-height'] = row_height
-        if use_optimal_row_height is not None:
+        if height:
+            kw['style:row-height'] = height
+        if use_optimal_height is not None:
             kw['style:use-optimal-row-height'] = Boolean.encode(
-                    use_optimal_row_height)
+                    use_optimal_height)
     # Table column
     elif area == 'table-column':
-        if column_width:
-            kw['style:column-width']  = column_width
+        if width:
+            kw['style:column-width']  = width
         if break_before:
             kw['fo:break-before'] = break_before
         if break_after:

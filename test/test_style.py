@@ -448,14 +448,14 @@ class TableStyleTestCase(TestCase):
 
 
     def test_table_row_height(self):
-        style = odf_create_style('table-row', row_height="5cm")
+        style = odf_create_style('table-row', height="5cm")
         self.assertEqual(style.serialize(), ('<style:style '
             'style:family="table-row"><style:table-row-properties '
             'style:row-height="5cm"/></style:style>'))
 
 
     def test_table_column_width(self):
-        style = odf_create_style('table-column', column_width="5cm")
+        style = odf_create_style('table-column', width="5cm")
         self.assertEqual(style.serialize(), ('<style:style '
             'style:family="table-column"><style:table-column-properties '
             'style:column-width="5cm"/></style:style>'))
