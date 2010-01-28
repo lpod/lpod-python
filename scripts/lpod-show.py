@@ -116,7 +116,8 @@ def spreadsheet_to_csv(document, target):
 
 if  __name__ == '__main__':
     # Options initialisation
-    usage = "%prog <file>"
+    usage = ( '%prog -o <dir-name> [--rst] <odf-file>\n'
+       '       %prog [--styles] [--meta] [--no-content] [--rst] <odf-file>\n')
     description = ("Dump text from an OpenDocument file to the standard "
                    "output, optionally styles and meta.")
     parser = OptionParser(usage, version=__version__,
