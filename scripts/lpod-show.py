@@ -95,6 +95,7 @@ def spreadsheet_to_stdout(document):
         encoding = 'utf-8'
     body = document.get_body()
     for table in body.get_table_list():
+        table.rstrip_table(aggressive=True)
         table.export_to_csv(stdout, encoding=encoding)
         stdout.write("\n")
     stdout.flush()
