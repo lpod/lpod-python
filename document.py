@@ -203,7 +203,9 @@ class odf_document(object):
                 footnotes = context['footnotes']
                 # Separate text from notes
                 if footnotes:
-                    if not rst_mode:
+                    if rst_mode:
+                        result.append(u'\n')
+                    else:
                         result.append(u'----\n')
                     for citation, body in footnotes:
                         if rst_mode:
@@ -218,7 +220,9 @@ class odf_document(object):
                 annotations = context['annotations']
                 # With a separation
                 if annotations:
-                    if not rst_mode:
+                    if rst_mode:
+                        result.append(u'\n')
+                    else:
                         result.append(u'----\n')
                     for annotation in annotations:
                         if rst_mode:
@@ -229,7 +233,9 @@ class odf_document(object):
         # Append the end notes
         endnotes = context['endnotes']
         if endnotes:
-            if not rst_mode:
+            if rst_mode:
+                result.append(u'\n\n')
+            else:
                 result.append(u'\n========\n')
             for citation, body in endnotes:
                 if rst_mode:
