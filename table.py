@@ -28,6 +28,7 @@
 
 # Import from the Standard Library
 from csv import reader, Sniffer
+from textwrap import wrap
 
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
@@ -980,7 +981,7 @@ class odf_table(odf_element):
                 value = value.strip()
                 # Strip the empty columns
                 if value:
-                    cols_nb = max(cols_nb, i)
+                    cols_nb = max(cols_nb, i + 1)
                 # Compute the size of each columns
                 cols_size[i] = max(cols_size.get(i, 0), len(value))
                 # Append
@@ -991,11 +992,27 @@ class odf_table(odf_element):
         if cols_nb == 0:
             return u''
 
+        # Update cols_size
+        LINE_MAX = 100
+        COL_MIN = 16
+
+        free_size = LINE_MAX - (cols_nb - 1) * 3 - 4
+        real_size = sum([ cols_size[i] for i in range(cols_nb) ])
+        if real_size > free_size:
+            factor = float(free_size) / real_size
+
+            for i in range(cols_nb):
+                new_size = int(factor * cols_size[i])
+
+                if new_size < COL_MIN:
+                    new_size = COL_MIN
+                cols_size[i] = new_size
+
         # Convert !
         result = [u'']
         # Construct the separated line
         line = [u'+']
-        for i in range(cols_nb + 1):
+        for i in range(cols_nb):
             line.append(u'-' * (cols_size[i] + 2))
             line.append(u'+')
         line = u''.join(line)
@@ -1003,14 +1020,29 @@ class odf_table(odf_element):
         # Add the lines
         result.append(line)
         for row in rows:
-            txt_row = [u'|']
-            for i, value in enumerate(row[:cols_nb + 1]):
-                txt_row.append(u' ')
-                txt_row.append(value)
-                txt_row.append(u' ' * (cols_size[i] - len(value) + 1))
-                txt_row.append(u'|')
-            txt_row = u''.join(txt_row)
-            result.append(txt_row)
+            # Wrap the row
+            row = [ wrap(value, width=cols_size[i])
+                    for i, value in enumerate(row[:cols_nb]) ]
+
+            # Append!
+            for j in range(max([len(values) for values in row ])):
+                txt_row = [u'|']
+                for i, values in enumerate(row):
+                    if len(values) - 1 < j:
+                        # An empty cell
+                        txt_row.append(u' ' * (cols_size[i] + 2))
+                        txt_row.append(u'|')
+                        continue
+
+                    # Not empty
+                    value = values[j]
+                    txt_row.append(u' ')
+                    txt_row.append(value)
+                    txt_row.append(u' ' * (cols_size[i] - len(value) + 1))
+                    txt_row.append(u'|')
+                txt_row = u''.join(txt_row)
+                result.append(txt_row)
+
             result.append(line)
         result.append(u'')
         result = u'\n'.join(result)
