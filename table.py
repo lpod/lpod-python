@@ -944,6 +944,79 @@ class odf_table(odf_element):
             raise ValueError, "row mismatch: %s cells expected" % width
 
 
+    def __get_formated_text_normal(self, context):
+        result = []
+        for row in self.traverse_rows():
+            for cell in row.traverse_cells():
+                value = get_value(cell, try_get_text=False)
+                # None ?
+                if value is None:
+                    # Try with get_formated_text on the elements
+                    value = []
+                    for element in cell.get_children():
+                        value.append(element.get_formated_text(context))
+                    value = u''.join(value)
+                else:
+                    value = unicode(value)
+                result.append(value)
+                result.append(u'\n')
+            result.append(u'\n')
+        return u''.join(result)
+
+
+    def __get_formated_text_rst(self, context):
+        # Strip the table => We must clone
+        table = self.clone()
+        table.rstrip_table(aggressive=True)
+
+        # Fill the rows
+        rows = []
+        cols_nb = 0
+        cols_size = {}
+        for odf_row in table.traverse_rows():
+            row = []
+            for i, value in enumerate(odf_row.get_cell_values()):
+                value = u'' if value is None else unicode(value)
+                value = value.strip()
+                # Strip the empty columns
+                if value:
+                    cols_nb = max(cols_nb, i)
+                # Compute the size of each columns
+                cols_size[i] = max(cols_size.get(i, 0), len(value))
+                # Append
+                row.append(value)
+            rows.append(row)
+
+        # Nothing ?
+        if cols_nb == 0:
+            return u''
+
+        # Convert !
+        result = [u'']
+        # Construct the separated line
+        line = [u'+']
+        for i in range(cols_nb + 1):
+            line.append(u'-' * (cols_size[i] + 2))
+            line.append(u'+')
+        line = u''.join(line)
+
+        # Add the lines
+        result.append(line)
+        for row in rows:
+            txt_row = [u'|']
+            for i, value in enumerate(row[:cols_nb + 1]):
+                txt_row.append(u' ')
+                txt_row.append(value)
+                txt_row.append(u' ' * (cols_size[i] - len(value) + 1))
+                txt_row.append(u'|')
+            txt_row = u''.join(txt_row)
+            result.append(txt_row)
+            result.append(line)
+        result.append(u'')
+        result = u'\n'.join(result)
+
+        return result
+
     #
     # Public API
     #
@@ -1039,23 +1112,10 @@ class odf_table(odf_element):
 
 
     def get_formated_text(self, context):
-        result = []
-        for row in self.traverse_rows():
-            for cell in row.traverse_cells():
-                value = get_value(cell, try_get_text=False)
-                # None ?
-                if value is None:
-                    # Try with get_formated_text on the elements
-                    value = []
-                    for element in cell.get_children():
-                        value.append(element.get_formated_text(context))
-                    value = u''.join(value)
-                else:
-                    value = unicode(value)
-                result.append(value)
-                result.append(u'\n')
-            result.append(u'\n')
-        return u''.join(result)
+        if context["rst_mode"]:
+            return self.__get_formated_text_rst(context)
+        else:
+            return self.__get_formated_text_normal(context)
 
 
     def get_cell_values(self):
