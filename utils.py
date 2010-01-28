@@ -163,6 +163,7 @@ family_mapping = {'paragraph': ('style:style', 'paragraph'),
                   'font-face': ('style:font-face', None),
                   'number': ('number:number-style', None),
                   'percentage': ('number:percentage-style', None),
+                  'time': ('number:time-style', None),
                   'date': ('number:date-style', None)}
 
 
