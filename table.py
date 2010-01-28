@@ -1282,6 +1282,9 @@ class odf_table(odf_element):
 
         Position start at 0. So cell A4 is on row 3.
 
+        Note the columns are automatically created when the first row is
+        inserted in an empty table. So better insert a filled row.
+
         Arguments:
 
             row -- odf_row
