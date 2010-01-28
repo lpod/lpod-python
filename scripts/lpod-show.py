@@ -183,7 +183,7 @@ if  __name__ == '__main__':
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
         if opts.output:
             spreadsheet_to_csv(document, target)
-        else:
+        elif not opts.no_content:
             spreadsheet_to_stdout(document)
     else:
         print "The OpenDocument format", doc_type, "is not supported yet."
