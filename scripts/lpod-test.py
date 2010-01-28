@@ -27,10 +27,20 @@
 
 # Import from the standard library
 from optparse import OptionParser
+from subprocess import Popen, PIPE
 from sys import exit
 
 # Import from lpod
 from lpod import __version__
+
+
+
+def run_command(command):
+    popen = Popen(command, stdout=PIPE, stderr=PIPE)
+    stdoutdata, stderrdata = popen.communicate()
+    if popen.returncode != 0 or stderrdata:
+        raise ValueError
+    return stdoutdata, stderrdata
 
 
 
@@ -41,15 +51,17 @@ if  __name__ == "__main__":
                    "cf http://odfpy.forge.osor.eu/")
     parser = OptionParser(usage, version=__version__,
             description=description)
-
-    # odflint ?
-    from odflint import lint
+    # Parse options
+    options, args = parser.parse_args()
 
     # Document
     if len(args) != 1:
         parser.print_help()
         exit(1)
     document = args[0]
+
+    # Finish me :-)
+    run_command(["odflint"])
 
 
 
