@@ -162,6 +162,7 @@ family_mapping = {'paragraph': ('style:style', 'paragraph'),
                   'master-page': ('style:master-page', None),
                   'font-face': ('style:font-face', None),
                   'number': ('number:number-style', None),
+                  'percentage': ('number:percentage-style', None),
                   'date': ('number:date-style', None)}
 
 
