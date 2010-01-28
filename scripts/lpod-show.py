@@ -117,9 +117,10 @@ def spreadsheet_to_csv(document, target):
 if  __name__ == '__main__':
     # Options initialisation
     usage = ( '%prog -o <dir-name> [--rst] <odf-file>\n'
-       '       %prog [--styles] [--meta] [--no-content] [--rst] <odf-file>\n')
+       '       %prog [--styles] [--meta] [--no-content] [--rst] <odf-file>')
     description = ("Dump text from an OpenDocument file to the standard "
-                   "output, optionally styles and meta.")
+                   "output, optionally styles and meta (and the Pictures/* "
+                   "in '-o <dir-name>' mode)")
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --output
@@ -130,10 +131,6 @@ if  __name__ == '__main__':
     parser.add_option('-m', '--meta', dest='meta', action='store_true',
                       default=False,
                       help='dump metadata in stdout')
-    # --pictures
-    parser.add_option('-p', '--pictures', dest='pictures', action='store_true',
-                      default=False,
-                      help='dump the pictures in DIRNAME/Pictures')
     # --styles
     parser.add_option('-s', '--styles', dest='styles', action='store_true',
                       default=False,
@@ -158,7 +155,7 @@ if  __name__ == '__main__':
     doc_type = document.get_type()
     if opts.output:
         target = get_target_directory(opts.output)
-    # Meta & Styles
+    # Meta / Styles / Pictures
     if opts.output:
         # Meta
         to_file = target.open('meta.txt', 'w')
