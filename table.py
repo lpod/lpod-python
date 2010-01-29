@@ -1002,7 +1002,13 @@ class odf_table(odf_element):
             factor = float(free_size) / real_size
 
             for i in range(cols_nb):
-                new_size = int(factor * cols_size[i])
+                old_size = cols_size[i]
+
+                # The cell is already small
+                if old_size <= COL_MIN:
+                    continue
+
+                new_size = int(factor * old_size)
 
                 if new_size < COL_MIN:
                     new_size = COL_MIN
