@@ -992,6 +992,11 @@ class odf_table(odf_element):
         if cols_nb == 0:
             return u''
 
+        # Prevent a crash with empty columns (by example with images)
+        for col, size in cols_size.iteritems():
+            if size == 0:
+                cols_size[col] = 1
+
         # Update cols_size
         LINE_MAX = 100
         COL_MIN = 16
