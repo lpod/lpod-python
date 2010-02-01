@@ -81,14 +81,14 @@ class odf_heading(odf_paragraph):
         # If here in rst_mode!
 
         # Get the level, max 5!
-        level_styles = u"=-+~."
+        LEVEL_STYLES = u"=-+^~°'."
         level = self.get_outline_level()
-        if level > 5:
+        if level > len(LEVEL_STYLES):
             raise ValueError, "Too many levels of heading"
 
         # And return the result
         title = title.strip()
-        result = ['\n', title, u'\n', level_styles[level - 1] * len(title),
+        result = ['\n', title, u'\n', LEVEL_STYLES[level - 1] * len(title),
                   '\n']
         return u''.join(result)
 
