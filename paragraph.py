@@ -39,6 +39,7 @@ from style import odf_style
 
 
 def _get_formated_text(element, context, with_text=True):
+    document = context['document']
     rst_mode = context['rst_mode']
 
     result = []
@@ -52,9 +53,36 @@ def _get_formated_text(element, context, with_text=True):
         else:
             tag = obj.get_tagname()
             # Good tags with text
-            if tag in ('text:span', 'text:a', 'text:p'):
+            if tag in ('text:a', 'text:p'):
                 result.append(_get_formated_text(obj, context,
                                                  with_text=True))
+            # Try to convert some styles in rst_mode
+            elif tag == 'text:span':
+                # XXX Move this part in span.py ??
+                text = _get_formated_text(obj, context, with_text=True)
+                if not rst_mode:
+                    result.append(text)
+                    continue
+                style = obj.get_attribute('text:style-name')
+                if style is None:
+                    result.append(text)
+                    continue
+                style = document.get_style("text", style)
+                properties = style.get_style_properties()
+                # Bold ?
+                if properties.get('fo:font-weight') == 'bold':
+                    result.append('**')
+                    result.append(text)
+                    result.append('**')
+                    continue
+                # Italique ?
+                if properties.get('fo:font-style') == 'italic':
+                    result.append('*')
+                    result.append(text)
+                    result.append('*')
+                    continue
+                # Unknown style, ...
+                result.append(text)
             # Footnote or endnote
             elif tag == 'text:note':
                 note_class = obj.get_note_class()

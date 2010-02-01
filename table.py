@@ -1034,8 +1034,8 @@ class odf_table(odf_element):
             for j in range(max([len(values) for values in row ])):
                 txt_row = [u'|']
                 for i, values in enumerate(row):
+                    # An empty cell ?
                     if len(values) - 1 < j:
-                        # An empty cell
                         txt_row.append(u' ' * (cols_size[i] + 2))
                         txt_row.append(u'|')
                         continue

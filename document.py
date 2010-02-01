@@ -187,7 +187,8 @@ class odf_document(object):
             raise NotImplementedError, ('Type of document "%s" not '
                                         'supported yet' % type)
         # Initialize an empty context
-        context = {'footnotes': [],
+        context = {'document': self,
+                   'footnotes': [],
                    'endnotes': [],
                    'annotations': [],
                    'rst_mode': rst_mode}
