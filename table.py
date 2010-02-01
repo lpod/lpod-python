@@ -1032,13 +1032,19 @@ class odf_table(odf_element):
         result.append(line)
         for row in rows:
             # Wrap the row
-            row = [ wrap(value, width=cols_size[i])
-                    for i, value in enumerate(row[:cols_nb]) ]
+            wrapped_row = []
+            for i, value in enumerate(row[:cols_nb]):
+                wrapped_value = []
+                for part in value.split('\n'):
+                    wrapped_value.extend(wrap(part, width=cols_size[i]))
+                wrapped_value = [ value.strip() for value in wrapped_value
+                                  if value.strip() ]
+                wrapped_row.append(wrapped_value)
 
             # Append!
-            for j in range(max([len(values) for values in row ])):
+            for j in range(max([len(values) for values in wrapped_row ])):
                 txt_row = [u'|']
-                for i, values in enumerate(row):
+                for i, values in enumerate(wrapped_row):
                     # An empty cell ?
                     if len(values) - 1 < j:
                         txt_row.append(u' ' * (cols_size[i] + 2))
