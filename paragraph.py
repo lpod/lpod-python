@@ -127,7 +127,9 @@ def odf_create_line_break():
 
 def odf_create_undividable_space(number=1):
     # XXX Maybe number = 1 => no text:c ?
-    return odf_create_element('<text:s text:c="%d"/>' % number)
+    element = odf_create_element('<text:s/>')
+    element.set_attribute('text:c', number)
+    return element
 
 
 

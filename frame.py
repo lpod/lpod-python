@@ -59,7 +59,7 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
 
     Return: odf_element
     """
-    element = odf_create_element(u'<draw:frame/>')
+    element = odf_create_element('<draw:frame/>')
     element.set_frame_size(size)
     element.set_frame_anchor_type(anchor_type, page_number=page_number)
     if name:

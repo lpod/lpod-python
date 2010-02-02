@@ -34,7 +34,9 @@ def odf_create_bookmark(name):
 
         name -- unicode
     """
-    return odf_create_element(u'<text:bookmark text:name="%s"/>' % name)
+    element = odf_create_element('<text:bookmark/>')
+    element.set_attribute('text:name', name)
+    return element
 
 
 
@@ -44,7 +46,9 @@ def odf_create_bookmark_start(name):
 
         name -- unicode
     """
-    return odf_create_element(u'<text:bookmark-start text:name="%s"/>' % name)
+    element = odf_create_element('<text:bookmark-start/>')
+    element.set_attribute('text:name', name)
+    return element
 
 
 
@@ -54,4 +58,6 @@ def odf_create_bookmark_end(name):
 
         name -- unicode
     """
-    return odf_create_element(u'<text:bookmark-end text:name="%s"/>' % name)
+    element = odf_create_element('<text:bookmark-end/>')
+    element.set_attribute('text:name', name)
+    return element

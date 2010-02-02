@@ -406,7 +406,8 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
     Return: odf_table
     """
-    element = odf_create_element(u'<table:table table:name="%s"/>' % name)
+    element = odf_create_element('<table:table/>')
+    element.set_table_name(name)
     if protected:
         if protection_key is None:
             raise ValueError, "missing protection key"
