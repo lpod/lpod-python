@@ -32,7 +32,7 @@ from utils import Boolean
 
 
 
-def odf_create_toc(name=u"Table of content", protected=True, style=None,
+def odf_create_toc(name=u"Table of Contents", protected=True, style=None,
                    outline_level=10):
     data = '<text:table-of-content/>'
     element = odf_create_element(data)
@@ -107,13 +107,25 @@ class odf_toc(odf_element):
         source.set_attribute('text:outline-level', str(int(level)))
 
 
-    def auto_fill(self, document):
-        """This function makes an update of the current TOC.
+    def fill(self, document=None):
+        """Fill the TOC with the titles found in the document. A TOC is not
+        contextual so it will catch all titles before and after its insertion.
+
+        If the TOC is not attached to a document, attach it beforehand or
+        provide one as argument.
 
         Arguments:
 
         document -- odf_document
         """
+        # Find the body
+        if document is not None:
+            content = document.get_content()
+            body = content.get_body()
+        else:
+            body = self.get_body()
+        if body is None:
+            raise ValueError, "the TOC must be related to a document somehow"
 
         # Clean the old index-body
         index_body = self.get_element('text:index-body')
@@ -123,15 +135,13 @@ class odf_toc(odf_element):
         self.append_element(index_body)
 
         # Auto fill the index
-        # 1. The title: "Table Of Content"
+        # 1. The title: "Table Of Contents"
         title = self.get_attribute('text:name')
         if not title:
-            title = u"Table of content"
+            title = u"Table of Contents"
         title = odf_create_index_title(title)
         index_body.append_element(title)
         #2. The section
-        content = document.get_content()
-        body = content.get_body()
         level_indexes = {}
         for heading in body.get_heading_list():
             level = heading.get_outline_level()

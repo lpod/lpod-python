@@ -119,7 +119,7 @@ if  __name__ == '__main__':
     # Make the document from the structure
     make_document([mm_structure], body)
     # Fill the TOC
-    toc.auto_fill(document)
+    toc.fill()
 
     # Save the document
     document.save(odt_file_url, pretty=True)

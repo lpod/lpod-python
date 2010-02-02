@@ -32,32 +32,51 @@ from lpod.document import odf_get_document
 from lpod.toc import odf_create_toc
 
 
+def get_toc_lines(toc):
+    return [paragraph.get_text()
+            for paragraph in toc.get_paragraph_list()]
+
+
 
 class TOCTest(TestCase):
 
-    def test_toc_autofill(self):
-        document = odf_get_document("samples/toc.odt")
+    def setUp(self):
+        self.document = odf_get_document("samples/toc.odt")
+        self.expected = [
+                u"Table des matières",
+                u"1. Level 1 title 1",
+                u"1.1. Level 2 title 1",
+                u"2. Level 1 title 2",
+                u"2.1.1. Level 3 title 1",
+                u"2.2. Level 2 title 2",
+                u"3. Level 1 title 3",
+                u"3.1. Level 2 title 1",
+                u"3.1.1. Level 3 title 1",
+                u"3.1.2. Level 3 title 2",
+                u"3.2. Level 2 title 2",
+                u"3.2.1. Level 3 title 1",
+                u"3.2.2. Level 3 title 2"]
 
+
+    def test_toc_fill_unattached(self):
         toc = odf_create_toc(u"Table des matières")
-        toc.auto_fill(document)
-        toc_lines = [ paragraph.get_text()
-                      for paragraph in toc.get_paragraph_list() ]
+        self.assertRaises(ValueError, toc.fill)
 
-        expected = [u"Table des matières",
-                    u"1. Level 1 title 1",
-                    u"1.1. Level 2 title 1",
-                    u"2. Level 1 title 2",
-                    u"2.1.1. Level 3 title 1",
-                    u"2.2. Level 2 title 2",
-                    u"3. Level 1 title 3",
-                    u"3.1. Level 2 title 1",
-                    u"3.1.1. Level 3 title 1",
-                    u"3.1.2. Level 3 title 2",
-                    u"3.2. Level 2 title 2",
-                    u"3.2.1. Level 3 title 1",
-                    u"3.2.2. Level 3 title 2"]
 
-        self.assertEqual(toc_lines, expected)
+    def test_toc_fill_unattached_document(self):
+        toc = odf_create_toc(u"Table des matières")
+        toc.fill(self.document)
+        toc_lines = get_toc_lines(toc)
+        self.assertEqual(toc_lines, self.expected)
+
+
+    def test_toc_fill_attached(self):
+        document = self.document.clone()
+        toc = odf_create_toc(u"Table des matières")
+        document.get_body().append_element(toc)
+        toc.fill()
+        toc_lines = get_toc_lines(toc)
+        self.assertEqual(toc_lines, self.expected)
 
 
 
