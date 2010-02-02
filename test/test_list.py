@@ -379,10 +379,12 @@ class TestList(TestCase):
         spam.append_element(how_not_to_be_seen2)
         foo.append_element(how_not_to_be_seen3)
 
-        # Initialize an empty context
-        context = {'notes_counter': 0,
+        # Initialize an empty fake context
+        context = {'document': None,
                    'footnotes': [],
-                   'endnotes': []}
+                   'endnotes': [],
+                   'annotations': [],
+                   'rst_mode': False}
         expected = (u'- In this picture, there are 47 people;\n'
                     u'  none of them can be seen.\n'
                     u'  - In this film, we hope to show you the\n'
