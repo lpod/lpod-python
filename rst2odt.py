@@ -568,7 +568,7 @@ def convert(document, rst_body, heading_level=0):
     # Finish the work
     toc = context["toc"]
     if toc is not None:
-        toc.fill()
+        toc.toc_fill()
 
     return document
 

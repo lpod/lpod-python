@@ -65,7 +65,7 @@ class TOCTest(TestCase):
 
     def test_toc_fill_unattached_document(self):
         toc = odf_create_toc(u"Table des matières")
-        toc.fill(self.document)
+        toc.toc_fill(self.document)
         toc_lines = get_toc_lines(toc)
         self.assertEqual(toc_lines, self.expected)
 
@@ -74,7 +74,7 @@ class TOCTest(TestCase):
         document = self.document.clone()
         toc = odf_create_toc(u"Table des matières")
         document.get_body().append_element(toc)
-        toc.fill()
+        toc.toc_fill()
         toc_lines = get_toc_lines(toc)
         self.assertEqual(toc_lines, self.expected)
 

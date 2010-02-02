@@ -32,17 +32,40 @@ from utils import Boolean
 
 
 
-def odf_create_toc(name=u"Table of Contents", protected=True, style=None,
-                   outline_level=10):
-    data = '<text:table-of-content/>'
-    element = odf_create_element(data)
-    if name:
+def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
+        outline_level=None, style=None):
+    """Create a table of contents. Default parameters are what most people
+    use: Protected from manual modifications and not limited in title levels.
+
+    The name is mandatory and derived automatically from the title if not
+    given. Provide one if you insert several TOCs in the same document.
+
+    Arguments:
+
+        title -- unicode
+
+        name -- unicode
+
+        protected -- bool
+
+        outline_level -- int
+
+        style -- str
+
+    Return: odf_toc
+    """
+    element = odf_create_element('<text:table-of-content/>')
+    # XXX
+    if name is None:
+        name = u"%s1" % title
         element.set_attribute('text:name', name)
     element.set_attribute('text:protected', Boolean.encode(protected))
     if style:
         element.set_attribute('text:style-name', style)
-    # A TOC is quite a complex hierarchy
-    element.set_toc_outline_level(outline_level)
+    if outline_level:
+        element.set_toc_outline_level(outline_level)
+    if title:
+        element.append_element(odf_create_index_title(title))
     return element
 
 
@@ -92,6 +115,22 @@ class odf_toc(odf_element):
         return u''.join(result)
 
 
+    def get_toc_title(self):
+        index_title = self.get_element('text:index-title')
+        if index_title is None:
+            return
+        return index_title.get_text_content()
+
+
+    def set_toc_title(self, title):
+        index_title = self.get_element('text:index-title')
+        if index_title is None:
+            index_title = odf_create_index_title(title)
+            self.append_element(index_title)
+        else:
+            index_title.set_text_content(title)
+
+
     def get_toc_outline_level(self):
         source = self.get_element('text:table-of-content-source')
         if source is None:
@@ -107,7 +146,7 @@ class odf_toc(odf_element):
         source.set_attribute('text:outline-level', str(int(level)))
 
 
-    def fill(self, document=None):
+    def toc_fill(self, document=None):
         """Fill the TOC with the titles found in the document. A TOC is not
         contextual so it will catch all titles before and after its insertion.
 

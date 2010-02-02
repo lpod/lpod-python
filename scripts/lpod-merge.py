@@ -252,7 +252,7 @@ if  __name__ == '__main__':
     if output_mimetype == 'text':
         output_body = output_doc.get_body()
         toc = output_body.get_toc()
-        toc.fill()
+        toc.toc_fill()
 
     # Save
     if output_doc is not None:
