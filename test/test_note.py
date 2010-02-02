@@ -198,11 +198,13 @@ class TestNote(TestCase):
         list_with_note.append_item(paragraph)
         body.append_element(list_with_note)
         expected = (u"- Un paragraphe[1] d'apparence(i) banale[*].\n"
-                    u"---\n"
-                    u"[1] C'est-à-dire l'élément « text:p ».\n\n"
-                    u"---\n"
-                    u"[*] Sauf qu'il est commenté !\n\n"
-                    u"------\n"
+                    u"----\n"
+                    u"[1] C'est-à-dire l'élément « text:p ».\n"
+                    u"\n"
+                    u"----\n"
+                    u"[*] Sauf qu'il est commenté !\n"
+                    u"\n"
+                    u"========\n"
                     u"(i) Les apparences sont trompeuses !\n")
         self.assertEqual(document.get_formated_text(), expected)
 
