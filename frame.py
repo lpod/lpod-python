@@ -267,7 +267,7 @@ class odf_frame(odf_element):
         self.set_attribute('text:anchor-page-number', str(page_number))
 
 
-    def get_formated_text(self, context):
+    def get_formatted_text(self, context):
         result = []
         for element in self.get_children():
             tag = element.get_tagname()
@@ -281,13 +281,13 @@ class odf_frame(odf_element):
             elif tag == 'draw:text-box':
                 subresult = [u'  ']
                 for element in element.get_children():
-                    subresult.append(element.get_formated_text(context))
+                    subresult.append(element.get_formatted_text(context))
                 subresult = u''.join(subresult)
                 subresult = subresult.replace(u'\n', u'\n  ')
                 subresult.rstrip(' ')
                 result.append(subresult)
             else:
-                result.append(element.get_formated_text(context))
+                result.append(element.get_formatted_text(context))
         result.append(u'\n')
         return u''.join(result)
 

@@ -38,7 +38,7 @@ from note import odf_create_note, odf_create_annotation
 from style import odf_style
 
 
-def _get_formated_text(element, context, with_text=True):
+def _get_formatted_text(element, context, with_text=True):
     document = context['document']
     rst_mode = context['rst_mode']
 
@@ -54,12 +54,12 @@ def _get_formated_text(element, context, with_text=True):
             tag = obj.get_tagname()
             # Good tags with text
             if tag in ('text:a', 'text:p'):
-                result.append(_get_formated_text(obj, context,
+                result.append(_get_formatted_text(obj, context,
                                                  with_text=True))
             # Try to convert some styles in rst_mode
             elif tag == 'text:span':
                 # XXX Move this part in span.py ??
-                text = _get_formated_text(obj, context, with_text=True)
+                text = _get_formatted_text(obj, context, with_text=True)
                 if not rst_mode:
                     result.append(text)
                     continue
@@ -115,7 +115,7 @@ def _get_formated_text(element, context, with_text=True):
             elif tag == 'text:line-break':
                 result.append(u"\n")
             else:
-                result.append(obj.get_formated_text(context))
+                result.append(obj.get_formatted_text(context))
     return u''.join(result)
 
 
@@ -155,8 +155,8 @@ def odf_create_paragraph(text=None, style=None):
 class odf_paragraph(odf_element):
     """Specialised element for paragraphs.
     """
-    def get_formated_text(self, context):
-        result = [_get_formated_text(self, context, with_text=True)]
+    def get_formatted_text(self, context):
+        result = [_get_formatted_text(self, context, with_text=True)]
         result.append(u'\n')
         return u''.join(result)
 

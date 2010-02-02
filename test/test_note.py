@@ -190,7 +190,7 @@ class TestNote(TestCase):
         self.assertEqual(paragraph.serialize(), expected)
 
 
-    def test_get_formated_text(self):
+    def test_get_formatted_text(self):
         document = self.document
         body = self.body
         paragraph = body.get_element('//text:p')
@@ -206,7 +206,7 @@ class TestNote(TestCase):
                     u"\n"
                     u"========\n"
                     u"(i) Les apparences sont trompeuses !\n")
-        self.assertEqual(document.get_formated_text(), expected)
+        self.assertEqual(document.get_formatted_text(), expected)
 
 
 

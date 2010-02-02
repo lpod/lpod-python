@@ -72,8 +72,8 @@ class odf_heading(odf_paragraph):
     paragraphs.
     """
 
-    def get_formated_text(self, context):
-        title = odf_paragraph.get_formated_text(self, context)
+    def get_formatted_text(self, context):
+        title = odf_paragraph.get_formatted_text(self, context)
 
         # No rst_mode ?
         if not context["rst_mode"]:

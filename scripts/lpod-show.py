@@ -176,9 +176,9 @@ if  __name__ == '__main__':
             'presentation-template'):
         if opts.output:
             to_file = target.open('content.txt', 'w')
-            dump(document.get_formated_text(rst_mode=opts.rst), to_file)
+            dump(document.get_formatted_text(rst_mode=opts.rst), to_file)
         elif not opts.no_content:
-            dump(document.get_formated_text(rst_mode=opts.rst), stdout)
+            dump(document.get_formatted_text(rst_mode=opts.rst), stdout)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
         if opts.output:

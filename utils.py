@@ -394,7 +394,7 @@ def get_value(element, value_type=None, try_get_text=True):
         value = element.get_attribute('office:string-value')
         if value is not None:
             return unicode(value)
-        # XXX: get_text or get_formated_text ???
+        # XXX: get_text or get_formatted_text ???
         if try_get_text:
             value = element.get_text(recursive=True)
             if value != '':

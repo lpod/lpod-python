@@ -945,17 +945,17 @@ class odf_table(odf_element):
             raise ValueError, "row mismatch: %s cells expected" % width
 
 
-    def __get_formated_text_normal(self, context):
+    def __get_formatted_text_normal(self, context):
         result = []
         for row in self.traverse_rows():
             for cell in row.traverse_cells():
                 value = get_value(cell, try_get_text=False)
                 # None ?
                 if value is None:
-                    # Try with get_formated_text on the elements
+                    # Try with get_formatted_text on the elements
                     value = []
                     for element in cell.get_children():
-                        value.append(element.get_formated_text(context))
+                        value.append(element.get_formatted_text(context))
                     value = u''.join(value)
                 else:
                     value = unicode(value)
@@ -965,7 +965,7 @@ class odf_table(odf_element):
         return u''.join(result)
 
 
-    def __get_formated_text_rst(self, context):
+    def __get_formatted_text_rst(self, context):
         # Strip the table => We must clone
         table = self.clone()
         table.rstrip_table(aggressive=True)
@@ -1160,11 +1160,11 @@ class odf_table(odf_element):
         self.set_attribute('table:style-name', style)
 
 
-    def get_formated_text(self, context):
+    def get_formatted_text(self, context):
         if context["rst_mode"]:
-            return self.__get_formated_text_rst(context)
+            return self.__get_formatted_text_rst(context)
         else:
-            return self.__get_formated_text_normal(context)
+            return self.__get_formatted_text_normal(context)
 
 
     def get_cell_values(self):

@@ -775,7 +775,7 @@ class odf_element(object):
         return self.get_element('//office:body/*[1]')
 
 
-    def get_formated_text(self, context):
+    def get_formatted_text(self, context):
         """This function must return a beautiful version of the text
         """
         return u''

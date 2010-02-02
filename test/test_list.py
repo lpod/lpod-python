@@ -30,7 +30,6 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
-from lpod.element import LAST_CHILD
 from lpod.list import odf_create_list, odf_create_list_item
 from lpod.utils import convert_unicode
 
@@ -350,7 +349,7 @@ class TestList(TestCase):
         self.assertEqual(item.serialize(pretty=True), expected)
 
 
-    def test_get_formated_text(self):
+    def test_get_formatted_text(self):
         # Create the items
         spam = odf_create_list_item(u'In this picture, there are 47 people;\n'
                                     u'none of them can be seen.')
@@ -393,7 +392,7 @@ class TestList(TestCase):
                     u'  - He cannot be seen.\n'
                     u'    - Now I am going to ask him to stand up.\n'
                     u'    - Mr. Bagthorpe, will you stand up please?\n')
-        self.assertEqual(how_not_to_be_seen1.get_formated_text(context),
+        self.assertEqual(how_not_to_be_seen1.get_formatted_text(context),
                          expected)
 
 

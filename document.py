@@ -179,7 +179,7 @@ class odf_document(object):
         return self.container.get_part(filename)
 
 
-    def get_formated_text(self, rst_mode=False):
+    def get_formatted_text(self, rst_mode=False):
         # For the moment, only "type='text'"
         type = self.get_type()
         if type not in ('text', 'text-template', 'presentation',
@@ -197,9 +197,9 @@ class odf_document(object):
         result = []
         for element in body.get_children():
             if element.get_tagname() == 'table:table':
-                result.append(element.get_formated_text(context))
+                result.append(element.get_formatted_text(context))
             else:
-                result.append(element.get_formated_text(context))
+                result.append(element.get_formatted_text(context))
                 # Insert the notes
                 footnotes = context['footnotes']
                 # Separate text from notes

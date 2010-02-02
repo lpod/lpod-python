@@ -50,10 +50,10 @@ class odf_section(odf_element):
     """Specialised element for sections.
     """
 
-    def get_formated_text(self, context):
+    def get_formatted_text(self, context):
         result = []
         for element in self.get_children():
-            result.append(element.get_formated_text(context))
+            result.append(element.get_formatted_text(context))
         result.append(u'\n')
         return u''.join(result)
 

@@ -205,10 +205,10 @@ def odf_create_connector(style=None, text_style=None, shape_id=None,
 
 class odf_shape(odf_element):
 
-    def get_formated_text(self, context):
+    def get_formatted_text(self, context):
         result = []
         for child in self.get_children():
-            result.append(child.get_formated_text(context))
+            result.append(child.get_formatted_text(context))
         result.append(u"\n")
         return u"".join(result)
 
