@@ -139,7 +139,11 @@ class odf_list(odf_element):
 
 
     def get_formated_text(self, context):
-        result = ['\n']
+        rst_mode = context["rst_mode"]
+
+        result = []
+        if rst_mode:
+            result.append('\n')
         for list_item in self.get_element_list('text:list-item'):
             text = []
             for children in list_item.get_children():
@@ -147,9 +151,10 @@ class odf_list(odf_element):
             text = u''.join(text)
             text = text.strip('\n')
             # Indent the text
-            text = u'- %s\n' % text.replace(u'\n', u'\n   ')
+            text = u'- %s\n' % text.replace(u'\n', u'\n  ')
             result.append(text)
-        result.append('\n')
+        if rst_mode:
+            result.append('\n')
         return u''.join(result)
 
 
