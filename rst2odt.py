@@ -540,7 +540,7 @@ def convert_node(node, context):
 
 
 
-def convert(document, rst_body, heading_level=0):
+def convert(document, rst_body, heading_level=1):
     """Convert a reStructuredText source into an existing document.
 
     Arguments:
