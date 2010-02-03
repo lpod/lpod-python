@@ -30,6 +30,9 @@ from subprocess import Popen, PIPE
 from sys import stderr, argv
 from os.path import basename
 
+# Import from lpod
+from vfs import vfs
+
 
 def _run_command(command):
     popen = Popen(command, stdout=PIPE, stderr=PIPE)
@@ -41,11 +44,7 @@ def _run_command(command):
 
 
 def has_git():
-    try:
-        probe = _run_command(['git', 'branch'])
-    except (ValueError, OSError):
-        return False
-    return True
+    return vfs.exists('.git')
 
 
 
