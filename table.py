@@ -794,7 +794,7 @@ class odf_row(odf_element):
 
 
     def get_cell_values(self):
-        """Get the list of all cell values in this row.
+        """Shortcut to get the list of all cell values in this row.
 
         Return: list of Python types
         """
@@ -802,18 +802,17 @@ class odf_row(odf_element):
 
 
     def set_cell_values(self, values):
-        """Set the list of all cell values in this row. The list must have
-        the same length than the row.
+        """Shortcut to set the list of all cell values in this row.
 
         Arguments:
 
             values -- list of Python types
         """
         width = self.get_row_width()
-        if len(values) != width:
-            raise ValueError, "row mismatch: %s cells expected" % width
-        for x, value in enumerate(values):
+        for x, value in enumerate(values[:width]):
             self.set_cell_value(x, value)
+        for value in values[width:]:
+            self.append_cell(odf_create_cell(value))
 
 
     def rstrip_row(self):
@@ -979,9 +978,9 @@ class odf_table(odf_element):
         rows = []
         cols_nb = 0
         cols_size = {}
-        for odf_row in table.traverse_rows():
+        for row in table.traverse_rows():
             row = []
-            for i, cell in enumerate(odf_row.traverse_cells()):
+            for i, cell in enumerate(row.traverse_cells()):
                 value = get_value(cell, try_get_text=False)
                 # None ?
                 if value is None:
@@ -1183,16 +1182,22 @@ class odf_table(odf_element):
             return self.__get_formatted_text_normal(context)
 
 
-    def get_cell_values(self):
-        """Get a matrix of all Python values of the cells.
+    def get_table_values(self):
+        """Get a matrix of all Python values of the table.
 
         Return: list of lists
         """
-        return [row.get_cell_values() for row in self.traverse_rows()]
+        data = []
+        width = self.get_table_width()
+        for row in self.traverse_rows():
+            values = row.get_cell_values()
+            values.extend([None] * (width - len(values)))
+            data.append(values)
+        return data
 
 
     def set_table_values(self, values):
-        """Set all Python values of all the cells.
+        """Set all Python values for the whole table.
 
         A list of lists is expected, with as many lists as rows, and as many
         items in each sublist as cells.
@@ -1384,8 +1389,8 @@ class odf_table(odf_element):
 
 
     def get_row_values(self, y):
-        """Get the list of Python values for the cells of the row at the
-        given "y" position.
+        """Shortcut to get the list of Python values for the cells of the row
+        at the given "y" position.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -1393,12 +1398,14 @@ class odf_table(odf_element):
 
             y -- int
         """
-        return self.get_row(y).get_cell_values()
+        values = self.get_row(y).get_cell_values()
+        values.extend([None] * (self.get_table_width() - len(values)))
+        return values
 
 
     def set_row_values(self, y, values):
-        """Set the values of all cells of the row at the given "y" position.
-        It must have the same number of cells.
+        """Shortcut to set the values of all cells of the row at the given
+        "y" position.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -1861,7 +1868,8 @@ class odf_table(odf_element):
 
 
     def get_column_cell_values(self, x):
-        """Get the list of Python values for the cells at the given position.
+        """Shortcut to get the list of Python values for the cells at the
+        given position.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
         like "C" is accepted.
@@ -1899,7 +1907,8 @@ class odf_table(odf_element):
 
 
     def set_column_cell_values(self, x, values):
-        """Set the list of Python values of cells at the given position.
+        """Shortcut to set the list of Python values of cells at the given
+        position.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
         like "C" is accepted.
