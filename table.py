@@ -346,7 +346,7 @@ def odf_create_column(default_cell_style=None, repeated=None, style=None):
     element = odf_create_element('<table:table-column/>')
     if default_cell_style:
         element.set_column_default_cell_style(default_cell_style)
-    if repeated:
+    if repeated and repeated > 1:
         element.set_column_repeated(repeated)
     if style:
         element.set_column_style(style)
@@ -940,10 +940,14 @@ class odf_table(odf_element):
         return y
 
 
-    def __check_width(self, row):
-        width = self.get_table_width()
-        if width and row.get_row_width() != width:
-            raise ValueError, "row mismatch: %s cells expected" % width
+    def __update_width(self, row):
+        """Synchronize the number of columns if the row is bigger.
+
+        Append, don't insert, not to disturb the current layout.
+        """
+        diff = row.get_row_width() - self.get_table_width()
+        if diff > 0:
+            self.append_column(odf_create_column(repeated=diff))
 
 
     def __get_formatted_text_normal(self, context):
@@ -1095,14 +1099,14 @@ class odf_table(odf_element):
 
 
     def get_table_width(self):
-        """Get the current width of the table.
+        """Get the current width of the table, measured on columns.
 
-        Measured on columns. Use the odf_table API to ensure width
+        Rows may have different widths, use the odf_table API to ensure width
         consistency.
 
         Return: int
         """
-        # Count columns: a good way to ensure consistency with row width
+        # Columns are our reference for user expected width
         columns = self._get_columns()
         repeated = self.xpath(
                 'table:table-column/@table:number-columns-repeated')
@@ -1205,7 +1209,10 @@ class odf_table(odf_element):
 
     def rstrip_table(self, aggressive=False):
         """Remove *in-place* empty rows below and empty cells at the right of
-        the table. If aggressive is True, only cells with data are kept.
+        the table. Cells with no value but style are not considered empty by
+        default.
+
+        If aggressive is True, empty cells with style are removed too.
 
         Argument:
 
@@ -1213,7 +1220,7 @@ class odf_table(odf_element):
         """
         # Step 1: remove empty rows below the table
         for row in reversed(self._get_rows()):
-            if row.is_row_empty(aggressive):
+            if row.is_row_empty(aggressive=aggressive):
                 row.get_parent().delete_element(row)
             else:
                 break
@@ -1308,7 +1315,6 @@ class odf_table(odf_element):
             row -- odf_row
         """
         y = self.__check_y(y)
-        self.__check_width(row)
         # Setting a repeated row accepted
         _set_element(y, row, self._get_rows(), odf_row.get_row_repeated,
                 odf_row.set_row_repeated)
@@ -1328,12 +1334,12 @@ class odf_table(odf_element):
         """
         if row is None:
             row = odf_create_row(width=self.get_table_width())
-        else:
-            self.__check_width(row)
         y = self.__check_y(y)
         # Inserting a repeated row accepted
         _insert_element(y, row, self._get_rows(), odf_row.get_row_repeated,
                 odf_row.set_row_repeated)
+        # Update width if necessary
+        self.__update_width(row)
         return row
 
 
@@ -1352,8 +1358,6 @@ class odf_table(odf_element):
         """
         if row is None:
             row = odf_create_row(self.get_table_width())
-        else:
-            self.__check_width(row)
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
         self.append_element(row)
@@ -1409,7 +1413,7 @@ class odf_table(odf_element):
         self.set_row(y, row)
 
 
-    def is_row_empty(self, y, aggresive=False):
+    def is_row_empty(self, y, aggressive=False):
         """Wether all the cells of the row at the given "y" position are
         undefined.
 
@@ -1419,7 +1423,7 @@ class odf_table(odf_element):
 
             y -- int
         """
-        return self.get_row(y).is_row_empty(aggresive)
+        return self.get_row(y).is_row_empty(aggressive=aggressive)
 
 
     #
@@ -1468,7 +1472,8 @@ class odf_table(odf_element):
 
 
     def get_cell_value(self, coordinates):
-        """Get the Python value of the cell at the given coordinates.
+        """Shortcut to get the Python value of the cell at the given
+        coordinates.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
         human-readable position like "C4".
@@ -1494,11 +1499,13 @@ class odf_table(odf_element):
             cell -- odf_cell
         """
         x, y = _get_cell_coordinates(coordinates)
+        x = self.__check_x(x)
         y = self.__check_y(y)
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
                 row.set_cell(x, cell)
                 self.set_row(h, row)
+                return
 
 
     def set_cell_value(self, coordinates, value):
@@ -1580,10 +1587,10 @@ class odf_table(odf_element):
         """Insert the given cell at the given coordinates. If no cell is
         given, an empty one is created.
 
-        They are either a 2-uplet of (x, y) starting from 0, or a
+        Coordinates are either a 2-uplet of (x, y) starting from 0, or a
         human-readable position like "C4".
 
-        Other rows are expanded to maintain width consistency.
+        Cells on the right are shifted. Other rows remain untouched.
 
         Arguments:
 
@@ -1596,19 +1603,25 @@ class odf_table(odf_element):
         y = self.__check_y(y)
         if cell is None:
             cell = odf_create_cell()
-        # Repetited cells are accepted
-        repeated = cell.get_cell_repeated()
-        stub = odf_create_cell(repeated=repeated)
-        # Must update width if not done to pass checks
-        future_width = self._get_rows()[0].get_row_width() + (repeated or 1)
-        if self.get_table_width() != future_width:
-            self.insert_column(x, odf_create_column(repeated=repeated))
-        # Now an empty column has been inserted
+        # Repeated cells are accepted
+        repeated = cell.get_cell_repeated() or 1
+        # Insert the cell
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
-                row.set_cell(x, cell)
+                row_width = row.get_row_width()
+                if row_width <= x:
+                    diff = row_width - x
+                    if diff > 0:
+                        row.append_cell(odf_create_cell(repeated=diff))
+                    row.append_cell(cell)
+                else:
+                    row.insert_cell(x, cell)
                 self.set_row(h, row)
-        return cell
+                # Update width if necessary
+                # Don't insert: we are shifting a single row, not the
+                # whole column; just append to match the width
+                self.__update_width(row)
+                return cell
 
 
     def append_cell(self, y, cell=None):
@@ -1617,7 +1630,7 @@ class odf_table(odf_element):
 
         Position start at 0. So cell A4 is on row 3.
 
-        Other rows are expanded to maintain width consistency.
+        Other rows remain untouched.
 
         Arguments:
 
@@ -1628,28 +1641,26 @@ class odf_table(odf_element):
         y = self.__check_y(y)
         if cell is None:
             cell = odf_create_cell()
-        # Repetited cells are accepted
-        repeated = cell.get_cell_repeated()
-        stub = odf_create_cell(repeated=repeated)
-        # Must update width if not done to pass checks
-        future_width = self._get_rows()[0].get_row_width() + (repeated or 1)
-        if self.get_table_width() != future_width:
-            self.append_column(odf_create_column(repeated=repeated))
-        # Now an empty column has been appended
+        # Repeated cells are accepted
+        repeated = cell.get_cell_repeated() or 1
+        # Append the cell
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
-                row.set_cell(future_width - 1, cell)
+                row.append_cell(cell)
                 self.set_row(h, row)
+                # Update width if necessary
+                self.__update_width(row)
                 return cell
 
 
     def delete_cell(self, coordinates):
-        """Delete the cell at the given coordinates.
+        """Delete the cell at the given coordinates, so that next cells are
+        shifted to the left.
 
-        They are either a 2-uplet of (x, y) starting from 0, or a
+        Coordinates are either a 2-uplet of (x, y) starting from 0, or a
         human-readable position like "C4".
 
-        Other rows are reduced to maintain width consistency.
+        Use "set_cell_value" for erasing value.
 
         Arguments:
 
@@ -1658,13 +1669,9 @@ class odf_table(odf_element):
         x, y = _get_cell_coordinates(coordinates)
         x = self.__check_x(x)
         y = self.__check_y(y)
-        # Must update width if not done to pass checks
-        future_width = self._get_rows()[0].get_row_width() - 1
-        if self.get_table_width() != future_width:
-            self.delete_column(x)
-            # Will have deleted cells in rows too
-        # Else nothing to do
-
+        row = self.get_row(y)
+        row.delete_cell(x)
+        self.set_row(y, row)
 
 
     #
@@ -1776,11 +1783,14 @@ class odf_table(odf_element):
         _insert_element(x, column, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
-        # Update width if not done
-        width = self.get_table_width()
+        # Repetitions are accepted
+        repeated = column.get_column_repeated() or 1
+        # Update width on every row
         for row in self._get_rows():
-            if row.get_row_width() != width:
-                row.insert_cell(x, odf_create_cell())
+            if row.get_row_width() > x:
+                row.insert_cell(x, odf_create_cell(repeated=repeated))
+            # Shorter rows don't need insert
+            # Longer rows shouldn't exist!
         return column
 
 
@@ -1801,11 +1811,9 @@ class odf_table(odf_element):
             column = odf_create_column()
         last_column = self._get_columns()[-1]
         self.insert_element(column, position=self.index(last_column) + 1)
-        # Update width if not done
-        width = self.get_table_width()
-        for row in self._get_rows():
-            if row.get_row_width() != width:
-                row.append_cell(odf_create_cell())
+        # Repetitions are accepted
+        repeated = column.get_column_repeated() or 1
+        # No need to update row widths
         return column
 
 
@@ -1824,11 +1832,12 @@ class odf_table(odf_element):
         _delete_element(x, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
-        # Update width if not done
+        # Update width
         width = self.get_table_width()
-        for row in self._get_rows():
-            if row.get_row_width() != width:
+        for y, row in enumerate(self.traverse_rows()):
+            if row.get_row_width() >= width:
                 row.delete_cell(x)
+                self.set_row(y, row)
 
 
     def get_column_cells(self, x):
@@ -1911,8 +1920,8 @@ class odf_table(odf_element):
         """Wether all the cells at the given position are empty.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
-        like "C" is accepted. If aggressive is True, the cells without data are
-        said empty.
+        like "C" is accepted. If aggressive is True, the cells without data
+        are said empty.
 
         Return: bool
         """

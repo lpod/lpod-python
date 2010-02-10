@@ -948,14 +948,14 @@ class TestTableRow(TestCase):
 
     def test_set_row_smaller(self):
         table = self.table.clone()
-        small_row = odf_create_row(width=table.get_table_width() - 1)
-        self.assertRaises(ValueError, table.set_row, 0, small_row)
+        table.set_row(0, odf_create_row(width=table.get_table_width() - 1))
+        self.assertEqual(table.get_table_height(), 4)
 
 
     def test_set_row_bigger(self):
         table = self.table.clone()
-        big_row = odf_create_row(width=table.get_table_width() + 1)
-        self.assertRaises(ValueError, table.set_row, 0, big_row)
+        table.set_row(0, odf_create_row(width=table.get_table_width() + 1))
+        self.assertEqual(table.get_table_height(), 4)
 
 
     def test_insert(self):
@@ -999,13 +999,15 @@ class TestTableRow(TestCase):
     def test_insert_row_smaller(self):
         table = self.table.clone()
         small_row = odf_create_row(width=table.get_table_width() - 1)
-        self.assertRaises(ValueError, table.insert_row, 0, small_row)
+        table.insert_row(0, small_row)
+        self.assertEqual(table.get_table_height(), 5)
 
 
     def test_insert_row_bigger(self):
         table = self.table.clone()
         big_row = odf_create_row(width=table.get_table_width() + 1)
-        self.assertRaises(ValueError, table.insert_row, 0, big_row)
+        table.insert_row(0, big_row)
+        self.assertEqual(table.get_table_height(), 5)
 
 
     def test_append(self):
@@ -1030,14 +1032,14 @@ class TestTableRow(TestCase):
 
     def test_append_row_smaller(self):
         table = self.table.clone()
-        small_row = odf_create_row(width=table.get_table_width() - 1)
-        self.assertRaises(ValueError, table.append_row, small_row)
+        table.append_row(odf_create_row(width=table.get_table_width() - 1))
+        self.assertEqual(table.get_table_height(), 5)
 
 
     def test_append_row_bigger(self):
         table = self.table.clone()
-        big_row = odf_create_row(width=table.get_table_width() + 1)
-        self.assertRaises(ValueError, table.append_row, big_row)
+        table.append_row(odf_create_row(width=table.get_table_width() + 1))
+        self.assertEqual(table.get_table_height(), 5)
 
 
     def test_delete_row(self):
@@ -1146,10 +1148,10 @@ class TestTableCell(TestCase):
         table = self.table.clone()
         table.insert_cell('B3', odf_create_cell(u"Inserted"))
         self.assertEqual(table.get_cell_values(),
-                [[1,        None, 1, 1, 2, 3, 3, 3],
-                 [1,        None, 1, 1, 2, 3, 3, 3],
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
                  [1, u"Inserted", 1, 1, 2, 3, 3, 3],
-                 [1,        None, 2, 3, 4, 5, 6, 7]])
+                 [1, 2, 3, 4, 5, 6, 7]])
         # Test columns are synchronized
         self.assertEqual(table.get_table_width(), 8)
 
@@ -1164,10 +1166,10 @@ class TestTableCell(TestCase):
         table = self.table.clone()
         table.append_cell(1, odf_create_cell(u"Appended"))
         self.assertEqual(table.get_cell_values(),
-                [[1, 1, 1, 2, 3, 3, 3, None],
+                [[1, 1, 1, 2, 3, 3, 3],
                  [1, 1, 1, 2, 3, 3, 3, u"Appended"],
-                 [1, 1, 1, 2, 3, 3, 3, None],
-                 [1, 2, 3, 4, 5, 6, 7, None]])
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
         # Test columns are synchronized
         self.assertEqual(table.get_table_width(), 8)
 
@@ -1176,12 +1178,12 @@ class TestTableCell(TestCase):
         table = self.table.clone()
         table.delete_cell('F3')
         self.assertEqual(table.get_cell_values(),
-                [[1, 1, 1, 2, 3, 3],
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
                  [1, 1, 1, 2, 3, 3],
-                 [1, 1, 1, 2, 3, 3],
-                 [1, 2, 3, 4, 5, 7]])
+                 [1, 2, 3, 4, 5, 6, 7]])
         # Test columns are synchronized
-        self.assertEqual(table.get_table_width(), 6)
+        self.assertEqual(table.get_table_width(), 7)
 
 
 
@@ -1246,7 +1248,7 @@ class TestTableColumn(TestCase):
         table = self.table.clone()
         table.append_column(odf_create_column())
         self.assertEqual(table.get_table_width(), 8)
-        self.assertEqual(table.get_row(0).get_row_width(),  8)
+        self.assertEqual(table.get_row(0).get_row_width(),  7)
         # The column must be inserted between the columns and the rows
         self.assert_(type(table.get_children()[-1]) is not odf_column)
 
