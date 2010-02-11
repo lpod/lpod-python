@@ -977,8 +977,17 @@ class odf_table(odf_element):
         cols_size = {}
         for odf_row in table.traverse_rows():
             row = []
-            for i, value in enumerate(odf_row.get_cell_values()):
-                value = u'' if value is None else unicode(value)
+            for i, cell in enumerate(odf_row.traverse_cells()):
+                value = get_value(cell, try_get_text=False)
+                # None ?
+                if value is None:
+                    # Try with get_formatted_text on the elements
+                    value = []
+                    for element in cell.get_children():
+                        value.append(element.get_formatted_text(context))
+                    value = u''.join(value)
+                else:
+                    value = unicode(value)
                 value = value.strip()
                 # Strip the empty columns
                 if value:
@@ -1037,9 +1046,11 @@ class odf_table(odf_element):
             for i, value in enumerate(row[:cols_nb]):
                 wrapped_value = []
                 for part in value.split('\n'):
-                    wrapped_value.extend(wrap(part, width=cols_size[i]))
-                wrapped_value = [ value.strip() for value in wrapped_value
-                                  if value.strip() ]
+                    wrapped_part = wrap(part, width=cols_size[i])
+                    if wrapped_part:
+                        wrapped_value.extend(wrapped_part)
+                    else:
+                        wrapped_value.append('')
                 wrapped_row.append(wrapped_value)
 
             # Append!
