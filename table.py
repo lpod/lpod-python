@@ -562,19 +562,17 @@ class odf_row(odf_element):
 
     # Private API
 
-    def __check_x(self, x):
-        x = _alpha_to_digit(x)
-        width = self.get_row_width()
-        if x < 0:
-            x = width + x
-        if x < 0 or x >= width:
-            raise ValueError, "X %d outside of row" % x
-        return x
-
-
     def _get_cells(self):
         return self.get_element_list(
                 '(table:table-cell|table:covered-table-cell)')
+
+
+    def _translate_x(self, x):
+        x = _alpha_to_digit(x)
+        if x < 0:
+            x = self.get_row_width() + x
+        return x
+
 
     # Public API
 
@@ -693,8 +691,11 @@ class odf_row(odf_element):
 
         Return: odf_cell
         """
-        x = self.__check_x(x)
-
+        x = self._translate_x(x)
+        # Outside the defined row
+        if x >= self.get_row_width():
+            return odf_create_cell()
+        # Inside the defined row
         cell_number = 0
         for cell in self._get_cells():
             repeated = cell.get_cell_repeated() or 1
@@ -716,7 +717,7 @@ class odf_row(odf_element):
         return self.get_cell(x).get_cell_value()
 
 
-    def set_cell(self, x, cell):
+    def set_cell(self, x, cell=None):
         """Push the cell back in the row at position "x" starting from 0.
         Alphabetical positions like "D" are accepted.
 
@@ -724,9 +725,16 @@ class odf_row(odf_element):
 
             x -- int or str
         """
-        x = self.__check_x(x)
-        if cell.get_cell_repeated():
-            raise ValueError, "setting a repeted cell not supported"
+        if cell is None:
+            cell = odf_create_cell()
+        x = self._translate_x(x)
+        # Outside the defined row
+        diff = x - self.get_row_width()
+        if diff > 0:
+            self.append_cell(odf_create_cell(repeated=diff))
+            self.append_cell(cell.clone())
+            return
+        # Inside the defined row
         _set_element(x, cell, self._get_cells(), odf_cell.get_cell_repeated,
                 odf_cell.set_cell_repeated)
 
@@ -755,7 +763,14 @@ class odf_row(odf_element):
         """
         if cell is None:
             cell = odf_create_cell()
-        x = self.__check_x(x)
+        x = self._translate_x(x)
+        # Outside the defined row
+        diff = x - self.get_row_width()
+        if diff > 0:
+            self.append_cell(odf_create_cell(repeated=diff))
+            self.append_cell(cell.clone())
+            return
+        # Inside the defined row
         # Inserting a repeated cell accepted
         _insert_element(x, cell, self._get_cells(),
                 odf_cell.get_cell_repeated, odf_cell.set_cell_repeated)
@@ -782,13 +797,18 @@ class odf_row(odf_element):
         """Delete the cell at the given position "x" starting from 0.
         Alphabetical positions like "D" are accepted.
 
-        Do not use when working on a table, use ``odf_table.delete_cell``.
+        Cells on the right will be shifted to the left. In a table, other
+        rows remain unaffected.
 
         Arguments:
 
             x -- int or str
         """
-        x = self.__check_x(x)
+        x = self._translate_x(x)
+        # Outside the defined row
+        if x >= self.get_row_width():
+            return
+        # Inside the defined row
         _delete_element(x, self._get_cells(), odf_cell.get_cell_repeated,
                 odf_cell.set_cell_repeated)
 
@@ -921,22 +941,21 @@ class odf_table(odf_element):
     # Private API
     #
 
-    def __check_x(self, x):
-        width = self.get_table_width()
-        if x < 0:
-            x = width + x
-        if x < 0 or x >= width:
-            raise ValueError, "X %d outside of table" % x
-        return x
-
-
-    def __check_y(self, y):
-        height = self.get_table_height()
+    def _translate_y(self, y):
+        # "3" (couting from 1) -> 2 (couting from 0)
+        if isinstance(y, str):
+            y = int(y) - 1
         if y < 0:
-            y = height + y
-        if y < 0 or y >= height:
-            raise ValueError, "Y %d outside of table" % y
+            y = self.get_table_height() + y
         return y
+
+
+    def _translate_coordinates(self, coordinates):
+        x, y = _get_cell_coordinates(coordinates)
+        if x < 0:
+            x = self.get_table_width() + x
+        y = self._translate_y(y)
+        return (x, y)
 
 
     def __update_width(self, row):
@@ -1182,18 +1201,23 @@ class odf_table(odf_element):
             return self.__get_formatted_text_normal(context)
 
 
-    def get_table_values(self):
+    def get_table_values(self, iterate=False):
         """Get a matrix of all Python values of the table.
 
         Return: list of lists
         """
-        data = []
+        if not iterate:
+            data = []
         width = self.get_table_width()
         for row in self.traverse_rows():
             values = row.get_cell_values()
             values.extend([None] * (width - len(values)))
-            data.append(values)
-        return data
+            if iterate:
+                yield values
+            else:
+                data.append(values)
+        if not iterate:
+            return data
 
 
     def set_table_values(self, values):
@@ -1300,13 +1324,17 @@ class odf_table(odf_element):
 
         Return: odf_row
         """
-        y = self.__check_y(y)
+        y = self._translate_y(y)
+        # Outside the defined table
+        if y >= self.get_table_height():
+            return odf_create_row()
+        # Inside the defined table
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
                 return row
 
 
-    def set_row(self, y, row):
+    def set_row(self, y, row=None):
         """Replace the row at the given position with the new one. It must
         have the same number of cells. Repetion of the old row will be
         adjusted.
@@ -1319,7 +1347,16 @@ class odf_table(odf_element):
 
             row -- odf_row
         """
-        y = self.__check_y(y)
+        if row is None:
+            row = odf_create_row()
+        y = self._translate_y(y)
+        # Outside the defined table
+        diff = y - self.get_table_height()
+        if diff > 0:
+            self.append_row(odf_create_row(repeated=diff))
+            self.append_row(row.clone())
+            return
+        # Inside the defined table
         # Setting a repeated row accepted
         _set_element(y, row, self._get_rows(), odf_row.get_row_repeated,
                 odf_row.set_row_repeated)
@@ -1338,8 +1375,15 @@ class odf_table(odf_element):
             row -- odf_row
         """
         if row is None:
-            row = odf_create_row(width=self.get_table_width())
-        y = self.__check_y(y)
+            row = odf_create_row()
+        y = self._translate_y(y)
+        # Outside the defined table
+        diff = y - self.get_table_height()
+        if diff > 0:
+            self.append_row(odf_create_row(repeated=diff))
+            self.append_row(row.clone())
+            return row
+        # Inside the defined table
         # Inserting a repeated row accepted
         _insert_element(y, row, self._get_rows(), odf_row.get_row_repeated,
                 odf_row.set_row_repeated)
@@ -1383,7 +1427,11 @@ class odf_table(odf_element):
 
             y -- int
         """
-        y = self.__check_y(y)
+        y = self._translate_y(y)
+        # Outside the defined table
+        if y >= self.get_table_height():
+            return
+        # Inside the defined table
         _delete_element(y, self._get_rows(), odf_row.get_row_repeated,
                 odf_row.set_row_repeated)
 
@@ -1471,8 +1519,11 @@ class odf_table(odf_element):
 
         Return: odf_cell
         """
-        x, y = _get_cell_coordinates(coordinates)
-        y = self.__check_y(y)
+        x, y = self._translate_coordinates(coordinates)
+        # Outside the defined table
+        if y >= self.get_table_height():
+            return odf_create_cell()
+        # Inside the defined table
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
                 return row.get_cell(x)
@@ -1493,7 +1544,7 @@ class odf_table(odf_element):
         return self.get_cell().get_cell_value()
 
 
-    def set_cell(self, coordinates, cell):
+    def set_cell(self, coordinates, cell=None):
         """Replace a cell of the table at the given coordinates.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
@@ -1505,9 +1556,18 @@ class odf_table(odf_element):
 
             cell -- odf_cell
         """
-        x, y = _get_cell_coordinates(coordinates)
-        x = self.__check_x(x)
-        y = self.__check_y(y)
+        if cell is None:
+            cell = odf_create_cell()
+        x, y = self._translate_coordinates(coordinates)
+        # Outside the defined table
+        diff = y - self.get_table_height()
+        if diff > 0:
+            self.append_row(odf_create_row(repeated=diff))
+            row = odf_create_row()
+            row.set_cell(x, cell.clone())
+            self.append_row(row)
+            return
+        # Inside the defined table
         for h, row in enumerate(self.traverse_rows()):
             if h == y:
                 row.set_cell(x, cell)
@@ -1561,9 +1621,7 @@ class odf_table(odf_element):
             if type is None:
                 raise ValueError, "document type not supported for images"
         # We need the end address of the image
-        x, y = _get_cell_coordinates(coordinates)
-        x = self.__check_x(x)
-        y = self.__check_y(y)
+        x, y = self._translate_coordinates(coordinates)
         cell = self.get_cell((x, y))
         image_frame = image_frame.clone()
         # Remove any previous paragraph, frame, etc.
@@ -1605,11 +1663,18 @@ class odf_table(odf_element):
 
             cell -- odf_cell
         """
-        x, y = _get_cell_coordinates(coordinates)
-        x = self.__check_x(x)
-        y = self.__check_y(y)
         if cell is None:
             cell = odf_create_cell()
+        x, y = self._translate_coordinates(coordinates)
+        # Outside the defined table
+        diff = y - self.get_table_height()
+        if diff > 0:
+            self.append_row(odf_create_row(repeated=diff))
+            row = odf_create_row()
+            row.set_cell(x, cell.clone())
+            self.append_row(row)
+            return cell
+        # Inside the defined table
         # Repeated cells are accepted
         repeated = cell.get_cell_repeated() or 1
         # Insert the cell
@@ -1624,11 +1689,12 @@ class odf_table(odf_element):
                 else:
                     row.insert_cell(x, cell)
                 self.set_row(h, row)
-                # Update width if necessary
-                # Don't insert: we are shifting a single row, not the
-                # whole column; just append to match the width
-                self.__update_width(row)
-                return cell
+                break
+        # Update width if necessary
+        # Don't insert: we are shifting a single row, not the
+        # whole column; just append to match the width
+        self.__update_width(row)
+        return cell
 
 
     def append_cell(self, y, cell=None):
@@ -1645,9 +1711,18 @@ class odf_table(odf_element):
 
             cell -- odf_cell
         """
-        y = self.__check_y(y)
         if cell is None:
             cell = odf_create_cell()
+        y = self._translate_y(y)
+        # Outside the defined table
+        diff = y - self.get_table_height()
+        if diff > 0:
+            self.append_row(odf_create_row(repeated=diff))
+            row = odf_create_row()
+            row.append_cell(cell.clone())
+            self.append_row(row)
+            return cell
+        # Inside the defined table
         # Repeated cells are accepted
         repeated = cell.get_cell_repeated() or 1
         # Append the cell
@@ -1655,9 +1730,10 @@ class odf_table(odf_element):
             if h == y:
                 row.append_cell(cell)
                 self.set_row(h, row)
-                # Update width if necessary
-                self.__update_width(row)
-                return cell
+                break
+        # Update width if necessary
+        self.__update_width(row)
+        return cell
 
 
     def delete_cell(self, coordinates):
@@ -1673,9 +1749,11 @@ class odf_table(odf_element):
 
             coordinates -- (int, int) or str
         """
-        x, y = _get_cell_coordinates(coordinates)
-        x = self.__check_x(x)
-        y = self.__check_y(y)
+        x, y = self._translate_coordinates(coordinates)
+        # Outside the defined table
+        if y >= self.get_table_height():
+            return
+        # Inside the defined table
         row = self.get_row(y)
         row.delete_cell(x)
         self.set_row(y, row)
@@ -1742,13 +1820,16 @@ class odf_table(odf_element):
 
         Return: odf_column
         """
-        x = self.__check_x(x)
+        # Outside the defined table
+        if x >= self.get_table_width():
+            return odf_create_column()
+        # Inside the defined table
         for w, column in enumerate(self.traverse_columns()):
             if w == x:
                 return column
 
 
-    def set_column(self, x, column):
+    def set_column(self, x, column=None):
         """Replace the column at the given "x" position.
 
         ODF columns don't contain cells, only style information.
@@ -1762,7 +1843,15 @@ class odf_table(odf_element):
 
             column -- odf_column
         """
-        x = self.__check_x(x)
+        if column is None:
+            column = odf_create_column()
+        # Outside the defined table
+        diff = x - self.get_table_width()
+        if diff > 0:
+            self.append_column(odf_create_column(repeated=diff))
+            self.append_column(column.clone())
+            return
+        # Inside the defined table
         _set_element(x, column, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
@@ -1784,9 +1873,15 @@ class odf_table(odf_element):
 
             column -- odf_column
         """
-        x = self.__check_x(x)
         if column is None:
             column = odf_create_column()
+        # Outside the defined table
+        diff = x - self.get_table_width()
+        if diff > 0:
+            self.append_column(odf_create_column(repeated=diff))
+            self.append_column(column.clone())
+            return column
+        # Inside the defined table
         _insert_element(x, column, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
@@ -1835,7 +1930,10 @@ class odf_table(odf_element):
 
             x -- int or str.isalpha()
         """
-        x = self.__check_x(x)
+        # Outside the defined table
+        if x >= self.get_table_width():
+            return
+        # Inside the defined table
         _delete_element(x, self._get_columns(),
                 odf_column.get_column_repeated,
                 odf_column.set_column_repeated)
@@ -1971,19 +2069,17 @@ class odf_table(odf_element):
             file = vfs.open(file, 'w')
             close_after = True
         quoted = '\\' + quotechar
-        for row in self.traverse_rows():
-            current_row = []
-            for value in row.get_cell_values():
+        for values in self.get_table_values(iterate=True):
+            line = []
+            for value in values:
                 if type(value) is unicode:
                     value = value.encode(encoding)
                 if type(value) is str:
                     value = value.strip()
                 value = '' if value is None else str(value)
-                # Quote
                 value = value.replace(quotechar, quoted)
-                # Append !
-                current_row.append(quotechar + value + quotechar)
-            file.write(delimiter.join(current_row) + lineterminator)
+                line.append(quotechar + value + quotechar)
+            file.write(delimiter.join(line) + lineterminator)
         if close_after:
             file.close()
 
