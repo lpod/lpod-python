@@ -1201,23 +1201,32 @@ class odf_table(odf_element):
             return self.__get_formatted_text_normal(context)
 
 
-    def get_table_values(self, iterate=False):
+    def get_table_values(self):
         """Get a matrix of all Python values of the table.
 
         Return: list of lists
         """
-        if not iterate:
-            data = []
+        data = []
         width = self.get_table_width()
         for row in self.traverse_rows():
             values = row.get_cell_values()
+            # Complement row to match column width
             values.extend([None] * (width - len(values)))
-            if iterate:
-                yield values
-            else:
-                data.append(values)
-        if not iterate:
-            return data
+            data.append(values)
+        return data
+
+
+    def iter_table_values(self):
+        """Iterate through lines of Python values of the table.
+
+        Return: iterator of lists
+        """
+        width = self.get_table_width()
+        for row in self.traverse_rows():
+            values = row.get_cell_values()
+            # Complement row to match column width
+            values.extend([None] * (width - len(values)))
+            yield values
 
 
     def set_table_values(self, values):
