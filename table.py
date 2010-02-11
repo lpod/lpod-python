@@ -997,9 +997,9 @@ class odf_table(odf_element):
         rows = []
         cols_nb = 0
         cols_size = {}
-        for row in table.traverse_rows():
+        for odf_row in table.traverse_rows():
             row = []
-            for i, cell in enumerate(row.traverse_cells()):
+            for i, cell in enumerate(odf_row.traverse_cells()):
                 value = get_value(cell, try_get_text=False)
                 # None ?
                 if value is None:
