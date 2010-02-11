@@ -2078,7 +2078,7 @@ class odf_table(odf_element):
             file = vfs.open(file, 'w')
             close_after = True
         quoted = '\\' + quotechar
-        for values in self.get_table_values(iterate=True):
+        for values in self.iter_table_values():
             line = []
             for value in values:
                 if type(value) is unicode:
@@ -2143,6 +2143,9 @@ def import_from_csv(file, name, style=None, delimiter=None, quotechar=None,
     table = odf_create_table(name, style=style)
     for line in csv:
         row = odf_create_row()
+        # rstrip line
+        while line and not line[-1].strip():
+            line.pop()
         for value in line:
             cell = odf_create_cell(_get_python_value(value, encoding))
             row.append_cell(cell)
