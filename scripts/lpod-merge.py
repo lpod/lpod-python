@@ -29,7 +29,7 @@
 # Import from the standard library
 from optparse import OptionParser
 from os.path import basename, splitext
-from sys import exit
+from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
@@ -94,6 +94,9 @@ def add_odt(filename, output_doc):
 
 
 def _get_table_name(name, output_body):
+    if isinstance(name, str):
+        encoding = stdout.encoding or 'utf8'
+        name = unicode(name, encoding)
     already_names = set([ table.get_table_name()
                           for table in output_body.get_table_list() ])
     if name in already_names:
