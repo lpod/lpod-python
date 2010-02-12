@@ -342,7 +342,7 @@ def convert_block_quote(node, context):
 
 
 
-def _add_image(image, caption, context):
+def _add_image(image, caption, context, width=None, height=None):
     DPI = 72
 
     # Load the image to find its size
@@ -354,7 +354,14 @@ def _add_image(image, caption, context):
         warn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size
-    size = (str(float(size[0]) / DPI)+"in", str(float(size[1]) / DPI)+"in")
+    if width:
+        if not height:
+            height = int(width / (float(size[0]) / float(size[1])))
+        size = (width, height)
+    elif height:
+        width = int(height * (float(size[0]) / float(size[1])))
+        size = (width, height)
+    size = ("%sin" % (float(size[0]) / DPI), "%sin" % (float(size[1]) / DPI))
 
     # Add the image
     local_uri = context["doc"].add_file(image)
@@ -396,13 +403,17 @@ def _add_image(image, caption, context):
 
 def convert_image(node, context):
     image = node.get("uri")
-    _add_image(image, None, context)
+    width = 'width' in node and int(node['width']) or None
+    height = 'height' in node and int(node['height']) or None
+    _add_image(image, None, context, width=width, height=height)
 
 
 
 def convert_figure(node, context):
     image = None
     caption = None
+    width = None
+    height = None
 
     for child in node:
         tagname = child.tagname
@@ -411,6 +422,8 @@ def convert_figure(node, context):
                 warn("unexpected image (just a image / figure) for a figure")
                 continue
             image = child.get("uri")
+            width = 'width' in child and int(child['width']) or None
+            height = 'height' in child and int(child['height']) or None
         elif tagname == "caption":
             if caption is not None:
                 warn("unexpected caption (just a caption / figure) for a "
@@ -418,7 +431,7 @@ def convert_figure(node, context):
                 continue
             caption = child.astext()
 
-    _add_image(image, caption, context)
+    _add_image(image, caption, context, width=width, height=height)
 
 
 
