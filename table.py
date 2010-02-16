@@ -143,15 +143,15 @@ def _get_python_value(data, encoding):
 
 def _set_element(position, new_element, real_elements, get_repeated,
         set_repeated):
-    p = 0
+    pos = 0
     for real_element in real_elements:
         repeated = get_repeated(real_element) or 1
         for current_repetition in xrange(repeated):
-            if p == position:
+            if pos == position:
                 # Repetitions start counting at 1
                 current_repetition += 1
                 break
-            p += 1
+            pos += 1
         else:
             # Not found on this(these) element(s)
             continue
@@ -180,15 +180,15 @@ def _set_element(position, new_element, real_elements, get_repeated,
 
 def _insert_element(position, new_element, real_elements, get_repeated,
         set_repeated):
-    p = 0
+    pos = 0
     for real_element in real_elements:
         repeated = get_repeated(real_element) or 1
         for current_repetition in xrange(repeated):
-            if p == position:
+            if pos == position:
                 # Repetitions start counting at 1
                 current_repetition += 1
                 break
-            p += 1
+            pos += 1
         else:
             # Not found on this(these) element(s)
             continue
@@ -214,13 +214,14 @@ def _insert_element(position, new_element, real_elements, get_repeated,
 
 
 def _delete_element(position, real_elements, get_repeated, set_repeated):
-    p = 0
+    parent = real_elements[0].get_parent()
+    pos = 0
     for real_element in real_elements:
         repeated = get_repeated(real_element) or 1
         for current_repetition in xrange(repeated):
-            if p == position:
+            if pos == position:
                 break
-            p += 1
+            pos += 1
         else:
             # Not found on this(these) element(s)
             continue
@@ -230,7 +231,6 @@ def _delete_element(position, real_elements, get_repeated, set_repeated):
             set_repeated(real_element, repeated)
         else:
             # Game over
-            parent = real_element.get_parent()
             parent.delete_element(real_element)
         return
 
@@ -704,7 +704,6 @@ class odf_row(odf_element):
                     # Return a copy without the now obsolete repetition
                     cell = cell.clone()
                     cell.set_cell_repeated(None)
-
                     return cell
                 cell_number += 1
 
@@ -1265,7 +1264,7 @@ class odf_table(odf_element):
         # Step 2: remove empty columns of cells for remaining rows
         for x in xrange(self.get_table_width() - 1, -1, -1):
             # XXX if aggressive=True => very slow
-            if self.is_column_empty(x, False):
+            if self.is_column_empty(x, aggressive=aggressive):
                 self.delete_column(x)
             else:
                 break
@@ -1948,10 +1947,9 @@ class odf_table(odf_element):
                 odf_column.set_column_repeated)
         # Update width
         width = self.get_table_width()
-        for y, row in enumerate(self.traverse_rows()):
+        for y, row in enumerate(self._get_rows()):
             if row.get_row_width() >= width:
                 row.delete_cell(x)
-                self.set_row(y, row)
 
 
     def get_column_cells(self, x):
@@ -1968,9 +1966,10 @@ class odf_table(odf_element):
         """
         result = []
         for row in self._get_rows():
+            cell = row.get_cell(x)
             repeated = row.get_row_repeated() or 1
             for i in xrange(repeated):
-                result.append(row.get_cell(x))
+                result.append(cell.clone())
         return result
 
 
