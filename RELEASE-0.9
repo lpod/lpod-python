@@ -45,11 +45,20 @@ High-level API
 
 - Draw page can use the fade transition.
 
+- Tables are quite faster and easier to use since you can access any
+  row/column/cell without having to expand the table first.
+
+- Most high-level elements support outputting reStructuredText representation.
+
+- Medium-complexity reStructuredText documents can be converted to ODT, from
+  scratch or appended to an existing document (docutils required).
+
 Command-line Utilities
 ----------------------
 
-- The lpod-show.py tool dumps a textual representation of the content. It can
-  also dump the latter, style information and metadata list in a directory.
+- The lpod-show.py tool dumps a textual representation of the content (informal
+  or reStructuredText). It can also dump the latter, style information and
+  metadata list in a directory. 
 
 - The lpod-style.py introspection tool shows the list of styles of the
   document, wether it is used, and is able to remove them all. It can also
@@ -64,10 +73,12 @@ Command-line Utilities
 - The lpod-highlight.py tool can apply a style on a text pattern. The default
   style is overlining as if you were using a yellow highlighter pen.
 
-- The lpod-mm2odt.py converts XML mind-map files to ODT.
+- The lpod-mm2odt.py tool converts XML mind-map files to ODT.
+
+- The lpod-rst2odt.py tool converts reStructuredText document to ODT.
 
 Documentation
 --------------
 
-- 80% of the documentation if finish style missing:
-xxx, xxx, xxx
+- 80 % of the documentation is implemented. Styles are the biggest missing
+  part.
