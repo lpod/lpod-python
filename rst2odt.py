@@ -354,11 +354,25 @@ def _add_image(image, caption, context, width=None, height=None):
         warn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size
+    # px is assumed
     if width:
-        if not height:
+        try:
+            width = int(width.replace('px', ''))
+        except ValueError:
+            raise NotImplementedError, 'only pixel units supported'
+        if height:
+            try:
+                height = int(height)
+            except ValueError:
+                raise NotImplementedError, 'only pixel units supported'
+        else:
             height = int(width / (float(size[0]) / float(size[1])))
         size = (width, height)
     elif height:
+        try:
+            height = int(height.replace('px', ''))
+        except ValueError:
+            raise NotImplementedError, 'only pixel units supported'
         width = int(height * (float(size[0]) / float(size[1])))
         size = (width, height)
     size = ("%sin" % (float(size[0]) / DPI), "%sin" % (float(size[1]) / DPI))
@@ -403,8 +417,8 @@ def _add_image(image, caption, context, width=None, height=None):
 
 def convert_image(node, context):
     image = node.get("uri")
-    width = 'width' in node and int(node['width']) or None
-    height = 'height' in node and int(node['height']) or None
+    width = node.get('width')
+    height = node.get('height')
     _add_image(image, None, context, width=width, height=height)
 
 
@@ -422,8 +436,8 @@ def convert_figure(node, context):
                 warn("unexpected image (just a image / figure) for a figure")
                 continue
             image = child.get("uri")
-            width = 'width' in child and int(child['width']) or None
-            height = 'height' in child and int(child['height']) or None
+            width = child.get('width')
+            height = child.get('height')
         elif tagname == "caption":
             if caption is not None:
                 warn("unexpected caption (just a caption / figure) for a "
