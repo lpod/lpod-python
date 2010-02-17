@@ -49,7 +49,7 @@ def has_git():
 
 
 def get_release():
-    output = _run_command(['git', 'describe',  '--tags', '--long'])
+    output = _run_command(['git', 'describe',  '--tags'])
     return output.strip()
 
 

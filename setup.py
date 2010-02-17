@@ -62,7 +62,7 @@ open('python_path.txt', 'w').write(executable)
 # And call core.setup ....
 core.setup(description='lpOD Library',
            license='GPLv3 + Apache',
-           name='lpod',
+           name='lpod-python',
            package_data={'lpod': data_files},
            package_dir={'lpod': ''},
            scripts=scripts,
