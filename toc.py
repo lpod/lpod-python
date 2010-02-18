@@ -237,14 +237,19 @@ class odf_toc(odf_element):
             paragraph.set_text(title)
 
 
-    def toc_fill(self, document=None):
+    def toc_fill(self, document=None, use_default_styles=True):
         """Fill the TOC with the titles found in the document. A TOC is not
         contextual so it will catch all titles before and after its insertion.
         If the TOC is not attached to a document, attach it beforehand or
         provide one as argument.
 
+        For having a pretty TOC, let use_default_styles by default.
+
         Arguments:
-        document -- odf_document
+
+            document -- odf_document
+
+            use_default_styles -- bool
         """
         # Find the body
         if document is not None:
@@ -281,11 +286,12 @@ class odf_toc(odf_element):
             for l in range(level + 1, 11):
                 if level_indexes.has_key(l):
                     del level_indexes[l]
-            number = u'.'.join(number)
-            number += u'.'
-            # Make the title with "1.2.3 Title" format
+            number = u'.'.join(number) + u'.'
+            # Make the title with "1.2.3. Title" format
             title = u"%s %s" % (number, heading.get_text())
             paragraph = odf_create_paragraph(title)
+            if use_default_styles:
+                paragraph.set_text_style(u"P%d" % level)
             index_body.append_element(paragraph)
 
 
