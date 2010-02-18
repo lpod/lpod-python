@@ -154,6 +154,8 @@ def convert_topic(node, context):
     context["top"] = context["body"]
 
     # Yet an other TOC ?
+    if context["skip_toc"]:
+        return
     if context["toc"] is not None:
         warn("a TOC is already inserted")
         return
@@ -567,8 +569,11 @@ def convert_node(node, context):
 
 
 
-def convert(document, rst_body, heading_level=1):
+def convert(document, rst_body, heading_level=1, skip_toc=False):
     """Convert a reStructuredText source into an existing document.
+
+    If the document contains its own TOC, you can ignore others with
+    "skip_toc".
 
     Arguments:
 
@@ -578,13 +583,15 @@ def convert(document, rst_body, heading_level=1):
 
         heading_level -- int
 
+        skip_toc -- bool
+
     Return: odf_document
     """
     # Init a context
     body = document.get_body()
     context = {"doc": document, "body": body, "top": body, "styles": {},
-            "heading-level": heading_level, "toc": None, "footnotes": {},
-            "tables_number": 0}
+            "heading-level": heading_level, "toc": None,
+            "skip_toc": skip_toc, "footnotes": {}, "tables_number": 0}
 
     # Go!
     if isinstance(rst_body, str):
