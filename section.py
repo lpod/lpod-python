@@ -41,7 +41,7 @@ def odf_create_section(style=None):
     """
     element = odf_create_element('<text:section/>')
     if style:
-        element.set_attribute('text:style-name', style)
+        element.set_text_style(style)
     return element
 
 

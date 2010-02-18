@@ -46,7 +46,7 @@ def odf_create_span(text=None, style=None):
     if text:
         element.set_text(text)
     if style:
-        element.set_attribute('text:style-name', style)
+        element.set_text_style(style)
     return element
 
 

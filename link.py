@@ -59,7 +59,7 @@ def odf_create_link(href, name=None, title=None, target_frame=None,
         else:
             element.set_attribute('xlink:show', 'replace')
     if style is not None:
-        element.set_attribute('text:style-name', style)
+        element.set_text_style(style)
     if visited_style is not None:
         element.set_attribute('text:visited-style-name', visited_style)
     return element

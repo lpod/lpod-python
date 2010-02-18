@@ -66,7 +66,7 @@ def _get_formatted_text(element, context, with_text=True):
                 if not text.strip():
                     result.append(text)
                     continue
-                style = obj.get_attribute('text:style-name')
+                style = obj.get_text_style()
                 if style is None:
                     result.append(text)
                     continue
@@ -179,7 +179,7 @@ def odf_create_paragraph(text=None, style=None):
     if text:
         element.set_text(text)
     if style:
-        element.set_attribute('text:style-name', style)
+        element.set_text_style(style)
     return element
 
 

@@ -799,6 +799,25 @@ class odf_element(object):
                 + _get_element_list(self, 'descendant::*', table_style=name)
                 + _get_element_list(self, 'descendant::*', page_layout=name))
 
+    #
+    # Common attributes
+    #
+
+    def get_outline_level(self):
+        return int(self.get_attribute('text:outline-level'))
+
+
+    def set_outline_level(self, level):
+        self.set_attribute('text:outline-level', unicode(level))
+
+
+    def get_text_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_text_style(self, style):
+        self.set_attribute('text:style-name', style)
+
 
     #
     # Dublin core

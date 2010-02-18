@@ -62,7 +62,7 @@ def odf_create_heading(level, text=None, restart_numbering=False,
     if suppress_numbering:
         element.set_attribute('text:suppress-numbering', 'true')
     if style:
-        element.set_attribute('text:style-name', style)
+        element.set_text_style(style)
     return element
 
 
@@ -91,14 +91,6 @@ class odf_heading(odf_paragraph):
         result = ['\n', title, u'\n', LEVEL_STYLES[level - 1] * len(title),
                   '\n']
         return u''.join(result)
-
-
-    def set_outline_level(self, level):
-        self.set_attribute('text:outline-level', unicode(level))
-
-
-    def get_outline_level(self):
-        return int(self.get_attribute('text:outline-level'))
 
 
 

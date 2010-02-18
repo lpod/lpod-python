@@ -445,7 +445,7 @@ class odf_list_style(odf_style):
         if start_value:
             level_style.set_attribute('text:start-value', str(start_value))
         if style:
-            level_style.set_attribute('text:style-name', style)
+            level_style.set_text_style(style)
         # Commit the creation
         if was_created:
             self.append_element(level_style)
