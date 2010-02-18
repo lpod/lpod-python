@@ -63,26 +63,49 @@ def _get_formatted_text(element, context, with_text=True):
                 if not rst_mode:
                     result.append(text)
                     continue
+                if not text.strip():
+                    result.append(text)
+                    continue
                 style = obj.get_attribute('text:style-name')
                 if style is None:
                     result.append(text)
                     continue
                 style = document.get_style("text", style)
                 properties = style.get_style_properties()
+                # Compute before, text and after
+                before = ''
+                for c in text:
+                    if c.isspace():
+                        before += c
+                    else:
+                        break
+                after = ''
+                for c in reversed(text):
+                    if c.isspace():
+                        after = c + after
+                    else:
+                        break
+                text = text.strip()
                 # Bold ?
                 if properties.get('fo:font-weight') == 'bold':
+                    result.append(before)
                     result.append('**')
                     result.append(text)
                     result.append('**')
+                    result.append(after)
                     continue
                 # Italique ?
                 if properties.get('fo:font-style') == 'italic':
+                    result.append(before)
                     result.append('*')
                     result.append(text)
                     result.append('*')
+                    result.append(after)
                     continue
                 # Unknown style, ...
+                result.append(before)
                 result.append(text)
+                result.append(after)
             # Footnote or endnote
             elif tag == 'text:note':
                 note_class = obj.get_note_class()
