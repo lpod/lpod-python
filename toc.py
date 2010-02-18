@@ -31,14 +31,14 @@ from paragraph import odf_create_paragraph
 from utils import Boolean
 
 
-
 def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
-        outline_level=None, style=None):
+        outline_level=None, style=None, title_style=u"Contents_20_Heading"):
     """Create a table of contents. Default parameters are what most people
     use: Protected from manual modifications and not limited in title levels.
 
     The name is mandatory and derived automatically from the title if not
-    given. Provide one if you insert several TOCs in the same document.
+    given. Provide one in case of a conflict with other TOCs in the same
+    document.
 
     Arguments:
 
@@ -58,14 +58,46 @@ def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
     # XXX
     if name is None:
         name = u"%s1" % title
-        element.set_attribute('text:name', name)
-    element.set_attribute('text:protected', Boolean.encode(protected))
-    if style:
-        element.set_attribute('text:style-name', style)
+    element.set_toc_name(name)
+    element.set_toc_protected(protected)
     if outline_level:
         element.set_toc_outline_level(outline_level)
+    if style:
+        element.set_toc_style(style)
+    # Create the source template
+    source = odf_create_toc_source(title=title, title_style=title_style)
+    element.append_element(source)
+    # Create the index body automatically with the index title
     if title:
-        element.append_element(odf_create_index_title(title))
+        # This style is in the template document
+        element.set_toc_title(title, text_style=title_style)
+    return element
+
+
+
+def odf_create_toc_source(title=None, outline_level=10,
+        title_style=u"Contents_20_Heading", entry_style=u"Contents_20_%d"):
+    element = odf_create_element('<text:table-of-content-source/>')
+    element.set_outline_level(outline_level)
+    if title:
+        title_template = odf_create_element('<text:index-title-template/>')
+        if title_style:
+            # This style is in the template document
+            title_template.set_text_style(title_style)
+        title_template.set_text(title)
+        element.append_element(title_template)
+    for level in range(1, 11):
+        template = odf_create_element('''<text:table-of-content-entry-template
+          text:outline-level="%d">
+          <text:index-entry-chapter/>
+          <text:index-entry-text/>
+          <text:index-entry-tab-stop style:type="right"
+            style:leader-char="."/>
+          <text:index-entry-page-number/>
+         </text:table-of-content-entry-template>''' % level)
+        if entry_style:
+            template.set_text_style(entry_style % level)
+        element.append_element(template)
     return element
 
 
@@ -75,7 +107,8 @@ def odf_create_index_body():
 
 
 
-def odf_create_index_title(title=None):
+def odf_create_index_title(title=None, name=None, style=None,
+        text_style=None):
     """Create an index title
 
     Arguments:
@@ -85,9 +118,13 @@ def odf_create_index_title(title=None):
     Return: odf_element
     """
     element = odf_create_element('<text:index-title/>')
-    if title:
-        title = odf_create_paragraph(text=title)
+    if title or text_style:
+        title = odf_create_paragraph(text=title, style=text_style)
         element.append_element(title)
+    if name:
+        element.set_attribute('text:name', name)
+    if style:
+        element.set_text_style(style)
     return element
 
 
@@ -115,27 +152,19 @@ class odf_toc(odf_element):
         return u''.join(result)
 
 
-    def get_toc_title(self):
-        index_title = self.get_element('text:index-title')
-        if index_title is None:
-            return
-        return index_title.get_text_content()
+    def get_toc_name(self):
+        return self.get_attribute('text:name')
 
 
-    def set_toc_title(self, title):
-        index_title = self.get_element('text:index-title')
-        if index_title is None:
-            index_title = odf_create_index_title(title)
-            self.append_element(index_title)
-        else:
-            index_title.set_text_content(title)
+    def set_toc_name(self, name):
+        self.set_attribute('text:name', name)
 
 
     def get_toc_outline_level(self):
         source = self.get_element('text:table-of-content-source')
         if source is None:
             return None
-        return source.get_attribute('text:outline-level')
+        return source.get_outline_level()
 
 
     def set_toc_outline_level(self, level):
@@ -143,44 +172,99 @@ class odf_toc(odf_element):
         if source is None:
             source = odf_create_element('<text:table-of-content-source/>')
             self.insert_element(source, FIRST_CHILD)
-        source.set_attribute('text:outline-level', str(int(level)))
+        source.set_outline_level(level)
+
+
+    def is_toc_protected(self):
+        return Boolean.decode(self.get_attribute('text:protected'))
+
+
+    def set_toc_protected(self, protected):
+        self.set_attribute('text:protected', Boolean.encode(protected))
+
+
+    def get_toc_style(self):
+        return self.get_text_style()
+
+
+    def set_toc_style(self, style):
+        self.set_text_style(style)
+
+
+    def get_toc_body(self):
+        return self.get_element('text:index-body')
+
+
+    def set_toc_body(self, body=None):
+        old_body = self.get_toc_body()
+        if old_body is not None:
+            self.delete_element(old_body)
+        if body is None:
+            body = odf_create_index_body()
+        self.append_element(body)
+        return body
+
+
+    def get_toc_title(self):
+        body = self.get_toc_body()
+        if body is None:
+            return None
+        index_title = body.get_element('text:index-title')
+        if index_title is None:
+            return None
+        return index_title.get_text_content()
+
+
+    def set_toc_title(self, title, style=None, text_style=None):
+        index_body = self.get_toc_body()
+        if index_body is None:
+            index_body = self.set_toc_body()
+        index_title = index_body.get_element('text:index-title')
+        if index_title is None:
+            name = u"%s_Head" % self.get_toc_name()
+            index_title = odf_create_index_title(title, name=name,
+                    style=style, text_style=text_style)
+            index_body.append_element(index_title)
+        else:
+            if style:
+                index_title.set_text_style(style)
+            paragraph = index_title.get_paragraph_by_position(0)
+            if paragraph is None:
+                paragraph = odf_create_paragraph()
+                index_title.append_element(paragraph)
+            if text_style:
+                paragraph.set_text_style(text_style)
+            paragraph.set_text(title)
 
 
     def toc_fill(self, document=None):
         """Fill the TOC with the titles found in the document. A TOC is not
         contextual so it will catch all titles before and after its insertion.
-
         If the TOC is not attached to a document, attach it beforehand or
         provide one as argument.
 
         Arguments:
-
         document -- odf_document
         """
         # Find the body
         if document is not None:
-            content = document.get_content()
-            body = content.get_body()
+            body = document.get_body()
         else:
             body = self.get_body()
         if body is None:
             raise ValueError, "the TOC must be related to a document somehow"
 
-        # Clean the old index-body
-        index_body = self.get_element('text:index-body')
-        if index_body:
-            self.delete_element(index_body)
-        index_body = odf_create_index_body()
-        self.append_element(index_body)
+        # Save the title
+        index_body = self.get_toc_body()
+        title = index_body.get_element('text:index-title')
 
-        # Auto fill the index
-        # 1. The title: "Table Of Contents"
-        title = self.get_attribute('text:name')
-        if not title:
-            title = u"Table of Contents"
-        title = odf_create_index_title(title)
-        index_body.append_element(title)
-        #2. The section
+        # Clean the old index-body
+        index_body = self.set_toc_body()
+
+        # Restore the title
+        index_body.insert_element(title, position=0)
+
+        # Auto-fill the index
         level_indexes = {}
         for heading in body.get_heading_list():
             level = heading.get_outline_level()
@@ -199,9 +283,9 @@ class odf_toc(odf_element):
                     del level_indexes[l]
             number = u'.'.join(number)
             number += u'.'
-            # Make the title
+            # Make the title with "1.2.3 Title" format
             title = u"%s %s" % (number, heading.get_text())
-            paragraph = odf_create_paragraph(text=title)
+            paragraph = odf_create_paragraph(title)
             index_body.append_element(paragraph)
 
 
