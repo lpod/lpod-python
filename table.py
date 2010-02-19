@@ -1067,7 +1067,14 @@ class odf_table(odf_element):
             for i, value in enumerate(row[:cols_nb]):
                 wrapped_value = []
                 for part in value.split('\n'):
-                    wrapped_part = wrap(part, width=cols_size[i])
+                    # Hack to handle correctly the lists
+                    subsequent_indent = ''
+                    if part.lstrip().startswith('-'):
+                        subsequent_indent = ' ' * (len(part) \
+                                                   - len(part.lstrip()) \
+                                                   + 2)
+                    wrapped_part = wrap(part, width=cols_size[i],
+                                        subsequent_indent=subsequent_indent)
                     if wrapped_part:
                         wrapped_value.extend(wrapped_part)
                     else:
