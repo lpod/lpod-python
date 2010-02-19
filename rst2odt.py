@@ -51,6 +51,9 @@ from lpod.toc import odf_create_toc
 from lpod.vfs import vfs, Error
 
 
+DPI = 72
+
+
 def warn(message):
     print >> stderr, "Warning:", message
 
@@ -345,8 +348,6 @@ def convert_block_quote(node, context):
 
 
 def _add_image(image, caption, context, width=None, height=None):
-    DPI = 72
-
     # Load the image to find its size
     encoding = stdout.encoding if stdout.encoding is not None else "utf-8"
     try:
@@ -356,7 +357,8 @@ def _add_image(image, caption, context, width=None, height=None):
         warn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size
-    # px is assumed
+
+    # Convert pixels to inches
     if width:
         try:
             width = int(width.replace('px', ''))
@@ -382,17 +384,31 @@ def _add_image(image, caption, context, width=None, height=None):
     # Add the image
     local_uri = context["doc"].add_file(image)
 
-    # Add a style
+    # Frame style for the caption frame
     styles = context["styles"]
-    if "image_frame" in styles:
-        frame_style = styles["image_frame"]
-    else:
-        frame_style = odf_create_style("graphic", parent="Frame")
-        frame_style.set_style_properties(properties={"style:wrap": "none"})
-        context["doc"].insert_style(frame_style, automatic=True)
-        styles["image_frame"] = frame_style
+    caption_style = styles.get('caption_style')
+    if caption_style is None:
+        caption_style = odf_create_style("graphic", parent="Frame")
+        caption_style.set_style_properties({'style:wrap': u"none",
+            'style:vertical-pos': u"top",
+            'style:vertical-rel': u"paragraph-content",
+            'style:horizontal-pos': u"center",
+            'style:horizontal-rel': u"paragraph-content",
+            'fo:padding': u"0.25cm",
+            'fo:border': u"0cm solid #000000"})
+        context['doc'].insert_style(caption_style, automatic=True)
+        styles['caption_style'] = caption_style
 
-    # XXX An image must be inserted in a paragraph ??
+    # Frame style for the image frame
+    image_style = styles.get('image_style')
+    if image_style is None:
+        image_style = odf_create_style('graphic', parent="Graphics")
+        image_style.set_style_properties({'style:horizontal-pos': u"center",
+            'style:horizontal-rel': u"paragraph"})
+        context['doc'].insert_style(image_style, automatic=True)
+        styles['image_style'] = image_style
+
+    # In text application, image must be inserted in a paragraph
     if context["top"].get_tagname() == "office:text":
         container = odf_create_paragraph()
         context["top"].append_element(container)
@@ -401,18 +417,17 @@ def _add_image(image, caption, context, width=None, height=None):
 
     if caption:
         paragraph = odf_create_paragraph()
-        image_frame = odf_create_image_frame(local_uri, size=size)
-
-        # A new frame, we fix only the width
-        text_frame = odf_create_text_frame(paragraph, size=(size[0], None),
-                                           style=frame_style.get_style_name())
-        container.append_element(text_frame)
-
+        image_frame = odf_create_image_frame(local_uri, size=size,
+                style=image_style.get_style_name())
         paragraph.append_element(image_frame)
         paragraph.append_element(caption)
+        # A new frame, we fix only the width
+        text_frame = odf_create_text_frame(paragraph, size=(size[0], None),
+                style=caption_style.get_style_name())
+        container.append_element(text_frame)
     else:
         image_frame = odf_create_image_frame(local_uri, size=size,
-                                          style=frame_style.get_style_name())
+                style=image_style.get_style_name())
         container.append_element(image_frame)
 
 

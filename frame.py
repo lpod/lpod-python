@@ -79,8 +79,8 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
 
     The optionnal text will appear above the image.
 
-    Size is a (width, height) tuple and position is a (left, top) tuple; items
-    are strings including the unit, e.g. ('21cm', '29.7cm').
+    Size is a (width, height) tuple and position is a (left, top) tuple;
+    items are strings including the unit, e.g. ('21cm', '29.7cm').
 
     Arguments:
 
