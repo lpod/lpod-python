@@ -2,17 +2,17 @@
 # Published at http://aur.archlinux.org/packages.php?ID=34271
 
 pkgname=python-lpod
-pkgver=0.9
-pkgrel=1
+pkgver=0.9.0
+pkgrel=2
 pkgdesc="Languages & Platforms OpenDocument: Python implementation"
 arch=('any')
 license=('GPL3' 'APACHE2')
 url="http://www.lpod-project.org/"
 depends=('python-lxml' 'pygobject')
-source=("http://download.lpod-project.org/lpod-python/lpod-python-v$pkgver.tar.gz")
-md5sums=('f8bd36fd76eb4ceeac9cae9df0d6e769')
+source=("http://download.lpod-project.org/lpod-python/lpod-python-$pkgver.tar.gz")
+md5sums=('040e67d63885be697776c9026a2ee960')
 
 build() {
-  cd "${srcdir}/lpod-python-v$pkgver"
+  cd "${srcdir}/lpod-python-$pkgver"
   python setup.py install --root="${pkgdir}" || return 1
 }
