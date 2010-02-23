@@ -136,7 +136,10 @@ def _get_formatted_text(element, context, with_text=True):
                 result.append(u'\t')
             # Line break
             elif tag == 'text:line-break':
-                result.append(u"\n")
+                if rst_mode:
+                    result.append(u"\n|")
+                else:
+                    result.append(u"\n")
             else:
                 result.append(obj.get_formatted_text(context))
     return u''.join(result)
