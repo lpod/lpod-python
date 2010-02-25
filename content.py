@@ -27,8 +27,6 @@
 #
 
 # Import from lpod
-from style import odf_style
-from utils import _make_xpath_query, _get_style_tagname
 from xmlpart import odf_xmlpart
 
 
@@ -40,19 +38,11 @@ class odf_content(odf_xmlpart):
 
     # The following two seem useless but they match styles API
 
-    def _get_style_context(self, name, family):
-        return self.get_element('//office:automatic-styles')
-
-
-    def _get_style_tagname(self, family, name):
-        # Treat the case for get_style_list where the name is undefined
-        if name is False:
-            if family is None:
-                return ('(//*[@style:name])', None)
-            tagname, famattr = _get_style_tagname(family)
-            tagname = '//' + tagname
-            return (tagname, famattr)
-        return _get_style_tagname(family)
+    def _get_style_contexts(self, family):
+        if family == 'font-face':
+            return (self.get_element('//office:font-face-decls'),)
+        return (self.get_element('//office:font-face-decls'),
+                self.get_element('//office:automatic-styles'))
 
 
     #
@@ -60,57 +50,50 @@ class odf_content(odf_xmlpart):
     #
 
     def get_style_list(self, family=None):
-        tagname, famattr = self._get_style_tagname(family, False)
-        query = _make_xpath_query(tagname, family=famattr)
-        context = self._get_style_context(False, family)
-        return context.get_element_list(query)
+        """Return the list of styles in the Content part, optionally limited
+        to the given family.
+
+        Arguments:
+
+            family -- str
+
+        Return: list of odf_style
+        """
+        result = []
+        for context in self._get_style_contexts(family):
+            if context is None:
+                continue
+            result.extend(context.get_style_list(family=family))
+        return result
 
 
-    def get_style(self, family, name_or_element=None, display_name=False):
+    def get_style(self, family, name_or_element=None, display_name=None):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 
         If the name is not the internal name but the name you gave in the
-        desktop application, set display_name to True.
+        desktop application, use display_name instead.
 
         Arguments:
-
-            name_or_element -- unicode or odf_style
 
             family -- 'paragraph', 'text', 'graphic', 'table', 'list',
                       'number'
 
-            display_name -- bool
+            name_or_element -- unicode or odf_style
+
+            display_name -- unicode
 
         Return: odf_style or None if not found
         """
-        # Default style
-        if name_or_element is None and display_name is False:
-            return None
-
-        # Common style
-        elif type(name_or_element) is unicode or name_or_element is None:
-            if display_name is True:
-                style_name = None
-                display_name = name_or_element
-            else:
-                style_name = name_or_element
-                display_name = None
-            tagname, famattr = self._get_style_tagname(family,
-                                                       name_or_element)
-            # famattr became None if no "style:family" attribute
-            query = _make_xpath_query(tagname, style_name=style_name,
-                                      display_name=display_name,
-                                      family=famattr)
-            context = self._get_style_context(name_or_element, family)
-            return context.get_element(query)
-
-        # An odf_style
-        elif isinstance(name_or_element, odf_style):
-            return name_or_element
-
-        # Error
-        raise TypeError, "style name or element expected"
+        for context in self._get_style_contexts(family):
+            if context is None:
+                continue
+            style = context.get_style(family,
+                    name_or_element=name_or_element,
+                    display_name=display_name)
+            if style is not None:
+                return style
+        return None
 
 
     def get_tracked_changes(self):

@@ -26,8 +26,6 @@
 #
 
 # Import from lpod
-from style import odf_style
-from utils import _make_xpath_query, _get_style_tagname
 from xmlpart import odf_xmlpart
 
 
@@ -46,6 +44,24 @@ COLORMAP = {
     'violet': (238, 130, 238),
     'white': (255, 255, 255),
     'yellow': (255, 255, 0)
+}
+
+
+context_mapping = {
+        'paragraph': ('//office:styles', '//office:automatic-styles'),
+        'text': ('//office:styles',),
+        'graphic': ('//office:styles',),
+        'page-layout': ('//office:automatic-styles',),
+        'master-page': ('//office:master-styles',),
+        'font-face': ('//office:font-face-decls',),
+        'outline': ('//office:styles',),
+        'date': ('//office:automatic-styles',),
+        'list': ('//office:styles',),
+        # FIXME Do they?
+        'table': ('//office:automatic-styles',),
+        'table-cell': ('//office:automatic-styles',),
+        'table-row': ('//office:automatic-styles',),
+        'table-column': ('//office:automatic-styles',),
 }
 
 
@@ -104,57 +120,37 @@ def rgb2hex(color):
 
 class odf_styles(odf_xmlpart):
 
-    def _get_style_context(self, name, family, automatic=False):
-        if name is None:
-            return self.get_element('//office:styles')
-        elif name is False:
-            # Treat the case for get_style_list where the name is undefined
-            if automatic:
-                return self.get_element('//office:automatic-styles')
-            # The most including element
-            return self.get_root()
-        if automatic:
-            return self.get_element('//office:automatic-styles')
-        mapping = {'paragraph': '//office:styles',
-                   'text': '//office:styles',
-                   'graphic': '//office:styles',
-                   'page-layout': '//office:automatic-styles',
-                   'master-page': '//office:master-styles',
-                   'font-face': '//office:font-face-decls',
-                   'outline': '//office:styles',
-                   'date': '//office:automatic-styles',
-                   'list': '//office:styles',
-                   # FIXME Do they?
-                   'table': '//office:automatic-styles',
-                   'table-cell': '//office:automatic-styles',
-                   'table-row': '//office:automatic-styles',
-                   'table-column': '//office:automatic-styles'}
-        if family not in mapping:
+    def _get_style_contexts(self, family, automatic=False):
+        if automatic is True:
+            return (self.get_element('//office:automatic-styles'),)
+        elif family is None:
+            # All possibilities
+            return (self.get_element('//office:automatic-styles'),
+                    self.get_element('//office:styles'),
+                    self.get_element('//office:master-styles'),
+                    self.get_element('//office:font-face-decls'))
+        queries = context_mapping.get(family)
+        if queries is None:
             raise ValueError, "unknown family: " + family
-        return self.get_element(mapping[family])
-
-
-    def _get_style_tagname(self, family, name):
-        if name is None:
-            return ('style:default-style', family)
-        # Treat the case for get_style_list where the name is undefined
-        elif name is False:
-            if family is None:
-                return ('(//style:default-style|//*[@style:name])', None)
-            tagname, famattr = _get_style_tagname(family)
-            tagname = '//' + tagname
-            if famattr:
-                # Candidate for a default style
-                tagname = '(%s|//style:default-style)' % tagname
-            return (tagname, famattr)
-        return _get_style_tagname(family)
+        return [self.get_element(query) for query in queries]
 
 
     def get_style_list(self, family=None, automatic=False):
-        tagname, famattr = self._get_style_tagname(family, False)
-        query = _make_xpath_query(tagname, family=famattr)
-        context = self._get_style_context(False, family, automatic)
-        return context.get_element_list(query)
+        """Return the list of styles in the Content part, optionally limited
+        to the given family.
+
+        Arguments:
+
+            family -- str
+
+        Return: list of odf_style
+        """
+        result = []
+        for context in self._get_style_contexts(family, automatic=automatic):
+            if context is None:
+                continue
+            result.extend(context.get_style_list(family=family))
+        return result
 
 
     def get_style(self, family, name_or_element=None, display_name=False):
@@ -177,21 +173,12 @@ class odf_styles(odf_xmlpart):
 
         Return: odf_style or None if not found
         """
-        if type(name_or_element) is unicode or name_or_element is None:
-            if display_name is True:
-                style_name = None
-                display_name = name_or_element
-            else:
-                style_name = name_or_element
-                display_name = None
-            tagname, famattr = self._get_style_tagname(family,
-                                                       name_or_element)
-            # famattr became None if no "style:family" attribute
-            query = _make_xpath_query(tagname, style_name=style_name,
-                                      display_name=display_name,
-                                      family=famattr)
-            context = self._get_style_context(name_or_element, family)
-            return context.get_element(query)
-        elif isinstance(name_or_element, odf_style):
-            return name_or_element
-        raise TypeError, "style name or element expected"
+        for context in self._get_style_contexts(family):
+            if context is None:
+                continue
+            style = context.get_style(family,
+                    name_or_element=name_or_element,
+                    display_name=display_name)
+            if style is not None:
+                return style
+        return None

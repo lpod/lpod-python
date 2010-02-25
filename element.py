@@ -36,7 +36,7 @@ from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 # Import from lpod
 from datatype import DateTime
 from utils import _get_abspath, _get_element_list, _get_element
-from utils import get_value
+from utils import _get_style_tagname, get_value
 
 
 ODF_NAMESPACES = {
@@ -1302,6 +1302,7 @@ class odf_element(object):
                       if line.get_attribute('draw:id') == id]
         return lines[0] if lines else None
 
+
     #
     # Rectangles
     #
@@ -1323,6 +1324,7 @@ class odf_element(object):
                                 if rectangle.get_attribute('draw:id') == id]
         return rectangles[0] if rectangle else None
 
+
     #
     # Ellipse
     #
@@ -1343,6 +1345,7 @@ class odf_element(object):
         ellipses = [ellipse for ellipse in ellipses
                             if ellipse.get_attribute('draw:id') == id]
         return ellipses[0] if ellipse else None
+
 
     #
     # Connectors
@@ -1378,6 +1381,7 @@ class odf_element(object):
                 connectors.append(connector)
         return connectors
 
+
     #
     # Tracked changes
     #
@@ -1392,6 +1396,7 @@ class odf_element(object):
         xpath_query += ' | descendant::text:change/@text:change-id'
         return self.xpath(xpath_query)
 
+
     #
     # Table Of Content
     #
@@ -1404,3 +1409,60 @@ class odf_element(object):
         return _get_element(self, 'text:table-of-content')
 
 
+    #
+    # Styles
+    #
+
+    def _get_style_tagname(self, family, is_default=False):
+        """Widely match possible tag names given the family (or not).
+        """
+        if family is None:
+            tagname = '(style:default-style|*[@style:name])'
+            famattr = None
+        elif is_default is True:
+            # Default style
+            tagname = 'style:default-style'
+            famattr = family
+        else:
+            tagname, famattr = _get_style_tagname(family)
+            if famattr:
+                # Include family default style
+                tagname = '(%s|style:default-style)' % tagname
+        return tagname, famattr
+
+
+    def get_style_list(self, family=None):
+        # Both common and default styles
+        tagname, famattr = self._get_style_tagname(family)
+        return _get_element_list(self, tagname, family=famattr)
+
+
+    def get_style(self, family, name_or_element=None, display_name=None):
+        """Return the style uniquely identified by the name/family pair. If
+        the argument is already a style object, it will return it.
+
+        If the name is not the internal name but the name you gave in the
+        desktop application, use display_name instead.
+
+        Arguments:
+
+            family -- 'paragraph', 'text', 'graphic', 'table', 'list',
+                      'number'
+
+            name_or_element -- unicode or odf_style
+
+            display_name -- unicode
+
+        Return: odf_style or None if not found
+        """
+        from style import odf_style
+
+        if isinstance(name_or_element, odf_style):
+            return name_or_element
+        style_name = name_or_element
+        is_default = not (style_name or display_name)
+        tagname, famattr = self._get_style_tagname(family,
+                is_default=is_default)
+        # famattr became None if no "style:family" attribute
+        return _get_element(self, tagname, style_name=style_name,
+                display_name=display_name, family=famattr)

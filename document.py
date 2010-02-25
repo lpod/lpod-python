@@ -353,36 +353,36 @@ class odf_document(object):
                 + styles.get_style_list(family=family, automatic=automatic))
 
 
-    def get_style(self, family, name_or_element=None, display_name=False):
+    def get_style(self, family, name_or_element=None, display_name=None):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 
         If the name is None, the default style is fetched.
 
         If the name is not the internal name but the name you gave in a
-        desktop application, set display_name to True.
+        desktop application, use display_name instead.
 
         Arguments:
-
-            name -- unicode or odf_element or None
 
             family -- 'paragraph', 'text',  'graphic', 'table', 'list',
                       'number', 'page-layout', 'master-page'
 
-            display_name -- bool
+            name -- unicode or odf_element or None
+
+            display_name -- unicode
 
         Returns: odf_style or None if not found.
         """
         # 1. content.xml
         content = self.get_content()
         element = content.get_style(family, name_or_element=name_or_element,
-                                    display_name=display_name)
+                display_name=display_name)
         if element is not None:
             return element
         # 2. styles.xml
         styles = self.get_styles()
         return styles.get_style(family, name_or_element=name_or_element,
-                                display_name=display_name)
+                display_name=display_name)
 
 
     def insert_style(self, style, name=None, automatic=False, default=False):

@@ -157,8 +157,7 @@ class TestStyle(TestCase):
 
 
     def test_get_style_display_name(self):
-        style = self.styles.get_style('paragraph', u"Text body",
-                                      display_name=True)
+        style = self.styles.get_style('paragraph', display_name=u"Text body")
         self.assertEqual(style.get_style_name(), u"Text_20_body")
 
 
