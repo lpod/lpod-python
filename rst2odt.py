@@ -466,7 +466,7 @@ def convert_figure(node, context):
 
 
 
-def _convert_table_rows(container, node, context):
+def _convert_table_rows(container, node, context, cell_style=None):
     for row in node:
         if row.tagname != "row":
             warn('node "%s" not supported in thead/tbody' % row.tagname)
@@ -481,7 +481,7 @@ def _convert_table_rows(container, node, context):
                 continue
 
             # Create a new odf_cell
-            odf_cell = odf_create_cell(cell_type="string")
+            odf_cell = odf_create_cell(cell_type="string", style=cell_style)
             odf_row.append_element(odf_cell)
 
             # XXX We don't add table:covered-table-cell !
@@ -511,16 +511,22 @@ def _convert_table_rows(container, node, context):
 
 
 def convert_table(node, context):
+    styles = context["styles"]
+    cell_style = styles.get('cell_style')
+    if cell_style is None:
+        cell_style = odf_create_style('table-cell', u"odf_table.A1",
+                padding=u"0.049cm", border=u"0.002cm solid #000000")
+        context['doc'].insert_style(cell_style, automatic=True)
+        styles['cell_style'] = cell_style
+
     for tgroup in node:
         if tgroup.tagname != "tgroup":
             warn('node "%s" not supported in table' % tgroup.tagname)
             continue
-
         columns_number = 0
         odf_table = None
         for child in tgroup:
             tagname = child.tagname
-
             if tagname == "thead" or tagname == "tbody":
                 # Create a new table with the info columns_number
                 if odf_table is None:
@@ -530,16 +536,16 @@ def convert_table(node, context):
                                                  context["tables_number"])
                     columns = odf_create_column(repeated=columns_number)
                     odf_table.append_element(columns)
-
                 # Convert!
                 if tagname == "thead":
                     header = odf_create_header_rows()
                     odf_table.append_element(header)
 
-                    _convert_table_rows(header, child, context)
+                    _convert_table_rows(header, child, context,
+                            cell_style=cell_style.get_style_name())
                 else:
-                    _convert_table_rows(odf_table, child, context)
-
+                    _convert_table_rows(odf_table, child, context,
+                            cell_style=cell_style.get_style_name())
             elif tagname == "colspec":
                 columns_number += 1
             else:
