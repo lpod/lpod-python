@@ -49,8 +49,17 @@ def has_git():
 
 
 def get_release():
-    output = _run_command(['git', 'describe',  '--tags'])
-    return output.strip()
+    # XXX do it in one git command
+    output = _run_command(['git', 'branch'])
+    for line in output.splitlines():
+        if line.startswith('*'):
+            branch = line[2:]
+            break
+    output = _run_command(['git', 'describe',  '--tags']).strip()
+    version, delta, sha = output.split('-')
+    if branch == 'master':
+        return '-'.join((version, delta, sha))
+    return '-'.join((branch, version, delta, sha))
 
 
 
