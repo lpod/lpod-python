@@ -834,46 +834,42 @@ class odf_row(odf_element):
             self.append_cell(odf_create_cell(value))
 
 
-    def rstrip_row(self):
-        """Remove *in-place* the empty cells at the right of the row.
+    def rstrip_row(self, aggressive=False):
+        """Remove *in-place* empty cells at the right of the row. Cells are
+        empty if they contain no value or it evaluates to False, and no
+        style.
 
-        Do not use when working on a table, use ``odf_table.rstrip_table``.
+        If aggressive is True, empty cells with style are removed too.
 
+        Arguments:
+
+            aggressive -- bool
         """
         for cell in reversed(self._get_cells()):
-            if (cell.get_cell_style() is None
-                    and cell.get_cell_value() is None):
-                self.delete_element(cell)
-            else:
+            if cell.get_cell_value():
                 return
+            if not aggressive and cell.get_cell_style() is not None:
+                return
+            self.delete_element(cell)
 
 
     def is_row_empty(self, aggressive=False):
-        """For the moment, a row is said empty when:
-        1- It has only a cell
-        2- This cell has no child
+        """Return wether every cell in the row has no value or the value
+        evaluates to False (empty string), and no style.
 
-        - or -
+        If aggressive is True, empty cells with style are considered empty.
 
-        When aggressive is True, when it contains only cells without data.
+        Arguments:
+
+            aggressive -- bool
+
+        Return: bool
         """
-        cells = self._get_cells()
-
-        if len(cells) == 0:
-            return True
-        elif len(cells) > 1:
-            for cell in cells:
-                if cell.get_cell_value() is not None:
-                    return False
-                if not aggressive and cell.get_cell_style() is not None:
-                    return False
-            return True
-
-        # If here we have only a cell
-        cell = cells[0]
-        if len(cell.get_element_list('*')) > 0:
-            return False
-
+        for cell in self._get_cells():
+            if cell.get_cell_value() is not None:
+                return False
+            if not aggressive and cell.get_cell_style() is not None:
+                return False
         return True
 
 
@@ -939,6 +935,13 @@ class odf_table(odf_element):
     #
     # Private API
     #
+
+    def _translate_x(self, x):
+        x = _alpha_to_digit(x)
+        if x < 0:
+            x = self.get_table_width() + x
+        return x
+
 
     def _translate_y(self, y):
         # "3" (couting from 1) -> 2 (couting from 0)
@@ -1255,14 +1258,14 @@ class odf_table(odf_element):
 
     def rstrip_table(self, aggressive=False):
         """Remove *in-place* empty rows below and empty cells at the right of
-        the table. Cells with no value but style are not considered empty by
-        default.
+        the table. Cells are empty if they contain no value or it evaluates
+        to False, and no style.
 
         If aggressive is True, empty cells with style are removed too.
 
         Argument:
 
-            aggressive -- boolean
+            aggressive -- bool
         """
         # Step 1: remove empty rows below the table
         for row in reversed(self._get_rows()):
@@ -1270,14 +1273,26 @@ class odf_table(odf_element):
                 row.get_parent().delete_element(row)
             else:
                 break
-        # Step 2: remove empty columns of cells for remaining rows
-        for x in xrange(self.get_table_width() - 1, -1, -1):
-            # XXX if aggressive=True => very slow
-            if self.is_column_empty(x, aggressive=aggressive):
-                self.delete_column(x)
-            else:
-                break
-
+        # Step 2: rstrip remaining rows
+        max_width = 0
+        for row in self._get_rows():
+            row.rstrip_row(aggressive=aggressive)
+            # keep count of the biggest row
+            max_width = max(max_width, row.get_row_width())
+        # Step 3: trim columns to match max_width
+        diff = self.get_table_width() - max_width
+        if diff > 0:
+            for column in reversed(self._get_columns()):
+                repeated = column.get_column_repeated() or 1
+                repeated = repeated - diff
+                if repeated > 0:
+                    column.set_column_repeated(repeated)
+                    break
+                else:
+                    column.get_parent().delete_element(column)
+                    diff = -repeated
+                    if diff == 0:
+                        break
 
     #
     # Rows
@@ -1837,6 +1852,7 @@ class odf_table(odf_element):
 
         Return: odf_column
         """
+        x = self._translate_x(x)
         # Outside the defined table
         if x >= self.get_table_width():
             return odf_create_column()
@@ -1860,6 +1876,7 @@ class odf_table(odf_element):
 
             column -- odf_column
         """
+        x = self._translate_x(x)
         if column is None:
             column = odf_create_column()
         # Outside the defined table
@@ -1892,6 +1909,7 @@ class odf_table(odf_element):
         """
         if column is None:
             column = odf_create_column()
+        x = self._translate_x(x)
         # Outside the defined table
         diff = x - self.get_table_width()
         if diff > 0:
@@ -1947,6 +1965,7 @@ class odf_table(odf_element):
 
             x -- int or str.isalpha()
         """
+        x = self._translate_x(x)
         # Outside the defined table
         if x >= self.get_table_width():
             return
@@ -1973,6 +1992,7 @@ class odf_table(odf_element):
 
         Return: list of odf_cell
         """
+        x = self._translate_x(x)
         result = []
         for row in self._get_rows():
             cell = row.get_cell(x)
