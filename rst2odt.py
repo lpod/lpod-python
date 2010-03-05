@@ -629,7 +629,7 @@ def convert(document, rst_body, heading_level=1, skip_toc=False):
 
 
 
-def rst2odt(rst_body, template=None):
+def rst2odt(rst_body, template=None, heading_level=1):
     """Convert a reStructuredText source to a new document.
 
     The template is a document to reuse instead of the default lpOD template.
@@ -651,4 +651,4 @@ def rst2odt(rst_body, template=None):
     else:
         document = odf_new_document_from_type("text")
 
-    return convert(document, rst_body)
+    return convert(document, rst_body, heading_level=heading_level)
