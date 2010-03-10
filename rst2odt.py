@@ -590,7 +590,7 @@ def convert_node(node, context):
 
 
 
-def convert(document, rst_body, heading_level=1, skip_toc=False):
+def convert(document, doctree, heading_level=1, skip_toc=False):
     """Convert a reStructuredText source into an existing document.
 
     If the document contains its own TOC, you can ignore others with
@@ -600,7 +600,7 @@ def convert(document, rst_body, heading_level=1, skip_toc=False):
 
         document -- odf_document
 
-        rst_body -- str or docutils node
+        doctree -- docutils node (reST str accepted)
 
         heading_level -- int
 
@@ -615,9 +615,9 @@ def convert(document, rst_body, heading_level=1, skip_toc=False):
             "skip_toc": skip_toc, "footnotes": {}, "tables_number": 0}
 
     # Go!
-    if isinstance(rst_body, str):
-        rst_body = publish_doctree(rst_body)
-    for child in rst_body:
+    if isinstance(doctree, str):
+        doctree = publish_doctree(doctree)
+    for child in doctree:
         convert_node(child, context)
 
     # Finish the work
@@ -636,7 +636,7 @@ def rst2odt(rst_body, template=None, heading_level=1):
 
     Arguments:
 
-        rst_body -- str or docutils node
+        rst_body -- reST str (docutils node accepted)
 
         template -- odf_document
 
