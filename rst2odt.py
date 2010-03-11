@@ -93,9 +93,7 @@ def convert_title(node, context):
 
 def convert_paragraph(node, context):
     # Search for a default style
-    style = context['styles'].get('paragraph_style')
-    if style is not None:
-        style = style.get_style_name()
+    style = context['styles'].get('paragraph')
     paragraph = odf_create_paragraph(style=style)
     context["top"].append_element(paragraph)
 
@@ -113,7 +111,7 @@ def convert_paragraph(node, context):
 
 
 def convert_list(node, context, list_type):
-    # Predefined styles
+    # Reuse template styles
     if list_type == "enumerated":
         style_name = "Numbering_20_1"
     else:
@@ -229,33 +227,41 @@ def _convert_style_like(node, context, style_name):
 
 
 
-def convert_emphasis(node, context):
-    # Yet an emphasis style ?
-    styles = context["styles"]
-    if "emphasis" in styles:
-        emphasis = styles["emphasis"]
-    else:
-        emphasis = odf_create_style("text", italic=True)
-        styles["emphasis"] = emphasis
-        context["doc"].insert_style(emphasis, automatic=True)
+def _get_emphasis_style(context):
+    styles = context['styles']
+    emphasis_style = styles.get('emphasis')
+    if emphasis_style is not None:
+        return emphasis_style
+    emphasis_style = odf_create_style("text", italic=True)
+    context['doc'].insert_style(emphasis_style, automatic=True)
+    styles['emphasis'] = emphasis_style
+    return emphasis_style
 
+
+
+def convert_emphasis(node, context):
+    emphasis_style = _get_emphasis_style(context).get_style_name()
     # Convert
-    _convert_style_like(node, context, emphasis.get_style_name())
+    _convert_style_like(node, context, emphasis_style)
+
+
+
+def _get_strong_style(context):
+    styles = context['styles']
+    strong_style = styles.get('strong')
+    if strong_style is not None:
+        return strong_style
+    strong_style = odf_create_style("text", bold=True)
+    context['doc'].insert_style(strong_style, automatic=True)
+    styles['strong'] = strong_style
+    return strong_style
 
 
 
 def convert_strong(node, context):
-    # Yet a strong style ?
-    styles = context["styles"]
-    if "strong" in styles:
-        strong = styles["strong"]
-    else:
-        strong = odf_create_style("text", bold=True)
-        styles["strong"] = strong
-        context["doc"].insert_style(strong, automatic=True)
-
+    strong_style = _get_strong_style(context).get_style_name()
     # Convert
-    _convert_style_like(node, context, strong.get_style_name())
+    _convert_style_like(node, context, strong_style)
 
 
 
@@ -325,11 +331,11 @@ def convert_reference(node, context):
 
 def _get_term_style(context):
     styles = context['styles']
-    doc = context['doc']
-    term_style = styles.get('term_style')
+    term_style = styles.get('term')
     if term_style is not None:
         return term_style
     # Reuse template style if any
+    doc = context['doc']
     term_style = doc.get_style('paragraph',
             u"Definition_20_List_20_Term")
     if term_style is None:
@@ -339,18 +345,18 @@ def _get_term_style(context):
                 display_name=u"Definition List Term", parent="Standard",
                 font_weight=u"bold", area='text')
         doc.insert_style(term_style, automatic=False)
-    styles['term_style'] = term_style
+    styles['term'] = term_style
     return term_style
 
 
 
 def _get_definition_style(context):
     styles = context['styles']
-    doc = context['doc']
-    definition_style = styles.get('definition_style')
+    definition_style = styles.get('definition')
     if definition_style is not None:
         return definition_style
     # Reuse template style if any
+    doc = context['doc']
     definition_style = doc.get_style('paragraph',
             u"Definition_20_List_20_Definition")
     if definition_style is None:
@@ -362,7 +368,7 @@ def _get_definition_style(context):
                 margin_right=u"0cm", text_indent=u"0cm",
                 **{'style:auto-text-indent': u"false"})
         doc.insert_style(definition_style, automatic=False)
-    styles['definition_style'] = definition_style
+    styles['definition'] = definition_style
     return definition_style
 
 
@@ -373,8 +379,9 @@ def convert_definition_list(node, context):
     The "Definition List Term" style is looked for term paragraphs, and the
     "Definition List Definition" style is looked for definition paragraphs.
     """
-    term_style = _get_term_style()
-    definition_style = _get_definition_style()
+    styles = context['styles']
+    term_style = _get_term_style(context).get_style_name()
+    definition_style = _get_definition_style(context).get_style_name()
 
     for item in node:
         if item.tagname != "definition_list_item":
@@ -384,15 +391,15 @@ def convert_definition_list(node, context):
             tagname = child.tagname
             if tagname == "term":
                 paragraph = odf_create_paragraph(text=child.astext(),
-                        style=term_style.get_style_name())
+                        style=term_style)
                 context["top"].append_element(paragraph)
             elif tagname == "definition":
                 # Push a style on the stack for next paragraphs to use
-                styles['paragraph_style'] = definition_style
+                styles['paragraph'] = definition_style
                 for subchildren in child:
                     convert_node(subchildren, context)
                 # Pop the paragraph style
-                del styles['paragraph_style']
+                del styles['paragraph']
             else:
                 warn('node "%s" not supported in definition_list_item' %
                         tagname)
@@ -403,6 +410,37 @@ def convert_block_quote(node, context):
     # TODO Add the style
     for child in node:
         convert_node(child, context)
+
+
+
+def _get_caption_style(context):
+    styles = context['styles']
+    caption_style = styles.get('caption')
+    if caption_style is not None:
+        return caption_style
+    caption_style = odf_create_style('graphic', parent=u"Frame",
+            **{'style:wrap': u"none", 'style:vertical-pos': u"top",
+                'style:vertical-rel': u"paragraph-content",
+                'style:horizontal-pos': u"center",
+                'style:horizontal-rel': u"paragraph-content",
+                'fo:padding': u"0.25cm", 'fo:border': u"0cm solid #000000"})
+    context['doc'].insert_style(caption_style, automatic=True)
+    styles['caption'] = caption_style
+    return caption_style
+
+
+
+def _get_image_style(context):
+    styles = context['styles']
+    image_style = styles.get('image')
+    if image_style is not None:
+        return image_style
+    image_style = odf_create_style('graphic', parent="Graphics",
+            **{'style:horizontal-pos': u"center",
+                'style:horizontal-rel': u"paragraph"})
+    context['doc'].insert_style(image_style, automatic=True)
+    styles['image'] = image_style
+    return image_style
 
 
 
@@ -444,28 +482,9 @@ def _add_image(image, caption, context, width=None, height=None):
     local_uri = context["doc"].add_file(image)
 
     # Frame style for the caption frame
-    styles = context["styles"]
-    caption_style = styles.get('caption_style')
-    if caption_style is None:
-        caption_style = odf_create_style("graphic", parent="Frame")
-        caption_style.set_style_properties({'style:wrap': u"none",
-            'style:vertical-pos': u"top",
-            'style:vertical-rel': u"paragraph-content",
-            'style:horizontal-pos': u"center",
-            'style:horizontal-rel': u"paragraph-content",
-            'fo:padding': u"0.25cm",
-            'fo:border': u"0cm solid #000000"})
-        context['doc'].insert_style(caption_style, automatic=True)
-        styles['caption_style'] = caption_style
-
+    caption_style = _get_caption_style(context).get_style_name()
     # Frame style for the image frame
-    image_style = styles.get('image_style')
-    if image_style is None:
-        image_style = odf_create_style('graphic', parent="Graphics")
-        image_style.set_style_properties({'style:horizontal-pos': u"center",
-            'style:horizontal-rel': u"paragraph"})
-        context['doc'].insert_style(image_style, automatic=True)
-        styles['image_style'] = image_style
+    image_style = _get_image_style(context).get_style_name()
 
     # In text application, image must be inserted in a paragraph
     if context["top"].get_tagname() == "office:text":
@@ -477,16 +496,16 @@ def _add_image(image, caption, context, width=None, height=None):
     if caption:
         paragraph = odf_create_paragraph()
         image_frame = odf_create_image_frame(local_uri, size=size,
-                style=image_style.get_style_name())
+                style=image_style)
         paragraph.append_element(image_frame)
         paragraph.append_element(caption)
         # A new frame, we fix only the width
         text_frame = odf_create_text_frame(paragraph, size=(size[0], None),
-                style=caption_style.get_style_name())
+                style=caption_style)
         container.append_element(text_frame)
     else:
         image_frame = odf_create_image_frame(local_uri, size=size,
-                style=image_style.get_style_name())
+                style=image_style)
         container.append_element(image_frame)
 
 
@@ -569,14 +588,22 @@ def _convert_table_rows(container, node, context, cell_style=None):
 
 
 
+def _get_cell_style(context):
+    styles = context['styles']
+    cell_style = styles.get('cell')
+    if cell_style is not None:
+        return cell_style
+    # Give borders to cells
+    cell_style = odf_create_style('table-cell', u"odf_table.A1",
+            padding=u"0.049cm", border=u"0.002cm solid #000000")
+    context['doc'].insert_style(cell_style, automatic=True)
+    styles['cell'] = cell_style
+    return cell_style
+
+
+
 def convert_table(node, context):
-    styles = context["styles"]
-    cell_style = styles.get('cell_style')
-    if cell_style is None:
-        cell_style = odf_create_style('table-cell', u"odf_table.A1",
-                padding=u"0.049cm", border=u"0.002cm solid #000000")
-        context['doc'].insert_style(cell_style, automatic=True)
-        styles['cell_style'] = cell_style
+    cell_style = _get_cell_style(context).get_style_name()
 
     for tgroup in node:
         if tgroup.tagname != "tgroup":
@@ -601,10 +628,10 @@ def convert_table(node, context):
                     odf_table.append_element(header)
 
                     _convert_table_rows(header, child, context,
-                            cell_style=cell_style.get_style_name())
+                            cell_style=cell_style)
                 else:
                     _convert_table_rows(odf_table, child, context,
-                            cell_style=cell_style.get_style_name())
+                            cell_style=cell_style)
             elif tagname == "colspec":
                 columns_number += 1
             else:
