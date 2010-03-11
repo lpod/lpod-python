@@ -92,7 +92,11 @@ def convert_title(node, context):
 
 
 def convert_paragraph(node, context):
-    paragraph = odf_create_paragraph()
+    # Search for a default style
+    style = context['styles'].get('paragraph_style')
+    if style is not None:
+        style = style.get_style_name()
+    paragraph = odf_create_paragraph(style=style)
     context["top"].append_element(paragraph)
 
     # Save the current top
@@ -319,24 +323,79 @@ def convert_reference(node, context):
 
 
 
+def _get_term_style(context):
+    styles = context['styles']
+    doc = context['doc']
+    term_style = styles.get('term_style')
+    if term_style is not None:
+        return term_style
+    # Reuse template style if any
+    term_style = doc.get_style('paragraph',
+            u"Definition_20_List_20_Term")
+    if term_style is None:
+        # Create default one
+        term_style = odf_create_style('paragraph',
+                name=u"Definition_20_List_20_Term",
+                display_name=u"Definition List Term", parent="Standard",
+                font_weight=u"bold", area='text')
+        doc.insert_style(term_style, automatic=False)
+    styles['term_style'] = term_style
+    return term_style
+
+
+
+def _get_definition_style(context):
+    styles = context['styles']
+    doc = context['doc']
+    definition_style = styles.get('definition_style')
+    if definition_style is not None:
+        return definition_style
+    # Reuse template style if any
+    definition_style = doc.get_style('paragraph',
+            u"Definition_20_List_20_Definition")
+    if definition_style is None:
+        # Create default one
+        definition_style = odf_create_style('paragraph',
+                name=u"Definition_20_List_20_Definition",
+                display_name=u"Definition List Definition",
+                parent="Standard", margin_left=u"0.5cm",
+                margin_right=u"0cm", text_indent=u"0cm",
+                **{'style:auto-text-indent': u"false"})
+        doc.insert_style(definition_style, automatic=False)
+    styles['definition_style'] = definition_style
+    return definition_style
+
+
+
 def convert_definition_list(node, context):
-    # TODO Add the style
+    """Convert a list of term/definition pairs to styled paragraphs.
+
+    The "Definition List Term" style is looked for term paragraphs, and the
+    "Definition List Definition" style is looked for definition paragraphs.
+    """
+    term_style = _get_term_style()
+    definition_style = _get_definition_style()
+
     for item in node:
         if item.tagname != "definition_list_item":
             warn('node "%s" not supported in definition_list' % item.tagname)
             continue
-
         for child in item:
             tagname = child.tagname
             if tagname == "term":
-                paragraph = odf_create_paragraph(text=child.astext())
+                paragraph = odf_create_paragraph(text=child.astext(),
+                        style=term_style.get_style_name())
                 context["top"].append_element(paragraph)
             elif tagname == "definition":
+                # Push a style on the stack for next paragraphs to use
+                styles['paragraph_style'] = definition_style
                 for subchildren in child:
                     convert_node(subchildren, context)
+                # Pop the paragraph style
+                del styles['paragraph_style']
             else:
                 warn('node "%s" not supported in definition_list_item' %
-                        item.tagname)
+                        tagname)
 
 
 
