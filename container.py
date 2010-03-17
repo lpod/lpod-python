@@ -74,7 +74,7 @@ ODF_MIMETYPES = {
 
 
 # Standard parts in the container (other are regular paths)
-ODF_PARTS = ['content', 'meta', 'mimetype', 'settings', 'styles']
+ODF_PARTS = ['content', 'meta', 'settings', 'styles'] # + 'mimetype'
 
 
 class odf_container(object):
@@ -122,10 +122,10 @@ class odf_container(object):
     def __get_zipfile(self):
         """Open a Zip object on the archive ODF.
         """
-        data = self.__get_data()
-        # StringIO will not duplicate the string, how big it is
-        filelike = StringIO(data)
         if self.__zipfile is None:
+            data = self.__get_data()
+            # StringIO will not duplicate the string, how big it is
+            filelike = StringIO(data)
             self.__zipfile = ZipFile(filelike)
         return self.__zipfile
 
@@ -133,7 +133,7 @@ class odf_container(object):
     def __get_part_xml(self, part_name):
         """Get bytes of a part from the XML-only ODF.
         """
-        if part_name not in ODF_PARTS:
+        if part_name not in ODF_PARTS and part_name != 'mimetype':
             raise ValueError, ("Third-party parts are not supported "
                                "in an XML-only ODF document")
         if part_name == 'mimetype':
@@ -152,7 +152,7 @@ class odf_container(object):
         """Get bytes of a part from the archive ODF.
         """
         zipfile = self.__get_zipfile()
-        if part_name in ODF_PARTS and part_name != 'mimetype':
+        if part_name in ODF_PARTS:
             file = zipfile.open('%s.xml' % part_name)
             part = file.read()
             file.close()
@@ -176,32 +176,36 @@ class odf_container(object):
         result = []
         for part in zipfile.infolist():
             filename = part.filename
-            if filename.endswith('.xml') and filename[:-4] in ODF_PARTS:
+            if filename[-4:] == '.xml' and filename[:-4] in ODF_PARTS:
                 result.append(filename[:-4])
             else:
                 result.append(filename)
         return result
 
 
-    def __make_xml(self):
-        """Make an XML-only ODF from the available parts.
+    def __save_xml(self, file):
+        """Save an XML-only ODF from the available parts.
         """
         raise NotImplementedError
 
 
-    def __make_zip(self):
-        """Make an archive ODF from the available parts.
+    def __save_zip(self, file):
+        """Save an archive ODF from the available parts.
         """
-        data = StringIO()
-        filezip = ZipFile(data, 'w')
-
-        for name, part_data in self.__parts.iteritems():
-            if name in ODF_PARTS and name != 'mimetype':
-                name += '.xml'
-            filezip.writestr(name, part_data)
-
+        # Parts were loaded by "save"
+        parts = self.__parts
+        filezip = ZipFile(file, 'w')
+        # "Pretty"-save parts in some order
+        # mimetype first
+        filezip.writestr('mimetype', parts['mimetype'])
+        # XML parts
+        for part_name in ODF_PARTS:
+            filezip.writestr(part_name + '.xml', parts[part_name])
+        # Everything else
+        for part_name, part_data in parts.iteritems():
+            if part_name not in ODF_PARTS and part_name != 'mimetype':
+                filezip.writestr(part_name, part_data)
         filezip.close()
-        return data.getvalue()
 
 
     #
@@ -269,7 +273,7 @@ class odf_container(object):
         object (if supported).
         """
         parts = self.__parts
-        # Get all parts
+        # Load parts
         for part in self.get_contents():
             if part not in parts:
                 self.get_part(part)
@@ -277,21 +281,26 @@ class odf_container(object):
         if packaging is None:
             packaging = ('flat' if self.mimetype == 'application/xml' else
                          'zip')
-        # Get data
+        # Open output file
+        close_after = False
+        if target is None:
+            file = vfs.open(self.uri, WRITE)
+            close_after = True
+        elif isinstance(target, str):
+            close_after = True
+            file = vfs.open(target, WRITE)
+        else:
+            file = target
+        # Serialize
         if packaging == 'flat':
-            data = self.__make_xml()
+            self.__save_xml(file)
         elif packaging == 'zip':
-            data = self.__make_zip()
+            self.__save_zip(file)
         else:
             raise ValueError, '"%s" packaging type not supported' % packaging
-        # Save it
-        if target is None:
-            container = vfs.open(self.uri, WRITE)
-        elif isinstance(target, str):
-            container = vfs.open(target, WRITE)
-        else:
-            container = target
-        container.write(data)
+        # Close files we opened ourselves
+        if close_after:
+            file.close()
 
 
 
