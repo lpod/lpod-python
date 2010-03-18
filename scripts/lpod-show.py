@@ -78,13 +78,13 @@ def dump(txt, to_file):
 
 
 def dump_pictures(document, target):
-    for part in document.get_files():
-        if part.startswith('Pictures/'):
+    for part_name in document.get_parts():
+        if part_name.startswith('Pictures/'):
             if not target.exists('Pictures'):
                 target.make_folder('Pictures')
-            data = document.get_file_data(part)
+            data = document.get_part(part_name)
             encoding = stdout.encoding if stdout.encoding else 'utf-8'
-            to_file = target.open(part.encode(encoding), 'w')
+            to_file = target.open(part_name.encode(encoding), 'w')
             to_file.write(data)
 
 

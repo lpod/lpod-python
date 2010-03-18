@@ -63,7 +63,7 @@ def init_doc(mimetype):
 def _add_pictures(document, output_doc):
     # Copy extra parts (images...)
     container = document.container
-    for partname in container.get_contents():
+    for partname in container.get_parts():
         if partname.startswith('Pictures/'):
             data = container.get_part(partname)
             # Suppose uniqueness

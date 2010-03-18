@@ -161,21 +161,31 @@ class odf_document(object):
         # application/vnd.oasis.opendocument.text
 
         # Isolate and return the last part
-        return mimetype.split('.')[-1]
+        return mimetype.rsplit('.', 1)[-1]
 
 
     def get_body(self):
+        """Return the body element of the content part, where actual content
+        is inserted.
+        """
         if self.__body is None:
             content = self.get_content()
             self.__body = content.get_body()
         return self.__body
 
 
-    def get_files(self):
-        return self.container.get_contents()
+    def get_parts(self):
+        """Return available part names with path inside the archive, e.g.
+        ['content.xml', ..., 'Pictures/100000000000032000000258912EB1C3.jpg']
+        """
+        return self.container.get_parts()
 
 
-    def get_file_data(self, filename):
+    def get_part(self, filename):
+        """Return the bytes of the given part. The filename includes the path
+        inside the archive, e.g.
+        "Pictures/100000000000032000000258912EB1C3.jpg"
+        """
         return self.container.get_part(filename)
 
 
@@ -322,8 +332,8 @@ class odf_document(object):
 
     def save(self, target=None, packaging=None, pretty=False):
         """Save the document, at the same place it was opened or at the given
-        URI (target). Target can also be a file like object. It can be saved as
-        a Zip file or as a plain XML file. The XML can be pretty printed.
+        URI (target). Target can also be a file like object. It can be saved
+        as a Zip file or as a flat XML file. XML parts can be pretty printed.
 
         Arguments:
 

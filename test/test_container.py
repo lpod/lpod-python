@@ -45,22 +45,30 @@ class NewContainerFromTemplateTestCase(TestCase):
 
     def test_text_template(self):
         uri = '../templates/text.ott'
-        self.assert_(odf_new_container_from_template(uri))
+        container = odf_new_container_from_template(uri)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_template(self):
         uri = '../templates/spreadsheet.ots'
-        self.assert_(odf_new_container_from_template(uri))
+        container = odf_new_container_from_template(uri)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_template(self):
         uri = '../templates/presentation.otp'
-        self.assert_(odf_new_container_from_template(uri))
+        container = odf_new_container_from_template(uri)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_template(self):
         uri = '../templates/drawing.otg'
-        self.assert_(odf_new_container_from_template(uri))
+        container = odf_new_container_from_template(uri)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odg'])
 
 
 
@@ -72,19 +80,27 @@ class NewContainerFromTypeTestCase(TestCase):
 
 
     def test_text_type(self):
-        self.assert_(odf_new_container_from_type('text'))
+        container = odf_new_container_from_type('text')
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_type(self):
-        self.assert_(odf_new_container_from_type('spreadsheet'))
+        container = odf_new_container_from_type('spreadsheet')
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_type(self):
-        self.assert_(odf_new_container_from_type('presentation'))
+        container = odf_new_container_from_type('presentation')
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_type(self):
-        self.assert_(odf_new_container_from_type('drawing'))
+        container = odf_new_container_from_type('drawing')
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odg'])
 
 
 
@@ -92,22 +108,30 @@ class GetContainerTestCase(TestCase):
 
     def test_filesystem(self):
         path = 'samples/example.odt'
-        self.assert_(odf_get_container(path))
+        container = odf_get_container(path)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_odf_xml(self):
         path = 'samples/example.xml'
-        self.assert_(odf_get_container(path))
+        container = odf_get_container(path)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_http(self):
         uri = 'http://ftp.lpod-project.org/example.odt'
-        self.assert_(odf_get_container(uri))
+        container = odf_get_container(uri)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_ftp(self):
         uri = 'ftp://ftp.lpod-project.org/example.odt'
-        self.assert_(odf_get_container(uri))
+        container = odf_get_container(uri)
+        mimetype = container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
 
@@ -123,8 +147,7 @@ class ContainerTestCase(TestCase):
     def test_get_part_xml(self):
         container = odf_get_container('samples/example.odt')
         content = container.get_part('content')
-        xml_decl = '<?xml version="1.0" encoding="UTF-8"?>'
-        self.assert_(content.startswith(xml_decl))
+        self.assert_('<office:document-content' in content)
 
 
     def test_get_part_mimetype(self):

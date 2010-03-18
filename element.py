@@ -197,7 +197,7 @@ class odf_text(unicode):
 
 
 class odf_element(object):
-    """Representation of an XML element.  Abstraction of the XML library
+    """Representation of an XML element. Abstraction of the XML library
     behind.
     """
 

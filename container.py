@@ -27,7 +27,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
-from zipfile import ZipFile
+from zipfile import ZipFile, BadZipfile
 from cStringIO import StringIO
 
 # Import from lpod
@@ -68,41 +68,48 @@ ODF_MIMETYPES = {
         'application/vnd.oasis.opendocument.presentation-template': 'otp',
         'application/vnd.oasis.opendocument.graphics': 'odg',
         'application/vnd.oasis.opendocument.graphics-template': 'otg',
-        # XML-only document
-        'application/xml': 'xml',
 }
 
 
 # Standard parts in the container (other are regular paths)
-ODF_PARTS = ['content', 'meta', 'settings', 'styles'] # + 'mimetype'
+ODF_PARTS = ['content', 'meta', 'settings', 'styles']
 
 
 class odf_container(object):
     """Representation of the ODF file.
     """
+    __zipfile = None
+    __zip_packaging = None
+
+
     def __init__(self, uri_or_file):
-        # Internal state
-        self.__zipfile = None
-        self.__parts = {}
-        # URI
         if type(uri_or_file) is str:
-            self.uri = uri_or_file
-            if not vfs.exists(uri_or_file):
-                raise ValueError, 'URI "%s" is not found' % uri_or_file
-            if vfs.is_folder(uri_or_file):
-                raise NotImplementedError, ("reading uncompressed ODF "
-                                            "is not supported")
-            mimetype = vfs.get_mimetype(uri_or_file)
-            if not mimetype in ODF_MIMETYPES:
-                raise ValueError, 'mimetype "%s" is unknown' % mimetype
-            self.mimetype = mimetype
-            self.__data = None
-        # File-like assumed
+            # URI
+            self.uri = uri = uri_or_file
+            if not vfs.exists(uri):
+                raise ValueError, 'URI "%s" is not found' % uri
+            if vfs.is_folder(uri):
+                message = "reading uncompressed ODF is not supported"
+                raise NotImplementedError, message
+            file = vfs.open(uri)
         else:
+            # File-like assumed
             self.uri = None
-            self.__data = uri_or_file.read()
-            # FIXME Zip format assumed
-            self.mimetype = self.__get_part_zip('mimetype')
+            file = uri_or_file
+        self.__data = file.read()
+        # Most probably zipped document
+        try:
+            mimetype = self.__get_zip_part('mimetype')
+            self.__zip_packaging = True
+        except BadZipfile:
+            # Maybe XML document
+            mimetype = self.__get_xml_part('mimetype')
+            self.__zip_packaging = False
+        if mimetype not in ODF_MIMETYPES:
+            message = 'Document of unknown type "%s"' % mimetype
+            raise ValueError, message
+        self.__parts = {'mimetype': mimetype}
+
 
 
     #
@@ -110,17 +117,50 @@ class odf_container(object):
     #
 
     def __get_data(self):
-        """Store bytes of the ODF in memory.
+        """Return bytes of the ODF in memory.
         """
-        if self.__data is None:
-            file = vfs.open(self.uri)
-            self.__data = file.read()
-            file.close()
         return self.__data
 
 
+    # XML implementation
+
+    def __get_xml_parts(self):
+        """Get the list of members in the XML-only ODF.
+        """
+        raise NotImplementedError
+
+
+    def __get_xml_part(self, part_name):
+        """Get bytes of a part from the XML-only ODF. No cache.
+        """
+        if part_name not in ODF_PARTS and part_name != 'mimetype':
+            raise ValueError, ("Third-party parts are not supported "
+                               "in an XML-only ODF document")
+        data = self.__get_data()
+        if part_name == 'mimetype':
+            start_attr = 'office:mimetype="'
+            start = data.index(start_attr) + len(start_attr)
+            end = data.index('"', start)
+            part = data[start:end]
+        else:
+            start_tag = '<office:document-%s>' % part_name
+            start = data.index(start_tag)
+            end_tag = '</office:document-%s>' % part_name
+            end = data.index(end_tag) + len(end_tag)
+            part = data[start:end]
+        return part
+
+
+    def __save_xml(self, file):
+        """Save an XML-only ODF from the available parts.
+        """
+        raise NotImplementedError
+
+
+    # Zip implementation
+
     def __get_zipfile(self):
-        """Open a Zip object on the archive ODF.
+        """Open a Zip object on the Zip ODF.
         """
         if self.__zipfile is None:
             data = self.__get_data()
@@ -130,47 +170,8 @@ class odf_container(object):
         return self.__zipfile
 
 
-    def __get_part_xml(self, part_name):
-        """Get bytes of a part from the XML-only ODF.
-        """
-        if part_name not in ODF_PARTS and part_name != 'mimetype':
-            raise ValueError, ("Third-party parts are not supported "
-                               "in an XML-only ODF document")
-        if part_name == 'mimetype':
-            part = self.mimetype
-        else:
-            data = self.__get_data()
-            start_tag = '<office:document-%s>' % part_name
-            start = data.index(start_tag)
-            end_tag = '</office:document-%s>' % part_name
-            end = data.index(end_tag)
-            part = data[start:end + len(end_tag)]
-        return part
-
-
-    def __get_part_zip(self, part_name):
-        """Get bytes of a part from the archive ODF.
-        """
-        zipfile = self.__get_zipfile()
-        if part_name in ODF_PARTS:
-            file = zipfile.open('%s.xml' % part_name)
-            part = file.read()
-            file.close()
-        else:
-            file = zipfile.open(part_name)
-            part = file.read()
-            file.close()
-        return part
-
-
-    def __get_xml_contents(self):
-        """Get the list of members in the XML-only ODF.
-        """
-        raise NotImplementedError
-
-
-    def __get_zip_contents(self):
-        """Get the list of members in the archive ODF.
+    def __get_zip_parts(self):
+        """Get the list of members in the Zip ODF.
         """
         zipfile = self.__get_zipfile()
         result = []
@@ -183,14 +184,20 @@ class odf_container(object):
         return result
 
 
-    def __save_xml(self, file):
-        """Save an XML-only ODF from the available parts.
+    def __get_zip_part(self, part_name):
+        """Get bytes of a part from the Zip ODF. No cache.
         """
-        raise NotImplementedError
+        zipfile = self.__get_zipfile()
+        if part_name in ODF_PARTS:
+            part_name = '%s.xml' % part_name
+        file = zipfile.open(part_name)
+        part = file.read()
+        file.close()
+        return part
 
 
     def __save_zip(self, file):
-        """Save an archive ODF from the available parts.
+        """Save a Zip ODF from the available parts.
         """
         # Parts were loaded by "save"
         parts = self.__parts
@@ -202,9 +209,9 @@ class odf_container(object):
         for part_name in ODF_PARTS:
             filezip.writestr(part_name + '.xml', parts[part_name])
         # Everything else
-        for part_name, part_data in parts.iteritems():
+        for part_name in sorted(parts):
             if part_name not in ODF_PARTS and part_name != 'mimetype':
-                filezip.writestr(part_name, part_data)
+                filezip.writestr(part_name, parts[part_name])
         filezip.close()
 
 
@@ -212,31 +219,12 @@ class odf_container(object):
     # Public API
     #
 
-    def get_contents(self):
+    def get_parts(self):
         """Get the list of members.
         """
-        if self.mimetype == 'application/xml':
-            return self.__get_xml_contents()
-        else:
-            return self.__get_zip_contents()
-
-
-    def clone(self):
-        """Make a copy of this container with no URI.
-        """
-        clone = object.__new__(self.__class__)
-        # Load state
-        self.__get_data()
-        for name in self.__dict__:
-            # "__zipfile" is not safe to copy
-            # but can be recreated from "__data"
-            if name in ('uri', '_odf_container__zipfile'):
-                setattr(clone, name, None)
-            else:
-                value = getattr(self, name)
-                value = deepcopy(value)
-                setattr(clone, name, value)
-        return clone
+        if self.__zip_packaging is True:
+            return self.__get_zip_parts()
+        return self.__get_xml_parts()
 
 
     def get_part(self, part_name):
@@ -248,10 +236,10 @@ class odf_container(object):
             if part is None:
                 raise ValueError, "part is deleted"
             return part
-        if self.mimetype == 'application/xml':
-            part = self.__get_part_xml(part_name)
+        if self.__zip_packaging is True:
+            part = self.__get_zip_part(part_name)
         else:
-            part = self.__get_part_zip(part_name)
+            part = self.__get_xml_part(part_name)
         loaded_parts[part_name] = part
         return part
 
@@ -268,19 +256,45 @@ class odf_container(object):
         self.__parts[part_name] = None
 
 
+    def clone(self):
+        """Make a copy of this container with no URI.
+        """
+        clone = object.__new__(self.__class__)
+        for name in self.__dict__:
+            # "__zipfile" is not safe to copy
+            # but can be recreated from "__data"
+            if name in ('uri', '_odf_container__zipfile'):
+                setattr(clone, name, None)
+            else:
+                value = getattr(self, name)
+                value = deepcopy(value)
+                setattr(clone, name, value)
+        return clone
+
+
     def save(self, target=None, packaging=None):
-        """Save the container to the given URI (target) or into this file like
-        object (if supported).
+        """Save the container to the given target, a URI or a file-like
+        object.
+
+        Package the output document in the same format than this document,
+        unless "packaging" is different.
+
+        Arguments:
+
+            target -- str or file-like
+
+            packaging -- 'zip' or 'flat'
         """
         parts = self.__parts
-        # Load parts
-        for part in self.get_contents():
-            if part not in parts:
-                self.get_part(part)
         # Packaging
         if packaging is None:
-            packaging = ('flat' if self.mimetype == 'application/xml' else
-                         'zip')
+            packaging = 'zip' if self.__zip_packaging is True else 'flat'
+        if packaging not in ('zip', 'flat'):
+            raise ValueError, 'packaging type "%s" not supported' % packaging
+        # Load parts
+        for part_name in self.get_parts():
+            if part_name not in parts:
+                self.get_part(part_name)
         # Open output file
         close_after = False
         if target is None:
@@ -292,12 +306,10 @@ class odf_container(object):
         else:
             file = target
         # Serialize
-        if packaging == 'flat':
-            self.__save_xml(file)
-        elif packaging == 'zip':
+        if packaging == 'zip':
             self.__save_zip(file)
         else:
-            raise ValueError, '"%s" packaging type not supported' % packaging
+            self.__save_xml(file)
         # Close files we opened ourselves
         if close_after:
             file.close()
