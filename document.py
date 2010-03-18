@@ -298,12 +298,15 @@ class odf_document(object):
 
 
     def add_file(self, uri_or_file):
+        name = None
         if type(uri_or_file) is unicode or type(uri_or_file) is str:
             uri_or_file = uri_or_file.encode('utf_8')
             file = vfs.open(uri_or_file)
+            name = uri_or_file
         else:
             file = uri_or_file
-        name = 'Pictures/%s' % uuid4()
+            name = getattr(file, 'name', uuid4())
+        name = 'Pictures/%s' % basename(name)
         data= file.read()
         self.container.set_part(name, data)
         return name
