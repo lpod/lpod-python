@@ -27,8 +27,9 @@
 
 # Import from the Standard Library
 from copy import deepcopy
-from zipfile import ZipFile, BadZipfile
 from cStringIO import StringIO
+from time import localtime, time
+from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, ZipInfo, BadZipfile
 
 # Import from lpod
 from utils import _get_abspath
@@ -201,10 +202,20 @@ class odf_container(object):
         """
         # Parts were loaded by "save"
         parts = self.__parts
-        filezip = ZipFile(file, 'w')
+        try:
+            filezip = ZipFile(file, 'w', ZIP_DEFLATED)
+        except RuntimeError:
+            # No zlib module
+            filezip = ZipFile(file, 'w', ZIP_STORED)
         # "Pretty"-save parts in some order
-        # mimetype first
-        filezip.writestr('mimetype', parts['mimetype'])
+        # mimetype requires to be first and uncompressed
+        # XXX Taken from zipfile.py just because "writestr" doesn't have
+        # "compress_type" argument
+        zinfo = ZipInfo(filename='mimetype',
+                date_time=localtime(time())[:6])
+        zinfo.external_attr = 0600 << 16
+        zinfo.compress_type = ZIP_STORED
+        filezip.writestr(zinfo, parts['mimetype'])
         # XML parts
         for part_name in ODF_PARTS:
             filezip.writestr(part_name + '.xml', parts[part_name])
@@ -219,7 +230,6 @@ class odf_container(object):
                 continue
             filezip.writestr(part_name, part_data)
         parts['META-INF/manifest.xml'] = manifest = self.__get_manifest()
-        print "manifest", manifest
         filezip.writestr('META-INF/manifest.xml', manifest)
         filezip.close()
 
