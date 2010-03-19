@@ -29,6 +29,7 @@
 # Import from the Standard Library
 from copy import deepcopy
 from operator import itemgetter
+from os.path import splitext
 from uuid import uuid4
 
 # Import from lpod
@@ -305,8 +306,15 @@ class odf_document(object):
             name = uri_or_file
         else:
             file = uri_or_file
-            name = getattr(file, 'name', uuid4())
-        name = 'Pictures/%s' % basename(name)
+            name = getattr(file, 'name')
+        # Generate a safe portable name
+        uuid = str(uuid4())
+        if name is None:
+            name = uuid
+        else:
+            _, extension = splitext(name)
+            name = uuid + extension.lower()
+        name = 'Pictures/%s' % (name)
         data= file.read()
         self.container.set_part(name, data)
         return name
