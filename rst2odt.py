@@ -661,6 +661,7 @@ convert_methods = {
         'strong': convert_strong,
         'table': convert_table,
         'title': convert_title,
+        'subtitle': convert_title,
         'topic': convert_topic
 }
 
