@@ -309,9 +309,12 @@ class odf_toc(odf_element):
                     automatic_styles.append_element(level_style)
 
         # Auto-fill the index
+        outline_level = self.get_toc_outline_level() or 10
         level_indexes = {}
         for heading in body.get_heading_list():
             level = heading.get_outline_level()
+            if level > outline_level:
+                continue
             number = []
             # 1. l < level
             for l in range(1, level):
