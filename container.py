@@ -28,6 +28,7 @@
 # Import from the Standard Library
 from copy import deepcopy
 from cStringIO import StringIO
+from sys import stderr
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 
 # Import from lpod
@@ -101,8 +102,10 @@ class odf_container(object):
         try:
             mimetype = self.__get_zip_part('mimetype')
             self.__zip_packaging = True
-        except BadZipfile:
+        except BadZipfile, e:
+            print >> stderr, "BadZipfile: %s" % e
             # Maybe XML document
+            # TODO detect broken Zip and fail now
             mimetype = self.__get_xml_part('mimetype')
             self.__zip_packaging = False
         if mimetype not in ODF_MIMETYPES:
