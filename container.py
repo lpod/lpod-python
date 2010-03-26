@@ -28,7 +28,6 @@
 # Import from the Standard Library
 from copy import deepcopy
 from cStringIO import StringIO
-from sys import stderr
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 
 # Import from lpod
@@ -90,23 +89,27 @@ class odf_container(object):
             if not vfs.exists(uri):
                 raise ValueError, 'URI "%s" is not found' % uri
             if vfs.is_folder(uri):
-                message = "reading uncompressed ODF is not supported"
+                message = "reading uncompressed OpenDocument not supported"
                 raise NotImplementedError, message
             file = vfs.open(uri)
         else:
             # File-like assumed
             self.uri = None
             file = uri_or_file
-        self.__data = file.read()
+        self.__data = data = file.read()
+        zip_expected = data[:4] == 'PK\x03\x04'
         # Most probably zipped document
         try:
             mimetype = self.__get_zip_part('mimetype')
             self.__zip_packaging = True
         except BadZipfile, e:
-            print >> stderr, "BadZipfile: %s" % e
+            if zip_expected:
+                raise ValueError, "corrupted or not an OpenDocument archive"
             # Maybe XML document
-            # TODO detect broken Zip and fail now
-            mimetype = self.__get_xml_part('mimetype')
+            try:
+                mimetype = self.__get_xml_part('mimetype')
+            except ValueError:
+                raise ValueError, "bad OpenDocument format"
             self.__zip_packaging = False
         if mimetype not in ODF_MIMETYPES:
             message = 'Document of unknown type "%s"' % mimetype
