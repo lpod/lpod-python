@@ -33,6 +33,13 @@ from os.path import basename
 # Import from lpod
 from vfs import vfs
 
+try:
+    # builtin on Windows
+    WindowsError
+except NameError:
+    class WindowsError(OSError):
+        pass
+
 
 def _run_command(command):
     popen = Popen(command, stdout=PIPE, stderr=PIPE)
@@ -44,7 +51,13 @@ def _run_command(command):
 
 
 def has_git():
-    return vfs.exists('.git')
+    if not vfs.exists('.git'):
+        return False
+    try:
+        _run_command(['git', 'branch'])
+    except (ValueError, OSError, WindowsError):
+        return False
+    return True
 
 
 
