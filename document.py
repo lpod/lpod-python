@@ -33,6 +33,7 @@ from os.path import splitext
 from uuid import uuid4
 
 # Import from lpod
+from __init__ import __version__
 from container import ODF_PARTS, odf_get_container
 from container import odf_new_container_from_template
 from container import odf_new_container_from_type, odf_container
@@ -362,6 +363,10 @@ class odf_document(object):
 
             pretty -- bool
         """
+        # Some advertising
+        meta = self.get_meta()
+        if not meta._generator_modified:
+            meta.set_generator(u"lpOD Python %s" % __version__)
         # Synchronize data with container
         for part_name, part in self.__xmlparts.items():
             if part is not None:

@@ -28,6 +28,7 @@
 #
 
 # Import from the Standard Library
+from cStringIO import StringIO
 from unittest import TestCase, main
 
 # Import from lpod
@@ -149,6 +150,27 @@ class DocumentTestCase(TestCase):
         self.assertEqual(parts.keys(), ['content'])
         container = clone.container
         self.assertEqual(container.uri, None)
+
+
+    def test_save_nogenerator(self):
+        document = self.document
+        temp = StringIO()
+        document.save(temp)
+        temp.seek(0)
+        new = odf_get_document(temp)
+        generator = new.get_meta().get_generator()
+        self.assert_(generator.startswith(u"lpOD Python"))
+
+
+    def test_save_generator(self):
+        document = self.document.clone()
+        document.get_meta().set_generator(u"toto")
+        temp = StringIO()
+        document.save(temp)
+        temp.seek(0)
+        new = odf_get_document(temp)
+        generator = new.get_meta().get_generator()
+        self.assertEqual(generator, u"toto")
 
 
 

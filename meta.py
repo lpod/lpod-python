@@ -36,6 +36,8 @@ from xmlpart import odf_xmlpart
 
 
 class odf_meta(odf_xmlpart):
+    _generator_modified = False
+
 
     def get_meta_body(self):
         return self.get_element('//office:meta')
@@ -371,6 +373,7 @@ class odf_meta(odf_xmlpart):
             element = odf_create_element('<meta:generator/>')
             self.get_meta_body().append_element(element)
         element.set_text(generator)
+        self._generator_modified = True
 
 
     def get_statistic(self):
