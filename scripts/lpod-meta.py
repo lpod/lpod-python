@@ -47,7 +47,7 @@ def set_metadata(doc, set_list):
         value = value.strip()
 
         if name in ("title", "subject", "initial_creator",
-                    "keyword", "generator", "description"):
+                    "keywords", "generator", "description"):
             value = value.decode(stdin.encoding)
             func = meta.__getattribute__('set_' + name)
             func(value)
@@ -67,7 +67,7 @@ def set_metadata(doc, set_list):
             func(date)
         else:
             print 'Error: Unknown metadata name "%s", please choose: ' % name
-            print ("       title, subject, initial_creator, keyword, "
+            print ("       title, subject, initial_creator, keywords, "
                    "generator, description, modification_date or "
                    "creation_date")
             exit(1)

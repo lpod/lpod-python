@@ -172,19 +172,19 @@ class TestMetadata(TestCase):
         self.assertEqual(clone.get_initial_creator(), creator)
 
 
-    def test_get_keyword(self):
+    def test_get_keywords(self):
         meta = self.meta
-        keyword = meta.get_keyword()
+        keywords = meta.get_keywords()
         expected = u"Mots-clés"
-        self.assertEqual(keyword, expected)
+        self.assertEqual(keywords, expected)
 
 
-    def test_set_keyword(self):
+    def test_set_keywords(self):
         meta = self.meta
         clone = meta.clone()
-        keyword = u"Nouveaux mots-clés"
-        clone.set_keyword(keyword)
-        self.assertEqual(clone.get_keyword(), keyword)
+        keywords = u"Nouveaux mots-clés"
+        clone.set_keywords(keywords)
+        self.assertEqual(clone.get_keywords(), keywords)
 
 
     def test_get_editing_duration(self):

@@ -182,12 +182,20 @@ class odf_document(object):
         return self.container.get_parts()
 
 
-    def get_part(self, filename):
-        """Return the bytes of the given part. The filename includes the path
-        inside the archive, e.g.
+    def get_part(self, part_name):
+        """Return the bytes of the given part. The part_name includes the
+        path inside the archive, e.g.
         "Pictures/100000000000032000000258912EB1C3.jpg"
         """
-        return self.container.get_part(filename)
+        return self.container.get_part(part_name)
+
+
+    def set_part(self, part_name, data):
+        """Set the bytes of the given part. The part_name includes the
+        path inside the archive, e.g.
+        "Pictures/100000000000032000000258912EB1C3.jpg"
+        """
+        return self.container.set_part(part_name, data)
 
 
     def get_formatted_text(self, rst_mode=False):

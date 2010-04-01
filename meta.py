@@ -246,8 +246,9 @@ class odf_meta(odf_xmlpart):
         element.set_text(creator)
 
 
-    def get_keyword(self):
-        """Get the keyword(s) of the document.
+    def get_keywords(self):
+        """Get the keywords of the document. Return the field as-is, without
+        any assumption on the keyword separator.
 
         Return: unicode (or None if inexistant)
         """
@@ -257,18 +258,19 @@ class odf_meta(odf_xmlpart):
         return element.get_text()
 
 
-    def set_keyword(self, keyword):
-        """Set the keyword(s) of the document.
+    def set_keywords(self, keywords):
+        """Set the keywords of the document. Although the name is plural, a
+        unicode string is required, so join your list first.
 
         Arguments:
 
-            keyword -- unicode
+            keywords -- unicode
         """
         element = self.get_element('//meta:keyword')
         if element is None:
             element = odf_create_element('<meta:keyword/>')
             self.get_meta_body().append_element(element)
-        element.set_text(keyword)
+        element.set_text(keywords)
 
 
     def get_editing_duration(self):
