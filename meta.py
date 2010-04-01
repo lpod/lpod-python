@@ -71,7 +71,7 @@ class odf_meta(odf_xmlpart):
 
 
     def get_description(self):
-        """Get the description of the document.
+        """Get the description of the document. Also known as comments.
 
         Return: unicode (or None if inexistant)
         """
@@ -80,9 +80,11 @@ class odf_meta(odf_xmlpart):
             return None
         return element.get_text()
 
+    get_comments = get_description
+
 
     def set_description(self, description):
-        """Set the title of the document.
+        """Set the description of the document. Also known as comments.
 
         Arguments:
 
@@ -93,6 +95,8 @@ class odf_meta(odf_xmlpart):
             element = odf_create_element('<dc:description/>')
             self.get_meta_body().append_element(element)
         element.set_text(description)
+
+    set_comments = set_description
 
 
     def get_subject(self):
