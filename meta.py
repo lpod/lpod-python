@@ -152,8 +152,8 @@ class odf_meta(odf_xmlpart):
             >>> document.set_language('fr-FR')
         """
         if type(language) is not str:
-            raise TypeError, ('language must be "xx-YY" lang-COUNTRY code '
-                              '(RFC3066)')
+            message = 'language must be "xx-YY" lang-COUNTRY code (RFC3066)'
+            raise TypeError, message
         # FIXME test validity?
         element = self.get_element('//dc:language')
         if element is None:
