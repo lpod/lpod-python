@@ -557,6 +557,28 @@ class odf_cell(odf_element):
         self.set_attribute('table:style-name', style)
 
 
+    def get_cell_formula(self):
+        """Get the formula of the cell, or None if undefined.
+
+        The formula is not interpreted in any way.
+
+        Return: unicode
+        """
+        return self.get_attribute('table:formula')
+
+
+    def set_cell_formula(self, formula):
+        """Set the formula of the cell, or None to remove it.
+
+        The formula is not interpreted in any way.
+
+        Arguments:
+
+            formula -- unicode
+        """
+        self.set_attribute('table:formula', formula)
+
+
 
 class odf_row(odf_element):
 
