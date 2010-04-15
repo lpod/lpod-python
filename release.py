@@ -69,6 +69,8 @@ def get_release():
             branch = line[2:]
             break
     output = _run_command(['git', 'describe',  '--tags']).strip()
+    if not '-' in output:
+        return output
     version, delta, sha = output.split('-')
     if branch == 'master':
         return '-'.join((version, delta, sha))

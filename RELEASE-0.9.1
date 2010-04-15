@@ -1,13 +1,20 @@
-==========
-LpOD 0.9.1
-==========
+======================
+LpOD 0.9.1 aka Granada
+======================
 
 lpOD -- languages & platforms OpenDocument.
 Definition of a Free Software API implementing the ISO/IEC 26300 standard.
 Development, for higher level use cases, in Python, Perl and Ruby languages.
 of a top-down oriented API.
 
-This release XXX
+This release has seen Restructured Text support much improved, and a Gentoo
+ebuild was contributed. Packaging of lpOD was a bit improved too and now it's
+publised on Pypi [#]_.
+
+.. [#] http://pypi.python.org/pypi/lpod-python
+
+A effort was made to remove ODF 1.2 traces from the templates, because lpOD
+targets ODF 1.1 for now. ODF 1.2 is not published yet.
 
 - Web: http://lpod-project.org
 - Documentation: http://docs.lpod-project.org
@@ -36,3 +43,6 @@ High-level API
 
 - In meta part, added "(g|s)et_comments" as an alias to "(g|s)et_description"
   because some desktop applications call them like this.
+
+- Table cells gained a "(g|s)et_cell_formula" method. Yes, formulas begin to be
+  taken into consideration!
