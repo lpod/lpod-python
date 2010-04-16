@@ -28,6 +28,7 @@
 
 # Import from the Standard Library
 from copy import deepcopy
+from mimetypes import guess_type
 from operator import itemgetter
 from os.path import splitext
 from uuid import uuid4
@@ -318,11 +319,22 @@ class odf_document(object):
 
 
     def add_file(self, uri_or_file):
+        """Insert a file from a URI or a fike-like object in the container.
+        Return the full path to reference it in the content.
+
+        Arguments:
+
+            uri_or_file -- str or file-like
+
+        Return: str
+        """
         name = None
+        close_after = False
         if type(uri_or_file) is unicode or type(uri_or_file) is str:
             uri_or_file = uri_or_file.encode('utf_8')
             file = vfs.open(uri_or_file)
             name = uri_or_file
+            close_after = True
         else:
             file = uri_or_file
             name = getattr(file, 'name')
@@ -330,16 +342,23 @@ class odf_document(object):
         uuid = str(uuid4())
         if name is None:
             name = uuid
+            media_type = ''
         else:
             _, extension = splitext(name)
             name = uuid + extension.lower()
-        name = 'Pictures/%s' % (name)
-        data= file.read()
-        self.container.set_part(name, data)
-        # Update manifest
+            media_type, encoding = guess_type(name)
+        # Folder for added files (FIXME hard-coded and copied)
         manifest = self.get_manifest()
-        manifest.add_full_path(name)
-        return name
+        if manifest.get_media_type('Pictures/') is None:
+            manifest.add_full_path('Pictures/')
+        full_path = 'Pictures/%s' % (name)
+        self.container.set_part(full_path, file.read())
+        # Update manifest
+        manifest.add_full_path(full_path, media_type)
+        # Close file
+        if close_after:
+            file.close_after()
+        return full_path
 
 
     def clone(self):
