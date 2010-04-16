@@ -687,6 +687,18 @@ class odf_document(object):
             if duplicate is not None:
                 duplicate.get_parent().delete_element(duplicate)
             dest.append_element(style)
+            # Copy images from the header/footer
+            if tagname == 'style:master-page':
+                query = 'descendant::draw:image'
+                for image in style.get_element_list(query):
+                    full_path = image.get_attribute('xlink:href')
+                    data = document.get_part(full_path)
+                    manifest = document.get_manifest()
+                    media_type = manifest.get_media_type(full_path)
+                    # Manually add the part to keep the name
+                    self.set_part(full_path, data)
+                    manifest = self.get_manifest()
+                    manifest.add_full_path(full_path, media_type)
 
 
 
