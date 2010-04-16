@@ -31,65 +31,39 @@ from unittest import TestCase, main
 
 # Import from lpod
 from lpod.document import odf_get_document
+from lpod.content import odf_content
 
 
 class ContentTestCase(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/base_text.odt')
+        self.content = document.get_content()
 
 
-    def tearDown(self):
-        del self.document
+    def test_get_content(self):
+        self.assert_(type(self.content) is odf_content)
 
 
     def test_get_body(self):
-        body = self.document.get_body()
-        expected = ('<office:text>\n'
-                    '   <text:sequence-decls>\n'
-                    '    <text:sequence-decl text:display-outline-level="0" '
-                    'text:name="Illustration"/>\n'
-                    '    <text:sequence-decl text:display-outline-level="0" '
-                    'text:name="Table"/>\n'
-                    '    <text:sequence-decl text:display-outline-level="0" '
-                    'text:name="Text"/>\n'
-                    '    <text:sequence-decl text:display-outline-level="0" '
-                    'text:name="Drawing"/>\n'
-                    '   </text:sequence-decls>\n'
-                    '   <text:section text:style-name="Sect1" '
-                    'text:name="Section1">\n'
-                    '    <text:h text:style-name="Heading_20_1" '
-                    'text:outline-level="1">LpOD Test Case Document</text:h>\n'
-                    '    <text:p text:style-name="Text_20_body">This is the '
-                    'first paragraph.</text:p>\n'
-                    '    <text:p text:style-name="Text_20_body">This is the '
-                    'second paragraph.</text:p>\n'
-                    '    <text:p text:style-name="Hanging_20_indent">This is '
-                    'a paragraph with a named style.</text:p>\n'
-                    '    <text:h text:style-name="Heading_20_2" '
-                    'text:outline-level="2">Level 2 Title</text:h>\n'
-                    '    <text:p text:style-name="Text_20_body">This is the '
-                    'first paragraph of the second title.</text:p>\n'
-                    '    <text:p text:style-name="Text_20_body">This is the '
-                    'last paragraph with diacritical signs: '
-                    '&#233;&#232;</text:p>\n'
-                    '   </text:section>\n'
-                    '   <text:section text:style-name="Sect1" '
-                    'text:name="Section2">\n'
-                    '    <text:h text:style-name="Heading_20_1" '
-                    'text:outline-level="1" text:restart-numbering="true" '
-                    'text:start-value="-1">First Title of the '
-                    'Second Section</text:h>\n'
-                    '    <text:p text:style-name="Text_20_body">First '
-                    'paragraph of the second section.</text:p>\n'
-                    '    <text:p text:style-name="Text_20_body">This is '
-                    'the second paragraph with <text:a xlink:type="simple" '
-                    'xlink:href="http://lpod-project.org/" office:name="Link '
-                    'to the lpod project">an external link</text:a> inside.'
-                    '</text:p>\n'
-                    '   </text:section>\n'
-                    '  </office:text>\n')
-        self.assertEqual(body.serialize(pretty=True), expected)
+        body = self.content.get_body()
+        self.assertEqual(body.get_tagname(), 'office:text')
+
+
+    def test_get_style_list(self):
+        result = self.content.get_style_list()
+        self.assertEqual(len(result), 4)
+
+
+    def test_get_style_list_family(self):
+        result = self.content.get_style_list('font-face')
+        self.assertEqual(len(result), 3)
+
+
+    def test_get_style(self):
+        style = self.content.get_style('section', u"Sect1")
+        self.assertEqual(style.get_style_name(), u"Sect1")
+        self.assertEqual(style.get_style_family(), 'section')
 
 
 
