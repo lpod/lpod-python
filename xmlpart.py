@@ -84,6 +84,14 @@ class odf_xmlpart(object):
         child.get_parent().delete_element(child)
 
 
+    def xpath(self, xpath_query):
+        """Apply XPath query to the XML part. Return list of odf_element or
+        odf_text instances translated from the nodes found.
+        """
+        root = self.get_root()
+        return root.xpath(xpath_query)
+
+
     def clone(self):
         clone = object.__new__(self.__class__)
         for name in self.__dict__:

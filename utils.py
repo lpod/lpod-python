@@ -207,7 +207,7 @@ def _expand_properties(properties):
 
     if type(properties) is dict:
         expanded = {}
-        for key, value in properties.items():
+        for key, value in properties.iteritems():
             key = map_key(key)
             expanded[key] = value
     elif type(properties) is list:

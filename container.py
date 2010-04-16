@@ -72,7 +72,7 @@ ODF_MIMETYPES = {
 
 
 # Standard parts in the container (other are regular paths)
-ODF_PARTS = ['content', 'meta', 'settings', 'styles']
+ODF_PARTS = ('content', 'meta', 'settings', 'styles')
 
 
 class odf_container(object):
@@ -185,6 +185,8 @@ class odf_container(object):
             filename = part.filename
             if filename[-4:] == '.xml' and filename[:-4] in ODF_PARTS:
                 result.append(filename[:-4])
+            elif filename == 'META-INF/manifest.xml':
+                result.append('manifest')
             else:
                 result.append(filename)
         return result
@@ -196,6 +198,8 @@ class odf_container(object):
         zipfile = self.__get_zipfile()
         if part_name in ODF_PARTS:
             part_name = '%s.xml' % part_name
+        elif part_name == 'manifest':
+            part_name = 'META-INF/manifest.xml'
         file = zipfile.open(part_name)
         part = file.read()
         file.close()
@@ -214,7 +218,7 @@ class odf_container(object):
             # No zlib module
             compression = ZIP_STORED
             filezip = ZipFile(file, 'w', compression=compression)
-        # "Pretty"-save parts in some order
+        # "Pretty-save" parts in some order
         # mimetype requires to be first and uncompressed
         filezip.compression = ZIP_STORED
         filezip.writestr('mimetype', parts['mimetype'])
@@ -227,13 +231,11 @@ class odf_container(object):
             if part_data is None:
                 # Deleted
                 continue
-            elif part_name == 'mimetype' or part_name in ODF_PARTS:
-                continue
-            elif part_name == 'META-INF/manifest.xml':
+            elif part_name in ODF_PARTS + ('mimetype', 'manifest'):
                 continue
             filezip.writestr(part_name, part_data)
-        parts['META-INF/manifest.xml'] = manifest = self.__get_manifest()
-        filezip.writestr('META-INF/manifest.xml', manifest)
+        # Manifest
+        filezip.writestr('META-INF/manifest.xml', parts['manifest'])
         filezip.close()
 
 
@@ -256,7 +258,7 @@ class odf_container(object):
         if part_name in loaded_parts:
             part = loaded_parts[part_name]
             if part is None:
-                raise ValueError, "part is deleted"
+                raise ValueError, 'part "%s" is deleted' % part_name
             return part
         if self.__zip_packaging is True:
             part = self.__get_zip_part(part_name)
@@ -276,52 +278,6 @@ class odf_container(object):
         """Mark a part for deletion.
         """
         self.__parts[part_name] = None
-
-
-    def __get_manifest(self):
-        # Parts were loaded by "save"
-        parts = self.__parts
-        ns = 'urn:oasis:names:tc:opendocument:xmlns:manifest:1.0'
-        pattern = (' <manifest:file-entry manifest:media-type="%s" '
-                'manifest:full-path="%s"/>')
-        conf_ns = 'application/vnd.sun.xml.ui.configuration'
-        manifest = ['<?xml version="1.0" encoding="UTF-8"?>',
-                '<manifest:manifest xmlns:manifest="%s">' % ns,
-                pattern % (parts['mimetype'], '/')]
-        # Follow save order
-        # XML parts
-        for part_name in ODF_PARTS:
-            manifest.append(pattern % ('text/xml', part_name + '.xml'))
-        # Everything else
-        dirs_done = set()
-        for part_name, part_data in sorted(parts.iteritems()):
-            if part_data is None:
-                # Deleted
-                continue
-            elif part_name == 'mimetype' or part_name in ODF_PARTS:
-                continue
-            elif part_name == 'META-INF/manifest.xml':
-                continue
-            elif part_name[-1] == '/' and not part_name in dirs_done:
-                manifest.append(pattern % ('', part_name))
-                dirs_done.add(part_name)
-                continue
-            media_type = ''
-            if part_name == 'manifest.rdf':
-                media_type = 'application/rdf+xml'
-            manifest.append(pattern % (media_type, part_name))
-            while '/' in part_name:
-                dirname, basename = part_name.rsplit('/', 1)
-                part_name = dirname + '/'
-                if dirname not in dirs_done:
-                    media_type = ''
-                    if part_name == 'Configurations2/':
-                        media_type = conf_ns
-                    manifest.append(pattern % (media_type, dirname))
-                    dirs_done.add(dirname)
-                part_name = dirname
-        manifest.append('</manifest:manifest>')
-        return '\n'.join(manifest)
 
 
     def clone(self):

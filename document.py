@@ -38,6 +38,7 @@ from container import ODF_PARTS, odf_get_container
 from container import odf_new_container_from_template
 from container import odf_new_container_from_type, odf_container
 from content import odf_content
+from manifest import odf_manifest
 from meta import odf_meta
 from style import odf_style, odf_master_page, odf_font_style
 from styles import odf_styles
@@ -95,7 +96,6 @@ class odf_document(object):
 
         # Cache of XML parts
         self.__xmlparts = {}
-
         # Cache of the body
         self.__body = None
 
@@ -105,7 +105,7 @@ class odf_document(object):
     #
 
     def get_xmlpart(self, part_name):
-        if part_name not in ODF_PARTS:
+        if part_name not in ODF_PARTS and part_name != 'manifest':
             raise ValueError, '"%s" is not an XML part' % part_name
         parts = self.__xmlparts
         part = parts.get(part_name)
@@ -117,6 +117,8 @@ class odf_document(object):
                 part = odf_meta(part_name, container)
             elif part_name == 'styles':
                 part = odf_styles(part_name, container)
+            elif part_name == 'manifest':
+                part = odf_manifest(part_name, container)
             else:
                 part = odf_xmlpart(part_name, container)
             parts[part_name] = part
@@ -145,6 +147,14 @@ class odf_document(object):
         Return: odf_styles
         """
         return self.get_xmlpart('styles')
+
+
+    def get_manifest(self):
+        """Return the manifest part.
+
+        Return: odf_manifest
+        """
+        return self.get_xmlpart('manifest')
 
 
     def get_type(self):
@@ -326,6 +336,9 @@ class odf_document(object):
         name = 'Pictures/%s' % (name)
         data= file.read()
         self.container.set_part(name, data)
+        # Update manifest
+        manifest = self.get_manifest()
+        manifest.add_full_path(name)
         return name
 
 
@@ -368,10 +381,9 @@ class odf_document(object):
         if not meta._generator_modified:
             meta.set_generator(u"lpOD Python %s" % __version__)
         # Synchronize data with container
-        for part_name, part in self.__xmlparts.items():
+        for part_name, part in self.__xmlparts.iteritems():
             if part is not None:
                 self.container.set_part(part_name, part.serialize(pretty))
-
         # Save the container
         self.container.save(target, packaging)
 

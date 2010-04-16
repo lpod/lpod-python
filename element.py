@@ -70,6 +70,7 @@ ODF_NAMESPACES = {
     'xlink': "http://www.w3.org/1999/xlink",
     'xsd': "http://www.w3.org/2001/XMLSchema",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance",
+    'manifest': "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0",
 }
 
 
