@@ -717,7 +717,8 @@ def odf_create_default_currency_style():
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
              'style:footer-style', 'text:list-level-style-number',
-             'text:list-level-style-bullet', 'text:list-level-style-image'):
+             'text:list-level-style-bullet', 'text:list-level-style-image',
+             'style:presentation-page-layout'):
     register_element_class(name, odf_style)
 register_element_class('text:list-style', odf_list_style)
 register_element_class('text:outline-style', odf_outline_style)
