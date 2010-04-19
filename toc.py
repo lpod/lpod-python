@@ -66,13 +66,11 @@ def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
         name = u"%s1" % title
     element.set_toc_name(name)
     element.set_toc_protected(protected)
-    if outline_level:
-        element.set_toc_outline_level(outline_level)
     if style:
         element.set_toc_style(style)
     # Create the source template
-    source = odf_create_toc_source(title=title, title_style=title_style,
-            entry_style=entry_style)
+    source = odf_create_toc_source(title=title, outline_level=outline_level,
+            title_style=title_style, entry_style=entry_style)
     element.append_element(source)
     # Create the index body automatically with the index title
     if title:
