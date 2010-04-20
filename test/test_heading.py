@@ -59,7 +59,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list_level(self):
         body = self.body
-        headings = body.get_heading_list(level=2)
+        headings = body.get_heading_list(outline_level=2)
         self.assertEqual(len(headings), 1)
         heading = headings[0]
         text = heading.get_text()
@@ -68,7 +68,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list_style_level(self):
         body = self.body
-        headings = body.get_heading_list(style='Heading_20_2', level=2)
+        headings = body.get_heading_list(style='Heading_20_2', outline_level=2)
         self.assertEqual(len(headings), 1)
         heading = headings[0]
         text = heading.get_text()
@@ -100,7 +100,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_level(self):
         body = self.body
-        heading = body.get_heading_by_position(0, level=2)
+        heading = body.get_heading_by_position(0, outline_level=2)
         text = heading.get_text()
         self.assertEqual(text, u'Level 2 Title')
 
