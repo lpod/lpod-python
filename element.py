@@ -805,11 +805,17 @@ class odf_element(object):
     #
 
     def get_outline_level(self):
-        return int(self.get_attribute('text:outline-level'))
+        outline_level = self.get_attribute('text:outline-level')
+        if outline_level is None:
+            return None
+        return int(outline_level)
 
 
-    def set_outline_level(self, level):
-        self.set_attribute('text:outline-level', unicode(level))
+    def set_outline_level(self, outline_level):
+        if outline_level is None:
+            self.set_attribute('text:outline-level', outline_level)
+        else:
+            self.set_attribute('text:outline-level', str(outline_level))
 
 
     def get_text_style(self):
