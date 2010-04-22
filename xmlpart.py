@@ -81,7 +81,7 @@ class odf_xmlpart(object):
 
 
     def delete_element(self, child):
-        child.get_parent().delete_element(child)
+        child.delete_element()
 
 
     def xpath(self, xpath_query):

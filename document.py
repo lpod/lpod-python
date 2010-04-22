@@ -640,7 +640,7 @@ class odf_document(object):
             elif type(style) is odf_master_page:
                 # Don't suppress header and footer, just styling was removed
                 continue
-            style.get_parent().delete_element(style)
+            style.delete_element()
             i += 1
         return i
 
@@ -685,7 +685,7 @@ class odf_document(object):
                 raise NotImplementedError, tagname
             duplicate = part.get_style(family, stylename)
             if duplicate is not None:
-                duplicate.get_parent().delete_element(duplicate)
+                duplicate.delete_element()
             dest.append_element(style)
             # Copy images from the header/footer
             if tagname == 'style:master-page':

@@ -584,6 +584,13 @@ class odf_element(object):
         return count
 
 
+    def get_root(self):
+        element = self.__element
+        tree = element.getroottree()
+        root = tree.getroot()
+        return _make_odf_element(root)
+
+
     def get_parent(self):
         element = self.__element
         parent = element.getparent()
@@ -643,7 +650,7 @@ class odf_element(object):
         if paragraphs:
             paragraph = paragraphs.pop(0)
             for obsolete in paragraphs:
-                obsolete.get_parent().delete_element(obsolete)
+                obsolete.delete_element()
         else:
             paragraph = odf_create_element('<text:p/>')
             self.insert_element(paragraph, FIRST_CHILD)
@@ -723,8 +730,23 @@ class odf_element(object):
             current.append(unicode_or_element.__element)
 
 
-    def delete_element(self, child):
-        self.__element.remove(child.__element)
+    def delete_element(self, child=None):
+        """Delete the given element from the XML tree. If no element is given,
+        "self" is deleted. The XML library may allow to continue to use an
+        element now "orphan" as long as you have a reference to it.
+
+        Arguments:
+
+            child -- odf_element
+        """
+        if child is None:
+            parent = self.get_parent()
+            if parent is None:
+                raise ValueError, "cannot delete the root element"
+            child = self
+        else:
+            parent = self
+        parent.__element.remove(child.__element)
 
 
     def xpath(self, xpath_query):

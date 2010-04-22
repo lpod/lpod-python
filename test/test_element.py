@@ -80,9 +80,22 @@ class ElementTestCase(TestCase):
         self.assertEqual(len(elements), 8)
 
 
-    def test_get_name(self):
+    def test_get_tagname(self):
         element = self.paragraph_element
         self.assertEqual(element.get_tagname(), 'text:p')
+
+
+    def test_get_parent(self):
+        element = odf_create_element('<text:p><text:span/></text:p>')
+        child = element.get_element('//text:span')
+        parent = child.get_parent()
+        self.assertEqual(parent.get_tagname(), 'text:p')
+
+
+    def test_get_root(self):
+        element = odf_create_element('<text:p><text:span/></text:p>')
+        root = element.get_root()
+        self.assert_(root.get_parent() is None)
 
 
     def test_clone(self):
@@ -92,11 +105,24 @@ class ElementTestCase(TestCase):
         self.assertEqual(element.get_text(), copy.get_text())
 
 
-    def test_delete(self):
-        element = odf_create_element('<a><b/></a>')
-        child = element.get_element('//b')
+    def test_delete_child(self):
+        element = odf_create_element('<text:p><text:span/></text:p>')
+        child = element.get_element('//text:span')
         element.delete_element(child)
-        self.assertEqual(element.serialize(), '<a/>')
+        self.assertEqual(element.serialize(), '<text:p/>')
+
+
+    def test_delete_self(self):
+        element = odf_create_element('<text:p><text:span/></text:p>')
+        child = element.get_element('//text:span')
+        child.delete_element()
+        self.assertEqual(element.serialize(), '<text:p/>')
+
+
+    def test_delete_root(self):
+        element = odf_create_element('<text:p><text:span/></text:p>')
+        root = element.get_root()
+        self.assertRaises(ValueError, root.delete_element)
 
 
 
@@ -285,14 +311,14 @@ class ElementTraverseTestCase(TestCase):
 
 
     def test_insert_element_bad_element(self):
-        element = odf_create_element('<a/>')
-        self.assertRaises(AttributeError, element.insert_element, '<b/>',
-                          FIRST_CHILD)
+        element = odf_create_element('<text:p/>')
+        self.assertRaises(AttributeError, element.insert_element,
+                '<text:span/>', FIRST_CHILD)
 
 
     def test_insert_element_bad_position(self):
-        element = odf_create_element('<a/>')
-        child = odf_create_element('<b/>')
+        element = odf_create_element('<text:p/>')
+        child = odf_create_element('<text:span/>')
         self.assertRaises(ValueError, element.insert_element, child, 999)
 
 

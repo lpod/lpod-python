@@ -214,7 +214,6 @@ def _insert_element(position, new_element, real_elements, get_repeated,
 
 
 def _delete_element(position, real_elements, get_repeated, set_repeated):
-    parent = real_elements[0].get_parent()
     pos = 0
     for real_element in real_elements:
         repeated = get_repeated(real_element) or 1
@@ -231,7 +230,7 @@ def _delete_element(position, real_elements, get_repeated, set_repeated):
             set_repeated(real_element, repeated)
         else:
             # Game over
-            parent.delete_element(real_element)
+            real_element.delete_element()
         return
 
 
