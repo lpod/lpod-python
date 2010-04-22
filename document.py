@@ -158,6 +158,10 @@ class odf_document(object):
         return self.get_xmlpart('manifest')
 
 
+    def get_mimetype(self):
+        return self.get_part('mimetype')
+
+
     def get_type(self):
         """
         Get the ODF type (also called class) of this document.
@@ -167,11 +171,9 @@ class odf_document(object):
             'presentation-template', 'spreadsheet', 'spreadsheet-template',
             'text', 'text-master', 'text-template' or 'text-web'
         """
-
-        mimetype = self.container.get_part('mimetype').strip()
-
         # The mimetype must be with the form:
         # application/vnd.oasis.opendocument.text
+        mimetype = self.get_mimetype()
 
         # Isolate and return the last part
         return mimetype.rsplit('.', 1)[-1]

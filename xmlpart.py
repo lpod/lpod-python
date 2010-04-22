@@ -109,9 +109,10 @@ class odf_xmlpart(object):
     def serialize(self, pretty=False):
         tree = self.__get_tree()
         # Lxml declaration is too exotic to me
-        data = ('<?xml version="1.0" encoding="UTF-8"?>\n'
-                + tostring(tree, encoding='UTF-8', pretty_print=pretty))
+        data = ['<?xml version="1.0" encoding="UTF-8"?>']
+        tree = tostring(tree, encoding='UTF-8', pretty_print=pretty)
         # Lxml with pretty_print is adding a empty line
         if pretty:
-            data = data.strip()
-        return data
+            tree = tree.strip()
+        data.append(tree)
+        return '\n'.join(data)

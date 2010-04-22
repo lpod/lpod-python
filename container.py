@@ -31,6 +31,7 @@ from cStringIO import StringIO
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 
 # Import from lpod
+from manifest import odf_manifest
 from utils import _get_abspath
 from vfs import vfs, WRITE
 
@@ -355,8 +356,12 @@ def odf_new_container_from_template(template_uri):
     # Return a copy of the template container
     clone = template_container.clone()
     # Change type from template to regular
-    mimetype = clone.get_part('mimetype')
-    clone.set_part('mimetype', mimetype.replace('-template', ''))
+    mimetype = clone.get_part('mimetype').replace('-template', '')
+    clone.set_part('mimetype', mimetype)
+    # Update the manifest
+    manifest = odf_manifest('manifest', clone)
+    manifest.set_media_type('/', mimetype)
+    clone.set_part('manifest', manifest.serialize())
     return clone
 
 

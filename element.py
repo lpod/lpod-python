@@ -790,11 +790,15 @@ class odf_element(object):
         return self.__class__(clone)
 
 
-    def serialize(self, pretty=False):
+    def serialize(self, pretty=False, with_ns=False):
+        # This copy bypasses serialization side-effects in lxml
         element = deepcopy(self.__element)
-        data = tostring(element, with_tail=False, pretty_print=pretty)
-        # Hack over lxml: remove namespaces
-        return ns_stripper.sub('', data)
+        data = tostring(element, with_tail=False,
+                pretty_print=pretty)
+        if not with_ns:
+            # Remove namespaces
+            data = ns_stripper.sub('', data)
+        return data
 
 
     #

@@ -32,9 +32,11 @@ from cStringIO import StringIO
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.container import ODF_EXTENSIONS
 from lpod.content import odf_content
 from lpod.document import odf_new_document_from_template
 from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.manifest import odf_manifest
 from lpod.meta import odf_meta
 from lpod.styles import odf_styles
 
@@ -65,6 +67,16 @@ class NewDocumentFromTemplateTestCase(TestCase):
         self.assert_(odf_new_document_from_template(uri))
 
 
+    def test_mimetype(self):
+        uri = '../templates/drawing.otg'
+        document = odf_new_document_from_template(uri)
+        mimetype = document.get_part('mimetype')
+        self.assertFalse('template' in mimetype)
+        manifest = document.get_manifest()
+        media_type = manifest.get_media_type('/')
+        self.assertFalse('template' in media_type)
+
+
 
 class NewdocumentFromTypeTestCase(TestCase):
 
@@ -74,19 +86,23 @@ class NewdocumentFromTypeTestCase(TestCase):
 
 
     def test_text_type(self):
-        self.assert_(odf_new_document_from_type('text'))
+        document = odf_new_document_from_type('text')
+        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_type(self):
-        self.assert_(odf_new_document_from_type('spreadsheet'))
+        document = odf_new_document_from_type('spreadsheet')
+        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_type(self):
-        self.assert_(odf_new_document_from_type('presentation'))
+        document = odf_new_document_from_type('presentation')
+        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_type(self):
-        self.assert_(odf_new_document_from_type('drawing'))
+        document = odf_new_document_from_type('drawing')
+        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odg'])
 
 
 
@@ -119,6 +135,10 @@ class DocumentTestCase(TestCase):
         self.document = odf_get_document('samples/example.odt')
 
 
+    def test_get_mimetype(self):
+        mimetype = self.document.get_mimetype()
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
+
     def test_get_content(self):
         content = self.document.get_content()
         self.assert_(type(content) is odf_content)
@@ -132,6 +152,11 @@ class DocumentTestCase(TestCase):
     def test_get_styles(self):
         styles = self.document.get_styles()
         self.assert_(type(styles) is odf_styles)
+
+
+    def test_get_manifest(self):
+        manifest = self.document.get_manifest()
+        self.assert_(type(manifest) is odf_manifest)
 
 
     def test_get_body(self):
