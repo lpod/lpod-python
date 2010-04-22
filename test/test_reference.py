@@ -66,7 +66,7 @@ class reference_markTest(TestCase):
     def test_get_reference_mark(self):
         body = self.body
         reference_mark = odf_create_reference_mark(u'你好 Zoé')
-        body.append_element(reference_mark)
+        body.append(reference_mark)
         get = body.get_reference_mark_by_name(u'你好 Zoé')
         expected = ('<text:reference-mark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -76,7 +76,7 @@ class reference_markTest(TestCase):
     def test_get_reference_mark_list(self):
         body = self.body
         reference_mark = odf_create_reference_mark(u'你好 Zoé')
-        body.append_element(reference_mark)
+        body.append(reference_mark)
         get = body.get_reference_mark_list()[0]
         expected = ('<text:reference-mark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -86,7 +86,7 @@ class reference_markTest(TestCase):
     def test_get_reference_mark_start(self):
         body = self.body
         reference_mark_start = odf_create_reference_mark_start(u'你好 Zoé')
-        body.append_element(reference_mark_start)
+        body.append(reference_mark_start)
         get = body.get_reference_mark_start_by_name(u'你好 Zoé')
         expected = ('<text:reference-mark-start text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -106,7 +106,7 @@ class reference_markTest(TestCase):
     def test_get_reference_mark_end(self):
         body = self.body
         reference_mark_end = odf_create_reference_mark_end(u'你好 Zoé')
-        body.append_element(reference_mark_end)
+        body.append(reference_mark_end)
         get = body.get_reference_mark_end_by_name(u'你好 Zoé')
         expected = ('<text:reference-mark-end text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))

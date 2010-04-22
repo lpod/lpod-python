@@ -58,7 +58,7 @@ samples = vfs.open('samples')
 for numero, filename in enumerate(samples.get_names()):
     # Heading
     heading = odf_create_heading(2, text=unicode(filename, 'utf-8'))
-    body.append_element(heading)
+    body.append(heading)
 
     uri = samples.get_uri(filename)
     handler = get_handler(uri)
@@ -72,9 +72,9 @@ for numero, filename in enumerate(samples.get_names()):
                                  str(width / 72.0) + 'in',
                                  str(height / 72.0) + 'in')
         image = odf_create_image(internal_name)
-        frame.append_element(image)
-        paragraph.append_element(frame)
-        body.append_element(paragraph)
+        frame.append(image)
+        paragraph.append(frame)
+        body.append(paragraph)
 
         # And store the data
         container = document.container
@@ -87,16 +87,16 @@ for numero, filename in enumerate(samples.get_names()):
             row = odf_create_row()
             for value in csv_row:
                 cell = odf_create_cell(value)
-                row.append_element(cell)
-            table.append_element(row)
+                row.append(cell)
+            table.append(row)
         for i in xrange(size):
             column = odf_create_column(style=u"Standard")
-            table.insert_element(column, FIRST_CHILD)
-        body.append_element(table)
+            table.insert(column, FIRST_CHILD)
+        body.append(table)
     else:
         paragraph = odf_create_paragraph(u"Not image / csv",
                 style=u"Standard")
-        body.append_element(paragraph)
+        body.append(paragraph)
 
 vfs.make_folder('test_output')
 document.save('test_output/use_case1.odt', pretty=True)

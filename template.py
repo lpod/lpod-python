@@ -108,12 +108,12 @@ def process(element, stack, repeat_stack):
                 text = u"".join(text)
                 if result.is_text():
                     parent.set_text(text)
-                    parent.insert_element(value, position=0)
+                    parent.insert(value, position=0)
                 else:
                     parent.set_tail(text)
                     container = parent.get_parent()
                     index = container.index(parent)
-                    container.insert_element(value, position=index + 1)
+                    container.insert(value, position=index + 1)
                 # Update the parent for next segments
                 parent = value
                 is_text = False

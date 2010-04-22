@@ -66,7 +66,7 @@ class BookmarkTest(TestCase):
     def test_get_bookmark(self):
         body = self.body
         bookmark = odf_create_bookmark(u'你好 Zoé')
-        body.append_element(bookmark)
+        body.append(bookmark)
         get = body.get_bookmark_by_name(u'你好 Zoé')
         expected = ('<text:bookmark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -85,7 +85,7 @@ class BookmarkTest(TestCase):
     def test_get_bookmark_start(self):
         body = self.body
         bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
-        body.append_element(bookmark_start)
+        body.append(bookmark_start)
         get = body.get_bookmark_start_by_name(u'你好 Zoé')
         expected = ('<text:bookmark-start text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -94,7 +94,7 @@ class BookmarkTest(TestCase):
 
     def test_get_bookmark_start_list(self):
         bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
-        self.body.append_element(bookmark_start)
+        self.body.append(bookmark_start)
         get = self.body.get_bookmark_start_list()[0]
         expected = ('<text:bookmark-start text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -104,7 +104,7 @@ class BookmarkTest(TestCase):
     def test_get_bookmark_end(self):
         body = self.body
         bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
-        body.append_element(bookmark_end)
+        body.append(bookmark_end)
         get = body.get_bookmark_end_by_name(u'你好 Zoé')
         expected = ('<text:bookmark-end text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -114,7 +114,7 @@ class BookmarkTest(TestCase):
     def test_get_bookmark_end_list(self):
         body = self.body
         bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
-        body.append_element(bookmark_end)
+        body.append(bookmark_end)
         get = body.get_bookmark_end_list()[0]
         expected = ('<text:bookmark-end text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))

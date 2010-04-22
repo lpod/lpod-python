@@ -135,7 +135,7 @@ class odf_note(odf_element):
             note_body.set_text_content(text_or_element)
         elif isinstance(text_or_element, odf_element):
             note_body.clear()
-            note_body.append_element(text_or_element)
+            note_body.append(text_or_element)
         else:
             raise ValueError, 'unexpected type for body: "%s"' % type(
                     text_or_element)
@@ -165,7 +165,7 @@ class odf_annotation(odf_element):
             self.set_text_content(text_or_element)
         elif isinstance(text_or_element, odf_element):
             self.clear()
-            self.append_element(text_or_element)
+            self.append(text_or_element)
         else:
             raise TypeError, 'expected unicode or odf_element'
 

@@ -105,7 +105,7 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
     image = odf_create_image(uri)
     if text:
         image.set_text_content(text)
-    frame.append_element(image)
+    frame.append(image)
     return frame
 
 
@@ -146,8 +146,8 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
     for item in text_or_element:
         if type(item) is unicode:
             item = odf_create_paragraph(item, style=text_style)
-        text_box.append_element(item)
-    frame.append_element(text_box)
+        text_box.append(item)
+    frame.append(text_box)
     return frame
 
 

@@ -196,7 +196,7 @@ class TestNote(TestCase):
         paragraph = body.get_element('//text:p')
         list_with_note = odf_create_list()
         list_with_note.append_item(paragraph)
-        body.append_element(list_with_note)
+        body.append(list_with_note)
         expected = (u"- Un paragraphe[1] d'apparence(i) banale[*].\n"
                     u"----\n"
                     u"[1] C'est-à-dire l'élément « text:p ».\n"

@@ -68,9 +68,9 @@ class TestList(TestCase):
         clone = content.clone()
         item = odf_create_list_item()
         a_list = odf_create_list(style='a_style')
-        a_list.append_element(item)
+        a_list.append(item)
         body = clone.get_body()
-        body.append_element(a_list)
+        body.append(a_list)
 
         expected = ('<text:list text:style-name="a_style">'
                     '<text:list-item/>'
@@ -194,7 +194,7 @@ class TestList(TestCase):
         ham = odf_create_list_item(u'ham')
         eggs = odf_create_list_item(u'eggs')
         # First way: a list in an item, right next to a paragraph
-        spam.append_element(odf_create_list([u'thé', u'café', u'chocolat']))
+        spam.append(odf_create_list([u'thé', u'café', u'chocolat']))
         breakfast.append_item(spam)
         breakfast.append_item(ham)
         breakfast.append_item(eggs)
@@ -314,8 +314,8 @@ class TestList(TestCase):
         ham_list.append_item(ham)
         eggs_list.append_item(eggs)
         # Create the final nested list (spam_list)
-        spam.append_element(ham_list)
-        ham.append_element(eggs_list)
+        spam.append(ham_list)
+        ham.append(eggs_list)
 
         item = spam_list.get_item_by_content(ur'spam')
         expected = ('<text:list-item>\n'
@@ -375,8 +375,8 @@ class TestList(TestCase):
         how_not_to_be_seen3.append_item(bar)
         how_not_to_be_seen3.append_item(baz)
         # Create the final nested list (how_not_to_be_seen1)
-        spam.append_element(how_not_to_be_seen2)
-        foo.append_element(how_not_to_be_seen3)
+        spam.append(how_not_to_be_seen2)
+        foo.append(how_not_to_be_seen3)
 
         # Initialize an empty fake context
         context = {'document': None,

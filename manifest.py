@@ -102,7 +102,7 @@ class odf_manifest(odf_xmlpart):
             self.set_media_type(full_path, media_type)
         root = self.get_root()
         file_entry = odf_create_file_entry(full_path, media_type)
-        root.append_element(file_entry)
+        root.append(file_entry)
 
 
     def del_full_path(self, full_path):
@@ -112,4 +112,4 @@ class odf_manifest(odf_xmlpart):
             raise KeyError, 'path "%s" not found' % full_path
         file_entry = result[0]
         root = self.get_root()
-        root.delete_element(file_entry)
+        root.delete(file_entry)

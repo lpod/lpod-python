@@ -89,8 +89,8 @@ class odf_draw_page(odf_element):
         transition = odf_create_anim_transitionFilter(smil_dur=dur,
                                                       smil_type=type,
                                                       smil_subtype=subtype)
-        anim_page.append_element(anim_begin)
-        anim_begin.append_element(transition)
+        anim_page.append(anim_begin)
+        anim_begin.append(transition)
 
         # Replace when already a transition:
         #   anim:seq => After the frame's transition
@@ -98,8 +98,8 @@ class odf_draw_page(odf_element):
         #   Conclusion: We must delete the first child 'anim:par'
         existing = self.get_element('anim:par')
         if existing:
-            self.delete_element(existing)
-        self.append_element(anim_page)
+            self.delete(existing)
+        self.append(anim_page)
 
 
     def get_formatted_text(self, context):

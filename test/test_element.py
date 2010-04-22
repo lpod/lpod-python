@@ -113,21 +113,21 @@ class ElementTestCase(TestCase):
     def test_delete_child(self):
         element = odf_create_element('<text:p><text:span/></text:p>')
         child = element.get_element('//text:span')
-        element.delete_element(child)
+        element.delete(child)
         self.assertEqual(element.serialize(), '<text:p/>')
 
 
     def test_delete_self(self):
         element = odf_create_element('<text:p><text:span/></text:p>')
         child = element.get_element('//text:span')
-        child.delete_element()
+        child.delete()
         self.assertEqual(element.serialize(), '<text:p/>')
 
 
     def test_delete_root(self):
         element = odf_create_element('<text:p><text:span/></text:p>')
         root = element.get_root()
-        self.assertRaises(ValueError, root.delete_element)
+        self.assertRaises(ValueError, root.delete)
 
 
 
@@ -288,14 +288,14 @@ class ElementTraverseTestCase(TestCase):
     def test_insert_element_first_child(self):
         element = odf_create_element('<root><a/></root>')
         child = odf_create_element('<b/>')
-        element.insert_element(child, FIRST_CHILD)
+        element.insert(child, FIRST_CHILD)
         self.assertEqual(element.serialize(), '<root><b/><a/></root>')
 
 
     def test_insert_element_last_child(self):
         element = odf_create_element('<root><a/></root>')
         child = odf_create_element('<b/>')
-        element.append_element(child)
+        element.append(child)
         self.assertEqual(element.serialize(), '<root><a/><b/></root>')
 
 
@@ -303,7 +303,7 @@ class ElementTraverseTestCase(TestCase):
         root = odf_create_element('<root><a/><b/></root>')
         element = root.get_element_list('//a')[0]
         sibling = odf_create_element('<c/>')
-        element.insert_element(sibling, NEXT_SIBLING)
+        element.insert(sibling, NEXT_SIBLING)
         self.assertEqual(root.serialize(), '<root><a/><c/><b/></root>')
 
 
@@ -311,20 +311,20 @@ class ElementTraverseTestCase(TestCase):
         root = odf_create_element('<root><a/><b/></root>')
         element = root.get_element_list('//a')[0]
         sibling = odf_create_element('<c/>')
-        element.insert_element(sibling, PREV_SIBLING)
+        element.insert(sibling, PREV_SIBLING)
         self.assertEqual(root.serialize(), '<root><c/><a/><b/></root>')
 
 
     def test_insert_element_bad_element(self):
         element = odf_create_element('text:p')
-        self.assertRaises(AttributeError, element.insert_element,
-                '<text:span/>', FIRST_CHILD)
+        self.assertRaises(AttributeError, element.insert, '<text:span/>',
+                FIRST_CHILD)
 
 
     def test_insert_element_bad_position(self):
         element = odf_create_element('text:p')
         child = odf_create_element('text:span')
-        self.assertRaises(ValueError, element.insert_element, child, 999)
+        self.assertRaises(ValueError, element.insert, child, 999)
 
 
     def test_get_children(self):
@@ -339,11 +339,11 @@ class ElementTraverseTestCase(TestCase):
 
     def test_append_element(self):
         element = odf_create_element("<root/>")
-        element.append_element(u"f")
-        element.append_element(u"oo1")
-        element.append_element(odf_create_element("<a/>"))
-        element.append_element(u"f")
-        element.append_element(u"oo2")
+        element.append(u"f")
+        element.append(u"oo1")
+        element.append(odf_create_element("<a/>"))
+        element.append(u"f")
+        element.append(u"oo2")
         self.assertEqual(element.serialize(), "<root>foo1<a/>foo2</root>")
 
 

@@ -104,7 +104,7 @@ class TestParagraph(TestCase):
         body = self.body.clone()
         paragraph = odf_create_paragraph(u'An inserted test',
                                          style='Text_20_body')
-        body.append_element(paragraph)
+        body.append(paragraph)
         last_paragraph = body.get_paragraph_list()[-1]
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
 

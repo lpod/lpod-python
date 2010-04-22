@@ -165,15 +165,15 @@ def _set_element(position, new_element, real_elements, get_repeated,
             set_repeated(real_element, repeated_before)
         else:
             # Replacing the first occurence
-            parent.delete_element(real_element)
+            parent.delete(real_element)
             index -= 1
         # Insert new element
-        parent.insert_element(new_element.clone(), position=index + 1, )
+        parent.insert(new_element.clone(), position=index + 1, )
         # Insert the remaining repetitions
         if repeated_after:
             element_after = real_element.clone()
             set_repeated(element_after, repeated_after)
-            parent.insert_element(element_after, position=index + 2)
+            parent.insert(element_after, position=index + 2)
         return
 
 
@@ -196,19 +196,19 @@ def _insert_element(position, new_element, real_elements, get_repeated,
         index = parent.index(real_element)
         if repeated == 1 or current_repetition == 1:
             # Just insert before
-            parent.insert_element(new_element.clone(), position=index)
+            parent.insert(new_element.clone(), position=index)
         else:
             repeated_after = repeated - current_repetition + 1
             repeated_before = current_repetition - 1
             # Update repetition
             set_repeated(real_element, repeated_before)
             # Insert new element
-            parent.insert_element(new_element.clone(), position=index + 1)
+            parent.insert(new_element.clone(), position=index + 1)
             # Insert the remaining repetitions
             if repeated_after:
                 element_after = real_element.clone()
                 set_repeated(element_after, repeated_after)
-                parent.insert_element(element_after, position=index + 2)
+                parent.insert(element_after, position=index + 2)
         return
 
 
@@ -230,7 +230,7 @@ def _delete_element(position, real_elements, get_repeated, set_repeated):
             set_repeated(real_element, repeated)
         else:
             # Game over
-            real_element.delete_element()
+            real_element.delete()
         return
 
 
@@ -293,7 +293,7 @@ def odf_create_row(width=None, repeated=None, style=None):
     element = odf_create_element('table:table-row')
     if width is not None:
         for i in xrange(width):
-            element.append_element(odf_create_cell())
+            element.append(odf_create_cell())
     if repeated:
         element.set_row_repeated(repeated)
     if style is not None:
@@ -318,7 +318,7 @@ def odf_create_row_group(height=None, width=None):
     if height is not None:
         for i in xrange(height):
             row = odf_create_row(width)
-            element.append_element(row)
+            element.append(row)
     return element
 
 
@@ -427,10 +427,10 @@ def odf_create_table(name, width=None, height=None, protected=False,
         height = height or 1
         # Column groups for style information
         columns = odf_create_column(repeated=width)
-        element.append_element(columns)
+        element.append(columns)
         for i in xrange(height):
             row = odf_create_row(width)
-            element.append_element(row)
+            element.append(row)
     return element
 
 
@@ -809,7 +809,7 @@ class odf_row(odf_element):
         """
         if cell is None:
             cell = odf_create_cell()
-        self.append_element(cell)
+        self.append(cell)
         return cell
 
 
@@ -871,7 +871,7 @@ class odf_row(odf_element):
                 return
             if not aggressive and cell.get_cell_style() is not None:
                 return
-            self.delete_element(cell)
+            self.delete(cell)
 
 
     def is_row_empty(self, aggressive=False):
@@ -1291,7 +1291,7 @@ class odf_table(odf_element):
         # Step 1: remove empty rows below the table
         for row in reversed(self._get_rows()):
             if row.is_row_empty(aggressive=aggressive):
-                row.get_parent().delete_element(row)
+                row.get_parent().delete(row)
             else:
                 break
         # Step 2: rstrip remaining rows
@@ -1310,7 +1310,7 @@ class odf_table(odf_element):
                     column.set_column_repeated(repeated)
                     break
                 else:
-                    column.get_parent().delete_element(column)
+                    column.get_parent().delete(column)
                     diff = -repeated
                     if diff == 0:
                         break
@@ -1462,11 +1462,11 @@ class odf_table(odf_element):
             row = odf_create_row(self.get_table_width())
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
-        self.append_element(row)
+        self.append(row)
         # Initialize columns
         if not self._get_columns():
             repeated = row.get_row_width()
-            self.insert_element(odf_create_column(repeated=repeated),
+            self.insert(odf_create_column(repeated=repeated),
                     position=0)
         return row
 
@@ -1679,7 +1679,7 @@ class odf_table(odf_element):
         image_frame = image_frame.clone()
         # Remove any previous paragraph, frame, etc.
         for child in cell.get_children():
-            cell.delete_element(child)
+            cell.delete(child)
         # Now it all depends on the document type
         if type == 'spreadsheet':
             image_frame.set_frame_anchor_type(None)
@@ -1692,12 +1692,12 @@ class odf_table(odf_element):
                     _digit_to_alpha(x), y + 1)
             image_frame.set_attribute('table:end-cell-address', address)
             # The frame is directly in the cell
-            cell.append_element(image_frame)
+            cell.append(image_frame)
         elif type == 'text':
             # The frame must be in a paragraph
             cell.set_cell_value(u"")
             paragraph = cell.get_element('text:p')
-            paragraph.append_element(image_frame)
+            paragraph.append(image_frame)
         self.set_cell(coordinates, cell)
 
 
@@ -1968,7 +1968,7 @@ class odf_table(odf_element):
         if column is None:
             column = odf_create_column()
         last_column = self._get_columns()[-1]
-        self.insert_element(column, position=self.index(last_column) + 1)
+        self.insert(column, position=self.index(last_column) + 1)
         # Repetitions are accepted
         repeated = column.get_column_repeated() or 1
         # No need to update row widths

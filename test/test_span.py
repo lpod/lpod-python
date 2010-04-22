@@ -82,7 +82,7 @@ class TestSpan(TestCase):
         body = self.body.clone()
         span = odf_create_span('my_style', u'my text')
         paragraph = body.get_paragraph_by_position(0)
-        paragraph.append_element(span)
+        paragraph.append(span)
 
 
 

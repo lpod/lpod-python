@@ -268,7 +268,7 @@ class odf_style(odf_element):
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             element = odf_create_element('style:%s-properties' % area)
-            self.append_element(element)
+            self.append(element)
         if properties or kw:
             properties = _expand_properties(_merge_dicts(properties, kw))
         elif style is not None:
@@ -352,23 +352,23 @@ class odf_style(odf_element):
                 return
             properties.del_attribute('fo:background-color')
             if bg_image is not None:
-                properties.delete_element(bg_image)
+                properties.delete(bg_image)
             return
         # Add the properties if necessary
         if properties is None:
             properties = odf_create_element('style:%s-properties' % family)
-            self.append_element(properties)
+            self.append(properties)
         # Add the color...
         if color:
             properties.set_attribute('fo:background-color', color)
             if bg_image is not None:
-                properties.delete_element(bg_image)
+                properties.delete(bg_image)
         # ... or the background
         elif uri:
             properties.set_attribute('fo:background-color', 'transparent')
             if bg_image is None:
                 bg_image = odf_create_element('style:background-image')
-                properties.append_element(bg_image)
+                properties.append(bg_image)
             bg_image.set_attribute('xlink:href',  uri)
             if position:
                 bg_image.set_attribute('style:position', position)
@@ -447,7 +447,7 @@ class odf_list_style(odf_style):
             level_style.set_text_style(style)
         # Commit the creation
         if was_created:
-            self.append_element(level_style)
+            self.append(level_style)
         return level_style
 
 
@@ -480,8 +480,8 @@ class odf_page_layout(odf_style):
     def set_header_style(self, new_style):
         header_style = self.get_header_style()
         if header_style is not None:
-            self.delete_element(header_style)
-        self.append_element(new_style)
+            self.delete(header_style)
+        self.append(new_style)
 
 
     def get_footer_style(self):
@@ -491,8 +491,8 @@ class odf_page_layout(odf_style):
     def set_footer_style(self, new_style):
         footer_style = self.get_footer_style()
         if footer_style is not None:
-            self.delete_element(footer_style)
-        self.append_element(new_style)
+            self.delete(footer_style)
+        self.append(new_style)
 
 
 
@@ -511,15 +511,15 @@ class odf_master_page(odf_style):
             header_or_footer = self.get_footer()
         if header_or_footer is None:
             header_or_footer = odf_create_element('style:' + name)
-            self.append_element(header_or_footer)
+            self.append(header_or_footer)
         else:
             header_or_footer.clear()
         if not isinstance(text_or_element, (list, tuple)):
             # Already a header or footer?
             if (isinstance(text_or_element, odf_element)
                     and text_or_element.get_tag() == 'style:%s' % name):
-                self.delete_element(header_or_footer)
-                self.append_element(text_or_element)
+                self.delete(header_or_footer)
+                self.append(text_or_element)
                 return
             text_or_element = [text_or_element]
         # FIXME cyclic import
@@ -527,9 +527,9 @@ class odf_master_page(odf_style):
         for item in text_or_element:
             if type(item) is unicode:
                 paragraph = odf_create_paragraph(item, style=style)
-                header_or_footer.append_element(paragraph)
+                header_or_footer.append(paragraph)
             elif isinstance(item, odf_element):
-                header_or_footer.append_element(item)
+                header_or_footer.append(item)
 
 
     #

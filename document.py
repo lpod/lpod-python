@@ -558,8 +558,8 @@ class odf_document(object):
 
         # Insert it!
         if existing is not None:
-            container.delete_element(existing)
-        container.append_element(style)
+            container.delete(existing)
+        container.append(style)
 
 
     def get_styled_elements(self, name=True):
@@ -643,7 +643,7 @@ class odf_document(object):
             elif type(style) is odf_master_page:
                 # Don't suppress header and footer, just styling was removed
                 continue
-            style.delete_element()
+            style.delete()
             i += 1
         return i
 
@@ -684,8 +684,8 @@ class odf_document(object):
                 raise NotImplementedError, tagname
             duplicate = part.get_style(family, stylename)
             if duplicate is not None:
-                duplicate.delete_element()
-            dest.append_element(style)
+                duplicate.delete()
+            dest.append(style)
             # Copy images from the header/footer
             if tagname == 'style:master-page':
                 query = 'descendant::draw:image'

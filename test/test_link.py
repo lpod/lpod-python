@@ -63,8 +63,8 @@ class TestLinks(TestCase):
         link1 = odf_create_link('http://example.com/', name='link1')
         link2 = odf_create_link('http://example.com/', name='link2')
         paragraph = self.paragraph
-        paragraph.append_element(link1)
-        paragraph.append_element(link2)
+        paragraph.append(link1)
+        paragraph.append(link2)
         element = self.body.get_link_by_name(u'link2')
         expected = ('<text:a xlink:href="http://example.com/" '
                       'office:name="link2"/>')
@@ -75,8 +75,8 @@ class TestLinks(TestCase):
         link1 = odf_create_link('http://example.com/', name='link1')
         link2 = odf_create_link('http://example.com/', name='link2')
         paragraph = self.paragraph
-        paragraph.append_element(link1)
-        paragraph.append_element(link2)
+        paragraph.append(link1)
+        paragraph.append(link2)
         element = self.body.get_link_list()[1]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link2"/>')
@@ -89,8 +89,8 @@ class TestLinks(TestCase):
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
         paragraph = self.paragraph
-        paragraph.append_element(link1)
-        paragraph.append_element(link2)
+        paragraph.append(link1)
+        paragraph.append(link2)
         # name
         element = self.body.get_link_list(name='link1')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
@@ -104,8 +104,8 @@ class TestLinks(TestCase):
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
         paragraph = self.paragraph
-        paragraph.append_element(link1)
-        paragraph.append_element(link2)
+        paragraph.append(link1)
+        paragraph.append(link2)
         # title
         element = self.body.get_link_list(title='title2')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
@@ -119,8 +119,8 @@ class TestLinks(TestCase):
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
         paragraph = self.paragraph
-        paragraph.append_element(link1)
-        paragraph.append_element(link2)
+        paragraph.append(link1)
+        paragraph.append(link2)
         # href
         elements = self.body.get_link_list(href=ur'\.com')
         self.assertEqual(len(elements), 2)
@@ -138,8 +138,8 @@ class TestLinks(TestCase):
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
         paragraph = self.paragraph
-        paragraph.append_element(link1)
-        paragraph.append_element(link2)
+        paragraph.append(link1)
+        paragraph.append(link2)
         # name and title
         element = self.body.get_link_list(name='link1', title='title1')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
@@ -168,8 +168,8 @@ class TestLinks(TestCase):
         link2 = odf_create_link('http://example.com/', name='link2',
                                 title='title2')
         paragraph = self.paragraph
-        paragraph.append_element(link1)
-        paragraph.append_element(link2)
+        paragraph.append(link1)
+        paragraph.append(link2)
         # Not found
         element = self.body.get_link_list(name='link1', title='title2')
         self.assertEqual(element, [])

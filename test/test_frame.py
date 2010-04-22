@@ -99,8 +99,8 @@ class TestFrame(TestCase):
         frame2 = odf_create_frame(u"frame2", size=('10cm', '10cm'),
                                   page_number=1, position=('10mm', '10mm'),
                                   style='Graphics')
-        body.append_element(frame1)
-        body.append_element(frame2)
+        body.append(frame1)
+        body.append(frame2)
         result = body.get_frame_list(style='Graphics')
         self.assertEqual(len(result), 2)
         element = body.get_frame_by_name(u"frame1")

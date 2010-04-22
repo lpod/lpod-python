@@ -50,7 +50,7 @@ def odf_create_list_item(text_or_element=None):
     if type(text_or_element) is unicode:
         element.set_text_content(text_or_element)
     elif isinstance(text_or_element, odf_element):
-        element.append_element(text_or_element)
+        element.append(text_or_element)
     elif text_or_element is not None:
         raise TypeError, "expected unicode or odf_element"
     return element
@@ -74,7 +74,7 @@ def odf_create_list(text=[], style=None):
     """
     element = odf_create_element('text:list')
     for value in text:
-        element.append_element(odf_create_list_item(text_or_element=value))
+        element.append(odf_create_list_item(text_or_element=value))
     if style is not None:
         element.set_text_style(style)
     return element
@@ -107,11 +107,11 @@ class odf_list(odf_element):
             text_or_element = [text_or_element]
         # Remove existing header
         for element in self.get_element_list('text:p'):
-            self.delete_element(element)
+            self.delete(element)
         for paragraph in reversed(text_or_element):
             if type(paragraph) is unicode:
                 paragraph = odf_create_paragraph(paragraph)
-            self.insert_element(paragraph, FIRST_CHILD)
+            self.insert(paragraph, FIRST_CHILD)
 
 
     def insert_item(self, item, position=None, before=None, after=None):
@@ -121,11 +121,11 @@ class odf_list(odf_element):
             item = odf_create_list_item(item)
 
         if before is not None:
-            before.insert_element(item, xmlposition=PREV_SIBLING)
+            before.insert(item, xmlposition=PREV_SIBLING)
         elif after is not None:
-            after.insert_element(item, xmlposition=NEXT_SIBLING)
+            after.insert(item, xmlposition=NEXT_SIBLING)
         elif position is not None:
-            self.insert_element(item, position=position)
+            self.insert(item, position=position)
         else:
             raise ValueError, "position must be defined"
 
@@ -135,7 +135,7 @@ class odf_list(odf_element):
         tag_name = item.get_tag() if isinstance(item, odf_element) else None
         if tag_name != 'text:list-item':
             item = odf_create_list_item(item)
-        self.append_element(item)
+        self.append(item)
 
 
     def get_formatted_text(self, context):

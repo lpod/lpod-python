@@ -52,7 +52,7 @@ class TestShapes(TestCase):
     def test_create_line(self):
         page = odf_create_draw_page('Page1')
         line = odf_create_line(p1=('2cm', '2cm'), p2=('1cm', '1cm'))
-        page.append_element(line)
+        page.append(line)
         expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:line svg:x1="2cm" svg:y1="2cm" svg:x2="1cm" '
                     'svg:y2="1cm"/>\n'
@@ -64,7 +64,7 @@ class TestShapes(TestCase):
         page = odf_create_draw_page('Page1')
         rectangle = odf_create_rectangle(size=('2cm', '1cm'),
                                          position=('3cm', '4cm'))
-        page.append_element(rectangle)
+        page.append(rectangle)
         expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:rect svg:width="2cm" svg:height="1cm" svg:x="3cm"'
                     ' svg:y="4cm"/>\n'
@@ -81,7 +81,7 @@ class TestShapes(TestCase):
             'svg:y': '2cm'}
         ellipse = odf_create_ellipse(size=('2cm', '1cm'), position=('3cm',
         '4cm'))
-        page.append_element(ellipse)
+        page.append(ellipse)
         expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:ellipse svg:width="2cm" svg:height="1cm" '
                     'svg:x="3cm" svg:y="4cm"/>\n'
@@ -100,9 +100,9 @@ class TestShapes(TestCase):
         connector = odf_create_connector(connected_shapes=(rectangle,
                                                            ellipse),
                                          glue_points=(1, 2))
-        page.append_element(rectangle)
-        page.append_element(ellipse)
-        page.append_element(connector)
+        page.append(rectangle)
+        page.append(ellipse)
+        page.append(connector)
         expected = ('<draw:page draw:id="Page1">\n'
                     '  <draw:rect draw:id="rectangle" svg:width="2cm" '
                     'svg:height="1cm" svg:x="3cm" svg:y="4cm"/>\n'
@@ -163,7 +163,7 @@ class TestShapes(TestCase):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(0)
         line = odf_create_line(shape_id=u'an id')
-        page.append_element(line)
+        page.append(line)
         line = page.get_draw_line_by_id(ur'an id')
         expected = '<draw:line draw:id="an id"/>\n'
         self.assertEqual(line.serialize(pretty=True), expected)
@@ -217,7 +217,7 @@ class TestShapes(TestCase):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(0)
         rectangle = odf_create_rectangle(shape_id=u'an id')
-        page.append_element(rectangle)
+        page.append(rectangle)
         rectangle = page.get_draw_rectangle_by_id(ur'an id')
         expected = ('<draw:rect draw:id="an id" svg:width="1cm" '
                     'svg:height="1cm"/>\n')
@@ -272,7 +272,7 @@ class TestShapes(TestCase):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(0)
         ellipse = odf_create_ellipse(shape_id=u'an id')
-        page.append_element(ellipse)
+        page.append(ellipse)
         ellipse = page.get_draw_ellipse_by_id(ur'an id')
         expected = ('<draw:ellipse draw:id="an id" svg:width="1cm" '
                     'svg:height="1cm"/>\n')
@@ -330,7 +330,7 @@ class TestShapes(TestCase):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(0)
         connector = odf_create_connector(shape_id=u'an id')
-        page.append_element(connector)
+        page.append(connector)
         connector = page.get_draw_connector_by_id(ur'an id')
         expected = '<draw:connector draw:id="an id"/>\n'
         self.assertEqual(connector.serialize(pretty=True), expected)
@@ -340,8 +340,8 @@ class TestShapes(TestCase):
         body = self.content.get_body()
         page = body.get_draw_page_by_position(0)
         orphan_connector = odf_create_connector()
-        orphan_connector.append_element(odf_create_paragraph(u'Orphan c'))
-        body.append_element(orphan_connector)
+        orphan_connector.append(odf_create_paragraph(u'Orphan c'))
+        body.append(orphan_connector)
         connectors = body.get_draw_orphans_connectors()
         self.assertEqual(len(connectors), 1)
 

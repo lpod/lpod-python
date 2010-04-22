@@ -109,7 +109,7 @@ class TestHeading(TestCase):
         body = self.body.clone()
         heading = odf_create_heading(2, u'An inserted heading',
                                      style='Heading_20_2')
-        body.append_element(heading)
+        body.append(heading)
         last_heading = body.get_heading_list()[-1]
         self.assertEqual(last_heading.get_text(), u'An inserted heading')
 

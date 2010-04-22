@@ -47,7 +47,7 @@ def init_doc(mimetype):
 
         # Begin with a TOC
         output_body = output_doc.get_body()
-        output_body.append_element(odf_create_toc())
+        output_body.append(odf_create_toc())
     # Spreadsheet mode
     elif mimetype in ("application/vnd.oasis.opendocument.spreadsheet",
                       "text/csv"):
@@ -83,7 +83,7 @@ def add_odt(filename, output_doc):
         if tagname in ('text:sequence-decls', 'text:table-of-content'):
             continue
         # Copy the rest recursively
-        output_body.append_element(element.clone())
+        output_body.append(element.clone())
 
     # Add pictures/
     _add_pictures(document, output_doc)
@@ -122,7 +122,7 @@ def add_ods(filename, output_doc):
         name = _get_table_name(name, output_body)
         table.set_table_name(name)
 
-        output_body.append_element(table)
+        output_body.append(table)
 
     # Add pictures/
     _add_pictures(document, output_doc)
@@ -140,7 +140,7 @@ def add_csv(filename, output_doc):
 
     table = import_from_csv(filename, name)
 
-    output_body.append_element(table)
+    output_body.append(table)
     print 'Add "%s"' % filename
 
 
@@ -167,7 +167,7 @@ def add_odp(filename, output_doc):
             page.set_page_name(name)
 
         already_names.add(name)
-        output_body.append_element(page)
+        output_body.append(page)
 
     # Add pictures/
     _add_pictures(document, output_doc)

@@ -60,7 +60,7 @@ def warn(message):
 
 
 def convert_text(node, context):
-    context["top"].append_element(node.astext())
+    context["top"].append(node.astext())
 
 
 
@@ -87,7 +87,7 @@ def convert_title(node, context):
         level = 1
     heading = odf_create_heading(level, node.astext(),
             style='Heading_20_%s' % level)
-    context["body"].append_element(heading)
+    context["body"].append(heading)
 
 
 
@@ -95,7 +95,7 @@ def convert_paragraph(node, context):
     # Search for a default style
     style = context['styles'].get('paragraph')
     paragraph = odf_create_paragraph(style=style)
-    context["top"].append_element(paragraph)
+    context["top"].append(paragraph)
 
     # Save the current top
     old_top = context["top"]
@@ -118,7 +118,7 @@ def convert_list(node, context, list_type):
         style_name = "List_20_1"
 
     odf_list = odf_create_list(style=style_name)
-    context["top"].append_element(odf_list)
+    context["top"].append(odf_list)
 
     # Save the current top
     old_top = context["top"]
@@ -131,7 +131,7 @@ def convert_list(node, context, list_type):
 
         # Create a new item
         odf_item = odf_create_list_item()
-        odf_list.append_element(odf_item)
+        odf_list.append(odf_item)
 
         # A new top
         context["top"] = odf_item
@@ -166,7 +166,7 @@ def convert_topic(node, context):
         return
 
     toc = odf_create_toc()
-    context["body"].append_element(toc)
+    context["body"].append(toc)
     context["toc"] = toc
 
 
@@ -203,7 +203,7 @@ def convert_footnote_reference(node, context):
     citation = node.astext()
 
     footnote = odf_create_note(note_id=refid, citation=citation)
-    context["top"].append_element(footnote)
+    context["top"].append(footnote)
 
     context["footnotes"][refid] = footnote
 
@@ -212,7 +212,7 @@ def convert_footnote_reference(node, context):
 def _convert_style_like(node, context, style_name):
     # Create the span
     span = odf_create_span(style=style_name)
-    context["top"].append_element(span)
+    context["top"].append(span)
 
     # Save the current top
     old_top = context["top"]
@@ -273,7 +273,7 @@ def convert_literal(node, context):
 
 def convert_literal_block(node, context):
     paragraph = odf_create_paragraph(style="Preformatted_20_Text")
-    context["top"].append_element(paragraph)
+    context["top"].append(paragraph)
 
     # Convert
     for child in node:
@@ -289,10 +289,10 @@ def convert_literal_block(node, context):
             if c == '\n':
                 if tmp:
                     tmp = u"".join(tmp)
-                    paragraph.append_element(tmp)
+                    paragraph.append(tmp)
                     tmp = []
                 spaces = 0
-                paragraph.append_element(odf_create_line_break())
+                paragraph.append(odf_create_line_break())
             elif c == '\r':
                 continue
             elif c == ' ':
@@ -304,9 +304,9 @@ def convert_literal_block(node, context):
                 if spaces >= 2:
                     if tmp:
                         tmp = u"".join(tmp)
-                        paragraph.append_element(tmp)
+                        paragraph.append(tmp)
                         tmp = []
-                    paragraph.append_element(
+                    paragraph.append(
                               odf_create_undividable_space(spaces))
                     spaces = 0
                 elif spaces == 1:
@@ -315,7 +315,7 @@ def convert_literal_block(node, context):
                 tmp.append(c)
         if tmp:
             tmp = u"".join(tmp)
-            paragraph.append_element(tmp)
+            paragraph.append(tmp)
 
 
 
@@ -325,7 +325,7 @@ def convert_reference(node, context):
 
     link = odf_create_link(refuri)
     link.set_text(text)
-    context["top"].append_element(link)
+    context["top"].append(link)
 
 
 
@@ -392,7 +392,7 @@ def convert_definition_list(node, context):
             if tagname == "term":
                 paragraph = odf_create_paragraph(text=child.astext(),
                         style=term_style)
-                context["top"].append_element(paragraph)
+                context["top"].append(paragraph)
             elif tagname == "definition":
                 # Push a style on the stack for next paragraphs to use
                 styles['paragraph'] = definition_style
@@ -489,7 +489,7 @@ def _add_image(image, caption, context, width=None, height=None):
     # In text application, image must be inserted in a paragraph
     if context["top"].get_tag() == "office:text":
         container = odf_create_paragraph()
-        context["top"].append_element(container)
+        context["top"].append(container)
     else:
         container = context["top"]
 
@@ -497,16 +497,16 @@ def _add_image(image, caption, context, width=None, height=None):
         paragraph = odf_create_paragraph()
         image_frame = odf_create_image_frame(local_uri, size=size,
                 style=image_style)
-        paragraph.append_element(image_frame)
-        paragraph.append_element(caption)
+        paragraph.append(image_frame)
+        paragraph.append(caption)
         # A new frame, we fix only the width
         text_frame = odf_create_text_frame(paragraph, size=(size[0], None),
                 style=caption_style)
-        container.append_element(text_frame)
+        container.append(text_frame)
     else:
         image_frame = odf_create_image_frame(local_uri, size=size,
                 style=image_style)
-        container.append_element(image_frame)
+        container.append(image_frame)
 
 
 
@@ -551,7 +551,7 @@ def _convert_table_rows(container, node, context, cell_style=None):
             continue
 
         odf_row = odf_create_row()
-        container.append_element(odf_row)
+        container.append(odf_row)
 
         for entry in row:
             if entry.tagname != "entry":
@@ -560,7 +560,7 @@ def _convert_table_rows(container, node, context, cell_style=None):
 
             # Create a new odf_cell
             odf_cell = odf_create_cell(cell_type="string", style=cell_style)
-            odf_row.append_element(odf_cell)
+            odf_row.append(odf_cell)
 
             # XXX We don't add table:covered-table-cell !
             #     It's bad but OO can nevertheless load the file
@@ -621,11 +621,11 @@ def convert_table(node, context):
                     odf_table = odf_create_table(name="table%d" %
                                                  context["tables_number"])
                     columns = odf_create_column(repeated=columns_number)
-                    odf_table.append_element(columns)
+                    odf_table.append(columns)
                 # Convert!
                 if tagname == "thead":
                     header = odf_create_header_rows()
-                    odf_table.append_element(header)
+                    odf_table.append(header)
 
                     _convert_table_rows(header, child, context,
                             cell_style=cell_style)
@@ -638,7 +638,7 @@ def convert_table(node, context):
                 warn('node "%s" not supported in tgroup' % child.tagname)
                 continue
 
-        context["top"].append_element(odf_table)
+        context["top"].append(odf_table)
 
 
 

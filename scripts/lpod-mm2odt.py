@@ -70,7 +70,7 @@ def make_document(structure, body):
         # Create the heading with the corresponding level
         heading = odf_create_heading(level, text=text)
         # Add the heading to the document's body
-        body.append_element(heading)
+        body.append(heading)
         make_document(struct, body)
 
 
@@ -115,7 +115,7 @@ if  __name__ == '__main__':
     body.clear()
     # Begin with a TOC
     toc = odf_create_toc()
-    body.append_element(toc)
+    body.append(toc)
     # Make the document from the structure
     make_document([mm_structure], body)
     # Fill the TOC

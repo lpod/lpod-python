@@ -217,9 +217,9 @@ class odf_paragraph(odf_element):
         if type(after) is unicode:
             self._insert(note_element, after=after)
         elif isinstance(after, odf_element):
-            after.insert_element(note_element, FIRST_CHILD)
+            after.insert(note_element, FIRST_CHILD)
         else:
-            self.insert_element(note_element, FIRST_CHILD)
+            self.insert(note_element, FIRST_CHILD)
 
 
     def insert_annotation(self, annotation_element=None, after=None,
@@ -240,9 +240,9 @@ class odf_paragraph(odf_element):
         if type(after) is unicode:
             self._insert(annotation_element, after=after)
         elif isinstance(after, odf_element):
-            after.insert_element(annotation_element, FIRST_CHILD)
+            after.insert(annotation_element, FIRST_CHILD)
         else:
-            self.insert_element(annotation_element, FIRST_CHILD)
+            self.insert(annotation_element, FIRST_CHILD)
 
 
     def insert_variable(self, variable_element,  after):
@@ -300,12 +300,12 @@ class odf_paragraph(odf_element):
                     if is_text:
                         container.set_text(before)
                         # Insert as first child
-                        container.insert_element(span, position=0)
+                        container.insert(span, position=0)
                     else:
                         container.set_tail(before)
                         # Insert as next sibling
                         index = wrapper.index(container)
-                        wrapper.insert_element(span, position=index + 1)
+                        wrapper.insert(span, position=index + 1)
 
 
     def set_link(self, url, regex=None, offset=None, length=0):

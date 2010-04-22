@@ -167,7 +167,7 @@ class TestStyle(TestCase):
                                  **{'fo:color': '#0000ff',
                                     'fo:background-color': '#ff0000'})
         context = styles.get_element('//office:styles')
-        context.append_element(style)
+        context.append(style)
 
         expected = ('<style:style style:name="style1" '
                                   'style:family="paragraph">\n'

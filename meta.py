@@ -68,7 +68,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:title')
         if element is None:
             element = odf_create_element('dc:title')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         element.set_text(title)
 
 
@@ -95,7 +95,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:description')
         if element is None:
             element = odf_create_element('dc:description')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         element.set_text(description)
 
     set_comments = set_description
@@ -122,7 +122,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:subject')
         if element is None:
             element = odf_create_element('dc:subject')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         element.set_text(subject)
 
 
@@ -160,7 +160,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:language')
         if element is None:
             element = odf_create_element('dc:language')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         element.set_text(unicode(language))
 
 
@@ -186,7 +186,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//dc:date')
         if element is None:
             element = odf_create_element('dc:date')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         modification_date = DateTime.encode(date)
         element.set_text(modification_date)
 
@@ -213,7 +213,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:creation-date')
         if element is None:
             element = odf_create_element('meta:creation-date')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         creation_date = DateTime.encode(date)
         element.set_text(creation_date)
 
@@ -248,7 +248,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:initial-creator')
         if element is None:
             element = odf_create_element('meta:initial-creator')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         element.set_text(creator)
 
 
@@ -275,7 +275,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:keyword')
         if element is None:
             element = odf_create_element('meta:keyword')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         element.set_text(keywords)
 
 
@@ -304,7 +304,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:editing-duration')
         if element is None:
             element = odf_create_element('meta:editing-duration')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         duration = Duration.encode(duration)
         element.set_text(duration)
 
@@ -336,7 +336,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:editing-cycles')
         if element is None:
             element = odf_create_element('meta:editing-cycles')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         cycles = str(cycles)
         element.set_text(cycles)
 
@@ -371,7 +371,7 @@ class odf_meta(odf_xmlpart):
         element = self.get_element('//meta:generator')
         if element is None:
             element = odf_create_element('meta:generator')
-            self.get_meta_body().append_element(element)
+            self.get_meta_body().append(element)
         element.set_text(generator)
         self._generator_modified = True
 
@@ -492,6 +492,6 @@ class odf_meta(odf_xmlpart):
         else:
             metadata = odf_create_element('meta:user-defined')
             metadata.set_attribute('meta:name', name)
-            self.get_meta_body().append_element(metadata)
+            self.get_meta_body().append(metadata)
         metadata.set_attribute('meta:value-type', value_type)
         metadata.set_text(value)

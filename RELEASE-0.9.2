@@ -17,11 +17,14 @@ Low-level API
 =============
 
 - The XML API in the odf_element class has seen many name shortenings:
-  Before       After
-  -----------  -----
-  get_tagname  get_tag
-  set_tagname  set_tag
-- "odf_element.delete_element" now accepts no argument to delete itself as a
+  Before          After
+  -----------     -----
+  get_tagname     get_tag
+  set_tagname     set_tag
+  insert_element  insert
+  append_element  append
+  delete_element  delete
+- "odf_element.delete" now accepts no argument to delete itself as a
   shortcut.
 - "odf_create_element" accepts qualified names such as "text:p" to quickly
   create a single element.

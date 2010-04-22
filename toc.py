@@ -71,7 +71,7 @@ def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
     # Create the source template
     source = odf_create_toc_source(title=title, outline_level=outline_level,
             title_style=title_style, entry_style=entry_style)
-    element.append_element(source)
+    element.append(source)
     # Create the index body automatically with the index title
     if title:
         # This style is in the template document
@@ -90,7 +90,7 @@ def odf_create_toc_source(title=None, outline_level=10,
             # This style is in the template document
             title_template.set_text_style(title_style)
         title_template.set_text(title)
-        element.append_element(title_template)
+        element.append(title_template)
     for level in range(1, 11):
         template = odf_create_element('''<text:table-of-content-entry-template
           text:outline-level="%d">
@@ -102,7 +102,7 @@ def odf_create_toc_source(title=None, outline_level=10,
          </text:table-of-content-entry-template>''' % level)
         if entry_style:
             template.set_text_style(entry_style % level)
-        element.append_element(template)
+        element.append(template)
     return element
 
 
@@ -125,7 +125,7 @@ def odf_create_index_title(title=None, name=None, style=None,
     element = odf_create_element('text:index-title')
     if title or text_style:
         title = odf_create_paragraph(text=title, style=text_style)
-        element.append_element(title)
+        element.append(title)
     if name:
         element.set_attribute('text:name', name)
     if style:
@@ -146,13 +146,13 @@ def odf_create_toc_level_style(level):
     position = 17.5 - (0.5 * level)
     tab_stop.set_attribute('style:position', u'%dcm' % position)
     tab_stops = odf_create_element('style:tab-stops')
-    tab_stops.append_element(tab_stop)
+    tab_stops.append(tab_stop)
     properties = odf_create_element('style:paragraph-properties')
-    properties.append_element(tab_stops)
+    properties.append(tab_stops)
     element = odf_create_style('paragraph',
             name=TOC_ENTRY_STYLE_PATTERN % level,
             parent='Contents_20_%d' % level)
-    element.append_element(properties)
+    element.append(properties)
     return element
 
 
@@ -199,7 +199,7 @@ class odf_toc(odf_element):
         source = self.get_element('text:table-of-content-source')
         if source is None:
             source = odf_create_element('text:table-of-content-source')
-            self.insert_element(source, FIRST_CHILD)
+            self.insert(source, FIRST_CHILD)
         source.set_outline_level(level)
 
 
@@ -226,10 +226,10 @@ class odf_toc(odf_element):
     def set_toc_body(self, body=None):
         old_body = self.get_toc_body()
         if old_body is not None:
-            self.delete_element(old_body)
+            self.delete(old_body)
         if body is None:
             body = odf_create_index_body()
-        self.append_element(body)
+        self.append(body)
         return body
 
 
@@ -252,14 +252,14 @@ class odf_toc(odf_element):
             name = u"%s_Head" % self.get_toc_name()
             index_title = odf_create_index_title(title, name=name,
                     style=style, text_style=text_style)
-            index_body.append_element(index_title)
+            index_body.append(index_title)
         else:
             if style:
                 index_title.set_text_style(style)
             paragraph = index_title.get_paragraph_by_position(0)
             if paragraph is None:
                 paragraph = odf_create_paragraph()
-                index_title.append_element(paragraph)
+                index_title.append(paragraph)
             if text_style:
                 paragraph.set_text_style(text_style)
             paragraph.set_text(title)
@@ -295,7 +295,7 @@ class odf_toc(odf_element):
         index_body = self.set_toc_body()
 
         # Restore the title
-        index_body.insert_element(title, position=0)
+        index_body.insert(title, position=0)
 
         # Insert default TOC style
         if use_default_styles:
@@ -304,7 +304,7 @@ class odf_toc(odf_element):
                 if automatic_styles.get_style('paragraph',
                         TOC_ENTRY_STYLE_PATTERN % level) is None:
                     level_style = odf_create_toc_level_style(level)
-                    automatic_styles.append_element(level_style)
+                    automatic_styles.append(level_style)
 
         # Auto-fill the index
         outline_level = self.get_toc_outline_level() or 10
@@ -332,7 +332,7 @@ class odf_toc(odf_element):
             paragraph = odf_create_paragraph(title)
             if use_default_styles:
                 paragraph.set_text_style(TOC_ENTRY_STYLE_PATTERN % level)
-            index_body.append_element(paragraph)
+            index_body.append(paragraph)
 
 
 

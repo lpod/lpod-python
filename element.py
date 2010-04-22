@@ -669,10 +669,10 @@ class odf_element(object):
         if paragraphs:
             paragraph = paragraphs.pop(0)
             for obsolete in paragraphs:
-                obsolete.delete_element()
+                obsolete.delete()
         else:
             paragraph = odf_create_element('text:p')
-            self.insert_element(paragraph, FIRST_CHILD)
+            self.insert(paragraph, FIRST_CHILD)
         # As "get_text_content" returned all text nodes, "set_text_content"
         # will overwrite all text nodes and children that may contain them
         element = paragraph.__element
@@ -681,7 +681,7 @@ class odf_element(object):
         element.text = text
 
 
-    def insert_element(self, element, xmlposition=None, position=None):
+    def insert(self, element, xmlposition=None, position=None):
         """Insert an element relatively to ourself.
 
         Insert either using DOM vocabulary or by numeric position.
@@ -717,7 +717,7 @@ class odf_element(object):
             raise ValueError, "(xml)position must be defined"
 
 
-    def append_element(self, unicode_or_element):
+    def append(self, unicode_or_element):
         """Insert element or text in the last position.
         """
         current = self.__element
@@ -749,7 +749,7 @@ class odf_element(object):
             current.append(unicode_or_element.__element)
 
 
-    def delete_element(self, child=None):
+    def delete(self, child=None):
         """Delete the given element from the XML tree. If no element is given,
         "self" is deleted. The XML library may allow to continue to use an
         element now "orphan" as long as you have a reference to it.
@@ -886,7 +886,7 @@ class odf_element(object):
         dc_creator = self.get_element('descendant::dc:creator')
         if dc_creator is None:
             dc_creator = odf_create_element('dc:creator')
-            self.append_element(dc_creator)
+            self.append(dc_creator)
         dc_creator.set_text(creator)
 
 
@@ -902,7 +902,7 @@ class odf_element(object):
         dc_date = self.get_element('descendant::dc:date')
         if dc_date is None:
             dc_date = odf_create_element('dc:date')
-            self.append_element(dc_date)
+            self.append(dc_date)
         dc_date.set_text(DateTime.encode(date))
 
     #
@@ -1166,7 +1166,7 @@ class odf_element(object):
         if variable_decls is None:
             from variable import odf_create_variable_decls
             body = self.get_body()
-            body.insert_element(odf_create_variable_decls(), FIRST_CHILD)
+            body.insert(odf_create_variable_decls(), FIRST_CHILD)
             variable_decls = body.get_element('//text:variable-decls')
 
         return variable_decls
@@ -1204,7 +1204,7 @@ class odf_element(object):
         if user_field_decls is None:
             from variable import odf_create_user_field_decls
             body = self.get_body()
-            body.insert_element(odf_create_user_field_decls(), FIRST_CHILD)
+            body.insert(odf_create_user_field_decls(), FIRST_CHILD)
             user_field_decls = body.get_element('//text:user-field-decls')
 
         return user_field_decls

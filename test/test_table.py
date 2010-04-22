@@ -513,9 +513,9 @@ class TestRow(TestCase):
     def setUp(self):
         row = odf_create_row(width=2, repeated=3, style=u"ro1")
         # Add repeated cell
-        row.append_element(odf_create_cell(1, repeated=2))
+        row.append(odf_create_cell(1, repeated=2))
         # Add regular cell
-        row.append_element(odf_create_cell(style=u"ce1"))
+        row.append(odf_create_cell(style=u"ce1"))
         self.row = row
 
 
@@ -775,14 +775,14 @@ class TestTable(TestCase):
 
     def test_get_table_by_name(self):
         body = self.body.clone()
-        body.append_element(odf_create_table(u"New Table"))
+        body.append(odf_create_table(u"New Table"))
         table = body.get_table_by_name(u"New Table")
         self.assertEqual(table.get_table_name(), u"New Table")
 
 
     def test_get_table_by_position(self):
         body = self.body.clone()
-        body.append_element(odf_create_table(u"New Table"))
+        body.append(odf_create_table(u"New Table"))
         table = body.get_table_by_position(3)
         self.assertEqual(table.get_table_name(), u"New Table")
 

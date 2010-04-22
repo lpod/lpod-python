@@ -171,7 +171,7 @@ class TestStyle(TestCase):
                 **{'fo:color': '#0000ff',
                    'fo:background-color': '#ff0000'})
         auto_styles = content.get_element('//office:automatic-styles')
-        auto_styles.append_element(style)
+        auto_styles.append(style)
         expected = ('<style:style style:name="style1" '
                                  'style:family="paragraph">'
                       '<style:text-properties fo:color="#0000ff" '
