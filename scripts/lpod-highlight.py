@@ -69,7 +69,7 @@ def highlight(odf_file_url, pattern, color=None, background_color=None,
     for i, paragraph in enumerate(body.get_paragraph_list(regex=pattern) +
                                   body.get_heading_list(regex=pattern)):
         # Don't colour the table of content
-        if paragraph.get_parent().get_tagname() in ('text:index-title',
+        if paragraph.get_parent().get_tag() in ('text:index-title',
                 'text:index-body'):
             continue
         paragraph.set_span(name, regex=pattern)

@@ -161,7 +161,7 @@ class DocumentTestCase(TestCase):
 
     def test_get_body(self):
         body = self.document.get_body()
-        self.assertEqual(body.get_tagname(), 'office:text')
+        self.assertEqual(body.get_tag(), 'office:text')
 
 
     def test_clone(self):

@@ -66,7 +66,7 @@ class XmlPartTestCase(TestCase):
         content = odf_xmlpart('content', self.container)
         root = content.get_root()
         self.assert_(isinstance(root, odf_element))
-        self.assertEqual(root.get_tagname(), "office:document-content")
+        self.assertEqual(root.get_tag(), "office:document-content")
         self.assertNotEqual(content._odf_xmlpart__root, None)
 
 

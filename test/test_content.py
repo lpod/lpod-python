@@ -47,7 +47,7 @@ class ContentTestCase(TestCase):
 
     def test_get_body(self):
         body = self.content.get_body()
-        self.assertEqual(body.get_tagname(), 'office:text')
+        self.assertEqual(body.get_tag(), 'office:text')
 
 
     def test_get_style_list(self):

@@ -59,7 +59,7 @@ def _show_styles(element, level=0):
     # Don't show the empty elements
     if not attributes and not children:
         return None
-    tag_name = element.get_tagname()
+    tag_name = element.get_tag()
     output.append(tag_name)
     # Underline and Overline the name
     underline = underline_lvl[level] * len(tag_name)
@@ -78,7 +78,7 @@ def _show_styles(element, level=0):
         output.extend(attrs)
     # Children
     # Sort children according to their names
-    children = [(child.get_tagname(), child) for child in children]
+    children = [(child.get_tag(), child) for child in children]
     children.sort()
     children = [child for name, child in children]
     for child in children:
@@ -230,7 +230,7 @@ class odf_document(object):
         # Get the text
         result = []
         for element in body.get_children():
-            if element.get_tagname() == 'table:table':
+            if element.get_tag() == 'table:table':
                 result.append(element.get_formatted_text(context))
             else:
                 result.append(element.get_formatted_text(context))
@@ -543,7 +543,7 @@ class odf_document(object):
                 container = part.get_element("office:styles")
 
                 # Force default style
-                style.set_tagname("style:default-style")
+                style.set_tag("style:default-style")
                 if name is not None:
                     style.del_attribute("style:name")
 
@@ -583,7 +583,7 @@ class odf_document(object):
         infos = []
         for style in self.get_style_list():
             name = style.get_style_name()
-            is_auto = (style.get_parent().get_tagname()
+            is_auto = (style.get_parent().get_tag()
                     == 'office:automatic-styles')
             if (is_auto and automatic is False
                     or not is_auto and common is False):
@@ -657,14 +657,14 @@ class odf_document(object):
         styles = self.get_styles()
         content = self.get_content()
         for style in document.get_style_list():
-            tagname = style.get_tagname()
+            tagname = style.get_tag()
             family = style.get_style_family()
             if family is None:
                 family = _get_style_family(tagname)
             stylename = style.get_style_name()
             container = style.get_parent()
-            container_name = container.get_tagname()
-            partname = container.get_parent().get_tagname()
+            container_name = container.get_tag()
+            partname = container.get_parent().get_tag()
             # The destination part
             if partname == "office:document-styles":
                 part = styles

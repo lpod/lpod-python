@@ -69,12 +69,12 @@ class ParentTestCase(TestCase):
 
     def test_text(self):
         text = self.results[0]
-        self.assertEqual(text.get_parent().get_tagname(), 'text:p')
+        self.assertEqual(text.get_parent().get_tag(), 'text:p')
 
 
     def test_tail(self):
         tail = self.results[1]
-        self.assertEqual(tail.get_parent().get_tagname(), 'text:span')
+        self.assertEqual(tail.get_parent().get_tag(), 'text:span')
 
 
 

@@ -105,7 +105,7 @@ class odf_draw_page(odf_element):
     def get_formatted_text(self, context):
         result = []
         for element in self.get_children():
-            if element.get_tagname() == 'presentation:notes':
+            if element.get_tag() == 'presentation:notes':
                 # No need for an advanced odf_notes.get_formatted_text()
                 # because the text seems to be only contained in paragraphs
                 # and frames, that we already handle

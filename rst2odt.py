@@ -487,7 +487,7 @@ def _add_image(image, caption, context, width=None, height=None):
     image_style = _get_image_style(context).get_style_name()
 
     # In text application, image must be inserted in a paragraph
-    if context["top"].get_tagname() == "office:text":
+    if context["top"].get_tag() == "office:text":
         container = odf_create_paragraph()
         context["top"].append_element(container)
     else:

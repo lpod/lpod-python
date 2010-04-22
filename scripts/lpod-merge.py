@@ -78,7 +78,7 @@ def add_odt(filename, output_doc):
     src_body = document.get_body()
     output_body = output_doc.get_body()
     for element in src_body.get_children():
-        tagname = element.get_tagname()
+        tagname = element.get_tag()
         # Skip TOC, etc.
         if tagname in ('text:sequence-decls', 'text:table-of-content'):
             continue

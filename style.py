@@ -241,7 +241,7 @@ class odf_style(odf_element):
         properties = element.get_attributes()
         # Nested properties are nested dictionaries
         for child in element.get_children():
-            properties[child.get_tagname()] = child.get_attributes()
+            properties[child.get_tag()] = child.get_attributes()
         return properties
 
 
@@ -406,7 +406,7 @@ class odf_list_style(odf_style):
         # Cloning or reusing an existing element
         if clone is not None:
             level_style = clone.clone()
-            level_style_name = level_style.get_tagname()
+            level_style_name = level_style.get_tag()
             was_created = True
         else:
             level_style = self.get_level_style(level)
@@ -414,8 +414,8 @@ class odf_list_style(odf_style):
                 level_style = odf_create_element(level_style_name)
                 was_created = True
         # Transmute if the type changed
-        if level_style.get_tagname() != level_style_name:
-            level_style.set_tagname(level_style_name)
+        if level_style.get_tag() != level_style_name:
+            level_style.set_tag(level_style_name)
         # Set the level
         level_style.set_attribute('text:level', str(level))
         # Set the main attribute
@@ -517,7 +517,7 @@ class odf_master_page(odf_style):
         if not isinstance(text_or_element, (list, tuple)):
             # Already a header or footer?
             if (isinstance(text_or_element, odf_element)
-                    and text_or_element.get_tagname() == 'style:%s' % name):
+                    and text_or_element.get_tag() == 'style:%s' % name):
                 self.delete_element(header_or_footer)
                 self.append_element(text_or_element)
                 return

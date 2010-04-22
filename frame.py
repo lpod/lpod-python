@@ -270,7 +270,7 @@ class odf_frame(odf_element):
     def get_formatted_text(self, context):
         result = []
         for element in self.get_children():
-            tag = element.get_tagname()
+            tag = element.get_tag()
             if tag == 'draw:image':
                 if context['rst_mode']:
                     result.append(u'\n.. image:: %s\n' %

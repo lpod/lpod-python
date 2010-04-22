@@ -218,7 +218,7 @@ class odf_element(object):
 
     def __str__(self):
         return '%s "%s"' % (super(odf_element, self).__str__(),
-                            self.get_tagname())
+                            self.get_tag())
 
 
     def _insert(self, element, before=None, after=None, position=0):
@@ -416,14 +416,26 @@ class odf_element(object):
         raise ValueError, "end text not found"
 
 
-    def get_tagname(self):
+    def get_tag(self):
+        """Return the tag name of the element as a qualified name, e.g.
+        "text:span".
+
+        Returns: str
+        """
         element = self.__element
         return _get_prefixed_name(element.tag)
 
 
-    def set_tagname(self, qname):
-        """XXX side effects?
-        and the wrapping class won't change
+    def set_tag(self, qname):
+        """Change the tag name of the element with the given qualified name.
+        Return a new element as there may be a more appropriate class
+        afterwards. XXX side effects?
+
+        Arguments:
+
+            qname -- str
+
+        Returns: odf_element or a subclass
         """
         element = self.__element
         element.tag = '{%s}%s' % _decode_qname(qname)

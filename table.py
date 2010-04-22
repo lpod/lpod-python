@@ -1670,7 +1670,7 @@ class odf_table(odf_element):
             if body is None:
                 raise ValueError, "document type not found"
             type = {'office:spreadsheet': 'spreadsheet',
-                    'office:text': 'text'}.get(body.get_tagname())
+                    'office:text': 'text'}.get(body.get_tag())
             if type is None:
                 raise ValueError, "document type not supported for images"
         # We need the end address of the image

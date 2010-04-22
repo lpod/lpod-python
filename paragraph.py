@@ -51,7 +51,7 @@ def _get_formatted_text(element, context, with_text=True):
         if type(obj) is odf_text:
             result.append(obj)
         else:
-            tag = obj.get_tagname()
+            tag = obj.get_tag()
             # Good tags with text
             if tag in ('text:a', 'text:p'):
                 result.append(_get_formatted_text(obj, context,

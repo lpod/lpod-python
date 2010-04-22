@@ -16,6 +16,11 @@ This release XXX manifest
 Low-level API
 =============
 
+- The XML API in the odf_element class has seen many name shortenings:
+  Before       After
+  -----------  -----
+  get_tagname  get_tag
+  set_tagname  set_tag
 - "odf_element.delete_element" now accepts no argument to delete itself as a
   shortcut.
 - "odf_create_element" accepts qualified names such as "text:p" to quickly
@@ -24,5 +29,5 @@ Low-level API
 High-level API
 ==============
 
-- methods "get_heading_*" now get an "outline_level" argument instead of
+- Methods "get_heading_*" now get an "outline_level" argument instead of
   "level" for consistency and not to mix with attribute "text:level"

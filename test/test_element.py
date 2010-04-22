@@ -87,14 +87,14 @@ class ElementTestCase(TestCase):
 
     def test_get_tagname(self):
         element = self.paragraph_element
-        self.assertEqual(element.get_tagname(), 'text:p')
+        self.assertEqual(element.get_tag(), 'text:p')
 
 
     def test_get_parent(self):
         element = odf_create_element('<text:p><text:span/></text:p>')
         child = element.get_element('//text:span')
         parent = child.get_parent()
-        self.assertEqual(parent.get_tagname(), 'text:p')
+        self.assertEqual(parent.get_tag(), 'text:p')
 
 
     def test_get_root(self):
@@ -275,7 +275,7 @@ class ElementTraverseTestCase(TestCase):
     def test_get_parent(self):
         paragraph = self.paragraph_element
         parent = paragraph.get_parent()
-        self.assertEqual(parent.get_tagname(), 'text:section')
+        self.assertEqual(parent.get_tag(), 'text:section')
 
 
     def test_get_parent_root(self):
@@ -332,9 +332,9 @@ class ElementTraverseTestCase(TestCase):
         children = element.get_children()
         self.assertEqual(len(children), 4)
         child = children[0]
-        self.assertEqual(child.get_tagname(), 'dc:creator')
+        self.assertEqual(child.get_tag(), 'dc:creator')
         child = children[-1]
-        self.assertEqual(child.get_tagname(), 'text:p')
+        self.assertEqual(child.get_tag(), 'text:p')
 
 
     def test_append_element(self):
