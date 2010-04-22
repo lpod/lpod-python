@@ -60,7 +60,7 @@ def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
 
     Return: odf_toc
     """
-    element = odf_create_element('<text:table-of-content/>')
+    element = odf_create_element('text:table-of-content')
     # XXX
     if name is None:
         name = u"%s1" % title
@@ -82,10 +82,10 @@ def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
 
 def odf_create_toc_source(title=None, outline_level=10,
         title_style=u"Contents_20_Heading", entry_style=u"Contents_20_%d"):
-    element = odf_create_element('<text:table-of-content-source/>')
+    element = odf_create_element('text:table-of-content-source')
     element.set_outline_level(outline_level)
     if title:
-        title_template = odf_create_element('<text:index-title-template/>')
+        title_template = odf_create_element('text:index-title-template')
         if title_style:
             # This style is in the template document
             title_template.set_text_style(title_style)
@@ -108,7 +108,7 @@ def odf_create_toc_source(title=None, outline_level=10,
 
 
 def odf_create_index_body():
-    return odf_create_element('<text:index-body/>')
+    return odf_create_element('text:index-body')
 
 
 
@@ -122,7 +122,7 @@ def odf_create_index_title(title=None, name=None, style=None,
 
     Return: odf_element
     """
-    element = odf_create_element('<text:index-title/>')
+    element = odf_create_element('text:index-title')
     if title or text_style:
         title = odf_create_paragraph(text=title, style=text_style)
         element.append_element(title)
@@ -145,9 +145,9 @@ def odf_create_toc_level_style(level):
     tab_stop = base_tab_stop.clone()
     position = 17.5 - (0.5 * level)
     tab_stop.set_attribute('style:position', u'%dcm' % position)
-    tab_stops = odf_create_element('<style:tab-stops/>')
+    tab_stops = odf_create_element('style:tab-stops')
     tab_stops.append_element(tab_stop)
-    properties = odf_create_element('<style:paragraph-properties/>')
+    properties = odf_create_element('style:paragraph-properties')
     properties.append_element(tab_stops)
     element = odf_create_style('paragraph',
             name=TOC_ENTRY_STYLE_PATTERN % level,
@@ -198,7 +198,7 @@ class odf_toc(odf_element):
     def set_toc_outline_level(self, level):
         source = self.get_element('text:table-of-content-source')
         if source is None:
-            source = odf_create_element('<text:table-of-content-source/>')
+            source = odf_create_element('text:table-of-content-source')
             self.insert_element(source, FIRST_CHILD)
         source.set_outline_level(level)
 

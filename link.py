@@ -46,7 +46,7 @@ def odf_create_link(href, name=None, title=None, target_frame=None,
 
         visited_style -- string
     """
-    element = odf_create_element('<text:a/>')
+    element = odf_create_element('text:a')
     element.set_attribute('xlink:href', href)
     if name is not None:
         element.set_attribute('office:name', name)

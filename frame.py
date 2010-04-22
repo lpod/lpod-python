@@ -59,7 +59,7 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
 
     Return: odf_element
     """
-    element = odf_create_element('<draw:frame/>')
+    element = odf_create_element('draw:frame')
     element.set_frame_size(size)
     element.set_frame_anchor_type(anchor_type, page_number=page_number)
     if name:
@@ -140,7 +140,7 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
             page_number=page_number, position=position, style=style)
     if text_style:
         frame.set_attribute('draw:text-style-name', text_style)
-    text_box = odf_create_element('<draw:text-box/>')
+    text_box = odf_create_element('draw:text-box')
     if not isinstance(text_or_element, (list, tuple)):
         text_or_element = [text_or_element]
     for item in text_or_element:

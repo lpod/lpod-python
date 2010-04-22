@@ -34,7 +34,7 @@ def odf_create_reference_mark(name):
 
         name -- unicode
     """
-    element = odf_create_element('<text:reference-mark/>')
+    element = odf_create_element('text:reference-mark')
     element.set_attribute('text:name', name)
     return element
 
@@ -46,7 +46,7 @@ def odf_create_reference_mark_start(name):
 
         name -- unicode
     """
-    element = odf_create_element('<text:reference-mark-start/>')
+    element = odf_create_element('text:reference-mark-start')
     element.set_attribute('text:name', name)
     return element
 
@@ -58,6 +58,6 @@ def odf_create_reference_mark_end(name):
 
         name -- unicode
     """
-    element = odf_create_element('<text:reference-mark-end/>')
+    element = odf_create_element('text:reference-mark-end')
     element.set_attribute('text:name', name)
     return element

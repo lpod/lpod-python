@@ -81,7 +81,7 @@ def odf_create_annotation(text_or_element=None, creator=None, date=None):
     Return: odf_element
     """
     # TODO allow paragraph and text styles
-    element = odf_create_element('<office:annotation/>')
+    element = odf_create_element('office:annotation')
     element.set_annotation_body(text_or_element)
     if creator:
         element.set_dc_creator(creator)

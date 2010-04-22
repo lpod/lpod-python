@@ -39,6 +39,6 @@ def odf_create_image(uri):
 
     Return: odf_element
     """
-    element = odf_create_element('<draw:image/>')
+    element = odf_create_element('draw:image')
     element.set_attribute('xlink:href', uri)
     return element

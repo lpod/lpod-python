@@ -31,20 +31,22 @@ from element import odf_create_element
 
 
 def odf_create_variable_decls():
-    return odf_create_element('<text:variable-decls />')
+    return odf_create_element('text:variable-decls')
 
 
 
 def odf_create_variable_decl(name, value_type):
-    data = u'<text:variable-decl office:value-type="%s" text:name="%s"/>'
-    return odf_create_element(data % (value_type, name))
+    element = odf_create_element('text:variable-decl')
+    element.set_attribute('office:value-type', value_type)
+    element.set_attribute('text:name', name)
+    return element
 
 
 
 def odf_create_variable_set(name, value, value_type=None, display=False,
         text=None, style=None):
-    data = u'<text:variable-set text:name="%s" />'
-    element = odf_create_element(data % name)
+    element = odf_create_element('text:variable-set')
+    element.set_attribute('text:name', name)
     text = _set_value_and_type(element, value=value, value_type=value_type,
             text=text)
     if not display:
@@ -59,8 +61,8 @@ def odf_create_variable_set(name, value, value_type=None, display=False,
 
 def odf_create_variable_get(name, value, value_type=None, text=None,
         style=None):
-    data = u'<text:variable-get text:name="%s" />'
-    element = odf_create_element(data % name)
+    element = odf_create_element('text:variable-get')
+    element.set_attribute('text:name', name)
     text = _set_value_and_type(element, value=value, value_type=value_type,
             text=text)
     element.set_text(text)
@@ -71,13 +73,13 @@ def odf_create_variable_get(name, value, value_type=None, text=None,
 
 
 def odf_create_user_field_decls():
-    return odf_create_element('<text:user-field-decls />')
+    return odf_create_element('text:user-field-decls>')
 
 
 
 def odf_create_user_field_decl(name, value, value_type=None):
-    data = u'<text:user-field-decl text:name="%s"/>'
-    element = odf_create_element(data % name)
+    element = odf_create_element('text:user-field-decl')
+    element.set_attribute('text:name', name)
     _set_value_and_type(element, value=value, value_type=value_type)
     return element
 
@@ -85,8 +87,8 @@ def odf_create_user_field_decl(name, value, value_type=None):
 
 def odf_create_user_field_get(name, value, value_type=None, text=None,
         style=None):
-    data = u'<text:user-field-get text:name="%s" />'
-    element = odf_create_element(data % name)
+    element = odf_create_element('text:user-field-get')
+    element.set_attribute('text:name', name)
     text = _set_value_and_type(element, value=value, value_type=value_type,
             text=text)
     element.set_text(text)
@@ -103,7 +105,7 @@ def odf_create_page_number_variable(select_page=None, page_adjust=None):
 
     page_adjust -- int
     """
-    element = odf_create_element('<text:page-number/>')
+    element = odf_create_element('text:page-number')
     if select_page is None:
         select_page = 'current'
     element.set_attribute('text:select-page', select_page)
@@ -114,14 +116,14 @@ def odf_create_page_number_variable(select_page=None, page_adjust=None):
 
 
 def odf_create_page_count_variable():
-    return odf_create_element('<text:page-count />')
+    return odf_create_element('text:page-count')
 
 
 
 def odf_create_date_variable(date, fixed=False, data_style=None, text=None,
         date_adjust=None):
-    data = '<text:date text:date-value="%s"/>'
-    element = odf_create_element(data % DateTime.encode(date))
+    element = odf_create_element('text:date')
+    element.set_attribute('text:date-value', DateTime.encode(date))
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
@@ -138,8 +140,8 @@ def odf_create_date_variable(date, fixed=False, data_style=None, text=None,
 
 def odf_create_time_variable(time, fixed=False, data_style=None, text=None,
         time_adjust=None):
-    data = '<text:time text:time-value="%s"/>'
-    element = odf_create_element(data % DateTime.encode(time))
+    element = odf_create_element('text:time')
+    element.set_attribute('text:time-value', DateTime.encode(time))
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
@@ -178,7 +180,7 @@ def odf_create_filename_variable(display='full', fixed=False):
 
 
 def odf_create_initial_creator_variable(fixed=False):
-    element = odf_create_element('<text:initial-creator/>')
+    element = odf_create_element('text:initial-creator')
     if fixed:
         element.set_attribute('text:fixed', 'true')
     return element
@@ -186,7 +188,7 @@ def odf_create_initial_creator_variable(fixed=False):
 
 
 def odf_create_creation_date_variable(fixed=False, data_style=None):
-    element = odf_create_element('<text:creation-date/>')
+    element = odf_create_element('text:creation-date')
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
@@ -196,7 +198,7 @@ def odf_create_creation_date_variable(fixed=False, data_style=None):
 
 
 def odf_create_creation_time_variable(fixed=False, data_style=None):
-    element = odf_create_element('<text:creation-time/>')
+    element = odf_create_element('text:creation-time')
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
@@ -206,7 +208,7 @@ def odf_create_creation_time_variable(fixed=False, data_style=None):
 
 
 def odf_create_description_variable(fixed=False):
-    element = odf_create_element('<text:description/>')
+    element = odf_create_element('text:description')
     if fixed:
         element.set_attribute('text:fixed', 'true')
     return element
@@ -214,7 +216,7 @@ def odf_create_description_variable(fixed=False):
 
 
 def odf_create_title_variable(fixed=False):
-    element = odf_create_element('<text:title/>')
+    element = odf_create_element('text:title')
     if fixed:
         element.set_attribute('text:fixed', 'true')
     return element
@@ -222,7 +224,7 @@ def odf_create_title_variable(fixed=False):
 
 
 def odf_create_subject_variable(fixed=False):
-    element = odf_create_element('<text:subject/>')
+    element = odf_create_element('text:subject')
     if fixed:
         element.set_attribute('text:fixed', 'true')
     return element
@@ -230,7 +232,7 @@ def odf_create_subject_variable(fixed=False):
 
 
 def odf_create_keywords_variable(fixed=False):
-    element = odf_create_element('<text:keywords/>')
+    element = odf_create_element('text:keywords')
     if fixed:
         element.set_attribute('text:fixed', 'true')
     return element

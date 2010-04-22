@@ -147,7 +147,7 @@ def _get_formatted_text(element, context, with_text=True):
 
 
 def odf_create_line_break():
-    return odf_create_element('<text:line-break/>')
+    return odf_create_element('text:line-break')
 
 
 
@@ -160,7 +160,7 @@ def odf_create_undividable_space(number=1):
     Return odf_element
     """
     # FIXME what is number?
-    element = odf_create_element('<text:s/>')
+    element = odf_create_element('text:s')
     element.set_attribute('text:c', str(number))
     return element
 
@@ -178,7 +178,7 @@ def odf_create_paragraph(text=None, style=None):
 
     Return: odf_element
     """
-    element = odf_create_element('<text:p/>')
+    element = odf_create_element('text:p')
     if text:
         element.set_text(text)
     if style:

@@ -47,7 +47,7 @@ def odf_create_draw_page(page_id, name=None, master_page=None,
 
     Return: odf_element
     """
-    element = odf_create_element('<draw:page/>')
+    element = odf_create_element('draw:page')
     element.set_page_id(page_id)
     if name:
         element.set_page_name(name)

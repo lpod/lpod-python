@@ -262,7 +262,7 @@ def odf_create_cell(value=None, text=None, cell_type=None, currency=None,
     Return: odf_cell
     """
 
-    element = odf_create_element('<table:table-cell/>')
+    element = odf_create_element('table:table-cell')
     element.set_cell_value(value, text=text, cell_type=cell_type,
             currency=currency)
     if repeated and repeated > 1:
@@ -290,7 +290,7 @@ def odf_create_row(width=None, repeated=None, style=None):
 
     Return: odf_row
     """
-    element = odf_create_element('<table:table-row/>')
+    element = odf_create_element('table:table-row')
     if width is not None:
         for i in xrange(width):
             element.append_element(odf_create_cell())
@@ -342,7 +342,7 @@ def odf_create_column(default_cell_style=None, repeated=None, style=None):
 
     Return: odf_column
     """
-    element = odf_create_element('<table:table-column/>')
+    element = odf_create_element('table:table-column')
     if default_cell_style:
         element.set_column_default_cell_style(default_cell_style)
     if repeated and repeated > 1:
@@ -354,7 +354,7 @@ def odf_create_column(default_cell_style=None, repeated=None, style=None):
 
 
 def odf_create_header_rows():
-    return odf_create_element('<table:table-header-rows/>')
+    return odf_create_element('table:table-header-rows')
 
 
 
@@ -405,7 +405,7 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
     Return: odf_table
     """
-    element = odf_create_element('<table:table/>')
+    element = odf_create_element('table:table')
     element.set_table_name(name)
     if protected:
         if protection_key is None:

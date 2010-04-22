@@ -155,9 +155,16 @@ def odf_create_element(element_data):
         raise TypeError, "element data is not str or unicode"
     if not element_data.strip():
         raise ValueError, "element data is empty"
-    data = ns_document_data % element_data
-    root = fromstring(data)
-    return _make_odf_element(root[0])
+    if '<' in element_data:
+        # XML fragment
+        data = ns_document_data % element_data
+        root = fromstring(data)
+        element = root[0]
+    else:
+        # Qualified name
+        uri, name = _decode_qname(element_data)
+        element = Element('{%s}%s' % (uri, name), nsmap=ODF_NAMESPACES)
+    return _make_odf_element(element)
 
 
 
@@ -652,7 +659,7 @@ class odf_element(object):
             for obsolete in paragraphs:
                 obsolete.delete_element()
         else:
-            paragraph = odf_create_element('<text:p/>')
+            paragraph = odf_create_element('text:p')
             self.insert_element(paragraph, FIRST_CHILD)
         # As "get_text_content" returned all text nodes, "set_text_content"
         # will overwrite all text nodes and children that may contain them
@@ -862,7 +869,7 @@ class odf_element(object):
     def set_dc_creator(self, creator):
         dc_creator = self.get_element('descendant::dc:creator')
         if dc_creator is None:
-            dc_creator = odf_create_element('<dc:creator/>')
+            dc_creator = odf_create_element('dc:creator')
             self.append_element(dc_creator)
         dc_creator.set_text(creator)
 
@@ -878,7 +885,7 @@ class odf_element(object):
     def set_dc_date(self, date):
         dc_date = self.get_element('descendant::dc:date')
         if dc_date is None:
-            dc_date = odf_create_element('<dc:date/>')
+            dc_date = odf_create_element('dc:date')
             self.append_element(dc_date)
         dc_date.set_text(DateTime.encode(date))
 

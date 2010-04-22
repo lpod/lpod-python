@@ -46,7 +46,7 @@ def odf_create_list_item(text_or_element=None):
 
     Return: odf_element
     """
-    element = odf_create_element('<text:list-item/>')
+    element = odf_create_element('text:list-item')
     if type(text_or_element) is unicode:
         element.set_text_content(text_or_element)
     elif isinstance(text_or_element, odf_element):
@@ -72,7 +72,7 @@ def odf_create_list(text=[], style=None):
 
     Return: odf_element
     """
-    element = odf_create_element('<text:list/>')
+    element = odf_create_element('text:list')
     for value in text:
         element.append_element(odf_create_list_item(text_or_element=value))
     if style is not None:

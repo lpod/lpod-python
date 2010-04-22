@@ -45,7 +45,7 @@ def odf_create_anim_par(presentation_node_type=None, smil_begin=None):
 
         smil_begin -- indefinite, 10s, [id].click, [id].begin
     """
-    element = odf_create_element('<anim:par/>')
+    element = odf_create_element('anim:par')
     if presentation_node_type:
         element.set_attribute('presentation:node-type', presentation_node_type)
     if smil_begin:
@@ -65,7 +65,7 @@ def odf_create_anim_seq(presentation_node_type=None):
                                   after-previous, timing-root, main-sequence
                                   and interactive-sequence
     """
-    element = odf_create_element('<anim:seq/>')
+    element = odf_create_element('anim:seq')
     if presentation_node_type:
         element.set_attribute('presentation:node-type', presentation_node_type)
     return element
@@ -86,7 +86,7 @@ def odf_create_anim_transitionFilter(smil_dur=None, smil_type=None,
       smil_mode -- in, out
     """
 
-    element = odf_create_element('<anim:transitionFilter/>')
+    element = odf_create_element('anim:transitionFilter')
 
     if smil_dur:
         element.set_attribute('smil:dur', smil_dur)

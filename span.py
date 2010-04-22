@@ -42,7 +42,7 @@ def odf_create_span(text=None, style=None):
 
     Return: odf_element
     """
-    element = odf_create_element('<text:span/>')
+    element = odf_create_element('text:span')
     if text:
         element.set_text(text)
     if style:

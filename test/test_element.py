@@ -50,6 +50,11 @@ class CreateElementTestCase(TestCase):
         self.assertEqual(element.serialize(), data)
 
 
+    def test_qname(self):
+        element = odf_create_element('text:p')
+        self.assertEqual(element.serialize(), '<text:p/>')
+
+
 
 class ElementTestCase(TestCase):
 
@@ -311,14 +316,14 @@ class ElementTraverseTestCase(TestCase):
 
 
     def test_insert_element_bad_element(self):
-        element = odf_create_element('<text:p/>')
+        element = odf_create_element('text:p')
         self.assertRaises(AttributeError, element.insert_element,
                 '<text:span/>', FIRST_CHILD)
 
 
     def test_insert_element_bad_position(self):
-        element = odf_create_element('<text:p/>')
-        child = odf_create_element('<text:span/>')
+        element = odf_create_element('text:p')
+        child = odf_create_element('text:span')
         self.assertRaises(ValueError, element.insert_element, child, 999)
 
 

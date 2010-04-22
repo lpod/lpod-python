@@ -116,7 +116,7 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
     Return: odf_style
     """
     tagname, famattr = _get_style_tagname(family)
-    element = odf_create_element('<%s/>' % tagname)
+    element = odf_create_element(tagname)
     # Common attributes
     if name:
         element.set_style_name(name)
@@ -267,7 +267,7 @@ class odf_style(odf_element):
             area = self.get_style_family()
         element = self.get_element('style:%s-properties' % area)
         if element is None:
-            element = odf_create_element('<style:%s-properties/>' % area)
+            element = odf_create_element('style:%s-properties' % area)
             self.append_element(element)
         if properties or kw:
             properties = _expand_properties(_merge_dicts(properties, kw))
@@ -356,8 +356,7 @@ class odf_style(odf_element):
             return
         # Add the properties if necessary
         if properties is None:
-            properties = odf_create_element('<style:%s-properties/>'
-                                            % family)
+            properties = odf_create_element('style:%s-properties' % family)
             self.append_element(properties)
         # Add the color...
         if color:
@@ -368,7 +367,7 @@ class odf_style(odf_element):
         elif uri:
             properties.set_attribute('fo:background-color', 'transparent')
             if bg_image is None:
-                bg_image = odf_create_element('<style:background-image/>')
+                bg_image = odf_create_element('style:background-image')
                 properties.append_element(bg_image)
             bg_image.set_attribute('xlink:href',  uri)
             if position:
@@ -412,7 +411,7 @@ class odf_list_style(odf_style):
         else:
             level_style = self.get_level_style(level)
             if level_style is None:
-                level_style = odf_create_element('<%s/>' % level_style_name)
+                level_style = odf_create_element(level_style_name)
                 was_created = True
         # Transmute if the type changed
         if level_style.get_tagname() != level_style_name:
@@ -511,7 +510,7 @@ class odf_master_page(odf_style):
         else:
             header_or_footer = self.get_footer()
         if header_or_footer is None:
-            header_or_footer = odf_create_element('<style:%s/>' % name)
+            header_or_footer = odf_create_element('style:' + name)
             self.append_element(header_or_footer)
         else:
             header_or_footer.clear()
