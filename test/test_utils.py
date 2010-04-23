@@ -33,7 +33,7 @@ from unittest import TestCase, main
 from lpod.document import odf_get_document
 from lpod.table import odf_create_cell
 from lpod.utils import _make_xpath_query
-from lpod.utils import get_value, set_value, convert_unicode
+from lpod.utils import get_value, set_value, convert_unicode, oooc_to_ooow
 from lpod.variable import odf_create_variable_set, odf_create_user_field_decl
 
 class GenerateXPathTestCase(TestCase):
@@ -159,6 +159,27 @@ class get_by_position_TestCase(TestCase):
         last_paragraph = self.body.get_paragraph_by_position(-1)
         expected = u"With diacritical signs: éè"
         self.assertEqual(last_paragraph.get_text(recursive=True), expected)
+
+
+
+class FormulaConvertTestCase(TestCase):
+
+    def test_addition(self):
+        formula = "oooc:=[.A2]+[.A3]"
+        excepted = "ooow:<A2>+<A3>"
+        self.assertEqual(oooc_to_ooow(formula), excepted)
+
+
+    def test_sum(self):
+        formula = "oooc:=SUM([.B2:.B4])"
+        excepted = "ooow:sum <B2:B4>"
+        self.assertEqual(oooc_to_ooow(formula), excepted)
+
+
+    def test_addition_sum(self):
+        formula = "oooc:=[.A2]-[.A3]+SUM([.B2:.B4])*[.D4]"
+        excepted = "ooow:<A2>-<A3>+sum <B2:B4>*<D4>"
+        self.assertEqual(oooc_to_ooow(formula), excepted)
 
 
 

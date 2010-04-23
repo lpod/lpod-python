@@ -438,3 +438,22 @@ def convert_unicode(text):
         else:
             result.append(c)
     return ''.join(result)
+
+
+
+def oooc_to_ooow(formula):
+    """Convert (proprietary) formula from calc format to writer format.
+
+    Arguments:
+
+        formula -- unicode
+
+    Returns: unicode
+    """
+    prefix, formula = formula.split(":=", 1)
+    assert "ooo" in prefix
+    # Convert cell addresses
+    formula = formula.replace("[.", "<").replace(":.", ":").replace("]", ">")
+    # Convert functions
+    formula = formula.replace("SUM(", "sum ").replace(")", "")
+    return "ooow:" + formula
