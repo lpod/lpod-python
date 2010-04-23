@@ -42,6 +42,7 @@ from content import odf_content
 from manifest import odf_manifest
 from meta import odf_meta
 from style import odf_style, odf_master_page, odf_font_style
+from style import registered_styles
 from styles import odf_styles
 from utils import _get_style_family
 from vfs import vfs
@@ -679,11 +680,7 @@ class odf_document(object):
                 raise NotImplementedError, container_name
             dest = part.get_element('//%s' % container_name)
             # Implemented style types
-            if tagname not in ('style:default-style', 'style:style',
-                               'style:style', 'style:page-layout',
-                               'style:master-page', 'style:font-face',
-                               'text:list-style', 'number:number-style',
-                               'text:outline-style', 'number:date-style'):
+            if tagname not in registered_styles:
                 raise NotImplementedError, tagname
             duplicate = part.get_style(family, stylename)
             if duplicate is not None:

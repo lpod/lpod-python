@@ -57,6 +57,8 @@ context_mapping = {
         'outline': ('//office:styles',),
         'date': ('//office:automatic-styles',),
         'list': ('//office:styles',),
+        'presentation': ('//office:styles', '//office:automatic-styles'),
+        'drawing-page': ('//office:automatic-styles',),
         # FIXME Do they?
         'table': ('//office:automatic-styles',),
         'table-cell': ('//office:automatic-styles',),

@@ -146,25 +146,28 @@ def _make_xpath_query(element_name, family=None, text_style=None,
 
 # These are listed exhaustively for keeping count of
 # implemented style types
-family_mapping = {'paragraph': ('style:style', 'paragraph'),
-                  'text': ('style:style', 'text'),
-                  'section': ('style:style', 'section'),
-                  'table': ('style:style', 'table'),
-                  'table-column': ('style:style', 'table-column'),
-                  'table-row': ('style:style', 'table-row'),
-                  'table-cell': ('style:style', 'table-cell'),
-                  'drawing-page': ('style:style', 'drawing-page'),
-                  'graphic': ('style:style', 'graphic'),
-                  # False families
-                  'list': ('text:list-style', None),
-                  'outline': ('text:outline-style', None),
-                  'page-layout': ('style:page-layout', None),
-                  'master-page': ('style:master-page', None),
-                  'font-face': ('style:font-face', None),
-                  'number': ('number:number-style', None),
-                  'percentage': ('number:percentage-style', None),
-                  'time': ('number:time-style', None),
-                  'date': ('number:date-style', None)}
+family_mapping = {
+        'paragraph': ('style:style', 'paragraph'),
+        'text': ('style:style', 'text'),
+        'section': ('style:style', 'section'),
+        'table': ('style:style', 'table'),
+        'table-column': ('style:style', 'table-column'),
+        'table-row': ('style:style', 'table-row'),
+        'table-cell': ('style:style', 'table-cell'),
+        'drawing-page': ('style:style', 'drawing-page'),
+        'graphic': ('style:style', 'graphic'),
+        'presentation': ('style:style', 'presentation'),
+        # False families
+        'list': ('text:list-style', None),
+        'outline': ('text:outline-style', None),
+        'page-layout': ('style:page-layout', None),
+        'master-page': ('style:master-page', None),
+        'font-face': ('style:font-face', None),
+        'number': ('number:number-style', None),
+        'percentage': ('number:percentage-style', None),
+        'time': ('number:time-style', None),
+        'date': ('number:date-style', None),
+}
 
 
 def _get_style_tagname(family):

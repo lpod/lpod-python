@@ -713,19 +713,27 @@ def odf_create_default_currency_style():
 
 
 
+registered_styles = []
+
+
+def register_style(tagname, cls):
+    register_element_class(tagname, cls)
+    registered_styles.append(tagname)
+
+
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
-             'style:footer-style', 'text:list-level-style-number',
-             'text:list-level-style-bullet', 'text:list-level-style-image',
-             'style:presentation-page-layout'):
-    register_element_class(name, odf_style)
-register_element_class('text:list-style', odf_list_style)
-register_element_class('text:outline-style', odf_outline_style)
-register_element_class('style:page-layout', odf_page_layout)
-register_element_class('style:master-page', odf_master_page)
-register_element_class('style:font-face', odf_font_style)
-register_element_class('number:number-style', odf_number_style)
-register_element_class('number:percentage-style', odf_percentage_style)
-register_element_class('number:time-style', odf_time_style)
-register_element_class('number:date-style', odf_date_style)
-register_element_class('number:currency-style', odf_currency_style)
+        'style:footer-style', 'text:list-level-style-number',
+        'text:list-level-style-bullet', 'text:list-level-style-image',
+        'style:presentation-page-layout'):
+    register_style(name, odf_style)
+register_style('text:list-style', odf_list_style)
+register_style('text:outline-style', odf_outline_style)
+register_style('style:page-layout', odf_page_layout)
+register_style('style:master-page', odf_master_page)
+register_style('style:font-face', odf_font_style)
+register_style('number:number-style', odf_number_style)
+register_style('number:percentage-style', odf_percentage_style)
+register_style('number:time-style', odf_time_style)
+register_style('number:date-style', odf_date_style)
+register_style('number:currency-style', odf_currency_style)
