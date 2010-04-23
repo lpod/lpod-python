@@ -41,8 +41,16 @@ ODF_TYPES = {
         'text': 'templates/text.ott',
         'spreadsheet': 'templates/spreadsheet.ots',
         'presentation': 'templates/presentation.otp',
+        # Follow the spec
         'drawing': 'templates/drawing.otg',
+        # Follow the mimetype
+        'graphics': 'templates/drawing.otg',
         # TODO
+        #'chart': 'templates/chart.otc',
+        #'image': 'templates/image.oti',
+        #'formula': 'templates/image.otf',
+        #'master': 'templates/image.odm',
+        #'web': 'templates/image.oth',
 }
 
 
@@ -55,7 +63,15 @@ ODF_EXTENSIONS = {
         'odp': 'application/vnd.oasis.opendocument.presentation',
         'otp': 'application/vnd.oasis.opendocument.presentation-template',
         'odg': 'application/vnd.oasis.opendocument.graphics',
-        'otg': 'application/vnd.oasis.opendocument.graphics-template'
+        'otg': 'application/vnd.oasis.opendocument.graphics-template',
+        'odc': 'application/vnd.oasis.opendocument.chart',
+        'otc': 'application/vnd.oasis.opendocument.chart-template',
+        'odi': 'application/vnd.oasis.opendocument.image',
+        'oti': 'application/vnd.oasis.opendocument.image-template',
+        'odf': 'application/vnd.oasis.opendocument.formula',
+        'otf': 'application/vnd.oasis.opendocument.formula-template',
+        'odm': 'application/vnd.oasis.opendocument.text-master',
+        'oth': 'application/vnd.oasis.opendocument.text-web',
 }
 
 
@@ -69,6 +85,14 @@ ODF_MIMETYPES = {
         'application/vnd.oasis.opendocument.presentation-template': 'otp',
         'application/vnd.oasis.opendocument.graphics': 'odg',
         'application/vnd.oasis.opendocument.graphics-template': 'otg',
+        'application/vnd.oasis.opendocument.chart': 'odc',
+        'application/vnd.oasis.opendocument.chart-template': 'otc',
+        'application/vnd.oasis.opendocument.image': 'odi',
+        'application/vnd.oasis.opendocument.image-template': 'oti',
+        'application/vnd.oasis.opendocument.formula': 'odf',
+        'application/vnd.oasis.opendocument.formula-template': 'otf',
+        'application/vnd.oasis.opendocument.text-master': 'odm',
+        'application/vnd.oasis.opendocument.text-web': 'oth',
 }
 
 
