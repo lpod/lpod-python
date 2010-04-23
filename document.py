@@ -590,7 +590,7 @@ class odf_document(object):
             is_used = bool(self.get_styled_elements(name))
             infos.append({'type': u"auto  " if is_auto else u"common",
                           'used': u"y" if is_used else u"n",
-                          'family': style.get_style_family(),
+                          'family': style.get_style_family() or u"",
                           'parent': style.get_parent_style_name() or u"",
                           'name': name or u"",
                           'display_name': style.get_style_display_name(),
