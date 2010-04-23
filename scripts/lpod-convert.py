@@ -36,6 +36,7 @@ from lpod import __version__
 from lpod.container import ODF_EXTENSIONS
 from lpod.document import odf_get_document, odf_new_document_from_type
 from lpod.paragraph import odf_create_paragraph
+from lpod.rst2odt import convert as rst_convert
 from lpod.table import odf_create_table, odf_create_row
 from lpod.utils import oooc_to_ooow
 from lpod.vfs import vfs
@@ -91,6 +92,11 @@ class Converter(object):
                         default=default)
 
 
+    @staticmethod
+    def txt_to_text(indoc, outdoc):
+        rst_convert(outdoc, indoc)
+
+
 
 def get_extension(filename):
     root, ext = splitext(filename)
@@ -102,9 +108,9 @@ def get_extension(filename):
 if  __name__ == '__main__':
     # Options initialisation
     usage = "%prog <INFILE> <OUTFILE>"
-    description = ("Convert an OpenDocument to another format. "
-            "Possible combinations:"
-            "    ods -> odt (convert tables and formulas)")
+    description = ("Convert an OpenDocument to another format. Possible "
+            "combinations: ods to odt (tables and styles), and txt to odt "
+            "(reStructuredText format)")
     parser = OptionParser(usage, version=__version__, description=description)
     # Parse !
     opts, args = parser.parse_args()
@@ -112,10 +118,16 @@ if  __name__ == '__main__':
     if len(args) != 2:
         parser.print_help()
         exit(1)
-    # Open documents
+    # Open input document
     infile = args[0]
-    indoc = odf_get_document(infile)
-    intype = indoc.get_type()
+    extension = get_extension(infile)
+    if extension == 'txt':
+        indoc = open(infile).read()
+        intype = 'txt'
+    else:
+        indoc = odf_get_document(infile)
+        intype = indoc.get_type()
+    # Open output document
     outfile = args[1]
     extension = get_extension(outfile)
     try:
@@ -128,12 +140,12 @@ if  __name__ == '__main__':
     outdoc = odf_new_document_from_type(outtype)
     # Convert function
     name = '%s_to_%s' % (intype, outtype)
-    convertor = getattr(Converter, name, None)
-    if convertor is None:
-        NotImplementedError, "unsupported combination"
+    converter = getattr(Converter, name, None)
+    if converter is None:
+        raise NotImplementedError, "unsupported combination"
     # Remove output file
     if vfs.exists(outfile):
         vfs.remove(outfile)
     # Convert!
-    convertor(indoc, outdoc)
+    converter(indoc, outdoc)
     outdoc.save(outfile)
