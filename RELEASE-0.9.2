@@ -7,7 +7,9 @@ Definition of a Free Software API implementing the ISO/IEC 26300 standard.
 Development, for higher level use cases, in Python, Perl and Ruby languages.
 of a top-down oriented API.
 
-This release XXX manifest
+This release adds preliminary support for the manifest, and scripts CLI is
+more homogeneous. A new script lpod-convert converts documents from one format
+to another (currently ods to odt, and reStructuredText to odt).
 
 - Web: http://lpod-project.org
 - Documentation: http://docs.lpod-project.org
@@ -34,3 +36,8 @@ High-level API
 
 - Methods "get_heading_*" now get an "outline_level" argument instead of
   "level" for consistency and not to mix with attribute "text:level"
+- Most scripts now write to the standard output, and provide "-o" option.
+  Exceptions and lpod-highlight (in-place) and lpod-mm2odt (foo.mm ->
+  foo.odt).
+- lpod-merge now merges documents in the first document provided, so this one
+  provides the styles.
