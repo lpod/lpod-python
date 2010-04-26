@@ -62,14 +62,3 @@ if  __name__ == "__main__":
 
     # Finish me :-)
     run_command(["odflint"])
-
-
-
-
-
-
-
-
-
-
-

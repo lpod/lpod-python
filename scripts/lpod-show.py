@@ -33,6 +33,7 @@ from sys import exit, stdout, stdin
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
+from lpod.scriptutils import add_option_output
 from lpod.vfs import vfs
 
 
@@ -124,26 +125,20 @@ if  __name__ == '__main__':
                    "in '-o <dir-name>' mode)")
     parser = OptionParser(usage, version=__version__,
             description=description)
-    # --output
-    parser.add_option('-o', '--output', action='store', type='string',
-                      dest='output', metavar='DIRNAME',
-                      help="dump output the files in the given directory.")
     # --meta
-    parser.add_option('-m', '--meta', dest='meta', action='store_true',
-                      default=False,
-                      help='dump metadata in stdout')
+    parser.add_option('-m', '--meta', action='store_true', default=False,
+            help='dump metadata in stdout')
     # --styles
-    parser.add_option('-s', '--styles', dest='styles', action='store_true',
-                      default=False,
-                      help='dump styles in stdout')
+    parser.add_option('-s', '--styles', action='store_true', default=False,
+            help='dump styles in stdout')
     # --no-content
-    parser.add_option('-n', '--no-content', dest='no_content',
-                      action='store_true', default=False,
-                      help='do not dump content in stdout')
+    parser.add_option('-n', '--no-content', action='store_true',
+            default=False, help='do not dump content in stdout')
     # --rst
-    parser.add_option('-r', '--rst', dest='rst',
-                      action='store_true', default=False,
-                      help='Dump the content file with a reST syntax')
+    parser.add_option('-r', '--rst', action='store_true', default=False,
+            help='Dump the content file with a reST syntax')
+    # --output
+    add_option_output(parser)
     # Parse !
     opts, args = parser.parse_args()
     # Container

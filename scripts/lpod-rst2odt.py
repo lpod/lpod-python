@@ -27,12 +27,13 @@
 
 # Import from the Standard Library
 from optparse import OptionParser
-from sys import exit, stdout
+from sys import exit
 
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.rst2odt import rst2odt
+from lpod.scriptutils import add_option_output, StdoutWriter
 
 
 
@@ -43,19 +44,15 @@ if  __name__ == "__main__":
     parser = OptionParser(usage, version=__version__,
             description=description)
 
-    # --output
-    parser.add_option("-o", "--output", action="store", type="string",
-            dest="output", metavar="FILE",
-            help="dump the output into the file FILE instead of the standard "
-                 "output")
-
     # --styles
-    parser.add_option("-s", "--styles", action="store", type="string",
-            dest="styles_from", metavar="FILE",
-            help="import the styles from the given file")
+    help = "import the styles from the given file"
+    parser.add_option("-s", "--styles", dest="styles_from", metavar="FILE",
+            help=help)
+    # --output
+    add_option_output(parser)
 
     # Parse !
-    opts, args = parser.parse_args()
+    options, args = parser.parse_args()
 
     # Source
     if len(args) != 1:
@@ -63,15 +60,16 @@ if  __name__ == "__main__":
         exit(1)
     source = args[0]
 
+    # Template
     template = None
-    if opts.styles_from:
-        template = odf_get_document(opts.styles_from)
+    if options.styles_from:
+        template = odf_get_document(options.styles_from)
 
     # Convert
     document = rst2odt(open(source).read(), template=template)
 
     # Save
-    if opts.output is not None:
-        document.save(target=opts.output)
-    else:
-        document.save(target=stdout)
+    target = options.output
+    if target is None:
+        target = StdoutWriter()
+    document.save(target=target)

@@ -29,33 +29,37 @@
 # Import from the standard library
 from optparse import OptionParser
 from os.path import basename, splitext
-from sys import exit, stdout
+from sys import exit, stdout, stderr
 
 # Import from lpod
 from lpod import __version__
+from lpod.container import ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION
 from lpod.document import odf_new_document_from_type, odf_get_document
-from lpod.toc import odf_create_toc
-from lpod.vfs import vfs
 from lpod.table import import_from_csv
+from lpod.toc import odf_create_toc
+from lpod.scriptutils import add_option_output, StdoutWriter
+from lpod.vfs import vfs
 
+
+CSV_SHORT = 'text/csv'
+CSV_LONG = 'text/comma-separated-values'
 
 
 def init_doc(mimetype):
-    # Text mode
-    if mimetype == "application/vnd.oasis.opendocument.text":
+    if mimetype == ODF_TEXT:
+        # Text mode
         output_doc = odf_new_document_from_type("text")
-
         # Begin with a TOC
         output_body = output_doc.get_body()
         output_body.append(odf_create_toc())
-    # Spreadsheet mode
-    elif mimetype in ("application/vnd.oasis.opendocument.spreadsheet",
-                      "text/csv"):
+    elif mimetype in (ODF_SPREADSHEET, CSV_SHORT, CSV_LONG):
+        # Spreadsheet mode
         output_doc = odf_new_document_from_type("spreadsheet")
-    # Presentation mode
-    else:
+    elif mimetype == ODF_PRESENTATION:
+        # Presentation mode
         output_doc = odf_new_document_from_type("presentation")
-
+    else:
+        raise NotImplementedError, mimetype
     return output_doc
 
 
@@ -176,6 +180,13 @@ def add_odp(filename, output_doc):
 
 
 
+def exit_incompatible(filename, type):
+    print >> stderr, 'Cannot merge "%s" in %s document, exiting.' % (
+            filename, type)
+    exit(1)
+
+
+
 if  __name__ == '__main__':
     # Options initialisation
     usage = "%prog <file1> [<file2> ...]"
@@ -183,18 +194,15 @@ if  __name__ == '__main__':
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --output
-    parser.add_option('-o', '--output', action='store', type='string',
-            dest='output', metavar='FILE', default=None,
-            help="Place output in file FILE (out.od[t|s|p] by default)")
+    add_option_output(parser)
 
     # Parse !
-    opts, filenames = parser.parse_args()
+    options, filenames = parser.parse_args()
 
     # Arguments
     if not filenames:
         parser.print_help()
         exit(1)
-    output_filename = opts.output
     output_doc = None
 
     # Concatenate content in the output doc
@@ -207,10 +215,8 @@ if  __name__ == '__main__':
 
         # A good file => Only text, spreadsheet and CSV
         mimetype = vfs.get_mimetype(filename)
-        if mimetype not in ("application/vnd.oasis.opendocument.text",
-                            "application/vnd.oasis.opendocument.spreadsheet",
-                            "text/csv",
-                            "application/vnd.oasis.opendocument.presentation"):
+        if mimetype not in (ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION,
+                CSV_SHORT, CSV_LONG):
             print 'Skip "%s" with mimetype "%s"' % (filename, mimetype)
             continue
 
@@ -218,48 +224,41 @@ if  __name__ == '__main__':
         if output_doc is None:
             # Create an empty doc
             output_doc = init_doc(mimetype)
-            output_mimetype = output_doc.get_type()
-            print '%s documents detected' % output_mimetype.title()
+            output_type = output_doc.get_type()
+            print '%s document detected' % output_type.title()
 
-            # Make the filename
-            if output_filename is None:
-                output_filename = "out.od%s" % output_mimetype[0]
-            if vfs.exists(output_filename):
-                vfs.remove(output_filename)
-
-        # Add a text doc
-        if mimetype == "application/vnd.oasis.opendocument.text":
-            if output_mimetype != "text":
-                print "We cannot merge a mix of text/spreadsheet/presentation!"
-                exit(1)
+        if mimetype == ODF_TEXT:
+            # Add a text doc
+            if output_type != 'text':
+                exit_incompatible(filename, output_type)
             add_odt(filename, output_doc)
-        # Add a spreadsheet doc
-        elif mimetype in ("application/vnd.oasis.opendocument.spreadsheet",
-                          "text/csv"):
-            if output_mimetype != "spreadsheet":
-                print "We cannot merge a mix of text/spreadsheet/presentation!"
-                exit(1)
-            # CSV ?
-            if mimetype == "text/csv":
+        elif mimetype in (ODF_SPREADSHEET, CSV_SHORT, CSV_LONG):
+            # Add a spreadsheet doc
+            if output_type != 'spreadsheet':
+                exit_incompatible(filename, output_type)
+            # CSV?
+            if mimetype in (CSV_SHORT, CSV_LONG):
                 add_csv(filename, output_doc)
             else:
                 add_ods(filename, output_doc)
-        # Add a presentation doc
-        else:
-            if output_mimetype != "presentation":
-                print "We cannot merge a mix of text/spreadsheet/presentation!"
-                exit(1)
+        elif mimetype == ODF_PRESENTATION:
+            # Add a presentation doc
+            if output_type != 'presentation':
+                exit_incompatible(filename, output_type)
             add_odp(filename, output_doc)
 
     # Extra for odt
-    if output_mimetype == 'text':
+    if output_type == 'text':
         output_body = output_doc.get_body()
         toc = output_body.get_toc()
         toc.toc_fill()
 
     # Save
     if output_doc is not None:
-        output_doc.save(output_filename, pretty=True)
-        print 'Document "%s" generated' % output_filename
+        target = options.output
+        if target is None:
+            target = StdoutWriter()
+        output_doc.save(target=target, pretty=True)
+        print 'Document "%s" generated' % target
     else:
         print "Nothing to save, ..."

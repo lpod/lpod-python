@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
 #          Romain Gauthier <romain@itaapy.com>
@@ -33,33 +33,36 @@ from sys import exit, stdout
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
+from lpod.scriptutils import add_option_output, StdoutWriter
 
 
-def show_styles(document, automatic=True, common=True, properties=False):
+def show_styles(document, target, automatic=True, common=True,
+        properties=False):
     """Show the different styles of a document and their properties.
     """
     output = document.show_styles(automatic=automatic, common=common,
             properties=properties)
-    # Print the styles
-    encoding = stdout.encoding if stdout.encoding is not None else 'utf-8'
-    stdout.write(output.encode(encoding))
-    stdout.flush()
+    # Print the output
+    if target is None:
+        target = stdout
+    encoding = target.encoding if target.encoding is not None else 'utf-8'
+    target.write(output.encode(encoding))
+    target.flush()
 
 
 
 def delete_styles(document, target, pretty=True):
-    output = document.clone()
-    n = output.delete_styles()
-    output.save(target=target, pretty=pretty)
+    n = document.delete_styles()
+    document.save(target=target, pretty=pretty)
     print n, "styles removed (0 error, 0 warning)."
 
 
 
-def merge_styles(document, from_file, pretty=True):
+def merge_styles(document, from_file, target=None, pretty=True):
     source = odf_get_document(from_file)
     document.delete_styles()
     document.merge_styles_from(source)
-    document.save(pretty=pretty)
+    document.save(target=target, pretty=pretty)
     print "Done (0 error, 0 warning)."
 
 
@@ -72,25 +75,25 @@ if  __name__ == '__main__':
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --automatic
-    parser.add_option('-a', '--automatic', dest='automatic',
-            action='store_true', default=False,
+    parser.add_option('-a', '--automatic', action='store_true', default=False,
             help="show automatic styles only")
     # --common
-    parser.add_option('-c', '--common', dest='common', action='store_true',
-            default=False, help="show common styles only")
+    parser.add_option('-c', '--common', action='store_true', default=False,
+            help="show common styles only")
     # --properties
-    parser.add_option('-p', '--properties', dest='properties',
-            action='store_true', help="show properties of styles")
+    parser.add_option('-p', '--properties', action='store_true',
+            help="show properties of styles")
     # --delete
-    help = ("delete all styles (except default) from <file> "
-            "and store it in FILE")
-    parser.add_option('-d', '--delete', dest='delete',
-            action='store', metavar='FILE', help=help)
+    help = ("return a copy with all styles (except default) deleted from "
+            "<file>")
+    parser.add_option('-d', '--delete', action='store_true', help=help)
     # --merge
     help = ('copy styles from FILE to <file>. Any style with the same name '
             'will be replaced.')
     parser.add_option('-m', '--merge-styles-from', dest='merge',
-            action='store', metavar='FILE', help=help)
+            metavar='FILE', help=help)
+    # --output
+    add_option_output(parser)
     # Parse options
     options, args = parser.parse_args()
     if len(args) != 1:
@@ -98,13 +101,19 @@ if  __name__ == '__main__':
         exit(1)
     document = odf_get_document(args[0])
     if options.delete:
-        delete_styles(document, options.delete)
+        target = options.output
+        if target is None:
+            target = StdoutWriter()
+        delete_styles(document, target)
     elif options.merge:
-        merge_styles(document, options.merge)
+        merge_styles(document, options.merge, target=options.output)
     else:
         automatic = options.automatic
         common = options.common
         if not automatic ^ common:
             automatic, common = True, True
-        show_styles(document, automatic=automatic, common=common,
-                properties=options.properties)
+        target = options.output
+        if target is not None:
+            target = open(target, 'w')
+        show_styles(document, target, automatic=automatic,
+                common=common, properties=options.properties)

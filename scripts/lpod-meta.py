@@ -85,10 +85,9 @@ if  __name__ == '__main__':
     parser = OptionParser(usage, version=__version__, description=description)
 
     # Set
+    help = 'Replace and/or set the metadata NAME with the value VALUE'
     parser.add_option('-s', '--set', action='append', dest='set_list',
-                      metavar='NAME=VALUE',
-                      help='Replace and/or set the metadata NAME with the '
-                           'value VALUE')
+            metavar='NAME=VALUE', help=help)
 
     # Parse !
     opts, args = parser.parse_args()

@@ -39,6 +39,7 @@ from lpod import __version__
 from lpod.toc import odf_create_toc
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
+from lpod.scriptutils import add_option_output
 from lpod.vfs import vfs
 
 
@@ -79,16 +80,15 @@ if  __name__ == '__main__':
     # Options initialisation
     usage = '%prog <file>'
     description = 'Transform a mind-map file to an OpenDocument Text file.'
-    oparser = OptionParser(usage, version=__version__,
-                           description=description)
-    help = 'place output in the specified file.'
-    oparser.add_option('-o', '--output', dest='output', metavar='<output>',
-                       action='store', help=help)
+    parser = OptionParser(usage, version=__version__,
+            description=description)
+    # --output
+    add_option_output(parser)
 
     # Parse options
-    opts, args = oparser.parse_args()
+    opts, args = parser.parse_args()
     if len(args) < 1:
-        oparser.print_help()
+        parser.print_help()
         exit(1)
 
     # Get the 2 URLs

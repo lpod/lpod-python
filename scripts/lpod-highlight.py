@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
 #
@@ -32,12 +32,13 @@ from sys import exit, stdin
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
+from lpod.scriptutils import add_option_output
 from lpod.style import odf_create_style
 from lpod.styles import rgb2hex
 
 
 def highlight(odf_file_url, pattern, color=None, background_color=None,
-              italic=False, bold=False, pretty=True):
+              italic=False, bold=False, target=None, pretty=True):
 
     # Make display_name and name
     display_name = [u"Highlight"]
@@ -73,7 +74,7 @@ def highlight(odf_file_url, pattern, color=None, background_color=None,
                 'text:index-body'):
             continue
         paragraph.set_span(name, regex=pattern)
-    document.save(pretty=pretty)
+    document.save(target=target, pretty=pretty)
     print (i + 1), "paragraphs changed (0 error, 0 warning)."
 
 
@@ -91,21 +92,22 @@ if  __name__ == '__main__':
     help = ("the name or #rrggbb color of the font color: black, blue, "
             "brown, cyan, green, grey, magenta, orange, pink, red, violet, "
             "white, yellow or none (default)")
-    parser.add_option('-c', '--color', dest='color', action='store',
-            default='none', metavar='COLOR', help=help)
+    parser.add_option('-c', '--color', default='none', metavar='COLOR',
+            help=help)
     # --background
     help = ("the name or #rrggbb color of the background color: black, "
             "blue, brown, cyan, green, grey, magenta, orange, pink, red, "
             "violet, white, yellow (default) or none")
-    parser.add_option('-g', '--background', dest='background',
-            action='store', default='yellow', metavar='BACKGROUND',
-            help=help)
+    parser.add_option('-g', '--background', default='yellow',
+            metavar='BACKGROUND', help=help)
     # --italic
     parser.add_option('-i', '--italic', dest='italic', action='store_true',
             default=False, help='set the italic font style')
     # --bold
     parser.add_option('-b', '--bold', dest='bold', action='store_true',
             default=False, help='set the bold font weight')
+    # --output
+    add_option_output(parser)
     # Parse options
     options, args = parser.parse_args()
     if len(args) != 2:
@@ -115,4 +117,4 @@ if  __name__ == '__main__':
     pattern = unicode(pattern, stdin.encoding)
     document = odf_get_document(odf_file_url)
     highlight(document, pattern, options.color, options.background,
-            options.italic, options.bold)
+            options.italic, options.bold, target=options.output)
