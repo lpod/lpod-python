@@ -35,6 +35,7 @@ from sys import exit, stdout, stderr
 from lpod import __version__
 from lpod.container import ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION
 from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.element import FIRST_CHILD
 from lpod.table import import_from_csv
 from lpod.toc import odf_create_toc
 from lpod.scriptutils import add_option_output, StdoutWriter
@@ -45,19 +46,16 @@ CSV_SHORT = 'text/csv'
 CSV_LONG = 'text/comma-separated-values'
 
 
-def init_doc(mimetype):
-    if mimetype == ODF_TEXT:
-        # Text mode
-        output_doc = odf_new_document_from_type("text")
-        # Begin with a TOC
-        output_body = output_doc.get_body()
-        output_body.append(odf_create_toc())
-    elif mimetype in (ODF_SPREADSHEET, CSV_SHORT, CSV_LONG):
-        # Spreadsheet mode
-        output_doc = odf_new_document_from_type("spreadsheet")
-    elif mimetype == ODF_PRESENTATION:
-        # Presentation mode
-        output_doc = odf_new_document_from_type("presentation")
+def init_doc(filename, mimetype):
+    if mimetype in (ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION):
+        output_doc = odf_get_document(filename)
+        if mimetype == ODF_TEXT:
+            # Extra for text: begin with a TOC
+            output_body = output_doc.get_body()
+            output_body.insert(odf_create_toc(), FIRST_CHILD)
+    elif mimetype in (CSV_SHORT, CSV_LONG):
+        output_doc = odf_new_document_from_type('spreadsheet')
+        add_csv(filename, output_doc)
     else:
         raise NotImplementedError, mimetype
     return output_doc
@@ -66,12 +64,15 @@ def init_doc(mimetype):
 
 def _add_pictures(document, output_doc):
     # Copy extra parts (images...)
-    container = document.container
-    for partname in container.get_parts():
+    manifest = output_doc.get_manifest()
+    document_manifest = document.get_manifest()
+    for partname in document.get_parts():
         if partname.startswith('Pictures/'):
-            data = container.get_part(partname)
-            # Suppose uniqueness
-            output_doc.container.set_part(partname, data)
+            data = document.get_part(partname)
+            # Manually add the part to keep the name (suppose uniqueness)
+            output_doc.set_part(partname, data)
+            media_type = document_manifest.get_media_type(partname)
+            manifest.add_full_path(partname, media_type)
 
 
 
@@ -91,9 +92,6 @@ def add_odt(filename, output_doc):
 
     # Add pictures/
     _add_pictures(document, output_doc)
-
-    # TODO embedded objects
-    print 'Add "%s"' % filename
 
 
 
@@ -131,8 +129,6 @@ def add_ods(filename, output_doc):
     # Add pictures/
     _add_pictures(document, output_doc)
 
-    print 'Add "%s"' % filename
-
 
 
 def add_csv(filename, output_doc):
@@ -145,7 +141,6 @@ def add_csv(filename, output_doc):
     table = import_from_csv(filename, name)
 
     output_body.append(table)
-    print 'Add "%s"' % filename
 
 
 
@@ -176,14 +171,11 @@ def add_odp(filename, output_doc):
     # Add pictures/
     _add_pictures(document, output_doc)
 
-    print 'Add "%s"' % filename
 
 
-
-def exit_incompatible(filename, type):
-    print >> stderr, 'Cannot merge "%s" in %s document, exiting.' % (
+def print_incompatible(filename, type):
+    print >> stderr, 'Cannot merge "%s" in %s document, skipping.' % (
             filename, type)
-    exit(1)
 
 
 
@@ -204,38 +196,41 @@ if  __name__ == '__main__':
         parser.print_help()
         exit(1)
     output_doc = None
+    output_type = None
 
     # Concatenate content in the output doc
     for filename in filenames:
 
         # Exists ?
         if not vfs.exists(filename):
-            print "Skip", filename, "not existing"
+            print >> stderr, "Skip", filename, "not existing"
             continue
 
         # A good file => Only text, spreadsheet and CSV
         mimetype = vfs.get_mimetype(filename)
         if mimetype not in (ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION,
                 CSV_SHORT, CSV_LONG):
-            print 'Skip "%s" with mimetype "%s"' % (filename, mimetype)
+            print >> stderr, 'Skip "%s" with unknown mimetype "%s"' % (
+                    filename, mimetype)
             continue
 
         # Not yet an output_doc ?
         if output_doc is None:
-            # Create an empty doc
-            output_doc = init_doc(mimetype)
+            # Use the first doc as the output_doc
+            output_doc = init_doc(filename, mimetype)
             output_type = output_doc.get_type()
-            print '%s document detected' % output_type.title()
-
-        if mimetype == ODF_TEXT:
+            print >> stderr, '%s document detected' % output_type.title()
+        elif mimetype == ODF_TEXT:
             # Add a text doc
             if output_type != 'text':
-                exit_incompatible(filename, output_type)
+                print_incompatible(filename, output_type)
+                continue
             add_odt(filename, output_doc)
         elif mimetype in (ODF_SPREADSHEET, CSV_SHORT, CSV_LONG):
             # Add a spreadsheet doc
             if output_type != 'spreadsheet':
-                exit_incompatible(filename, output_type)
+                print_incompatible(filename, output_type)
+                continue
             # CSV?
             if mimetype in (CSV_SHORT, CSV_LONG):
                 add_csv(filename, output_doc)
@@ -244,8 +239,10 @@ if  __name__ == '__main__':
         elif mimetype == ODF_PRESENTATION:
             # Add a presentation doc
             if output_type != 'presentation':
-                exit_incompatible(filename, output_type)
+                print_incompatible(filename, output_type)
+                continue
             add_odp(filename, output_doc)
+        print >> stderr, 'Add "%s"' % filename
 
     # Extra for odt
     if output_type == 'text':
@@ -259,6 +256,5 @@ if  __name__ == '__main__':
         if target is None:
             target = StdoutWriter()
         output_doc.save(target=target, pretty=True)
-        print 'Document "%s" generated' % target
-    else:
-        print "Nothing to save, ..."
+        if options.output:
+            print 'Document "%s" generated' % options.output
