@@ -47,9 +47,10 @@ def show_styles(document, automatic=True, common=True, properties=False):
 
 
 
-def delete_styles(document, pretty=True):
-    n = document.delete_styles()
-    document.save(pretty=pretty)
+def delete_styles(document, target, pretty=True):
+    output = document.clone()
+    n = output.delete_styles()
+    output.save(target=target, pretty=pretty)
     print n, "styles removed (0 error, 0 warning)."
 
 
@@ -81,8 +82,10 @@ if  __name__ == '__main__':
     parser.add_option('-p', '--properties', dest='properties',
             action='store_true', help="show properties of styles")
     # --delete
+    help = ("delete all styles (except default) from <file> "
+            "and store it in FILE")
     parser.add_option('-d', '--delete', dest='delete',
-            action='store_true', help="delete all styles (except default)")
+            action='store', metavar='FILE', help=help)
     # --merge
     help = ('copy styles from FILE to <file>. Any style with the same name '
             'will be replaced.')
@@ -95,7 +98,7 @@ if  __name__ == '__main__':
         exit(1)
     document = odf_get_document(args[0])
     if options.delete:
-        delete_styles(document)
+        delete_styles(document, options.delete)
     elif options.merge:
         merge_styles(document, options.merge)
     else:
