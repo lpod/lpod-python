@@ -29,11 +29,9 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.container import ODF_PRESENTATION
 from lpod.document import odf_get_document
 from lpod.manifest import odf_manifest
-
-
-ODP_MEDIA_TYPE = 'application/vnd.oasis.opendocument.presentation'
 
 
 class ManifestTestCase(TestCase):
@@ -57,11 +55,11 @@ class ManifestTestCase(TestCase):
         results = self.manifest.get_path_media_list()
         self.assertEqual(len(results), 20)
         root = results[0]
-        self.assertEqual(root, ('/', ODP_MEDIA_TYPE))
+        self.assertEqual(root, ('/', ODF_PRESENTATION))
 
 
     def test_get_media_type_root(self):
-        self.assertEqual(self.manifest.get_media_type('/'), ODP_MEDIA_TYPE)
+        self.assertEqual(self.manifest.get_media_type('/'), ODF_PRESENTATION)
 
 
     def test_get_media_type_directory(self):

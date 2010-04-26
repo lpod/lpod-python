@@ -54,45 +54,63 @@ ODF_TYPES = {
 }
 
 
+ODF_TEXT = 'application/vnd.oasis.opendocument.text'
+ODF_TEXT_TEMPLATE = 'application/vnd.oasis.opendocument.text-template'
+ODF_SPREADSHEET = 'application/vnd.oasis.opendocument.spreadsheet'
+ODF_SPREADSHEET_TEMPLATE = 'application/vnd.oasis.opendocument.spreadsheet-template'
+ODF_PRESENTATION = 'application/vnd.oasis.opendocument.presentation'
+ODF_PRESENTATION_TEMPLATE = 'application/vnd.oasis.opendocument.presentation-template'
+ODF_DRAWING = 'application/vnd.oasis.opendocument.graphics'
+ODF_DRAWING_TEMPLATE = 'application/vnd.oasis.opendocument.graphics-template'
+ODF_CHART = 'application/vnd.oasis.opendocument.chart'
+ODF_CHART_TEMPLATE = 'application/vnd.oasis.opendocument.chart-template'
+ODF_IMAGE = 'application/vnd.oasis.opendocument.image'
+ODF_IMAGE_TEMPLATE = 'application/vnd.oasis.opendocument.image-template'
+ODF_FORMULA = 'application/vnd.oasis.opendocument.formula'
+ODF_FORMULA_TEMPLATE = 'application/vnd.oasis.opendocument.formula-template'
+ODF_MASTER = 'application/vnd.oasis.opendocument.text-master'
+ODF_WEB = 'application/vnd.oasis.opendocument.text-web'
+
+
 # File extensions and their mimetype
 ODF_EXTENSIONS = {
-        'odt': 'application/vnd.oasis.opendocument.text',
-        'ott': 'application/vnd.oasis.opendocument.text-template',
-        'ods': 'application/vnd.oasis.opendocument.spreadsheet',
-        'ots': 'application/vnd.oasis.opendocument.spreadsheet-template',
-        'odp': 'application/vnd.oasis.opendocument.presentation',
-        'otp': 'application/vnd.oasis.opendocument.presentation-template',
-        'odg': 'application/vnd.oasis.opendocument.graphics',
-        'otg': 'application/vnd.oasis.opendocument.graphics-template',
-        'odc': 'application/vnd.oasis.opendocument.chart',
-        'otc': 'application/vnd.oasis.opendocument.chart-template',
-        'odi': 'application/vnd.oasis.opendocument.image',
-        'oti': 'application/vnd.oasis.opendocument.image-template',
-        'odf': 'application/vnd.oasis.opendocument.formula',
-        'otf': 'application/vnd.oasis.opendocument.formula-template',
-        'odm': 'application/vnd.oasis.opendocument.text-master',
-        'oth': 'application/vnd.oasis.opendocument.text-web',
+        'odt': ODF_TEXT,
+        'ott': ODF_TEXT_TEMPLATE,
+        'ods': ODF_SPREADSHEET,
+        'ots': ODF_SPREADSHEET_TEMPLATE,
+        'odp': ODF_PRESENTATION,
+        'otp': ODF_PRESENTATION_TEMPLATE,
+        'odg': ODF_DRAWING,
+        'otg': ODF_DRAWING_TEMPLATE,
+        'odc': ODF_CHART,
+        'otc': ODF_CHART_TEMPLATE,
+        'odi': ODF_IMAGE,
+        'oti': ODF_IMAGE_TEMPLATE,
+        'odf': ODF_FORMULA,
+        'otf': ODF_FORMULA_TEMPLATE,
+        'odm': ODF_MASTER,
+        'oth': ODF_WEB,
 }
 
 
 # Mimetypes and their file extension
 ODF_MIMETYPES = {
-        'application/vnd.oasis.opendocument.text': 'odt',
-        'application/vnd.oasis.opendocument.text-template': 'ott',
-        'application/vnd.oasis.opendocument.spreadsheet': 'ods',
-        'application/vnd.oasis.opendocument.spreadsheet-template': 'ots',
-        'application/vnd.oasis.opendocument.presentation': 'odp',
-        'application/vnd.oasis.opendocument.presentation-template': 'otp',
-        'application/vnd.oasis.opendocument.graphics': 'odg',
-        'application/vnd.oasis.opendocument.graphics-template': 'otg',
-        'application/vnd.oasis.opendocument.chart': 'odc',
-        'application/vnd.oasis.opendocument.chart-template': 'otc',
-        'application/vnd.oasis.opendocument.image': 'odi',
-        'application/vnd.oasis.opendocument.image-template': 'oti',
-        'application/vnd.oasis.opendocument.formula': 'odf',
-        'application/vnd.oasis.opendocument.formula-template': 'otf',
-        'application/vnd.oasis.opendocument.text-master': 'odm',
-        'application/vnd.oasis.opendocument.text-web': 'oth',
+        ODF_TEXT: 'odt',
+        ODF_TEXT_TEMPLATE: 'ott',
+        ODF_SPREADSHEET: 'ods',
+        ODF_SPREADSHEET_TEMPLATE: 'ots',
+        ODF_PRESENTATION: 'odp',
+        ODF_PRESENTATION_TEMPLATE: 'otp',
+        ODF_DRAWING: 'odg',
+        ODF_DRAWING_TEMPLATE: 'otg',
+        ODF_CHART: 'odc',
+        ODF_CHART_TEMPLATE: 'otc',
+        ODF_IMAGE: 'odi',
+        ODF_IMAGE_TEMPLATE: 'oti',
+        ODF_FORMULA: 'odf',
+        ODF_FORMULA_TEMPLATE: 'otf',
+        ODF_MASTER: 'odm',
+        ODF_WEB: 'oth',
 }
 
 
