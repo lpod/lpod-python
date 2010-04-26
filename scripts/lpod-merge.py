@@ -29,7 +29,7 @@
 # Import from the standard library
 from optparse import OptionParser
 from os.path import basename, splitext
-from sys import exit, stdout, stderr
+from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
@@ -39,6 +39,7 @@ from lpod.element import FIRST_CHILD
 from lpod.table import import_from_csv
 from lpod.toc import odf_create_toc
 from lpod.scriptutils import add_option_output, StdoutWriter
+from lpod.scriptutils import printerr, printinfo
 from lpod.vfs import vfs
 
 
@@ -174,8 +175,7 @@ def add_odp(filename, output_doc):
 
 
 def print_incompatible(filename, type):
-    print >> stderr, 'Cannot merge "%s" in %s document, skipping.' % (
-            filename, type)
+    printerr('Cannot merge "%s" in %s document, skipping.' % (filename, type))
 
 
 
@@ -203,15 +203,15 @@ if  __name__ == '__main__':
 
         # Exists ?
         if not vfs.exists(filename):
-            print >> stderr, "Skip", filename, "not existing"
+            printerr("Skip", filename, "not existing")
             continue
 
         # A good file => Only text, spreadsheet and CSV
         mimetype = vfs.get_mimetype(filename)
         if mimetype not in (ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION,
                 CSV_SHORT, CSV_LONG):
-            print >> stderr, 'Skip "%s" with unknown mimetype "%s"' % (
-                    filename, mimetype)
+            printerr('Skip "%s" with unknown mimetype "%s"' % (filename,
+                mimetype))
             continue
 
         # Not yet an output_doc ?
@@ -219,7 +219,7 @@ if  __name__ == '__main__':
             # Use the first doc as the output_doc
             output_doc = init_doc(filename, mimetype)
             output_type = output_doc.get_type()
-            print >> stderr, '%s document detected' % output_type.title()
+            printinfo('%s document detected' % output_type.title())
         elif mimetype == ODF_TEXT:
             # Add a text doc
             if output_type != 'text':
@@ -242,7 +242,7 @@ if  __name__ == '__main__':
                 print_incompatible(filename, output_type)
                 continue
             add_odp(filename, output_doc)
-        print >> stderr, 'Add "%s"' % filename
+        printinfo('Add "%s"' % filename)
 
     # Extra for odt
     if output_type == 'text':
@@ -257,4 +257,4 @@ if  __name__ == '__main__':
             target = StdoutWriter()
         output_doc.save(target=target, pretty=True)
         if options.output:
-            print 'Document "%s" generated' % options.output
+            printinfo('Document "%s" generated' % options.output)

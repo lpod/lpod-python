@@ -32,6 +32,7 @@ from sys import exit, stdin
 from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.datatype import Date, DateTime
+from lpod.scriptutils import printerr
 
 
 
@@ -39,8 +40,7 @@ def set_metadata(doc, set_list):
     meta = doc.get_meta()
     for set_info in set_list:
         if '=' not in set_info:
-            print ('Error: Bad argument -s "%s" (must be "name=value")' %
-                   set_info)
+            printerr('Bad argument -s "%s" (must be "name=value")' % set_info)
             exit(1)
         name, value = set_info.split('=', 1)
         name = name.lower().strip()
@@ -60,16 +60,15 @@ def set_metadata(doc, set_list):
                 else:
                     date = Date.decode(value)
             except ValueError, error:
-                print 'Error: Bad argument -s "%s": %s' % (set_info,
-                                                           str(error))
+                printerr('Bad argument -s "%s": %s' % (set_info, error))
                 exit(1)
             func = meta.__getattribute__('set_' + name)
             func(date)
         else:
-            print 'Error: Unknown metadata name "%s", please choose: ' % name
-            print ("       title, subject, initial_creator, keywords, "
-                   "generator, description, modification_date or "
-                   "creation_date")
+            printerr('Unknown metadata name "%s", please choose: ' % name)
+            printerr("       title, subject, initial_creator, keywords, "
+                    "generator, description, modification_date or "
+                    "creation_date")
             exit(1)
 
         # XXX User defined metadata?

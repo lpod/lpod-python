@@ -24,9 +24,10 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
+# Import from the future
 # Import from the Standard Library
 from StringIO import StringIO
-from sys import stdout
+from sys import stdout, stderr
 
 # Import from lpod
 
@@ -38,6 +39,19 @@ from sys import stdout
 def add_option_output(parser):
     help = "dump the output into FILE instead of the standard output"
     parser.add_option("-o", "--output", metavar="FILE", help=help)
+
+
+
+def printinfo(*args):
+    # TODO switch to print function
+    output = ' '.join(str(arg) for arg in args)
+    stderr.write(output)
+    stderr.write("\n")
+
+
+
+def printerr(*args):
+    printinfo("Error:", *args)
 
 
 

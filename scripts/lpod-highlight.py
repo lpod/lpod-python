@@ -32,7 +32,7 @@ from sys import exit, stdin
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
-from lpod.scriptutils import add_option_output
+from lpod.scriptutils import add_option_output, printinfo
 from lpod.style import odf_create_style
 from lpod.styles import rgb2hex
 
@@ -75,7 +75,7 @@ def highlight(odf_file_url, pattern, color=None, background_color=None,
             continue
         paragraph.set_span(name, regex=pattern)
     document.save(target=target, pretty=pretty)
-    print (i + 1), "paragraphs changed (0 error, 0 warning)."
+    printinfo((i + 1), "paragraphs changed (0 error, 0 warning).")
 
 
 

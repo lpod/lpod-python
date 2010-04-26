@@ -33,7 +33,7 @@ from sys import exit, stdout
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
-from lpod.scriptutils import add_option_output, StdoutWriter
+from lpod.scriptutils import add_option_output, StdoutWriter, printinfo
 
 
 def show_styles(document, target, automatic=True, common=True,
@@ -54,7 +54,7 @@ def show_styles(document, target, automatic=True, common=True,
 def delete_styles(document, target, pretty=True):
     n = document.delete_styles()
     document.save(target=target, pretty=pretty)
-    print n, "styles removed (0 error, 0 warning)."
+    printinfo(n, "styles removed (0 error, 0 warning).")
 
 
 
@@ -63,7 +63,7 @@ def merge_styles(document, from_file, target=None, pretty=True):
     document.delete_styles()
     document.merge_styles_from(source)
     document.save(target=target, pretty=pretty)
-    print "Done (0 error, 0 warning)."
+    printinfo("Done (0 error, 0 warning).")
 
 
 

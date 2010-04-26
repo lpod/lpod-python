@@ -33,7 +33,7 @@ from sys import exit, stdout, stdin
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
-from lpod.scriptutils import add_option_output
+from lpod.scriptutils import add_option_output, printerr
 from lpod.vfs import vfs
 
 
@@ -181,5 +181,5 @@ if  __name__ == '__main__':
         elif not opts.no_content:
             spreadsheet_to_stdout(document)
     else:
-        print "The OpenDocument format", doc_type, "is not supported yet."
+        printerr("The OpenDocument format", doc_type, "is not supported yet.")
         exit(1)
