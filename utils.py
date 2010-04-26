@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: David Versmisse <david.versmisse@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
@@ -451,7 +451,7 @@ def oooc_to_ooow(formula):
     Returns: unicode
     """
     prefix, formula = formula.split(":=", 1)
-    assert "ooo" in prefix
+    assert "oooc" in prefix
     # Convert cell addresses
     formula = formula.replace("[.", "<").replace(":.", ":").replace("]", ">")
     # Convert functions
