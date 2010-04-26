@@ -387,12 +387,12 @@ class odf_document(object):
 
     def save(self, target=None, packaging=None, pretty=False):
         """Save the document, at the same place it was opened or at the given
-        URI (target). Target can also be a file like object. It can be saved
+        target URI. Target can also be a file-like object. It can be saved
         as a Zip file or as a flat XML file. XML parts can be pretty printed.
 
         Arguments:
 
-            target -- str -or- file like object
+            target -- str or file-like object
 
             packaging -- 'zip' or 'flat'
 

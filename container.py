@@ -368,8 +368,8 @@ class odf_container(object):
             file = vfs.open(self.uri, WRITE)
             close_after = True
         elif isinstance(target, str):
-            close_after = True
             file = vfs.open(target, WRITE)
+            close_after = True
         else:
             file = target
         # Serialize
