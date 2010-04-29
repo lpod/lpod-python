@@ -326,6 +326,7 @@ class odf_container(object):
     def clone(self):
         """Make a copy of this container with no URI.
         """
+        # FIXME must load parts before?
         clone = object.__new__(self.__class__)
         for name in self.__dict__:
             # "__zipfile" is not safe to copy
