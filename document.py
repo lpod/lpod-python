@@ -360,7 +360,7 @@ class odf_document(object):
         manifest.add_full_path(full_path, media_type)
         # Close file
         if close_after:
-            file.close_after()
+            file.close()
         return full_path
 
 
