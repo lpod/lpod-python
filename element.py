@@ -933,12 +933,17 @@ class odf_element(object):
                 text_style=style, regex=regex)
 
 
-    def get_paragraph_by_position(self, position):
-        return _get_element(self, 'descendant::text:p', position=position)
+    def get_paragraph(position=0, content=None):
+        return _get_element(self, 'descendant::text:p', position=position,
+                regex=content)
 
 
-    def get_paragraph_by_content(self, regex):
-        return _get_element(self, 'descendant::text:p', regex=regex)
+    def get_paragraph(position=0, content=None):
+        result = _get_element_list(self, 'descendant::text:p', regex=content)
+        try:
+            return result[position]
+        except KeyError:
+            return None
 
 
     #
