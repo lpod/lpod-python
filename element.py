@@ -153,7 +153,8 @@ def odf_create_element(element_data):
         element_data = element_data.encode('utf-8')
     else:
         raise TypeError, "element data is not str or unicode"
-    if not element_data.strip():
+    element_data = element_data.strip()
+    if not element_data:
         raise ValueError, "element data is empty"
     if '<' in element_data:
         # XML fragment
