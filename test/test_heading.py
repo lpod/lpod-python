@@ -77,7 +77,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list_context(self):
         body = self.body
-        section2 = body.get_section_by_position(1)
+        section2 = body.get_section(position=1)
         headings = section2.get_heading_list()
         self.assertEqual(len(headings), 1)
         heading = headings[0]
@@ -87,20 +87,20 @@ class TestHeading(TestCase):
 
     def test_odf_heading(self):
         body = self.body
-        heading = body.get_heading_by_position(0)
+        heading = body.get_heading()
         self.assert_(isinstance(heading, odf_heading))
 
 
     def test_get_heading(self):
         body = self.body
-        heading = body.get_heading_by_position(1)
+        heading = body.get_heading(position=1)
         text = heading.get_text()
         self.assertEqual(text, u'Level 2 Title')
 
 
     def test_get_heading_level(self):
         body = self.body
-        heading = body.get_heading_by_position(0, outline_level=2)
+        heading = body.get_heading(outline_level=2)
         text = heading.get_text()
         self.assertEqual(text, u'Level 2 Title')
 

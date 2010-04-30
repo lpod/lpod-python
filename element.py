@@ -224,7 +224,7 @@ class odf_element(object):
 
     def _insert(self, element, before=None, after=None, position=0):
         """Insert an element before or after the characters in the text which
-        match the regexp before/after. When the regexp matches more of one part
+        match the regex before/after. When the regex matches more of one part
         of the text, position can be set to choice which part must be used. If
         before and after are None, we use only position that is the number of
         characters. If position is positive and before=after=None, we insert
@@ -235,9 +235,9 @@ class odf_element(object):
 
         element -- odf_element
 
-        before -- regexp (unicode)
+        before -- unicode regex
 
-        after -- regexp (unicode)
+        after -- unicode regex
 
         position -- int
         """
@@ -247,29 +247,29 @@ class odf_element(object):
 
         # 1) before xor after is not None
         if (before is not None) ^ (after is not None):
-            regexp = compile(before) if before is not None else compile(after)
+            regex = compile(before) if before is not None else compile(after)
 
             # position = -1
             if position < 0:
-                # Found the last text that matches the regexp
+                # Found the last text that matches the regex
                 text = None
                 for a_text in current.xpath("//text()"):
-                    if regexp.search(a_text) is not None:
+                    if regex.search(a_text) is not None:
                         text = a_text
                 if text is None:
                     raise ValueError, "text not found"
-                sre = list(regexp.finditer(text))[-1]
+                sre = list(regex.finditer(text))[-1]
             # position >= 0
             else:
                 count = 0
                 for text in current.xpath("//text()"):
-                    found_nb = len(regexp.findall(text))
+                    found_nb = len(regex.findall(text))
                     if found_nb + count >= position + 1:
                         break
                     count += found_nb
                 else:
                     raise ValueError, "text not found"
-                sre = list(regexp.finditer(text))[position - count]
+                sre = list(regex.finditer(text))[position - count]
 
             # Compute pos
             pos = sre.start() if before is not None else sre.end()
@@ -421,7 +421,7 @@ class odf_element(object):
         """Return the tag name of the element as a qualified name, e.g.
         "text:span".
 
-        Returns: str
+        Return: str
         """
         element = self.__element
         return _get_prefixed_name(element.tag)
@@ -436,7 +436,7 @@ class odf_element(object):
 
             qname -- str
 
-        Returns: odf_element or a subclass
+        Return: odf_element or a subclass
         """
         element = self.__element
         element.tag = '{%s}%s' % _decode_qname(qname)
@@ -531,8 +531,8 @@ class odf_element(object):
 
 
     def search(self, pattern):
-        """Return the first position of the pattern in the text content of the
-        element, or None if not found.
+        """Return the first position of the pattern in the text content of
+        the element, or None if not found.
 
         Python regular expression syntax applies.
 
@@ -540,7 +540,7 @@ class odf_element(object):
 
             pattern -- unicode
 
-        Returns: int or None
+        Return: int or None
         """
         if isinstance(pattern, str):
             # Fail properly if the pattern is an non-ascii bytestring
@@ -562,7 +562,7 @@ class odf_element(object):
 
             pattern -- unicode
 
-        Returns: bool
+        Return: bool
         """
         return self.search(pattern) is not None
 
@@ -583,7 +583,7 @@ class odf_element(object):
 
             new -- unicode
 
-        Returns: int
+        Return: int
         """
         if isinstance(pattern, str):
             # Fail properly if the pattern is an non-ascii bytestring
@@ -910,93 +910,171 @@ class odf_element(object):
     # Sections
     #
 
-    def get_section_list(self, style=None, regex=None):
+    def get_section_list(self, style=None, content=None):
+        """Return all the sections that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'text:section', text_style=style,
-                regex=regex)
+                content=content)
 
 
-    def get_section_by_position(self, position):
-        return _get_element(self, 'descendant::text:section',
-                            position=position)
+    def get_section(self, position=0, content=None):
+        """Return the section that matches the criteria.
 
+        Arguments:
 
-    def get_section_by_content(self, regex):
-        return _get_element(self, 'descendant::text:section', regex=regex)
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_element or None if not found
+        """
+        return _get_element(self, 'descendant::text:section', position,
+                content=content)
 
 
     #
     # Paragraphs
     #
 
-    def get_paragraph_list(self, style=None, regex=None):
+    def get_paragraph_list(self, style=None, content=None):
+        """Return all the paragraphs that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_paragraph
+        """
         return _get_element_list(self, 'descendant::text:p',
-                text_style=style, regex=regex)
+                text_style=style, content=content)
 
 
-    def get_paragraph(position=0, content=None):
-        return _get_element(self, 'descendant::text:p', position=position,
-                regex=content)
+    def get_paragraph(self, position=0, content=None):
+        """Return the paragraph that matches the criteria.
 
+        Arguments:
 
-    def get_paragraph(position=0, content=None):
-        result = _get_element_list(self, 'descendant::text:p', regex=content)
-        try:
-            return result[position]
-        except KeyError:
-            return None
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_paragraph or None if not found
+        """
+        return _get_element(self, 'descendant::text:p', position,
+                content=content)
 
 
     #
     # Span
     #
 
-    def get_span_list(self, style=None, regex=None):
+    def get_span_list(self, style=None, content=None):
+        """Return all the spans that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_span
+        """
         return _get_element_list(self, 'descendant::text:span',
-                text_style=style, regex=regex)
+                text_style=style, content=content)
 
 
-    def get_span_by_position(self, position):
-        return _get_element(self, 'descendant::text:span', position=position)
+    def get_span(self, position=0, content=None):
+        """Return the span that matches the criteria.
 
+        Arguments:
 
-    def get_span_by_content(self, regex):
-        return _get_element(self, 'descendant::text:span', regex=regex)
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_span or None if not found
+        """
+        return _get_element(self, 'descendant::text:span', position,
+                content=content)
 
 
     #
     # Headings
     #
 
-    def get_heading_list(self, style=None, outline_level=None, regex=None):
+    def get_heading_list(self, style=None, outline_level=None, content=None):
+        """Return all the headings that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_heading
+        """
         return _get_element_list(self, 'descendant::text:h',
-                text_style=style, outline_level=outline_level, regex=regex)
+                text_style=style, outline_level=outline_level,
+                content=content)
 
 
-    def get_heading_by_position(self, position, outline_level=None):
-        return _get_element(self, 'descendant::text:h', position=position,
-                outline_level=outline_level)
+    def get_heading(self, position=0, outline_level=None, content=None):
+        """Return the heading that matches the criteria.
 
+        Arguments:
 
-    def get_heading_by_content(self, regex, outline_level=None):
-        return _get_element(self, 'descendant::text:h', regex=regex,
-                outline_level=outline_level)
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_heading or None if not found
+        """
+        return _get_element(self, 'descendant::text:h', position,
+                outline_level=outline_level, content=content)
 
 
     #
     # Lists
     #
 
-    def get_list_list(self, style=None, regex=None):
+    def get_list_list(self, style=None, content=None):
+        """Return all the lists that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_list
+        """
         return _get_element_list(self, 'descendant::text:list',
-                text_style=style, regex=regex)
+                text_style=style, content=content)
 
 
-    def get_list_by_position(self, position):
-        return _get_element(self, 'descendant::text:list', position=position)
+    def get_list(self, position=0, content=None):
+        """Return the list that matches the criteria.
 
+        Arguments:
 
-    def get_list_by_content(self, regex):
-        return _get_element(self, 'descendant::text:list', regex=regex)
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_list or None if not found
+        """
+        return _get_element(self, 'descendant::text:list', position,
+                content=content)
 
 
     #
@@ -1004,129 +1082,164 @@ class odf_element(object):
     #
 
     def get_frame_list(self, style=None, title=None, description=None,
-                       regex=None):
+                       content=None):
+        """Return all the frames that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            title -- unicode regex
+
+            description -- unicode regex
+
+            content -- unicode regex
+
+        Return: list of odf_frame
+        """
         return _get_element_list(self, 'descendant::draw:frame',
-                                 draw_style=style, svg_title=title,
-                                 svg_desc=description, regex=regex)
+                draw_style=style, svg_title=title, svg_desc=description,
+                content=content)
 
 
-    def get_frame_by_name(self, name):
-        return _get_element(self, 'descendant::draw:frame', draw_name=name)
+    def get_frame(self, position=0, name=None, title=None, description=None,
+            content=None):
+        """Return the section that matches the criteria.
 
+        Arguments:
 
-    def get_frame_by_position(self, position):
-        return _get_element(self, 'descendant::draw:frame', position=position)
+            position -- int
 
+            title -- unicode regex
 
-    def get_frame_by_content(self, regex):
-        return _get_element(self, 'descendant::draw:frame', regex=regex)
+            description -- unicode regex
 
+            content -- unicode regex
 
-    def get_frame_by_title(self, regex):
-        return _get_element(self, 'descendant::draw:frame', svg_title=regex)
-
-
-    def get_frame_by_description(self, regex):
-        return _get_element(self, 'descendant::draw:frame', svg_desc=regex)
+        Return: odf_frame or None if not found
+        """
+        return _get_element(self, 'descendant::draw:frame', position,
+                draw_name=name, svg_title=title, svg_desc=description,
+                content=content)
 
 
     #
     # Images
     #
 
-    def get_image_list(self, style=None, href=None, regex=None):
-        """Get all image elements matching the criteria. Style is the style
-        name. Set link to False to get only internal images, and True to
-        get only external images (not in the container). Href is a regex to
-        find all images with their path matching.
+    def get_image_list(self, style=None, href=None, content=None):
+        """Return all the sections that match the criteria.
 
         Arguments:
 
             style -- str
 
-            link -- bool
-
             href -- unicode regex
+
+            content -- unicode regex
 
         Return: list of odf_element
         """
         return _get_element_list(self, 'descendant::draw:image',
-                text_style=style, href=href, regex=regex)
+                text_style=style, href=href, content=content)
 
 
-    def get_image_by_name(self, name):
+    def get_image(self, position=0, name=None, href=None, content=None):
+        """Return the image that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_element or None if not found
+        """
         # The frame is holding the name
-        frame = _get_element(self, 'descendant::draw:frame', draw_name=name)
-        if frame is None:
-            return None
-        return frame.get_element('draw:image')
-
-
-    def get_image_by_position(self, position):
-        return _get_element(self, 'descendant::draw:image', position=position)
-
-
-    def get_image_by_path(self, regex):
-        return _get_element(self, 'descendant::draw:image', href=regex)
-
-
-    def get_image_by_content(self, regex):
-        return _get_element(self, 'descendant::draw:image', regex=regex)
+        if name is not None:
+            frame = _get_element(self, 'descendant::draw:frame',
+                    position=position, draw_name=name)
+            if frame is None:
+                return None
+            # The name is supposedly unique
+            return frame.get_element('draw:image')
+        return _get_element(self, 'descendant::draw:image', position,
+                href=href, content=content)
 
 
     #
     # Tables
     #
 
-    def get_table_list(self, style=None, regex=None):
+    def get_table_list(self, style=None, content=None):
+        """Return all the tables that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_table
+        """
         return _get_element_list(self, 'descendant::table:table',
-                table_style=style, regex=regex)
+                table_style=style, content=content)
 
 
-    def get_table_by_name(self, name):
-        return _get_element(self, 'descendant::table:table', table_name=name)
+    def get_table(self, position=0, name=None, content=None):
+        """Return the table that matches the criteria.
 
+        Arguments:
 
-    def get_table_by_position(self, position):
-        return _get_element(self, 'descendant::table:table', position=position)
+            position -- int
 
+            name -- unicode
 
-    def get_table_by_content(self, regex):
-        return _get_element(self, 'descendant::table:table', regex=regex)
+            content -- unicode regex
+
+        Return: odf_table or None if not found
+        """
+        return _get_element(self, 'descendant::table:table', position,
+                table_name=name, content=content)
 
 
     #
     # Notes
     #
 
-    def get_note_list(self, note_class=None, regex=None):
-        """Return the list of all note element, optionally the ones of the
-        given class or that match the given regex.
+    def get_note_list(self, note_class=None, content=None):
+        """Return all the notes that match the criteria.
 
         Arguments:
 
             note_class -- 'footnote' or 'endnote'
 
-            regex -- unicode
+            content -- unicode regex
 
-        Return: list of odf_element
+        Return: list of odf_note
         """
         return _get_element_list(self, 'descendant::text:note',
-                                 note_class=note_class,
-                                 regex=regex)
+                note_class=note_class, content=content)
 
 
-    def get_note_by_id(self, note_id):
-        return _get_element(self, 'descendant::text:note', text_id=note_id)
+    def get_note(self, position=0, note_id=None, note_class=None,
+            content=None):
+        """Return the note that matches the criteria.
 
+        Arguments:
 
-    def get_note_by_class(self, note_class):
-        return _get_element_list(self, 'descendant::text:note',
-                                 note_class=note_class)
+            position -- int
 
+            note_id -- unicode
 
-    def get_note_by_content(self, regex):
-        return _get_element(self, 'descendant::text:note', regex=regex)
+            note_class -- 'footnote' or 'endnote'
+
+            content -- unicode regex
+
+        Return: odf_note or None if not found
+        """
+        return _get_element(self, 'descendant::text:note', position,
+                text_id=note_id, note_class=note_class, content=content)
 
 
     #
@@ -1134,12 +1247,26 @@ class odf_element(object):
     #
 
     def get_annotation_list(self, creator=None, start_date=None,
-                            end_date=None, regex=None):
-        """XXX end date is not included (as expected in Python).
+            end_date=None, content=None):
+        """Return all the sections that match the criteria.
+
+        End date is not included (as expected in Python).
+
+        Arguments:
+
+            creator -- unicode
+
+            start_date -- date object
+
+            end_date -- date object
+
+            content -- unicode regex
+
+        Return: list of odf_annotation
         """
         annotations = []
         for annotation in _get_element_list(self,
-                'descendant::office:annotation', regex=regex):
+                'descendant::office:annotation', content=content):
             if (creator is not None
                     and creator != annotation.get_dc_creator()):
                 continue
@@ -1152,15 +1279,34 @@ class odf_element(object):
         return annotations
 
 
-    def get_annotation(self, creator=None, start_date=None, end_date=None,
-                       regex=None):
+    def get_annotation(self, position=0, creator=None, start_date=None,
+            end_date=None, content=None):
+        """Return the section that matches the criteria.
+
+        End date is not included (as expected in Python).
+
+        Arguments:
+
+            position -- int
+
+            creator -- unicode
+
+            start_date -- date object
+
+            end_date -- date object
+
+            content -- unicode regex
+
+        Return: odf_annotation or None if not found
+        """
         annotations = self.get_annotation_list(creator=creator,
-                                               start_date=start_date,
-                                               end_date=end_date,
-                                               regex=regex)
-        if annotations:
-            return annotations[0]
-        return None
+                start_date=start_date, end_date=end_date, content=content)
+        if not annotations:
+            return None
+        try:
+            return annotations[position]
+        except IndexError:
+            return None
 
 
     #
@@ -1168,6 +1314,11 @@ class odf_element(object):
     #
 
     def get_variable_decls(self):
+        """Return the container for variable declarations. Created if not
+        found.
+
+        Return: odf_element
+        """
         variable_decls = self.get_element('//text:variable-decls')
         if variable_decls is None:
             from variable import odf_create_variable_decls
@@ -1178,27 +1329,67 @@ class odf_element(object):
         return variable_decls
 
 
-    def get_variable_list(self):
+    def get_variable_decl_list(self):
+        """Return all the variable declarations.
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:variable-decl')
 
 
-    def get_variable_decl(self, name):
-        return _get_element(self, 'descendant::text:variable-decl',
-                            text_name=name)
+    def get_variable_decl(self, name, position=0):
+        """return the variable declaration for the given name.
+
+        return: odf_element or none if not found
+        """
+        return _get_element(self, 'descendant::text:variable-decl', position,
+                text_name=name)
 
 
-    def get_variable_sets(self, name):
+    def get_variable_set_list(self, name=None):
+        """Return all the variable sets that match the criteria.
+
+        Arguments:
+
+            name -- unicode
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:variable-set',
-                                 text_name=name)
+                text_name=name)
 
 
-    def get_variable_value(self, name, value_type=None):
-        variable_sets = self.get_variable_sets(name)
-        # Nothing ?
-        if not variable_sets:
+    def get_variable_set(self, name, position=-1):
+        """Return the variable set for the given name (last one by default).
+
+        Arguments:
+
+            name -- unicode
+
+            position -- int
+
+        Return: odf_element or None if not found
+        """
+        return _get_element(self, 'descendant::text:variable-set', position,
+                text_name=name)
+
+
+    def get_variable_set_value(self, name, value_type=None):
+        """Return the last value of the given variable name.
+
+        Arguments:
+
+            name -- unicode
+
+            value_type -- 'boolean', 'currency', 'date', 'float',
+                          'percentage', 'string', 'time' or automatic
+
+        Return: most appropriate Python type
+        """
+        variable_set = self.get_variable_set(name)
+        if not variable_set:
             return None
-        # Get the last value
-        return get_value(variable_sets[-1], value_type)
+        return get_value(variable_set, value_type)
 
 
     #
@@ -1206,6 +1397,11 @@ class odf_element(object):
     #
 
     def get_user_field_decls(self):
+        """Return the container for user field declarations. Created if not
+        found.
+
+        Return: odf_element
+        """
         user_field_decls = self.get_element('//text:user-field-decls')
         if user_field_decls is None:
             from variable import odf_create_user_field_decls
@@ -1216,18 +1412,36 @@ class odf_element(object):
         return user_field_decls
 
 
-    def get_user_field_list(self):
+    def get_user_field_decl_list(self):
+        """Return all the user field declarations.
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:user-field-decl')
 
 
-    def get_user_field_decl(self, name):
+    def get_user_field_decl(self, name, position=0):
+        """return the user field declaration for the given name.
+
+        return: odf_element or none if not found
+        """
         return _get_element(self, 'descendant::text:user-field-decl',
-                            text_name=name)
+                position, text_name=name)
 
 
     def get_user_field_value(self, name, value_type=None):
+        """Return the value of the given user field name.
+
+        Arguments:
+
+            name -- unicode
+
+            value_type -- 'boolean', 'currency', 'date', 'float',
+                          'percentage', 'string', 'time' or automatic
+
+        Return: most appropriate Python type
+        """
         user_field_decl = self.get_user_field_decl(name)
-        # Nothing ?
         if user_field_decl is None:
             return None
         return get_value(user_field_decl, value_type)
@@ -1236,42 +1450,83 @@ class odf_element(object):
     #
     # Draw Pages
     #
-    def get_draw_page_list(self, style=None, regex=None):
+    def get_draw_page_list(self, style=None, content=None):
+        """Return all the draw pages that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_draw_page
+        """
         return _get_element_list(self, 'descendant::draw:page',
-                                 draw_style=style, regex=regex)
+                draw_style=style, content=content)
 
 
-    def get_draw_page_by_name(self, name):
-        return _get_element(self, 'descendant::draw:page', draw_name=name)
+    def get_draw_page(self, position=0, name=None, content=None):
+        """Return the draw page that matches the criteria.
 
+        Arguments:
 
-    def get_draw_page_by_position(self, position):
-        return _get_element(self, 'descendant::draw:page', position=position)
+            position -- int
 
+            name -- unicode
 
-    def get_draw_page_by_content(self, regex):
-        return _get_element(self, 'descendant::draw:page', regex=regex)
+            content -- unicode regex
+
+        Return: odf_draw_page or None if not found
+        """
+        return _get_element(self, 'descendant::draw:page', position,
+                draw_name=name, content=content)
 
 
     #
     # Links
     #
 
-    def get_link_list(self, name=None, title=None, href=None, regex=None):
-        return _get_element_list(self, 'descendant::text:a', office_name=name,
-                                 office_title=title, href=href, regex=regex)
+    def get_link_list(self, name=None, title=None, href=None, content=None):
+        """Return all the links that match the criteria.
+
+        Arguments:
+
+            name -- unicode
+
+            title -- unicode
+
+            href -- unicode regex
+
+            content -- unicode regex
+
+        Return: list of odf_element
+        """
+        return _get_element_list(self, 'descendant::text:a',
+                office_name=name, office_title=title, href=href,
+                content=content)
 
 
-    def get_link_by_name(self, name):
-        return _get_element(self, 'descendant::text:a', office_name=name)
+    def get_link(self, position=0, name=None, title=None, href=None,
+            content=None):
+        """Return the link that matches the criteria.
 
+        Arguments:
 
-    def get_link_by_path(self, regex):
-        return _get_element(self, 'descendant::text:a', href=regex)
+            position -- int
 
+            name -- unicode
 
-    def get_link_by_content(self, regex):
-        return _get_element(self, 'descendant::text:a', regex=regex)
+            title -- unicode
+
+            href -- unicode regex
+
+            content -- unicode regex
+
+        Return: odf_element or None if not found
+        """
+        return _get_element(self, 'descendant::text:a', position,
+                office_name=name, office_title=title, href=href,
+                content=content)
 
 
     #
@@ -1279,29 +1534,72 @@ class odf_element(object):
     #
 
     def get_bookmark_list(self):
+        """Return all the bookmarks.
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:bookmark')
 
 
-    def get_bookmark_by_name(self, name):
-        return _get_element(self, 'descendant::text:bookmark', text_name=name)
+    def get_bookmark(self, position=0, name=None):
+        """Return the bookmark that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            name -- unicode
+
+        Return: odf_element or None if not found
+        """
+        return _get_element(self, 'descendant::text:bookmark', position,
+                text_name=name)
 
 
     def get_bookmark_start_list(self):
+        """Return all the bookmark starts.
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:bookmark-start')
 
 
-    def get_bookmark_start_by_name(self, name):
+    def get_bookmark_start(self, position=0, name=None):
+        """Return the bookmark start that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            name -- unicode
+
+        Return: odf_element or None if not found
+        """
         return _get_element(self, 'descendant::text:bookmark-start',
-                            text_name=name)
+                position, text_name=name)
 
 
     def get_bookmark_end_list(self):
+        """Return all the bookmark ends.
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:bookmark-end')
 
 
-    def get_bookmark_end_by_name(self, name):
-        return _get_element(self, 'descendant::text:bookmark-end',
-                            text_name=name)
+    def get_bookmark_end(self, position=0, name=None):
+        """Return the bookmark end that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            name -- unicode
+
+        Return: odf_element or None if not found
+        """
+        return _get_element(self, 'descendant::text:bookmark-end', position,
+                text_name=name)
 
 
     #
@@ -1309,30 +1607,73 @@ class odf_element(object):
     #
 
     def get_reference_mark_list(self):
+        """Return all the reference marks.
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:reference-mark')
 
 
-    def get_reference_mark_by_name(self, name):
+    def get_reference_mark(self, position=0, name=None):
+        """Return the reference mark that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            name -- unicode
+
+        Return: odf_element or None if not found
+        """
         return _get_element(self, 'descendant::text:reference-mark',
-                            text_name=name)
+                position, text_name=name)
 
 
     def get_reference_mark_start_list(self):
-        return _get_element_list(self, 'descendant::text:reference-mark-start')
+        """Return all the reference mark starts.
+
+        Return: list of odf_element
+        """
+        return _get_element_list(self,
+                'descendant::text:reference-mark-start')
 
 
-    def get_reference_mark_start_by_name(self, name):
+    def get_reference_mark_start(self, position=0, name=None):
+        """Return the reference mark start that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            name -- unicode
+
+        Return: odf_element or None if not found
+        """
         return _get_element(self, 'descendant::text:reference-mark-start',
-                            text_name=name)
+                position, text_name=name)
 
 
     def get_reference_mark_end_list(self):
+        """Return all the reference mark ends.
+
+        Return: list of odf_element
+        """
         return _get_element_list(self, 'descendant::text:reference-mark-end')
 
 
-    def get_reference_mark_end_by_name(self, name):
+    def get_reference_mark_end(self, position=0, name=None):
+        """Return the reference mark end that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            name -- unicode
+
+        Return: odf_element or None if not found
+        """
         return _get_element(self, 'descendant::text:reference-mark-end',
-                            text_name=name)
+                position, text_name=name)
 
 
     #
@@ -1344,21 +1685,39 @@ class odf_element(object):
     #
 
     def get_draw_line_list(self, draw_style=None, draw_text_style=None,
-                           regex=None):
+            content=None):
+        """Return all the draw lines that match the criteria.
+
+        Arguments:
+
+            draw_style -- unicode
+
+            draw_text_style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_shape
+        """
         return _get_element_list(self, 'descendant::draw:line',
-                                 draw_style=draw_style,
-                                 draw_text_style=draw_text_style, regex=regex)
+                draw_style=draw_style, draw_text_style=draw_text_style,
+                content=content)
 
 
-    def get_draw_line_by_content(self, regex):
-        return _get_element(self, 'descendant::draw:line', regex=regex)
+    def get_draw_line(self, position=0, id=None, content=None):
+        """Return the draw line that matches the criteria.
 
+        Arguments:
 
-    def get_draw_line_by_id(self, id):
-        lines = self.get_draw_line_list()
-        lines = [line for line in lines
-                      if line.get_attribute('draw:id') == id]
-        return lines[0] if lines else None
+            position -- int
+
+            id -- unicode
+
+            content -- unicode regex
+
+        Return: odf_shape or None if not found
+        """
+        return _get_element(self, 'descendant::draw:line', position,
+                draw_id=id, content=content)
 
 
     #
@@ -1366,21 +1725,39 @@ class odf_element(object):
     #
 
     def get_draw_rectangle_list(self, draw_style=None, draw_text_style=None,
-                                regex=None):
+            content=None):
+        """Return all the draw rectangles that match the criteria.
+
+        Arguments:
+
+            draw_style -- unicode
+
+            draw_text_style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_shape
+        """
         return _get_element_list(self, 'descendant::draw:rect',
-                                 draw_style=draw_style,
-                                 draw_text_style=draw_text_style, regex=regex)
+                draw_style=draw_style, draw_text_style=draw_text_style,
+                content=content)
 
 
-    def get_draw_rectangle_by_content(self, regex):
-        return _get_element(self, 'descendant::draw:rect', regex=regex)
+    def get_draw_rectangle(self, position=0, id=None, content=None):
+        """Return the draw rectangle that matches the criteria.
 
+        Arguments:
 
-    def get_draw_rectangle_by_id(self, id):
-        rectangles = self.get_draw_rectangle_list()
-        rectangles = [rectangle for rectangle in rectangles
-                                if rectangle.get_attribute('draw:id') == id]
-        return rectangles[0] if rectangle else None
+            position -- int
+
+            id -- unicode
+
+            content -- unicode regex
+
+        Return: odf_shape or None if not found
+        """
+        return _get_element(self, 'descendant::draw:rect', position,
+                draw_id=id, content=content)
 
 
     #
@@ -1388,21 +1765,39 @@ class odf_element(object):
     #
 
     def get_draw_ellipse_list(self, draw_style=None, draw_text_style=None,
-                              regex=None):
+            content=None):
+        """Return all the draw ellipses that match the criteria.
+
+        Arguments:
+
+            draw_style -- unicode
+
+            draw_text_style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_shape
+        """
         return _get_element_list(self, 'descendant::draw:ellipse',
-                                 draw_style=draw_style,
-                                 draw_text_style=draw_text_style, regex=regex)
+                draw_style=draw_style, draw_text_style=draw_text_style,
+                content=content)
 
 
-    def get_draw_ellipse_by_content(self, regex):
-        return _get_element(self, 'descendant::draw:ellipse', regex=regex)
+    def get_draw_ellipse(self, position=0, id=None, content=None):
+        """Return the draw ellipse that matches the criteria.
 
+        Arguments:
 
-    def get_draw_ellipse_by_id(self, id):
-        ellipses = self.get_draw_ellipse_list()
-        ellipses = [ellipse for ellipse in ellipses
-                            if ellipse.get_attribute('draw:id') == id]
-        return ellipses[0] if ellipse else None
+            position -- int
+
+            id -- unicode
+
+            content -- unicode regex
+
+        Return: odf_shape or None if not found
+        """
+        return _get_element(self, 'descendant::draw:ellipse', position,
+                draw_id=id, content=content)
 
 
     #
@@ -1410,26 +1805,44 @@ class odf_element(object):
     #
 
     def get_draw_connector_list(self, draw_style=None, draw_text_style=None,
-                                regex=None):
+            content=None):
+        """Return all the draw connectors that match the criteria.
+
+        Arguments:
+
+            draw_style -- unicode
+
+            draw_text_style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_shape
+        """
         return _get_element_list(self, 'descendant::draw:connector',
-                                 draw_style=draw_style,
-                                 draw_text_style=draw_text_style, regex=regex)
+                draw_style=draw_style, draw_text_style=draw_text_style,
+                content=content)
 
 
-    def get_draw_connector_by_content(self, regex):
-        return _get_element(self, 'descendant::draw:connector', regex=regex)
+    def get_draw_connector(self, position=0, id=None, content=None):
+        """Return the draw connector that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            id -- unicode
+
+            content -- unicode regex
+
+        Return: odf_shape or None if not found
+        """
+        return _get_element(self, 'descendant::draw:connector', position,
+                draw_id=id, content=content)
 
 
-    def get_draw_connector_by_id(self, id):
-        connectors = self.get_draw_connector_list()
-        connectors = [connector for connector in connectors
-                                if connector.get_attribute('draw:id') == id]
-        return connectors[0] if connector else None
-
-
-    def get_draw_orphans_connectors(self):
-        """Return a list of connectors, which havn't any shape connected to
-        them.
+    def get_orphan_draw_connectors(self):
+        """Return a list of connectors which don't have any shape connected
+        to them.
         """
         connectors = []
         for connector in self.get_draw_connector_list():
@@ -1443,6 +1856,12 @@ class odf_element(object):
     #
     # Tracked changes
     #
+
+    def get_tracked_changes(self):
+        """Return the tracked-changes part in the text body.
+        """
+        return self.get_element('//text:tracked-changes')
+
 
     def get_changes_ids(self):
         """Return a list of ids that refers to a change region in the tracked
@@ -1460,11 +1879,26 @@ class odf_element(object):
     #
 
     def get_toc_list(self):
+        """Return all the tables of contents.
+
+        Return: list of odf_toc
+        """
         return _get_element_list(self, 'text:table-of-content')
 
 
-    def get_toc(self):
-        return _get_element(self, 'text:table-of-content')
+    def get_toc(self, position=0, content=None):
+        """Return the table of contents that matches the criteria.
+
+        Arguments:
+
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_toc or None if not found
+        """
+        return _get_element(self, 'text:table-of-content', position,
+                content=content)
 
 
     #
@@ -1522,5 +1956,5 @@ class odf_element(object):
         tagname, famattr = self._get_style_tagname(family,
                 is_default=is_default)
         # famattr became None if no "style:family" attribute
-        return _get_element(self, tagname, style_name=style_name,
+        return _get_element(self, tagname, 0, style_name=style_name,
                 display_name=display_name, family=famattr)

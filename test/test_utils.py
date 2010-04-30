@@ -136,7 +136,7 @@ class Set_Get_ValueTestCase(TestCase):
 
 
 
-class get_by_position_TestCase(TestCase):
+class GetElementByPositionTestCase(TestCase):
 
     def setUp(self):
         doc = odf_get_document("samples/example.odt")
@@ -144,19 +144,19 @@ class get_by_position_TestCase(TestCase):
 
 
     def test_first(self):
-        last_paragraph = self.body.get_paragraph_by_position(0)
+        last_paragraph = self.body.get_paragraph(position=0)
         expected = u"This is the first paragraph."
         self.assertEqual(last_paragraph.get_text(recursive=True), expected)
 
 
     def test_next_to_last(self):
-        last_paragraph = self.body.get_paragraph_by_position(-2)
+        last_paragraph = self.body.get_paragraph(position=-2)
         expected = u"This is an annotation."
         self.assertEqual(last_paragraph.get_text(recursive=True), expected)
 
 
     def test_last(self):
-        last_paragraph = self.body.get_paragraph_by_position(-1)
+        last_paragraph = self.body.get_paragraph(position=-1)
         expected = u"With diacritical signs: éè"
         self.assertEqual(last_paragraph.get_text(recursive=True), expected)
 

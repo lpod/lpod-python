@@ -256,7 +256,7 @@ class odf_toc(odf_element):
         else:
             if style:
                 index_title.set_text_style(style)
-            paragraph = index_title.get_paragraph_by_position(0)
+            paragraph = index_title.get_paragraph()
             if paragraph is None:
                 paragraph = odf_create_paragraph()
                 index_title.append(paragraph)

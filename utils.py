@@ -82,7 +82,7 @@ def _get_abspath(local_path):
 
 
 def _make_xpath_query(element_name, family=None, text_style=None,
-        draw_name=None, draw_style=None, draw_text_style=None,
+        draw_id=None, draw_name=None, draw_style=None, draw_text_style=None,
         table_name=None, table_style=None, style_name=None,
         display_name=None, note_class=None, text_id=None, text_name=None,
         office_name=None, office_title=None, outline_level=None, level=None,
@@ -93,6 +93,8 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         attributes['text:style-name'] = text_style
     if family:
         attributes['style:family'] = family
+    if draw_id:
+        attributes['draw:id'] = draw_id
     if draw_name:
         attributes['draw:name'] = draw_name
     if draw_style:
@@ -237,14 +239,13 @@ def _merge_dicts(d, *args, **kw):
 # Non-public yet useful helpers
 #
 
-def _get_element_list(context, element_name, regex=None, href=None,
-        svg_title=None, svg_desc=None, **kw):
+def _get_element_list(context, element_name, content=None, href=None,
+        svg_title=None, svg_desc=None, dc_creator=None, dc_date=None, **kw):
     query = _make_xpath_query(element_name, **kw)
     elements = context.get_element_list(query)
-    # Filter the elements with the regex
-    if regex is not None:
-        elements = [element for element in elements
-                            if element.match(regex)]
+    # Filter the elements with the regex (TODO use XPath)
+    if content is not None:
+        elements = [element for element in elements if element.match(content)]
     if href is not None:
         filtered = []
         for element in elements:
@@ -252,25 +253,33 @@ def _get_element_list(context, element_name, regex=None, href=None,
             if search(href, href_attr) is not None:
                 filtered.append(element)
         elements = filtered
-    if svg_title is not None or svg_desc is not None:
-        for variable, childname in [(svg_title, 'svg:title'),
-                                    (svg_desc, 'svg:desc')]:
-            if not variable:
-                continue
-            filtered = []
-            for element in elements:
-                child = element.get_element(childname)
-                if child and child.match(variable):
-                    filtered.append(element)
-            elements = filtered
+    if dc_date is not None:
+        # XXX Date or DateTime?
+        dc_date = DateTime.encode(dc_date)
+    for variable, childname in [
+            (svg_title, 'svg:title'),
+            (svg_desc, 'svg:desc'),
+            (dc_creator, 'descendant::dc:creator'),
+            (dc_date, 'descendant::dc:date')]:
+        if not variable:
+            continue
+        filtered = []
+        for element in elements:
+            child = element.get_element(childname)
+            if child and child.match(variable):
+                filtered.append(element)
+        elements = filtered
     return elements
 
 
-def _get_element(context, element_name, **kw):
+
+def _get_element(context, element_name, position, **kw):
+    # TODO Transmit position not to load the whole list
     result = _get_element_list(context, element_name, **kw)
-    if result:
-        return result[0]
-    return None
+    try:
+        return result[position]
+    except IndexError:
+        return None
 
 
 
@@ -448,7 +457,7 @@ def oooc_to_ooow(formula):
 
         formula -- unicode
 
-    Returns: unicode
+    Return: unicode
     """
     prefix, formula = formula.split(":=", 1)
     assert "oooc" in prefix

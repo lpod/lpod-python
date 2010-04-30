@@ -675,7 +675,7 @@ class odf_row(odf_element):
                 yield cell
 
 
-    def get_cell_list(self, regex=None, style=None):
+    def get_cell_list(self, style=None, content=None):
         """Get the list of cells matching the criteria. Each result is a
         tuple of (x, y, cell).
 
@@ -690,7 +690,7 @@ class odf_row(odf_element):
         cells = []
         for x, cell in enumerate(self.traverse_cells()):
             # Filter the cells with the regex
-            if regex and not cell.match(regex):
+            if content and not cell.match(content):
                 continue
             # Filter the cells with the style
             if style and style != cell.get_cell_style():
@@ -1339,7 +1339,7 @@ class odf_table(odf_element):
                 yield row
 
 
-    def get_row_list(self, regex=None, style=None):
+    def get_row_list(self, style=None, content=None):
         """Get the list of rows matching the criteria. Each result is a
         tuple of (y, row).
 
@@ -1356,7 +1356,7 @@ class odf_table(odf_element):
         """
         rows = []
         for y, row in enumerate(self.traverse_rows()):
-            if regex and not row.match(regex):
+            if content and not row.match(content):
                 continue
             if style and style != row.get_row_style():
                 continue
@@ -1538,7 +1538,7 @@ class odf_table(odf_element):
     # Cells
     #
 
-    def get_cell_list(self, regex=None, style=None):
+    def get_cell_list(self, style=None, content=None):
         """Get the list of cells matching the criteria. Each result is a
         tuple of (x, y, cell).
 
@@ -1552,7 +1552,7 @@ class odf_table(odf_element):
         """
         cells = []
         for y, row in enumerate(self.traverse_rows()):
-            for x, cell in row.get_cell_list(regex=regex, style=style):
+            for x, cell in row.get_cell_list(style=style, content=content):
                 cells.append((x, y, cell))
         # Return the coordinates and element
         return cells

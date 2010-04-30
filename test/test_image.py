@@ -59,20 +59,20 @@ class TestImage(TestCase):
 
     def test_get_image_by_name(self):
         body = self.body
-        element = body.get_image_by_name(u"Logo")
+        element = body.get_image(name=u"Logo")
         # Searched by frame but got the inner image with no name
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
     def test_get_image_by_position(self):
         body = self.body
-        element = body.get_image_by_position(0)
+        element = body.get_image(position=0)
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
     def test_get_image_by_path(self):
         body = self.body
-        element = body.get_image_by_path('.png')
+        element = body.get_image(href='.png')
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 
@@ -83,10 +83,10 @@ class TestImage(TestCase):
         frame = odf_create_frame(u"Image Frame", size=('0cm', '0cm'),
                                  style='Graphics')
         frame.append(image)
-        body.get_frame_by_position(0).insert(frame, NEXT_SIBLING)
-        element = body.get_image_by_name(u"Image Frame")
+        body.get_frame().insert(frame, NEXT_SIBLING)
+        element = body.get_image(name=u"Image Frame")
         self.assertEqual(element.get_attribute('xlink:href'), path)
-        element = body.get_image_by_position(1)
+        element = body.get_image(position=1)
         self.assertEqual(element.get_attribute('xlink:href'), path)
 
 

@@ -74,7 +74,7 @@ def hex2rgb(color):
 
         color: str
 
-    Returns: tuple
+    Return: tuple
     """
     code = color[1:]
     if not (len(color) == 7 and color[0] == '#' and code.isalnum()):
@@ -93,7 +93,7 @@ def rgb2hex(color):
 
         color -- str or tuple
 
-    Returns: str
+    Return: str
 
     Examples::
 

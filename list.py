@@ -25,6 +25,9 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
+# Import from the Standard Library
+from re import search
+
 # Import from lpod
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
@@ -85,21 +88,43 @@ class odf_list(odf_element):
     """Specialised element for lists.
     """
 
-    def get_item_list(self, regex=None):
-        return _get_element_list(self, 'text:list-item', regex=regex)
+    def get_item_list(self, content=None):
+        """Return all the list items that match the criteria.
+
+        Arguments:
+
+            style -- unicode
+
+            content -- unicode regex
+
+        Return: list of odf_paragraph
+        """
+        return _get_element_list(self, 'text:list-item', content=content)
 
 
-    def get_item_by_position(self, position):
-        return _get_element(self, 'text:list-item', position=position)
+    def get_item(self, position=0, content=None):
+        """Return the list item that matches the criteria. In nested lists,
+        return the list item that really contains that content.
 
+        Arguments:
 
-    def get_item_by_content(self, regex):
-        query = 'descendant::text:list-item/text:p'
-        paragraphs = [p for p in self.get_element_list(query)
-                      if p.match(regex)]
-        if paragraphs:
-            return paragraphs[0].get_parent()
-        return None
+            position -- int
+
+            content -- unicode regex
+
+        Return: odf_element or None if not found
+        """
+        # Custom implementation because of nested lists
+        results = self.get_element_list('descendant::text:list-item')
+        if content:
+            # Don't search recursively but on the very own paragraph(s) of
+            # each list item
+            results = [e for e in results
+                    if search(content, e.get_text_content()) is not None]
+        try:
+            return results[position]
+        except IndexError:
+            return None
 
 
     def set_header(self, text_or_element):

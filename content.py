@@ -94,9 +94,3 @@ class odf_content(odf_xmlpart):
             if style is not None:
                 return style
         return None
-
-
-    def get_tracked_changes(self):
-        """Return the tracked-changes part in the text body.
-        """
-        return self.get_element('//text:tracked-changes')

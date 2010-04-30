@@ -19,15 +19,18 @@ Low-level API
 =============
 
 - The XML API in the odf_element class has seen many name shortenings:
-  Before          After
-  -----------     -----
-  get_tagname     get_tag
-  set_tagname     set_tag
-  insert_element  insert
-  append_element  append
-  delete_element  delete
+
+    Before          After
+    --------------  -------
+    get_tagname     get_tag
+    set_tagname     set_tag
+    insert_element  insert
+    append_element  append
+    delete_element  delete
+
 - "odf_element.delete" now accepts no argument to delete itself as a
   shortcut.
+
 - "odf_create_element" accepts qualified names such as "text:p" to quickly
   create a single element.
 
@@ -36,8 +39,26 @@ High-level API
 
 - Methods "get_heading_*" now get an "outline_level" argument instead of
   "level" for consistency and not to mix with attribute "text:level"
+
 - Most scripts now write to the standard output, and provide "-o" option.
   Exceptions and lpod-highlight (in-place) and lpod-mm2odt (foo.mm ->
   foo.odt).
+
 - lpod-merge now merges documents in the first document provided, so this one
   provides the styles.
+
+- Methods "get_<element>_by_yyy" are merged in a single "get_<element>" and
+  several optional arguments.
+
+- Some variable methods were renamed for consistency:
+
+    Before               After
+    -------------------  ------------------------
+    get_variable_list    get_variable_decl_list
+    get_variable_sets    get_variable_set_list
+    (missing)            get_variable_set
+    get_variable_value   get_variable_set_value
+    get_user_field_list  get_user_field_decl_list
+
+- Method "get_tracked_changes" was moved from odf_content to odf_element,
+  to group it with all other tracked changes methods.

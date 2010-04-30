@@ -317,7 +317,7 @@ class TestList(TestCase):
         spam.append(ham_list)
         ham.append(eggs_list)
 
-        item = spam_list.get_item_by_content(ur'spam')
+        item = spam_list.get_item(content=ur'spam')
         expected = ('<text:list-item>\n'
                     '  <text:p>spam</text:p>\n'
                     '  <text:list>\n'
@@ -332,7 +332,7 @@ class TestList(TestCase):
                     '  </text:list>\n'
                     '</text:list-item>\n')
         self.assertEqual(item.serialize(pretty=True), expected)
-        item = spam_list.get_item_by_content(ur'ham')
+        item = spam_list.get_item(content=ur'ham')
         expected = ('<text:list-item>\n'
                     '  <text:p>ham</text:p>\n'
                     '  <text:list>\n'
@@ -342,7 +342,7 @@ class TestList(TestCase):
                     '  </text:list>\n'
                     '</text:list-item>\n')
         self.assertEqual(item.serialize(pretty=True), expected)
-        item = spam_list.get_item_by_content(ur'eggs')
+        item = spam_list.get_item(content=ur'eggs')
         expected = ('<text:list-item>\n'
                     '  <text:p>eggs</text:p>\n'
                     '</text:list-item>\n')

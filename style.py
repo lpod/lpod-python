@@ -394,7 +394,7 @@ class odf_list_style(odf_style):
 
 
     def get_level_style(self, level):
-        return _get_element(self, self.any_style, level=level)
+        return _get_element(self, self.any_style, 0, level=level)
 
 
     def set_level_style(self, level, type=None, format=None, prefix=None,

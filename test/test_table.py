@@ -579,7 +579,7 @@ class TestRowCell(TestCase):
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
         body = document.get_body()
-        table = body.get_table_by_name(u"Example1").clone()
+        table = body.get_table(name=u"Example1").clone()
         self.row_repeats = table.get_row(0)
         self.row = table.get_row(1)
 
@@ -593,7 +593,7 @@ class TestRowCell(TestCase):
 
 
     def test_get_cell_list_regex(self):
-        coordinates = [x for x, cell in self.row.get_cell_list(regex=ur'3')]
+        coordinates = [x for x, cell in self.row.get_cell_list(content=ur'3')]
         expected = [4, 5, 6]
         self.assertEqual(coordinates, expected)
 
@@ -760,7 +760,7 @@ class TestTable(TestCase):
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
         self.body = body = document.get_body()
-        self.table = body.get_table_by_name(u"Example1")
+        self.table = body.get_table(name=u"Example1")
 
 
     def test_get_table_list(self):
@@ -775,15 +775,16 @@ class TestTable(TestCase):
 
     def test_get_table_by_name(self):
         body = self.body.clone()
-        body.append(odf_create_table(u"New Table"))
-        table = body.get_table_by_name(u"New Table")
-        self.assertEqual(table.get_table_name(), u"New Table")
+        name = u"New Table"
+        body.append(odf_create_table(name))
+        table = body.get_table(name=name)
+        self.assertEqual(table.get_table_name(), name)
 
 
     def test_get_table_by_position(self):
         body = self.body.clone()
         body.append(odf_create_table(u"New Table"))
-        table = body.get_table_by_position(3)
+        table = body.get_table(position=3)
         self.assertEqual(table.get_table_name(), u"New Table")
 
 
@@ -846,7 +847,7 @@ class TestTable(TestCase):
 
     def test_rstrip_table(self):
         document = odf_get_document('samples/styled_table.ods')
-        table = document.get_body().get_table_by_name(u'Feuille1').clone()
+        table = document.get_body().get_table(name=u'Feuille1').clone()
         table.rstrip_table()
         self.assertEqual(table.get_table_size(), (5, 9))
 
@@ -856,7 +857,7 @@ class TestTableRow(TestCase):
 
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
-        self.table = document.get_body().get_table_by_name(u"Example1")
+        self.table = document.get_body().get_table(name=u"Example1")
 
 
     def test_traverse_rows(self):
@@ -872,7 +873,7 @@ class TestTableRow(TestCase):
 
 
     def test_get_row_list_regex(self):
-        coordinates = [y for y, row in self.table.get_row_list(regex=ur'4')]
+        coordinates = [y for y, row in self.table.get_row_list(content=ur'4')]
         self.assertEqual(coordinates, [3])
 
 
@@ -1070,7 +1071,7 @@ class TestTableCell(TestCase):
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
         body = document.get_body()
-        self.table = body.get_table_by_name(u"Example1").clone()
+        self.table = body.get_table(name=u"Example1").clone()
 
 
     def test_get_cell_alpha(self):
@@ -1108,7 +1109,7 @@ class TestTableCell(TestCase):
     def test_get_cell_list_regex(self):
         table = self.table
         coordinates = [(x, y)
-                for x, y, cell in table.get_cell_list(regex=ur'3')]
+                for x, y, cell in table.get_cell_list(content=ur'3')]
         expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
                 (5, 2), (6, 2), (2, 3)]
         self.assertEqual(coordinates, expected)
@@ -1176,7 +1177,7 @@ class TestTableColumn(TestCase):
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
         body = document.get_body()
-        self.table = body.get_table_by_name(u"Example1").clone()
+        self.table = body.get_table(name=u"Example1").clone()
 
 
     def test_traverse_columns(self):

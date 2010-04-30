@@ -103,7 +103,7 @@ class TestVariables(TestCase):
     def test_get_variable_set(self):
         clone = self.document.clone()
         body = clone.get_body()
-        variable_sets = body.get_variable_sets(u"Variabilité")
+        variable_sets = body.get_variable_set_list(u"Variabilité")
         self.assertEqual(len(variable_sets), 1)
         expected = ('<text:variable-set text:name="%s" '
                       'office:value-type="float" office:value="123" '
@@ -115,7 +115,7 @@ class TestVariables(TestCase):
     def test_get_variable_get(self):
         document = self.document.clone()
         body = document.get_body()
-        value = body.get_variable_value(u"Variabilité")
+        value = body.get_variable_set_value(u"Variabilité")
         self.assertEqual(value, 123)
 
 

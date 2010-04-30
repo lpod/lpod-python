@@ -67,7 +67,7 @@ class BookmarkTest(TestCase):
         body = self.body
         bookmark = odf_create_bookmark(u'你好 Zoé')
         body.append(bookmark)
-        get = body.get_bookmark_by_name(u'你好 Zoé')
+        get = body.get_bookmark(name=u'你好 Zoé')
         expected = ('<text:bookmark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
@@ -86,7 +86,7 @@ class BookmarkTest(TestCase):
         body = self.body
         bookmark_start = odf_create_bookmark_start(u'你好 Zoé')
         body.append(bookmark_start)
-        get = body.get_bookmark_start_by_name(u'你好 Zoé')
+        get = body.get_bookmark_start(name=u'你好 Zoé')
         expected = ('<text:bookmark-start text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
@@ -105,7 +105,7 @@ class BookmarkTest(TestCase):
         body = self.body
         bookmark_end = odf_create_bookmark_end(u'你好 Zoé')
         body.append(bookmark_end)
-        get = body.get_bookmark_end_by_name(u'你好 Zoé')
+        get = body.get_bookmark_end(name=u'你好 Zoé')
         expected = ('<text:bookmark-end text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
@@ -123,9 +123,9 @@ class BookmarkTest(TestCase):
 
     def test_set_bookmark_simple(self):
         body = self.body
-        paragraph = body.get_paragraph_by_position(-1)
+        paragraph = body.get_paragraph(position=-1)
         paragraph.set_bookmark("A bookmark")
-        bookmark = paragraph.get_bookmark_by_name("A bookmark")
+        bookmark = paragraph.get_bookmark(name="A bookmark")
         self.assertNotEqual(bookmark, None)
 
 

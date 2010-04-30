@@ -67,8 +67,8 @@ def highlight(odf_file_url, pattern, color=None, background_color=None,
     # Patch!
     body = document.get_body()
     i = -1
-    for i, paragraph in enumerate(body.get_paragraph_list(regex=pattern) +
-                                  body.get_heading_list(regex=pattern)):
+    for i, paragraph in enumerate(body.get_paragraph_list(content=pattern) +
+                                  body.get_heading_list(content=pattern)):
         # Don't colour the table of content
         if paragraph.get_parent().get_tag() in ('text:index-title',
                 'text:index-body'):

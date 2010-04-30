@@ -79,7 +79,7 @@ class TestSection(TestCase):
 
     def test_get_section(self):
         body = self.body
-        section = body.get_section_by_position(1)
+        section = body.get_section(position=1)
         name = section.get_attribute('text:name')
         self.assertEqual(name, "Section2")
 

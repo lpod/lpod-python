@@ -120,36 +120,36 @@ class TestShapes(TestCase):
 
     def test_get_draw_line_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         lines = page.get_draw_line_list()
         self.assertEqual(len(lines), 2)
 
 
     def test_get_draw_line_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        lines = page.get_draw_line_list(regex=ur'èche*')
+        page = body.get_draw_page()
+        lines = page.get_draw_line_list(content=ur'èche*')
         self.assertEqual(len(lines), 1)
 
 
     def test_get_draw_line_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         lines = page.get_draw_line_list(draw_style=ur'gr2')
         self.assertEqual(len(lines), 1)
 
 
     def test_get_draw_line_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         lines = page.get_draw_line_list(draw_text_style=ur'P1')
         self.assertEqual(len(lines), 2)
 
 
     def test_get_draw_line_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        line = page.get_draw_line_by_content(ur'Ligne')
+        page = body.get_draw_page()
+        line = page.get_draw_line(content=ur'Ligne')
         expected = ('<draw:line draw:style-name="gr1" '
                     'draw:text-style-name="P1" draw:layer="layout" '
                     'svg:x1="3.5cm" svg:y1="2.5cm" svg:x2="10.5cm" '
@@ -161,10 +161,10 @@ class TestShapes(TestCase):
 
     def test_get_draw_line_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         line = odf_create_line(shape_id=u'an id')
         page.append(line)
-        line = page.get_draw_line_by_id(ur'an id')
+        line = page.get_draw_line(id=ur'an id')
         expected = '<draw:line draw:id="an id"/>\n'
         self.assertEqual(line.serialize(pretty=True), expected)
 
@@ -174,36 +174,36 @@ class TestShapes(TestCase):
 
     def test_get_draw_rectangle_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         rectangles = page.get_draw_rectangle_list()
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        rectangles = page.get_draw_rectangle_list(regex=ur'angle')
+        page = body.get_draw_page()
+        rectangles = page.get_draw_rectangle_list(content=ur'angle')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         rectangles = page.get_draw_rectangle_list(draw_style=ur'gr1')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         rectangles = page.get_draw_rectangle_list(draw_text_style=ur'P1')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        rectangle = page.get_draw_rectangle_by_content(ur'Rect')
+        page = body.get_draw_page()
+        rectangle = page.get_draw_rectangle(content=ur'Rect')
         expected = ('<draw:rect draw:style-name="gr1" '
                     'draw:text-style-name="P1" draw:id="id1" '
                     'draw:layer="layout" svg:width="6cm" svg:height="7cm" '
@@ -215,10 +215,10 @@ class TestShapes(TestCase):
 
     def test_get_draw_rectangle_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         rectangle = odf_create_rectangle(shape_id=u'an id')
         page.append(rectangle)
-        rectangle = page.get_draw_rectangle_by_id(ur'an id')
+        rectangle = page.get_draw_rectangle(id=ur'an id')
         expected = ('<draw:rect draw:id="an id" svg:width="1cm" '
                     'svg:height="1cm"/>\n')
         self.assertEqual(rectangle.serialize(pretty=True), expected)
@@ -229,36 +229,36 @@ class TestShapes(TestCase):
 
     def test_get_draw_ellipse_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         ellipses = page.get_draw_ellipse_list()
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        ellipses = page.get_draw_ellipse_list(regex=ur'rcle')
+        page = body.get_draw_page()
+        ellipses = page.get_draw_ellipse_list(content=ur'rcle')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         ellipses = page.get_draw_ellipse_list(draw_style=ur'gr1')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         ellipses = page.get_draw_ellipse_list(draw_text_style=ur'P1')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        ellipse = page.get_draw_ellipse_by_content(ur'Cerc')
+        page = body.get_draw_page()
+        ellipse = page.get_draw_ellipse(content=ur'Cerc')
         expected = ('<draw:ellipse draw:style-name="gr1" '
                     'draw:text-style-name="P1" draw:id="id2" '
                     'draw:layer="layout" svg:width="4cm" svg:height="3.5cm" '
@@ -270,10 +270,10 @@ class TestShapes(TestCase):
 
     def test_get_draw_ellipse_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         ellipse = odf_create_ellipse(shape_id=u'an id')
         page.append(ellipse)
-        ellipse = page.get_draw_ellipse_by_id(ur'an id')
+        ellipse = page.get_draw_ellipse(id=ur'an id')
         expected = ('<draw:ellipse draw:id="an id" svg:width="1cm" '
                     'svg:height="1cm"/>\n')
         self.assertEqual(ellipse.serialize(pretty=True), expected)
@@ -284,36 +284,36 @@ class TestShapes(TestCase):
 
     def test_get_draw_connector_list(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         connectors = page.get_draw_connector_list()
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_regex(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        connectors = page.get_draw_connector_list(regex=ur'Con')
+        page = body.get_draw_page()
+        connectors = page.get_draw_connector_list(content=ur'Con')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_draw_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         connectors = page.get_draw_connector_list(draw_style=ur'gr4')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_draw_text_style(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         connectors = page.get_draw_connector_list(draw_text_style=ur'P1')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_by_content(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
-        connector = page.get_draw_connector_by_content(ur'ecteur')
+        page = body.get_draw_page()
+        connector = page.get_draw_connector(content=ur'ecteur')
         expected = ('<draw:connector draw:style-name="gr4" '
                     'draw:text-style-name="P1" draw:layer="layout" '
                     'svg:x1="11cm" svg:y1="8cm" svg:x2="15.5cm" '
@@ -328,21 +328,21 @@ class TestShapes(TestCase):
 
     def test_get_draw_connector_by_id(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         connector = odf_create_connector(shape_id=u'an id')
         page.append(connector)
-        connector = page.get_draw_connector_by_id(ur'an id')
+        connector = page.get_draw_connector(id=ur'an id')
         expected = '<draw:connector draw:id="an id"/>\n'
         self.assertEqual(connector.serialize(pretty=True), expected)
 
 
     def test_get_draw_orphans_connector(self):
         body = self.content.get_body()
-        page = body.get_draw_page_by_position(0)
+        page = body.get_draw_page()
         orphan_connector = odf_create_connector()
         orphan_connector.append(odf_create_paragraph(u'Orphan c'))
         body.append(orphan_connector)
-        connectors = body.get_draw_orphans_connectors()
+        connectors = body.get_orphan_draw_connectors()
         self.assertEqual(len(connectors), 1)
 
 

@@ -439,7 +439,7 @@ class odf_document(object):
 
             display_name -- unicode
 
-        Returns: odf_style or None if not found.
+        Return: odf_style or None if not found.
         """
         # 1. content.xml
         content = self.get_content()

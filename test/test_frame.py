@@ -76,19 +76,19 @@ class TestFrame(TestCase):
 
     def test_get_frame_by_name(self):
         body = self.body
-        frame = body.get_frame_by_name(u"Logo")
+        frame = body.get_frame(name=u"Logo")
         self.assertEqual(frame.get_tag(), 'draw:frame')
 
 
     def test_get_frame_by_position(self):
         body = self.body
-        frame = body.get_frame_by_position(3)
+        frame = body.get_frame(position=3)
         self.assertEqual(frame.get_attribute('presentation:class'), u'notes')
 
 
     def test_get_frame_by_description(self):
         body = self.body
-        frame = body.get_frame_by_description(u"描述")
+        frame = body.get_frame(description=u"描述")
         self.assertEqual(frame.get_tag(), 'draw:frame')
 
 
@@ -103,9 +103,9 @@ class TestFrame(TestCase):
         body.append(frame2)
         result = body.get_frame_list(style='Graphics')
         self.assertEqual(len(result), 2)
-        element = body.get_frame_by_name(u"frame1")
+        element = body.get_frame(name=u"frame1")
         self.assertEqual(element.get_tag(), 'draw:frame')
-        element = body.get_frame_by_name(u"frame2")
+        element = body.get_frame(name=u"frame2")
         self.assertEqual(element.get_tag(), 'draw:frame')
 
 
@@ -171,7 +171,7 @@ class TestOdfFrame(TestCase):
 
     def test_get_frame(self):
         body = self.body
-        frame = body.get_frame_by_position(0)
+        frame = body.get_frame()
         self.assert_(isinstance(frame, odf_frame))
 
 

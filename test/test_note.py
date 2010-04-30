@@ -73,7 +73,7 @@ class TestNote(TestCase):
 
     def test_get_note(self):
         body = self.body
-        note = body.get_note_by_id('ftn1')
+        note = body.get_note(note_id='ftn1')
         self.assertEqual(note.get_tag(), 'text:note')
 
 
@@ -97,7 +97,7 @@ class TestNote(TestCase):
 
     def test_get_note_by_id(self):
         body = self.body
-        note = body.get_note_by_id('ftn1')
+        note = body.get_note(note_id='ftn1')
         expected = ('<text:note text:id="ftn1" text:note-class="footnote">\n'
                     '  <text:note-citation>1</text:note-citation>\n'
                     '  <text:note-body>\n'
@@ -111,7 +111,7 @@ class TestNote(TestCase):
 
     def test_get_note_by_class_footnote(self):
         body = self.body
-        footnotes = body.get_note_by_class('footnote')
+        footnotes = body.get_note_list(note_class='footnote')
         footnote = footnotes[0]
         expected = ('<text:note text:id="ftn1" text:note-class="footnote">\n'
                     '  <text:note-citation>1</text:note-citation>\n'
@@ -126,7 +126,7 @@ class TestNote(TestCase):
 
     def test_get_note_by_class_endnote(self):
         body = self.body
-        endnotes = body.get_note_by_class('endnote')
+        endnotes = body.get_note_list(note_class='endnote')
         endnote = endnotes[0]
         expected = ('<text:note text:id="ftn2" text:note-class="endnote">\n'
                     '  <text:note-citation>i</text:note-citation>\n'

@@ -39,7 +39,7 @@ class TestLinks(TestCase):
     def setUp(self):
         document = odf_get_document('samples/base_text.odt')
         self.body = body = document.get_body().clone()
-        self.paragraph = body.get_paragraph_by_position(0)
+        self.paragraph = body.get_paragraph()
 
 
     def test_create_link1(self):
@@ -65,7 +65,7 @@ class TestLinks(TestCase):
         paragraph = self.paragraph
         paragraph.append(link1)
         paragraph.append(link2)
-        element = self.body.get_link_by_name(u'link2')
+        element = self.body.get_link(name=u'link2')
         expected = ('<text:a xlink:href="http://example.com/" '
                       'office:name="link2"/>')
         self.assertEqual(element.serialize(), expected)
@@ -147,17 +147,17 @@ class TestLinks(TestCase):
         self.assertEqual(element.serialize(), expected)
 
 
-    def test_get_link_by_path(self):
+    def test_get_link_by_href(self):
         body = self.body
-        link = body.get_link_by_path(ur'lpod')
+        link = body.get_link(href=ur'lpod')
         href = link.get_attribute('xlink:href')
         self.assertEqual(href, u'http://lpod-project.org/')
 
 
     def test_get_link_by_path_context(self):
         body = self.body
-        section2 = body.get_section_by_position(1)
-        link = section2.get_link_by_path(ur'\.org')
+        section2 = body.get_section(position=1)
+        link = section2.get_link(href=ur'\.org')
         href = link.get_attribute('xlink:href')
         self.assertEqual(href, u'http://lpod-project.org/')
 
