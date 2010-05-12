@@ -72,6 +72,8 @@ def _get_formatted_text(element, context, with_text=True):
                     continue
                 style = document.get_style("text", style)
                 properties = style.get_style_properties()
+                if properties is None:
+                    continue
                 # Compute before, text and after
                 before = ''
                 for c in text:
@@ -94,7 +96,7 @@ def _get_formatted_text(element, context, with_text=True):
                     result.append('**')
                     result.append(after)
                     continue
-                # Italique ?
+                # Italic ?
                 if properties.get('fo:font-style') == 'italic':
                     result.append(before)
                     result.append('*')
