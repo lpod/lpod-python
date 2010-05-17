@@ -51,10 +51,10 @@ class Boolean(object):
 
     @staticmethod
     def encode(value):
-        if value is True:
-            return 'true'
-        elif value is False:
-            return 'false'
+        if value is True or str(value).lower() == "true":
+            return "true"
+        elif value is False or str(value).lower() == "false":
+            return "false"
         raise TypeError, '"%s" is not a boolean' % value
 
 

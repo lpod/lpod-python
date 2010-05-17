@@ -67,10 +67,12 @@ class BooleanTestCase(TestCase):
     def test_encode(self):
         self.assertEqual(Boolean.encode(True), 'true')
         self.assertEqual(Boolean.encode(False), 'false')
+        self.assertEqual(Boolean.encode("true"), 'true')
+        self.assertEqual(Boolean.encode("false"), 'false')
 
 
     def test_bad_encode(self):
-        self.assertRaises(TypeError, Boolean.encode, 'true')
+        self.assertRaises(TypeError, Boolean.encode, 'on')
         self.assertRaises(TypeError, Boolean.encode, 1)
 
 

@@ -1185,15 +1185,15 @@ class odf_table(odf_element):
 
 
     def set_table_protected(self, protect):
-        self.set_attribute('table:protected', Boolean.encode(protect))
+        self.set_boolean_attribute('table:protected', protect)
 
 
     def is_table_displayed(self):
-        return self.get_attribute('table:display') == 'true'
+        return self.get_boolean_attribute('table:display') is True
 
 
     def set_table_displayed(self, display):
-        self.set_attribute('table:display', Boolean.encode(display))
+        self.set_boolean_attribute('table:display', display)
 
 
     def is_table_printable(self):
@@ -1205,7 +1205,7 @@ class odf_table(odf_element):
 
 
     def set_table_printable(self, printable):
-        self.set_attribute('table:print', Boolean.encode(printable))
+        self.set_boolean_attribute('table:print', printable)
 
 
     def get_table_print_ranges(self):

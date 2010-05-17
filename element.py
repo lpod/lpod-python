@@ -34,7 +34,7 @@ from lxml.etree import fromstring, tostring, Element, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
-from datatype import DateTime
+from datatype import DateTime, Boolean
 from utils import _get_abspath, _get_element_list, _get_element
 from utils import _get_style_tagname, get_value
 
@@ -476,6 +476,10 @@ class odf_element(object):
         return unicode(value)
 
 
+    def get_boolean_attribute(self, name):
+        return Boolean.decode(self.get_attribute(name))
+
+
     def set_attribute(self, name, value):
         element = self.__element
         uri, name = _decode_qname(name)
@@ -488,6 +492,11 @@ class odf_element(object):
                 pass
             return
         element.set(name, value)
+
+
+    def set_boolean_attribute(self, name, value):
+        value = Boolean.encode(value)
+        self.set_attribute(name, value)
 
 
     def del_attribute(self, name):
