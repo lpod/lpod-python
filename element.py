@@ -477,6 +477,15 @@ class odf_element(object):
 
 
     def get_boolean_attribute(self, name):
+        """Shortcut to get the value of an attribute that contains "true" or
+        "false" as a boolean value.
+
+        Arguments:
+
+            name -- str
+
+        Returns: bool
+        """
         return Boolean.decode(self.get_attribute(name))
 
 
@@ -495,8 +504,16 @@ class odf_element(object):
 
 
     def set_boolean_attribute(self, name, value):
-        value = Boolean.encode(value)
-        self.set_attribute(name, value)
+        """Shortcut to set an attribute that expects "true" or "false" from a
+        boolean value. "true" and "false" accepted as well.
+
+        Arguments:
+
+            name -- str
+
+            value -- bool or "true" or "false"
+        """
+        self.set_attribute(name, Boolean.encode(value))
 
 
     def del_attribute(self, name):
