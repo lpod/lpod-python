@@ -1,7 +1,6 @@
 Install Dependencies:
   - python >= 2.6: http://www.python.org/
   - lxml >= 2.0: http://codespeak.net/lxml/
-  - pygobject >= 2.16.1: http://www.pygtk.org/
 
 Use Case Dependencies:
   - itools = 0.60: http://www.hforge.org/itools

@@ -28,12 +28,12 @@
 # Import from the Standard Library
 from copy import deepcopy
 from cStringIO import StringIO
+from os.path import isdir
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 
 # Import from lpod
 from manifest import odf_manifest
 from utils import _get_abspath
-from vfs import vfs, WRITE
 
 
 # Types and their default template
@@ -125,20 +125,18 @@ class odf_container(object):
     __zip_packaging = None
 
 
-    def __init__(self, uri_or_file):
-        if type(uri_or_file) is str:
-            # URI
-            self.uri = uri = uri_or_file
-            if not vfs.exists(uri):
-                raise ValueError, 'URI "%s" is not found' % uri
-            if vfs.is_folder(uri):
+    def __init__(self, path_or_file):
+        if type(path_or_file) is str:
+            # Path
+            self.path = path = path_or_file
+            if isdir(path):
                 message = "reading uncompressed OpenDocument not supported"
                 raise NotImplementedError, message
-            file = vfs.open(uri)
+            file = open(path, 'rb')
         else:
             # File-like assumed
-            self.uri = None
-            file = uri_or_file
+            self.path = None
+            file = path_or_file
         self.__data = data = file.read()
         zip_expected = data[:4] == 'PK\x03\x04'
         # Most probably zipped document
@@ -324,14 +322,14 @@ class odf_container(object):
 
 
     def clone(self):
-        """Make a copy of this container with no URI.
+        """Make a copy of this container with no path.
         """
         # FIXME must load parts before?
         clone = object.__new__(self.__class__)
         for name in self.__dict__:
             # "__zipfile" is not safe to copy
             # but can be recreated from "__data"
-            if name in ('uri', '_odf_container__zipfile'):
+            if name in ('path', '_odf_container__zipfile'):
                 setattr(clone, name, None)
             else:
                 value = getattr(self, name)
@@ -341,7 +339,7 @@ class odf_container(object):
 
 
     def save(self, target=None, packaging=None):
-        """Save the container to the given target, a URI or a file-like
+        """Save the container to the given target, a path or a file-like
         object.
 
         Package the output document in the same format than this document,
@@ -366,10 +364,9 @@ class odf_container(object):
         # Open output file
         close_after = False
         if target is None:
-            file = vfs.open(self.uri, WRITE)
-            close_after = True
-        elif isinstance(target, str):
-            file = vfs.open(target, WRITE)
+            target = self.path
+        if type(target) is str:
+            file = open(target, 'wb')
             close_after = True
         else:
             file = target
@@ -384,18 +381,18 @@ class odf_container(object):
 
 
 
-def odf_get_container(uri):
-    """Return an "odf_container" instance of the ODF document stored at the
-    given URI.
+def odf_get_container(path_or_file):
+    """Return an odf_container instance of the ODF document stored at the
+    given local path or in the given (open) file-like object.
     """
-    return odf_container(uri)
+    return odf_container(path_or_file)
 
 
 
-def odf_new_container_from_template(template_uri):
-    """Return an "odf_container" instance using the given template.
+def odf_new_container_from_template(template_path_or_file):
+    """Return an odf_container instance based on the given template.
     """
-    template_container = odf_get_container(template_uri)
+    template_container = odf_get_container(template_path_or_file)
     # Return a copy of the template container
     clone = template_container.clone()
     # Change type from template to regular
@@ -414,6 +411,5 @@ def odf_new_container_from_type(odf_type):
     """
     if odf_type not in ODF_TYPES:
         raise ValueError, 'unknown ODF type "%s"' % odf_type
-    template_path = ODF_TYPES[odf_type]
-    template_uri = _get_abspath(template_path)
-    return odf_new_container_from_template(template_uri)
+    template_path = _get_abspath(ODF_TYPES[odf_type])
+    return odf_new_container_from_template(template_path)

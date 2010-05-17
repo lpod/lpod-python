@@ -29,7 +29,9 @@
 
 # Import from the Standard Library
 from cStringIO import StringIO
+from ftplib import FTP
 from unittest import TestCase, main
+from urllib import urlopen
 
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
@@ -44,32 +46,32 @@ from lpod.styles import odf_styles
 class NewDocumentFromTemplateTestCase(TestCase):
 
     def test_bad_template(self):
-        self.assertRaises(ValueError, odf_new_document_from_template,
+        self.assertRaises(IOError, odf_new_document_from_template,
                           '../templates/notexisting')
 
     def test_text_template(self):
-        uri = '../templates/text.ott'
-        self.assert_(odf_new_document_from_template(uri))
+        path = '../templates/text.ott'
+        self.assert_(odf_new_document_from_template(path))
 
 
     def test_spreadsheet_template(self):
-        uri = '../templates/spreadsheet.ots'
-        self.assert_(odf_new_document_from_template(uri))
+        path = '../templates/spreadsheet.ots'
+        self.assert_(odf_new_document_from_template(path))
 
 
     def test_presentation_template(self):
-        uri = '../templates/presentation.otp'
-        self.assert_(odf_new_document_from_template(uri))
+        path = '../templates/presentation.otp'
+        self.assert_(odf_new_document_from_template(path))
 
 
     def test_drawing_template(self):
-        uri = '../templates/drawing.otg'
-        self.assert_(odf_new_document_from_template(uri))
+        path = '../templates/drawing.otg'
+        self.assert_(odf_new_document_from_template(path))
 
 
     def test_mimetype(self):
-        uri = '../templates/drawing.otg'
-        document = odf_new_document_from_template(uri)
+        path = '../templates/drawing.otg'
+        document = odf_new_document_from_template(path)
         mimetype = document.get_part('mimetype')
         self.assertFalse('template' in mimetype)
         manifest = document.get_manifest()
@@ -119,13 +121,20 @@ class GetDocumentTestCase(TestCase):
 
 
     def test_http(self):
-        uri = 'http://ftp.lpod-project.org/example.odt'
-        self.assert_(odf_get_document(uri))
+        file = urlopen('http://ftp.lpod-project.org/example.odt')
+        document = odf_get_document(file)
+        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
 
 
     def test_ftp(self):
-        uri = 'ftp://ftp.lpod-project.org/example.odt'
-        self.assert_(odf_get_document(uri))
+        ftp = FTP('ftp.lpod-project.org')
+        ftp.login()
+        file = StringIO()
+        ftp.retrbinary('RETR example.odt', file.write)
+        ftp.quit()
+        file.seek(0)
+        document = odf_get_document(file)
+        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
 
 
 
@@ -174,7 +183,7 @@ class DocumentTestCase(TestCase):
         self.assertEqual(len(parts), 1)
         self.assertEqual(parts.keys(), ['content'])
         container = clone.container
-        self.assertEqual(container.uri, None)
+        self.assertEqual(container.path, None)
 
 
     def test_save_nogenerator(self):

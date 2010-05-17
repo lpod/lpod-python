@@ -45,7 +45,6 @@ from style import odf_style, odf_master_page, odf_font_style
 from style import registered_styles
 from styles import odf_styles
 from utils import _get_style_family
-from vfs import vfs
 from xmlpart import odf_xmlpart
 
 
@@ -321,25 +320,25 @@ class odf_document(object):
         return u"\n".join(result) + '\n'
 
 
-    def add_file(self, uri_or_file):
-        """Insert a file from a URI or a fike-like object in the container.
+    def add_file(self, path_or_file):
+        """Insert a file from a path or a fike-like object in the container.
         Return the full path to reference it in the content.
 
         Arguments:
 
-            uri_or_file -- str or file-like
+            path_or_file -- str or file-like
 
         Return: str
         """
         name = None
         close_after = False
-        if type(uri_or_file) is unicode or type(uri_or_file) is str:
-            uri_or_file = uri_or_file.encode('utf_8')
-            file = vfs.open(uri_or_file)
-            name = uri_or_file
+        if type(path_or_file) is unicode or type(path_or_file) is str:
+            path_or_file = path_or_file.encode('utf_8')
+            file = open(path_or_file, 'rb')
+            name = path_or_file
             close_after = True
         else:
-            file = uri_or_file
+            file = path_or_file
             name = getattr(file, 'name')
         # Generate a safe portable name
         uuid = str(uuid4())
@@ -387,7 +386,7 @@ class odf_document(object):
 
     def save(self, target=None, packaging=None, pretty=False):
         """Save the document, at the same place it was opened or at the given
-        target URI. Target can also be a file-like object. It can be saved
+        target path. Target can also be a file-like object. It can be saved
         as a Zip file or as a flat XML file. XML parts can be pretty printed.
 
         Arguments:
@@ -705,30 +704,32 @@ class odf_document(object):
 # odf_document factories
 #
 
-def odf_get_document(uri):
-    """Return an "odf_document" instance of the ODF document stored in the
-    given file-like object or at the given URI.
+def odf_get_document(path_or_file):
+    """Return an "odf_document" instance of the ODF document stored at the
+    given local path or in the given (open) file-like object.
 
-    Example::
+    Examples::
 
+        >>> document = odf_get_document('/tmp/document.odt')
+        >>> stringio = StringIO(...)
         >>> document = odf_get_document(stringio)
-        >>> uri = 'uri://of/a/document.odt'
-        >>> document = odf_get_document(uri)
+        >>> file = urllib.urlopen('http://example.com/document.odt')
+        >>> document = odf_get_document(file)
     """
-    container = odf_get_container(uri)
+    container = odf_get_container(path_or_file)
     return odf_document(container)
 
 
 
-def odf_new_document_from_template(template_uri):
+def odf_new_document_from_template(template_path):
     """Return an "odf_document" instance using the given template.
 
     Example::
 
-        >>> uri = 'uri://of/a/template.ott'
-        >>> document = odf_new_document_from_template(uri)
+        >>> path = 'models/invoice.ott'
+        >>> document = odf_new_document_from_template(path)
     """
-    container = odf_new_container_from_template(template_uri)
+    container = odf_new_container_from_template(template_path)
     return odf_document(container)
 
 

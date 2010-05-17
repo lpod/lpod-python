@@ -114,6 +114,6 @@ if  __name__ == '__main__':
             automatic, common = True, True
         target = options.output
         if target is not None:
-            target = open(target, 'w')
+            target = open(target, 'wb')
         show_styles(document, target, automatic=automatic,
                 common=common, properties=options.properties)

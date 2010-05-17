@@ -28,30 +28,16 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from sys import exit, stdout, stdin
+from os import mkdir, makedirs
+from os.path import join, exists
+from shutil import rmtree
+from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.scriptutils import add_option_output, printerr
-from lpod.vfs import vfs
-
-
-
-def get_target_directory(dirname):
-    # Check the name and create the directory
-    if vfs.exists(dirname):
-        message = 'The directory "%s" exists, can i overwrite it? [y/N]'
-        stdout.write(message % dirname)
-        stdout.flush()
-        line = stdin.readline()
-        line = line.strip().lower()
-        if line == 'y':
-            vfs.remove(dirname)
-        else:
-            exit(0)
-    vfs.make_folder(dirname)
-    return vfs.open(dirname)
+from lpod.scriptutils import check_target_directory
 
 
 
@@ -81,11 +67,13 @@ def dump(txt, to_file):
 def dump_pictures(document, target):
     for part_name in document.get_parts():
         if part_name.startswith('Pictures/'):
-            if not target.exists('Pictures'):
-                target.make_folder('Pictures')
+            path = join(target, "Pictures")
+            if not exists(path):
+                mkdir(path)
             data = document.get_part(part_name)
             encoding = stdout.encoding if stdout.encoding else 'utf-8'
-            to_file = target.open(part_name.encode(encoding), 'w')
+            path = join(target, part_name.encode(encoding))
+            to_file = open(path, 'wb')
             to_file.write(data)
 
 
@@ -108,7 +96,7 @@ def spreadsheet_to_csv(document, target):
     for table in body.get_table_list():
         name = table.get_table_name()
         filename = clean_filename(name) + '.csv'
-        csv_file = target.open(filename, 'w')
+        csv_file = open(join(target, filename), 'wb')
 
         table.rstrip_table(aggressive=True)
         table.export_to_csv(csv_file)
@@ -138,7 +126,7 @@ if  __name__ == '__main__':
     parser.add_option('-r', '--rst', action='store_true', default=False,
             help='Dump the content file with a reST syntax')
     # --output
-    add_option_output(parser)
+    add_option_output(parser, metavar="DIR")
     # Parse !
     opts, args = parser.parse_args()
     # Container
@@ -150,14 +138,16 @@ if  __name__ == '__main__':
     document = odf_get_document(container_url)
     doc_type = document.get_type()
     if opts.output:
-        target = get_target_directory(opts.output)
-    # Meta / Styles / Pictures
-    if opts.output:
+        target = opts.output
+        check_target_directory(target)
+        if exists(target):
+            rmtree(target)
+        makedirs(target)
         # Meta
-        to_file = target.open('meta.txt', 'w')
+        to_file = open(join(target, 'meta.txt'), 'wb')
         dump(document.get_formated_meta(), to_file)
         # Styles
-        to_file = target.open('styles.txt', 'w')
+        to_file = open(join(target, 'styles.txt'), 'wb')
         dump(document.show_styles(), to_file)
         # Pictures
         dump_pictures(document, target)
@@ -170,7 +160,7 @@ if  __name__ == '__main__':
     if doc_type in ('text', 'text-template', 'presentation',
             'presentation-template'):
         if opts.output:
-            to_file = target.open('content.txt', 'w')
+            to_file = open(join(target, 'content.txt'), 'wb')
             dump(document.get_formatted_text(rst_mode=opts.rst), to_file)
         elif not opts.no_content:
             dump(document.get_formatted_text(rst_mode=opts.rst), stdout)

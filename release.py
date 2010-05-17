@@ -28,10 +28,9 @@
 # Import from the Standard Library
 from subprocess import Popen, PIPE
 from sys import stderr, argv
-from os.path import basename
+from os.path import basename, exists
 
 # Import from lpod
-from vfs import vfs
 
 try:
     # builtin on Windows
@@ -51,7 +50,7 @@ def _run_command(command):
 
 
 def has_git():
-    if not vfs.exists('.git'):
+    if not exists('.git'):
         return False
     try:
         _run_command(['git', 'branch'])

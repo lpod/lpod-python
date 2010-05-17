@@ -32,7 +32,7 @@ from re import search
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
 from paragraph import odf_create_paragraph
-from utils import _get_element_list, _get_element
+from utils import _get_element_list
 
 
 def odf_create_list_item(text_or_element=None):

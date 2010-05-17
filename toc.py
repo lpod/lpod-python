@@ -29,7 +29,6 @@ from element import FIRST_CHILD
 from element import register_element_class, odf_create_element, odf_element
 from paragraph import odf_create_paragraph
 from style import odf_create_style
-from utils import Boolean
 
 
 def odf_create_toc(title=u"Table of Contents", name=None, protected=True,

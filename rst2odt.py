@@ -48,7 +48,6 @@ from lpod.style import odf_create_style
 from lpod.table import odf_create_cell, odf_create_table, odf_create_row
 from lpod.table import odf_create_column, odf_create_header_rows
 from lpod.toc import odf_create_toc
-from lpod.vfs import vfs, Error
 
 
 DPI = 72
@@ -448,9 +447,9 @@ def _add_image(image, caption, context, width=None, height=None):
     # Load the image to find its size
     encoding = stdout.encoding if stdout.encoding is not None else "utf-8"
     try:
-        image_file = vfs.open(image.encode(encoding))
+        image_file = open(image.encode(encoding), 'rb')
         image_object = Image.open(image_file)
-    except (Error, UnicodeEncodeError, IOError, OverflowError), e:
+    except (UnicodeEncodeError, IOError, OverflowError), e:
         warn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size

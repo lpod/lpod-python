@@ -3,13 +3,14 @@
 
 # Import from the Standard Library
 from datetime import date
+from os import remove
+from os.path import exists
 from sys import argv, stderr, exit
 
 # Import from lpod
 from lpod.document import odf_new_document_from_template
 from lpod.span import odf_create_span
 from lpod.template import stl_odf
-from lpod.vfs import vfs
 
 
 def get_namespace(homme=False):
@@ -33,7 +34,7 @@ if __name__ == '__main__':
         exit(1)
     document = odf_new_document_from_template('test_template.ott')
     stl_odf(document, get_namespace())
-    if vfs.exists(output):
-        vfs.remove(output)
+    if exists(output):
+        remove(output)
     document.save(output)
     print 'Document "%s" generated.' % output

@@ -24,10 +24,11 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-# Import from the future
 # Import from the Standard Library
+from mimetypes import guess_type
+from os.path import exists, isfile
 from StringIO import StringIO
-from sys import stdout, stderr
+from sys import stdin, stdout, stderr
 
 # Import from lpod
 
@@ -36,9 +37,44 @@ from sys import stdout, stderr
 """
 
 
-def add_option_output(parser):
-    help = "dump the output into FILE instead of the standard output"
-    parser.add_option("-o", "--output", metavar="FILE", help=help)
+def check_target_file(path, kind="file"):
+    if exists(path):
+        message = 'The %s "%s" exists, can i overwrite it? [y/N]'
+        stdout.write(message % (kind, path))
+        stdout.flush()
+        line = stdin.readline()
+        line = line.strip().lower()
+        if line != 'y':
+            stdout.write('Operation aborted\n')
+            stdout.flush()
+            exit(0)
+
+
+
+def check_target_directory(path):
+    return check_target_file(path, kind="directory")
+
+
+
+encoding_map = {'gzip': 'application/x-gzip', 'bzip2': 'application/x-bzip2'}
+
+
+def get_mimetype(filename):
+    if not isfile(filename):
+        return 'application/x-directory'
+    mimetype, encoding = guess_type(filename)
+    if encoding is not None:
+        return encoding_map.get(encoding, encoding)
+    if mimetype is not None:
+        return mimetype
+    return 'application/octet-stream'
+
+
+
+def add_option_output(parser, metavar="FILE"):
+    help = "dump the output into %s instead of the standard output" % (
+            metavar)
+    parser.add_option("-o", "--output", metavar=metavar, help=help)
 
 
 

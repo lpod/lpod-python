@@ -29,7 +29,7 @@
 # Import from the standard library
 from optparse import OptionParser
 from os.path import basename, splitext
-from sys import exit, stdout, stdin
+from sys import exit, stdout
 
 # Import from lxml
 from lxml.etree import parse
@@ -39,22 +39,7 @@ from lpod import __version__
 from lpod.toc import odf_create_toc
 from lpod.document import odf_new_document_from_type
 from lpod.heading import odf_create_heading
-from lpod.scriptutils import add_option_output
-from lpod.vfs import vfs
-
-
-def check_for_overwrite(odt_file_url):
-    if vfs.exists(odt_file_url):
-        message = 'The file "%s" exists, can i overwrite it? [y/N]'
-        stdout.write(message % odt_file_url)
-        stdout.flush()
-        line = stdin.readline()
-        line = line.strip().lower()
-        if line != 'y':
-            stdout.write('Operation aborted\n')
-            stdout.flush()
-            exit(0)
-
+from lpod.scriptutils import add_option_output, check_target_file
 
 
 def make_mm_structure(node, level):
@@ -91,18 +76,18 @@ if  __name__ == '__main__':
         parser.print_help()
         exit(1)
 
-    # Get the 2 URLs
-    mm_file_url = args[0]
-    odt_file_url = opts.output
-    # Default value for the URL of the ODT file.
-    if not odt_file_url:
-        mm_basename = basename(mm_file_url)
-        odt_file_url = '%s.odt' % splitext(mm_basename)[0]
+    # Get the 2 paths
+    inname = args[0]
+    outname = opts.output
+    # Default value for the name of the output file.
+    if not outname:
+        mm_basename = basename(inname)
+        outname = '%s.odt' % splitext(mm_basename)[0]
     # Check if the file already exists
-    check_for_overwrite(odt_file_url)
+    check_target_file(outname)
 
     # Open the XML file
-    mm = parse(open(mm_file_url))
+    mm = parse(open(inname, 'rb'))
     # Get the first node of the mind map
     first_node = mm.xpath('/map/node')[0]
     # Make the structure
@@ -122,9 +107,9 @@ if  __name__ == '__main__':
     toc.toc_fill()
 
     # Save the document
-    document.save(odt_file_url, pretty=True)
+    document.save(outname, pretty=True)
     # Feed back to the user
     message = u"`%s' created from `%s' by lpOD\n"
-    message = message % (odt_file_url, mm_file_url)
+    message = message % (outname, inname)
     stdout.write(message.encode('utf-8'))
     stdout.flush()

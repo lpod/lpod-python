@@ -66,7 +66,7 @@ if  __name__ == "__main__":
         template = odf_get_document(options.styles_from)
 
     # Convert
-    document = rst2odt(open(source).read(), template=template)
+    document = rst2odt(open(source, 'rb').read(), template=template)
 
     # Save
     target = options.output

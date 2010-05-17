@@ -28,7 +28,7 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from os.path import basename, splitext
+from os.path import basename, splitext, exists
 from sys import exit, stdout
 
 # Import from lpod
@@ -39,8 +39,7 @@ from lpod.element import FIRST_CHILD
 from lpod.table import import_from_csv
 from lpod.toc import odf_create_toc
 from lpod.scriptutils import add_option_output, StdoutWriter
-from lpod.scriptutils import printerr, printinfo
-from lpod.vfs import vfs
+from lpod.scriptutils import printerr, printinfo, get_mimetype
 
 
 CSV_SHORT = 'text/csv'
@@ -202,12 +201,12 @@ if  __name__ == '__main__':
     for filename in filenames:
 
         # Exists ?
-        if not vfs.exists(filename):
+        if not exists(filename):
             printerr("Skip", filename, "not existing")
             continue
 
         # A good file => Only text, spreadsheet and CSV
-        mimetype = vfs.get_mimetype(filename)
+        mimetype = get_mimetype(filename)
         if mimetype not in (ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION,
                 CSV_SHORT, CSV_LONG):
             printerr('Skip "%s" with unknown mimetype "%s"' % (filename,

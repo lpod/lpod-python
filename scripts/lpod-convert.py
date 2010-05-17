@@ -28,7 +28,8 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from os.path import splitext
+from os import remove
+from os.path import splitext, exists
 from sys import exit
 
 # Import from lpod
@@ -39,7 +40,6 @@ from lpod.paragraph import odf_create_paragraph
 from lpod.rst2odt import convert as rst_convert
 from lpod.table import odf_create_table, odf_create_row
 from lpod.utils import oooc_to_ooow
-from lpod.vfs import vfs
 
 
 class Converter(object):
@@ -122,7 +122,7 @@ if  __name__ == '__main__':
     infile = args[0]
     extension = get_extension(infile)
     if extension == 'txt':
-        indoc = open(infile).read()
+        indoc = open(infile, 'rb').read()
         intype = 'txt'
     else:
         indoc = odf_get_document(infile)
@@ -144,8 +144,8 @@ if  __name__ == '__main__':
     if converter is None:
         raise NotImplementedError, "unsupported combination"
     # Remove output file
-    if vfs.exists(outfile):
-        vfs.remove(outfile)
+    if exists(outfile):
+        remove(outfile)
     # Convert!
     converter(indoc, outdoc)
     outdoc.save(outfile)

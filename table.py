@@ -34,7 +34,6 @@ from textwrap import wrap
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
 from utils import get_value, _set_value_and_type
-from vfs import vfs
 
 
 def _alpha_to_digit(alpha):
@@ -2103,16 +2102,16 @@ class odf_table(odf_element):
     # Utilities
     #
 
-    def export_to_csv(self, file, delimiter=';', quotechar='"',
+    def export_to_csv(self, path_or_file, delimiter=';', quotechar='"',
                       lineterminator='\n', encoding='utf-8'):
         """
-        Write the table as CSV in the file. If the file is a name, it is
-        opened as a URI. Else a file-like is expected. Opened file-like
-        are closed, given file-like are left open.
+        Write the table as CSV in the file. If the file is a string, it is
+        opened as a local path. Else a open file-like is expected; it will not
+        be closed afterwards.
 
         Arguments:
 
-            file -- file-like or URI
+            path_or_file -- str or file-like
 
             delimiter -- str
 
@@ -2124,7 +2123,7 @@ class odf_table(odf_element):
         """
         close_after = False
         if type(file) is str or type(file) is unicode:
-            file = vfs.open(file, 'w')
+            file = open(file, 'wb')
             close_after = True
         quoted = '\\' + quotechar
         for values in self.iter_table_values():
@@ -2143,16 +2142,18 @@ class odf_table(odf_element):
 
 
 
-def import_from_csv(file, name, style=None, delimiter=None, quotechar=None,
-        lineterminator=None, encoding='utf-8'):
-    """Convert the CSV file to an odf_table.
+def import_from_csv(path_or_file, name, style=None, delimiter=None,
+        quotechar=None, lineterminator=None, encoding='utf-8'):
+    """Convert the CSV file to an odf_table. If the file is a string, it is
+    opened as a local path. Else a open file-like is expected; it will not be
+    closed afterwards.
 
     CSV format can be autodetected to a certain limit, but encoding is
     important.
 
     Arguments:
 
-      file -- file-like or URI
+      path_or_file -- str or file-like
 
       name -- unicode
 
@@ -2170,13 +2171,13 @@ def import_from_csv(file, name, style=None, delimiter=None, quotechar=None,
     # Load the data
     # XXX Load the entire file in memory
     # Alternative: a file-wrapper returning the sample then the rest
-    if type(file) is str:
-        file = vfs.open(file)
+    if type(path_or_file) is str:
+        file = open(path_or_file, 'rb')
         data = file.read().splitlines(True)
         file.close()
     else:
         # Leave the file we were given open
-        data = file.read().splitlines(True)
+        data = path_or_file.read().splitlines(True)
     # Sniff the dialect
     sample = ''.join(data[:100])
     dialect = Sniffer().sniff(sample)

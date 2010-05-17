@@ -27,46 +27,50 @@
 #
 
 # Import from the Standard Library
+from cStringIO import StringIO
+from ftplib import FTP
+from os import mkdir
+from shutil import rmtree
 from unittest import TestCase, main
+from urllib import urlopen
 
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
 from lpod.container import odf_get_container
 from lpod.container import odf_new_container_from_type
 from lpod.container import odf_new_container_from_template
-from lpod.vfs import vfs
 
 
 class NewContainerFromTemplateTestCase(TestCase):
 
     def test_bad_template(self):
-        self.assertRaises(ValueError, odf_new_container_from_template,
+        self.assertRaises(IOError, odf_new_container_from_template,
                           '../templates/notexisting')
 
     def test_text_template(self):
-        uri = '../templates/text.ott'
-        container = odf_new_container_from_template(uri)
+        path = '../templates/text.ott'
+        container = odf_new_container_from_template(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_template(self):
-        uri = '../templates/spreadsheet.ots'
-        container = odf_new_container_from_template(uri)
+        path = '../templates/spreadsheet.ots'
+        container = odf_new_container_from_template(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_template(self):
-        uri = '../templates/presentation.otp'
-        container = odf_new_container_from_template(uri)
+        path = '../templates/presentation.otp'
+        container = odf_new_container_from_template(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_template(self):
-        uri = '../templates/drawing.otg'
-        container = odf_new_container_from_template(uri)
+        path = '../templates/drawing.otg'
+        container = odf_new_container_from_template(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odg'])
 
@@ -121,15 +125,20 @@ class GetContainerTestCase(TestCase):
 
 
     def test_http(self):
-        uri = 'http://ftp.lpod-project.org/example.odt'
-        container = odf_get_container(uri)
+        file = urlopen('http://ftp.lpod-project.org/example.odt')
+        container = odf_get_container(file)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_ftp(self):
-        uri = 'ftp://ftp.lpod-project.org/example.odt'
-        container = odf_get_container(uri)
+        ftp = FTP('ftp.lpod-project.org')
+        ftp.login()
+        file = StringIO()
+        ftp.retrbinary('RETR example.odt', file.write)
+        ftp.quit()
+        file.seek(0)
+        container = odf_get_container(file)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
@@ -140,7 +149,7 @@ class ContainerTestCase(TestCase):
     def test_clone(self):
         container = odf_new_container_from_type('text')
         clone = container.clone()
-        self.assertEqual(clone.uri, None)
+        self.assertEqual(clone.path, None)
         self.assertNotEqual(clone._odf_container__data, None)
 
 
@@ -187,11 +196,11 @@ class ContainerTestCase(TestCase):
 class ContainerSaveTestCase(TestCase):
 
     def setUp(self):
-        vfs.make_folder('trash')
+        mkdir('trash')
 
 
     def tearDown(self):
-        vfs.remove('trash')
+        rmtree('trash')
 
 
     def test_save_zip(self):

@@ -37,6 +37,11 @@ Low-level API
 - "get/set_boolean_attribute" as shortcuts to get/set a "true"/"false"
   attribute from a boolean ("true" and "false" accepted too).
 
+- The undocumented and unspecified VFS was dropped (and so the pygobject
+  dependency). The Python Standard Library, third-party packages and library
+  wrappers offer enough file and file-like objects with "read" and "write"
+  methods for your needs.
+
 High-level API
 ==============
 
