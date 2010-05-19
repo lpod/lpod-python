@@ -110,7 +110,7 @@ if  __name__ == '__main__':
        '       %prog [--styles] [--meta] [--no-content] [--rst] <odf-file>')
     description = ("Dump text from an OpenDocument file to the standard "
                    "output, optionally styles and meta (and the Pictures/* "
-                   "in '-o <dir-name>' mode)")
+                   'in "-o <dir-name>" mode)')
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --meta

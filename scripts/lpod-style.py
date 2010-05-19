@@ -34,6 +34,7 @@ from sys import exit, stdout
 from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.scriptutils import add_option_output, StdoutWriter, printinfo
+from lpod.scriptutils import check_target_file, printerr
 
 
 def show_styles(document, target, automatic=True, common=True,
@@ -103,7 +104,13 @@ if  __name__ == '__main__':
     if options.delete:
         target = options.output
         if target is None:
+            printerr("Will not delete in-place: ",
+                    'output file needed or "-" for stdout')
+            exit(1)
+        elif target == "-":
             target = StdoutWriter()
+        else:
+            check_target_file(target)
         delete_styles(document, target)
     elif options.merge:
         merge_styles(document, options.merge, target=options.output)

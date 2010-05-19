@@ -26,7 +26,7 @@
 #
 
 # Import from the Standard Library
-from sys import stdout, stderr
+from sys import stdout
 
 # Import from docutils
 from docutils.core import publish_doctree
@@ -35,27 +35,23 @@ from docutils.core import publish_doctree
 from PIL import Image
 
 # Import from lpod
-from lpod.document import odf_new_document_from_type
-from lpod.frame import odf_create_image_frame, odf_create_text_frame
-from lpod.heading import odf_create_heading
-from lpod.link import odf_create_link
-from lpod.list import odf_create_list, odf_create_list_item
-from lpod.note import odf_create_note
-from lpod.paragraph import odf_create_paragraph, odf_create_line_break
-from lpod.paragraph import odf_create_undividable_space
-from lpod.span import odf_create_span
-from lpod.style import odf_create_style
-from lpod.table import odf_create_cell, odf_create_table, odf_create_row
-from lpod.table import odf_create_column, odf_create_header_rows
-from lpod.toc import odf_create_toc
+from document import odf_new_document_from_type
+from frame import odf_create_image_frame, odf_create_text_frame
+from heading import odf_create_heading
+from link import odf_create_link
+from list import odf_create_list, odf_create_list_item
+from note import odf_create_note
+from paragraph import odf_create_paragraph, odf_create_line_break
+from paragraph import odf_create_undividable_space
+from span import odf_create_span
+from scriptutils import printwarn
+from style import odf_create_style
+from table import odf_create_cell, odf_create_table, odf_create_row
+from table import odf_create_column, odf_create_header_rows
+from toc import odf_create_toc
 
 
 DPI = 72
-
-
-def warn(message):
-    print >> stderr, "Warning:", message
-
 
 
 def convert_text(node, context):
@@ -125,7 +121,7 @@ def convert_list(node, context, list_type):
     for item in node:
 
         if item.tagname != "list_item":
-            warn("node not supported: %s" % item.tagname)
+            printwarn("node not supported: %s" % item.tagname)
             continue
 
         # Create a new item
@@ -161,7 +157,7 @@ def convert_topic(node, context):
     if context["skip_toc"]:
         return
     if context["toc"] is not None:
-        warn("a TOC is already inserted")
+        printwarn("a TOC is already inserted")
         return
 
     toc = odf_create_toc()
@@ -177,7 +173,7 @@ def convert_footnote(node, context):
     # Find the footnote
     footnotes = context["footnotes"]
     if refid not in footnotes:
-        warn('unknown footnote "%s"' % refid)
+        printwarn('unknown footnote "%s"' % refid)
         return
     footnote_body = footnotes[refid].get_element("text:note-body")
 
@@ -278,7 +274,8 @@ def convert_literal_block(node, context):
     for child in node:
         # Only text
         if child.tagname != "#text":
-            warn('node "%s" not supported in literal block' % child.tagname)
+            printwarn('node "%s" not supported in literal block' % (
+                child.tagname))
             continue
         text = child.astext()
 
@@ -384,7 +381,8 @@ def convert_definition_list(node, context):
 
     for item in node:
         if item.tagname != "definition_list_item":
-            warn('node "%s" not supported in definition_list' % item.tagname)
+            printwarn('node "%s" not supported in definition_list' % (
+                item.tagname))
             continue
         for child in item:
             tagname = child.tagname
@@ -400,7 +398,7 @@ def convert_definition_list(node, context):
                 # Pop the paragraph style
                 del styles['paragraph']
             else:
-                warn('node "%s" not supported in definition_list_item' %
+                printwarn('node "%s" not supported in definition_list_item' %
                         tagname)
 
 
@@ -450,7 +448,7 @@ def _add_image(image, caption, context, width=None, height=None):
         image_file = open(image.encode(encoding), 'rb')
         image_object = Image.open(image_file)
     except (UnicodeEncodeError, IOError, OverflowError), e:
-        warn('unable to insert the image "%s": %s' % (image, e))
+        printwarn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size
 
@@ -527,15 +525,14 @@ def convert_figure(node, context):
         tagname = child.tagname
         if tagname == "image":
             if image is not None:
-                warn("unexpected image (just a image / figure) for a figure")
+                printwarn("unexpected duplicate image in a figure")
                 continue
             image = child.get("uri")
             width = child.get('width')
             height = child.get('height')
         elif tagname == "caption":
             if caption is not None:
-                warn("unexpected caption (just a caption / figure) for a "
-                        "figure")
+                printwarn("unexpected duplicate caption in a figure")
                 continue
             caption = child.astext()
 
@@ -546,7 +543,7 @@ def convert_figure(node, context):
 def _convert_table_rows(container, node, context, cell_style=None):
     for row in node:
         if row.tagname != "row":
-            warn('node "%s" not supported in thead/tbody' % row.tagname)
+            printwarn('node "%s" not supported in thead/tbody' % row.tagname)
             continue
 
         odf_row = odf_create_row()
@@ -554,7 +551,7 @@ def _convert_table_rows(container, node, context, cell_style=None):
 
         for entry in row:
             if entry.tagname != "entry":
-                warn('node "%s" not supported in row' % entry.tagname)
+                printwarn('node "%s" not supported in row' % entry.tagname)
                 continue
 
             # Create a new odf_cell
@@ -606,7 +603,7 @@ def convert_table(node, context):
 
     for tgroup in node:
         if tgroup.tagname != "tgroup":
-            warn('node "%s" not supported in table' % tgroup.tagname)
+            printwarn('node "%s" not supported in table' % tgroup.tagname)
             continue
         columns_number = 0
         odf_table = None
@@ -634,7 +631,8 @@ def convert_table(node, context):
             elif tagname == "colspec":
                 columns_number += 1
             else:
-                warn('node "%s" not supported in tgroup' % child.tagname)
+                printwarn('node "%s" not supported in tgroup' % (
+                    child.tagname))
                 continue
 
         context["top"].append(odf_table)
@@ -672,7 +670,7 @@ def convert_node(node, context):
     if convert_method is not None:
         convert_method(node, context)
     else:
-        warn("node not supported: %s" % tagname)
+        printwarn("node not supported: %s" % tagname)
 
 
 

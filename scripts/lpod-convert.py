@@ -28,8 +28,7 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from os import remove
-from os.path import splitext, exists
+from os.path import splitext
 from sys import exit
 
 # Import from lpod
@@ -156,8 +155,6 @@ if  __name__ == '__main__':
         raise NotImplementedError, "unsupported combination"
     # Remove output file
     check_target_file(outfile)
-    if exists(outfile):
-        remove(outfile)
     # Convert!
     converter(indoc, outdoc)
     outdoc.save(outfile)

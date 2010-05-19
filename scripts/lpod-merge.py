@@ -40,6 +40,7 @@ from lpod.table import import_from_csv
 from lpod.toc import odf_create_toc
 from lpod.scriptutils import add_option_output, StdoutWriter
 from lpod.scriptutils import printerr, printinfo, get_mimetype
+from lpod.scriptutils import check_target_file
 
 
 CSV_SHORT = 'text/csv'
@@ -180,12 +181,12 @@ def print_incompatible(filename, type):
 
 if  __name__ == '__main__':
     # Options initialisation
-    usage = "%prog <file1> [<file2> ...]"
+    usage = "%prog -o FILE <file1> [<file2> ...]"
     description = "Merge all input files in an unique OpenDocument file"
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --output
-    add_option_output(parser)
+    add_option_output(parser, complement='("-" for stdout)')
 
     # Parse !
     options, filenames = parser.parse_args()
@@ -194,6 +195,12 @@ if  __name__ == '__main__':
     if not filenames:
         parser.print_help()
         exit(1)
+    target = options.output
+    if target is None:
+        printerr('"-o" option mandatory (use "-" to print to stdout)')
+        exit(1)
+    check_target_file(target)
+
     output_doc = None
     output_type = None
 
@@ -251,8 +258,7 @@ if  __name__ == '__main__':
 
     # Save
     if output_doc is not None:
-        target = options.output
-        if target is None:
+        if target == "-":
             target = StdoutWriter()
         output_doc.save(target=target, pretty=True)
         if options.output:

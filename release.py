@@ -27,10 +27,12 @@
 
 # Import from the Standard Library
 from subprocess import Popen, PIPE
-from sys import stderr, argv
+from sys import argv
 from os.path import basename, exists
 
 # Import from lpod
+from scriptutils import printerr
+
 
 try:
     # builtin on Windows
@@ -87,6 +89,6 @@ if __name__ == '__main__':
     try:
         print get_release()
     except:
-        print>>stderr, '%s: error: unable to read info' % basename(argv[0])
+        printerr('%s: unable to read info' % basename(argv[0]))
 
 

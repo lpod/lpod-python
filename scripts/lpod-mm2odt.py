@@ -29,7 +29,7 @@
 # Import from the standard library
 from optparse import OptionParser
 from os.path import basename, splitext
-from sys import exit, stdout
+from sys import exit
 
 # Import from lxml
 from lxml.etree import parse
@@ -68,7 +68,7 @@ if  __name__ == '__main__':
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --output
-    add_option_output(parser)
+    add_option_output(parser, complement="(<file>.odt by default)")
 
     # Parse options
     options, args = parser.parse_args()
@@ -109,7 +109,4 @@ if  __name__ == '__main__':
     # Save the document
     document.save(outname, pretty=True)
     # Feed back to the user
-    message = u"`%s' created from `%s' by lpOD\n"
-    message = message % (outname, inname)
-    stdout.write(message.encode('utf-8'))
-    stdout.flush()
+    print "`%s' created from `%s'" % (outname, inname)

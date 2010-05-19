@@ -39,7 +39,7 @@ from sys import stdin, stdout, stderr
 
 def check_target_file(path, kind="file"):
     if exists(path):
-        message = 'The %s "%s" exists, can i overwrite it? [y/N]'
+        message = 'The %s "%s" exists, overwrite it? [y/N]'
         stdout.write(message % (kind, path))
         stdout.flush()
         line = stdin.readline()
@@ -71,9 +71,8 @@ def get_mimetype(filename):
 
 
 
-def add_option_output(parser, metavar="FILE"):
-    help = "dump the output into %s instead of the standard output" % (
-            metavar)
+def add_option_output(parser, metavar="FILE", complement=""):
+    help = "dump the output into %s %s" % (metavar, complement)
     parser.add_option("-o", "--output", metavar=metavar, help=help)
 
 
@@ -84,6 +83,9 @@ def printinfo(*args):
     stderr.write(output)
     stderr.write("\n")
 
+
+def printwarn(*args):
+    printinfo("Warning:", *args)
 
 
 def printerr(*args):
