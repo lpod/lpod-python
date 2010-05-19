@@ -38,6 +38,7 @@ from lpod.container import ODF_EXTENSIONS
 from lpod.document import odf_get_document, odf_new_document_from_type
 from lpod.paragraph import odf_create_paragraph
 from lpod.rst2odt import convert as rst_convert
+from lpod.scriptutils import check_target_file
 from lpod.table import odf_create_table, odf_create_row
 from lpod.utils import oooc_to_ooow
 
@@ -112,8 +113,12 @@ if  __name__ == '__main__':
             "combinations: ods to odt (tables and styles), and txt to odt "
             "(reStructuredText format)")
     parser = OptionParser(usage, version=__version__, description=description)
+    # --styles
+    help = "import the styles from the given file"
+    parser.add_option("-s", "--styles", dest="styles_from", metavar="FILE",
+            help=help)
     # Parse !
-    opts, args = parser.parse_args()
+    options, args = parser.parse_args()
     # Container
     if len(args) != 2:
         parser.print_help()
@@ -129,21 +134,28 @@ if  __name__ == '__main__':
         intype = indoc.get_type()
     # Open output document
     outfile = args[1]
-    extension = get_extension(outfile)
-    try:
-        mimetype = ODF_EXTENSIONS[extension]
-    except KeyError:
-        raise ValueError, "output filename not recognized: " + extension
-    outtype = mimetype[mimetype.rindex('.') + 1:]
-    if '-template' in outtype:
-        outtype = mimetype[mimetype.rindex('-') + 1:]
-    outdoc = odf_new_document_from_type(outtype)
+    if options.styles_from:
+        outdoc = odf_get_document(options.styles_from).clone()
+        outdoc.get_body().clear()
+        outdoc.path = outfile
+        outtype = outdoc.get_type()
+    else:
+        extension = get_extension(outfile)
+        try:
+            mimetype = ODF_EXTENSIONS[extension]
+        except KeyError:
+            raise ValueError, "output filename not recognized: " + extension
+        outtype = mimetype[mimetype.rindex('.') + 1:]
+        if '-template' in outtype:
+            outtype = mimetype[mimetype.rindex('-') + 1:]
+        outdoc = odf_new_document_from_type(outtype)
     # Convert function
     name = '%s_to_%s' % (intype, outtype)
     converter = getattr(Converter, name, None)
     if converter is None:
         raise NotImplementedError, "unsupported combination"
     # Remove output file
+    check_target_file(outfile)
     if exists(outfile):
         remove(outfile)
     # Convert!
