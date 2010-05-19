@@ -29,6 +29,7 @@
 from sys import stdout
 
 # Import from docutils
+from docutils import nodes
 from docutils.core import publish_doctree
 
 # Import from imaging
@@ -159,8 +160,8 @@ def convert_topic(node, context):
     if context["toc"] is not None:
         printwarn("a TOC is already inserted")
         return
-
-    toc = odf_create_toc()
+    title = node.next_node(condition=nodes.title).astext()
+    toc = odf_create_toc(title=title)
     context["body"].append(toc)
     context["toc"] = toc
 
