@@ -128,7 +128,7 @@ if  __name__ == '__main__':
     # --output
     add_option_output(parser, metavar="DIR")
     # Parse !
-    opts, args = parser.parse_args()
+    options, args = parser.parse_args()
     # Container
     if len(args) != 1:
         parser.print_help()
@@ -137,8 +137,8 @@ if  __name__ == '__main__':
     # Open it!
     document = odf_get_document(container_url)
     doc_type = document.get_type()
-    if opts.output:
-        target = opts.output
+    if options.output:
+        target = options.output
         check_target_directory(target)
         if exists(target):
             rmtree(target)
@@ -152,23 +152,23 @@ if  __name__ == '__main__':
         # Pictures
         dump_pictures(document, target)
     else:
-        if opts.meta:
+        if options.meta:
             dump(document.get_formated_meta(), stdout)
-        if opts.styles:
+        if options.styles:
             dump(document.show_styles(), stdout)
     # text
     if doc_type in ('text', 'text-template', 'presentation',
             'presentation-template'):
-        if opts.output:
+        if options.output:
             to_file = open(join(target, 'content.txt'), 'wb')
-            dump(document.get_formatted_text(rst_mode=opts.rst), to_file)
-        elif not opts.no_content:
-            dump(document.get_formatted_text(rst_mode=opts.rst), stdout)
+            dump(document.get_formatted_text(rst_mode=options.rst), to_file)
+        elif not options.no_content:
+            dump(document.get_formatted_text(rst_mode=options.rst), stdout)
     # spreadsheet
     elif doc_type in ('spreadsheet', 'spreadsheet-template'):
-        if opts.output:
+        if options.output:
             spreadsheet_to_csv(document, target)
-        elif not opts.no_content:
+        elif not options.no_content:
             spreadsheet_to_stdout(document)
     else:
         printerr("The OpenDocument format", doc_type, "is not supported yet.")

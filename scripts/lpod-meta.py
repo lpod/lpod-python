@@ -89,7 +89,7 @@ if  __name__ == '__main__':
             metavar='NAME=VALUE', help=help)
 
     # Parse !
-    opts, args = parser.parse_args()
+    options, args = parser.parse_args()
 
     # Open the document
     if len(args) != 1:
@@ -97,9 +97,9 @@ if  __name__ == '__main__':
         exit(1)
     doc = odf_get_document(args[0])
 
-    if opts.set_list:
+    if options.set_list:
         # Set metadata, ...
-        set_metadata(doc, opts.set_list)
+        set_metadata(doc, options.set_list)
     else:
         # Dump
         print doc.get_formated_meta()

@@ -71,14 +71,14 @@ if  __name__ == '__main__':
     add_option_output(parser)
 
     # Parse options
-    opts, args = parser.parse_args()
+    options, args = parser.parse_args()
     if len(args) < 1:
         parser.print_help()
         exit(1)
 
     # Get the 2 paths
     inname = args[0]
-    outname = opts.output
+    outname = options.output
     # Default value for the name of the output file.
     if not outname:
         mm_basename = basename(inname)
