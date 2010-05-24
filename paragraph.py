@@ -318,10 +318,10 @@ class odf_paragraph(odf_element):
 
 
     def set_bookmark(self, name, before=None, after=None, position=0,
-                     role=None, content=None, limits=None):
+                     role=None, content=None):
         """Insert a bookmark before or after the characters in the text which
         match the regex before/after. When the regex matches more of one part
-        of the text, position can be set to choice which part must be used.
+        of the text, position can be set to choose which part must be used.
         If before and after are None, we use only position that is the number
         of characters. So, by default, this function inserts a bookmark
         before the first character of the content. Role can be None, "start"
@@ -331,76 +331,60 @@ class odf_paragraph(odf_element):
 
           paragraph.set_bookmark("bookmark", content="xyz")
 
-        ::
+        and::
 
           paragraph.set_bookmark("bookmark", before="xyz", role="start")
           paragraph.set_bookmark("bookmark", after="xyz", role="end")
 
-        If limits is not None these 2 calls are equivalent::
+        If position is a 2-tuple, these 2 calls are equivalent::
 
-          paragraph.set_bookmark("bookmark", limits=(10, 20))
+          paragraph.set_bookmark("bookmark", position=(10, 20))
 
-        ::
+        and::
 
           paragraph.set_bookmark("bookmark", position=10, role="start")
           paragraph.set_bookmark("bookmark", position=20, role="end")
 
         Arguments:
 
-            name -- string
+            name -- str
 
             before -- unicode regex
 
             after -- unicode regex
 
-            position -- int
+            position -- int or (int, int)
 
             role -- None, "start" or "end"
 
             content -- unicode regex
-
-            limits -- (int, int)
         """
-
         # With "content" => automatically insert a "start" and an "end"
         # bookmark
-        if (before is None and
-            after is None and
-            role is None and
-            content is not None and
-            limits is None):
-
+        if (before is None and after is None and role is None
+                and content is not None and type(position) is int):
             # Start
             start = odf_create_bookmark_start(name)
             self._insert(start, before=content, position=position)
-
             # End
             end = odf_create_bookmark_end(name)
             self._insert(end, after=content, position=position)
-
             return start, end
 
-        # With "limits" =>  automatically insert a "start" and an "end"
+        # With "(int, int)" =>  automatically insert a "start" and an "end"
         # bookmark
-        if (before is None and
-            after is None and
-            role is None and
-            content is None and
-            position == 0 and
-            limits is not None):
-
+        if (before is None and after is None and role is None
+                and content is None and type(position) is tuple):
             # Start
             start = odf_create_bookmark_start(name)
-            self._insert(start, position=limits[0])
-
+            self._insert(start, position=position[0])
             # End
             end = odf_create_bookmark_end(name)
-            self._insert(end, position=limits[1])
-
+            self._insert(end, position=position[1])
             return start, end
 
-        # Without "content" and "limits"
-        if content is not None or limits is not None:
+        # Without "content" nor "position"
+        if content is not None or type(position) is not int:
             raise ValueError, "bad arguments"
 
         # Role

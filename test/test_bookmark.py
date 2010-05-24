@@ -230,7 +230,7 @@ class BookmarkTest(TestCase):
 
     def test_set_bookmark_with_limits(self):
         paragraph = odf_create_paragraph(u"aa bb bb aa")
-        paragraph.set_bookmark("bookmark", limits=(6, 8))
+        paragraph.set_bookmark("bookmark", position=(6, 8))
         expected = ('<text:p>aa bb '
                       '<text:bookmark-start text:name="bookmark"/>'
                       'bb'
