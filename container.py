@@ -241,10 +241,7 @@ class odf_container(object):
             part_name = '%s.xml' % part_name
         elif part_name == 'manifest':
             part_name = 'META-INF/manifest.xml'
-        file = zipfile.open(part_name)
-        part = file.read()
-        file.close()
-        return part
+        return zipfile.read(part_name)
 
 
     def __save_zip(self, file):
