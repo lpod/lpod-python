@@ -9,7 +9,7 @@ DESCRIPTION="languages & platforms OpenDocument - Python library"
 HOMEPAGE="http://lpod-project.org"
 SRC_URI="http://download.lpod-project.org/${PN}/${P}.tar.gz"
 
-LICENSE="GPL"
+LICENSE="GPL-3 Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="doc"
