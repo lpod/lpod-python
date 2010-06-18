@@ -51,3 +51,7 @@ import style
 import table
 import toc
 import tracked_changes
+
+# Silent pyflakes
+draw_page, frame, heading, list, note, paragraph, section, shapes, span,
+style, table, toc, tracked_changes
