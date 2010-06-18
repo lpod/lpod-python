@@ -31,8 +31,8 @@ from re import compile
 
 # Import from lpod
 from lpod.container import odf_get_container
-from lpod.element import odf_create_element, odf_element
-from lpod.element import FIRST_CHILD, NEXT_SIBLING, PREV_SIBLING
+from lpod.element import register_element_class, odf_create_element
+from lpod.element import odf_element, FIRST_CHILD, NEXT_SIBLING, PREV_SIBLING
 from lpod.xmlpart import odf_xmlpart
 
 
@@ -529,6 +529,42 @@ class ReplaceTestCase(TestCase):
 
 class XmlNamespaceTestCase(TestCase):
     """We must be able to use the API with unknown prefix/namespace"""
+
+
+
+
+class RegisterTestCase(TestCase):
+
+
+    def setUp(self):
+        class dummy_element(odf_element):
+            pass
+
+        self.dummy_element = dummy_element
+
+
+    def test_register(self):
+        register_element_class('office:dummy1', self.dummy_element)
+        element = odf_create_element('office:dummy1')
+        self.assert_(type(element) is self.dummy_element)
+
+
+    def test_unregistered(self):
+        element = odf_create_element('office:dummy2')
+        self.assert_(type(element) is odf_element)
+
+
+    def test_register_family(self):
+        register_element_class('office:dummy3', self.dummy_element,
+                family='graphics')
+        element = odf_create_element('<office:dummy3/>')
+        self.assert_(type(element) is odf_element)
+        element = odf_create_element('<office:dummy3 '
+                'style:family="graphics"/>')
+        self.assert_(type(element) is self.dummy_element)
+        element = odf_create_element('<office:dummy4 '
+                'style:family="graphics"/>')
+        self.assert_(type(element) is odf_element)
 
 
 

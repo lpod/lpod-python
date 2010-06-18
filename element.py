@@ -122,22 +122,56 @@ def _get_prefixed_name(tag):
 
 
 #
-# Semi-Public API (used elsewhere)
+# Semi-Public API
+# (not in the lpOD specification but foundation of the Python implementation)
 #
 
 __class_registry = {}
 
-def register_element_class(qname, cls):
+def register_element_class(qname, cls, family=None):
+    """Associate a qualified element name to a Python class that handles this
+    type of element.
+
+    Getting the right Python class when loading an existing ODF document is
+    then transparent. Unassociated elements will be handled by the base
+    odf_element class.
+
+    Most styles use the "style:style" qualified name and only differ by their
+    "style:family" attribute. So the "family" attribute was added to register
+    specialized style classes.
+
+    Arguments:
+
+        qname -- str
+
+        cls -- Python class
+
+        family -- str
+    """
     # Turn tag name into what lxml is expecting
     tag = '{%s}%s' % _decode_qname(qname)
-    if tag in __class_registry:
+    if (tag, family) in __class_registry:
         raise ValueError,  'element "%s" already registered' % qname
-    __class_registry[tag] = cls
+    __class_registry[(tag, family)] = cls
 
 
 
 def _make_odf_element(native_element):
-    cls = __class_registry.get(native_element.tag,  odf_element)
+    """Turn an lxml Element into an odf_element (or the registered subclass).
+
+    Arguments:
+
+        native_element -- lxml.Element
+
+    Returns: odf_element
+    """
+    tag = native_element.tag
+    family = native_element.get("{%s}family" % ODF_NAMESPACES['style'])
+    cls = __class_registry.get((tag, family))
+    if cls is None and family is not None:
+        cls = __class_registry.get((tag, None))
+    if cls is None:
+        cls = odf_element
     return cls(native_element)
 
 
