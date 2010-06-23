@@ -107,7 +107,8 @@ def get_extension(filename):
 
 if  __name__ == '__main__':
     # Options initialisation
-    usage = "%prog <INFILE> <OUTFILE>"
+    usage = ("%prog [options] <input.ods> <output.odt>\n"
+      "       %prog [options] <input.txt> <output.odt>")
     description = ("Convert an OpenDocument to another format. Possible "
             "combinations: ods to odt (tables and styles), and txt to odt "
             "(reStructuredText format)")

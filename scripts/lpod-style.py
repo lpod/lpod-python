@@ -70,9 +70,10 @@ def merge_styles(document, from_file, target=None, pretty=True):
 
 if  __name__ == '__main__':
     # Options initialisation
-    usage = '%prog <file>'
-    description = 'A command line interface to manipulate styles of ' \
-                  'OpenDocument files.'
+    usage = '%prog [options] <file>'
+    description = ("A command line interface to manipulate styles of "
+            "OpenDocument files. By default prints all the styles to the "
+            "standard output.")
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --automatic

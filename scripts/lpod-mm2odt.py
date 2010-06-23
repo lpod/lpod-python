@@ -63,7 +63,7 @@ def make_document(structure, body):
 
 if  __name__ == '__main__':
     # Options initialisation
-    usage = '%prog <file>'
+    usage = '%prog [-o output.odt] <input.mm>'
     description = 'Transform a mind-map file to an OpenDocument Text file.'
     parser = OptionParser(usage, version=__version__,
             description=description)

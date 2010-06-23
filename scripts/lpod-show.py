@@ -106,22 +106,22 @@ def spreadsheet_to_csv(document, target):
 
 if  __name__ == '__main__':
     # Options initialisation
-    usage = ( '%prog -o <dir-name> [--rst] <odf-file>\n'
-       '       %prog [--styles] [--meta] [--no-content] [--rst] <odf-file>')
+    usage = ('%prog [--styles] [--meta] [--no-content] [--rst] <file>\n'
+      '       %prog -o <DIR> [--rst] <file>')
     description = ("Dump text from an OpenDocument file to the standard "
-                   "output, optionally styles and meta (and the Pictures/* "
-                   'in "-o <dir-name>" mode)')
+            "output, optionally styles and meta (and the Pictures/* in "
+            '"-o <DIR>" mode)')
     parser = OptionParser(usage, version=__version__,
             description=description)
     # --meta
     parser.add_option('-m', '--meta', action='store_true', default=False,
-            help='dump metadata in stdout')
+            help='dump metadata to stdout')
     # --styles
     parser.add_option('-s', '--styles', action='store_true', default=False,
-            help='dump styles in stdout')
+            help='dump styles to stdout')
     # --no-content
     parser.add_option('-n', '--no-content', action='store_true',
-            default=False, help='do not dump content in stdout')
+            default=False, help='do not dump content to stdout')
     # --rst
     parser.add_option('-r', '--rst', action='store_true', default=False,
             help='Dump the content file with a reST syntax')
