@@ -27,6 +27,7 @@
 #
 
 # Import from the Standard Library
+from cStringIO import StringIO
 from csv import reader, Sniffer
 from textwrap import wrap
 
@@ -2102,7 +2103,7 @@ class odf_table(odf_element):
     # Utilities
     #
 
-    def export_to_csv(self, path_or_file, delimiter=',', quotechar='"',
+    def export_to_csv(self, path_or_file=None, delimiter=',', quotechar='"',
             lineterminator='\n', encoding='utf-8'):
         """
         Write the table as CSV in the file. If the file is a string, it is
@@ -2122,8 +2123,10 @@ class odf_table(odf_element):
             encoding -- str
         """
         close_after = False
-        if type(file) is str or type(file) is unicode:
-            file = open(file, 'wb')
+        if path_or_file is None:
+            file = StringIO()
+        elif type(path_or_file) is str or type(path_or_file) is unicode:
+            file = open(path_or_file, 'wb')
             close_after = True
         quoted = quotechar * 2
         for values in self.iter_table_values():
@@ -2137,6 +2140,8 @@ class odf_table(odf_element):
                 value = value.replace(quotechar, quoted)
                 line.append(quotechar + value + quotechar)
             file.write(delimiter.join(line) + lineterminator)
+        if path_or_file is None:
+            return file.getvalue()
         if close_after:
             file.close()
 
