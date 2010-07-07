@@ -2102,8 +2102,8 @@ class odf_table(odf_element):
     # Utilities
     #
 
-    def export_to_csv(self, path_or_file, delimiter=';', quotechar='"',
-                      lineterminator='\n', encoding='utf-8'):
+    def export_to_csv(self, path_or_file, delimiter=',', quotechar='"',
+            lineterminator='\n', encoding='utf-8'):
         """
         Write the table as CSV in the file. If the file is a string, it is
         opened as a local path. Else a open file-like is expected; it will not
@@ -2125,7 +2125,7 @@ class odf_table(odf_element):
         if type(file) is str or type(file) is unicode:
             file = open(file, 'wb')
             close_after = True
-        quoted = '\\' + quotechar
+        quoted = quotechar * 2
         for values in self.iter_table_values():
             line = []
             for value in values:
