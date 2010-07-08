@@ -119,7 +119,7 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
     element = odf_create_element(tagname)
     # Common attributes
     if name:
-        element.set_style_name(name)
+        element.set_name(name)
     if famattr:
         element.set_attribute('style:family', famattr)
     if display_name:
@@ -180,7 +180,7 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         if break_after:
             kw['fo:break-after'] = break_after
     if kw:
-        element.set_style_properties(kw, area=area)
+        element.set_properties(kw, area=area)
     return element
 
 
@@ -188,23 +188,23 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 class odf_style(odf_element):
     """Specialised element for styles, yet generic to all style types.
     """
-    def get_style_name(self):
+    def get_name(self):
         return self.get_attribute('style:name')
 
 
-    def set_style_name(self, name):
+    def set_name(self, name):
         self.set_attribute('style:name', name)
 
 
-    def get_style_display_name(self):
+    def get_display_name(self):
         return self.get_attribute('style:display-name')
 
 
-    def get_style_family(self):
+    def get_family(self):
         return self.get_attribute('style:family')
 
 
-    def set_style_family(self, family):
+    def set_family(self, family):
         self.set_attribute('style:family', family)
 
 
@@ -221,7 +221,7 @@ class odf_style(odf_element):
         self.set_attribute('style:parent-style-name', name)
 
 
-    def get_style_properties(self, area=None):
+    def get_properties(self, area=None):
         """Get the mapping of all properties of this style. By default the
         properties of the same family, e.g. a paragraph style and its
         paragraph properties. Specify the area to get the text properties of
@@ -234,7 +234,7 @@ class odf_style(odf_element):
         Return: dict
         """
         if area is None:
-            area = self.get_style_family()
+            area = self.get_family()
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             return None
@@ -245,8 +245,7 @@ class odf_style(odf_element):
         return properties
 
 
-    def set_style_properties(self, properties={}, style=None, area=None,
-            **kw):
+    def set_properties(self, properties={}, style=None, area=None, **kw):
         """Set the properties of the "area" type of this style. Properties
         are given either as a dict or as named arguments (or both). The area
         is identical to the style family by default. If the properties
@@ -264,7 +263,7 @@ class odf_style(odf_element):
             area -- 'paragraph', 'text'...
         """
         if area is None:
-            area = self.get_style_family()
+            area = self.get_family()
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             element = odf_create_element('style:%s-properties' % area)
@@ -272,7 +271,7 @@ class odf_style(odf_element):
         if properties or kw:
             properties = _expand_properties(_merge_dicts(properties, kw))
         elif style is not None:
-            properties = style.get_style_properties(area=area)
+            properties = style.get_properties(area=area)
             if properties is None:
                 return
         for key, value in properties.iteritems():
@@ -282,7 +281,7 @@ class odf_style(odf_element):
                 element.set_attribute(key, value)
 
 
-    def del_style_properties(self, properties=[], area=None, *args):
+    def del_properties(self, properties=[], area=None, *args):
         """Delete the given properties, either by list argument or
         positional argument (or both). Remove only from the given area,
         identical to the style family by default.
@@ -294,7 +293,7 @@ class odf_style(odf_element):
             area -- str
         """
         if area is None:
-            area = self.get_style_family()
+            area = self.get_family()
         element = self.get_element('style:%s-properties' % area)
         if element is None:
             raise ValueError, "properties element is inexistent"
@@ -335,7 +334,7 @@ class odf_style(odf_element):
 
             filter -- str
         """
-        family = self.get_style_family()
+        family = self.get_family()
         if family not in ('text', 'paragraph', 'page-layout', 'section',
                           'table', 'table-row', 'table-cell', 'graphic'):
             raise TypeError, 'no background support for this family'
@@ -389,7 +388,7 @@ class odf_list_style(odf_style):
                  '|text:list-level-style-image)')
 
 
-    def get_style_family(self):
+    def get_family(self):
         return 'list'
 
 
@@ -455,7 +454,7 @@ class odf_list_style(odf_style):
 class odf_outline_style(odf_list_style):
 
     # FIXME stubs
-    def get_style_family(self):
+    def get_family(self):
         return 'outline'
 
 
@@ -465,11 +464,11 @@ class odf_page_layout(odf_style):
 
     XXX to verify
     """
-    def get_style_family(self):
+    def get_family(self):
         return 'page-layout'
 
 
-    def set_style_family(self):
+    def set_family(self):
         raise ValueError, 'family is read-only'
 
 
@@ -536,11 +535,11 @@ class odf_master_page(odf_style):
     # Public API
     #
 
-    def get_style_family(self):
+    def get_family(self):
         return 'master-page'
 
 
-    def set_style_family(self):
+    def set_family(self):
         raise ValueError, 'family is read-only'
 
 
@@ -600,7 +599,7 @@ class odf_master_page(odf_style):
 # FIXME stub
 class odf_font_style(odf_style):
 
-    def get_style_family(self):
+    def get_family(self):
         return 'font-face'
 
 
@@ -608,7 +607,7 @@ class odf_font_style(odf_style):
 # FIXME stub
 class odf_number_style(odf_style):
 
-    def get_style_family(self):
+    def get_family(self):
         return 'number'
 
 
@@ -616,7 +615,7 @@ class odf_number_style(odf_style):
 # FIXME stub
 class odf_percentage_style(odf_style):
 
-    def get_style_family(self):
+    def get_family(self):
         return 'percentage'
 
 
@@ -624,7 +623,7 @@ class odf_percentage_style(odf_style):
 # FIXME stub
 class odf_time_style(odf_style):
 
-    def get_style_family(self):
+    def get_family(self):
         return 'time'
 
 
@@ -632,7 +631,7 @@ class odf_time_style(odf_style):
 # FIXME stub
 class odf_date_style(odf_style):
 
-    def get_style_family(self):
+    def get_family(self):
         return 'date'
 
 
@@ -640,7 +639,7 @@ class odf_date_style(odf_style):
 # FIXME stub
 class odf_currency_style(odf_style):
 
-    def get_style_family(self):
+    def get_family(self):
         return 'currency'
 
 
