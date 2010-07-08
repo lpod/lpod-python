@@ -236,7 +236,7 @@ def _get_emphasis_style(context):
 
 
 def convert_emphasis(node, context):
-    emphasis_style = _get_emphasis_style(context).get_style_name()
+    emphasis_style = _get_emphasis_style(context).get_name()
     # Convert
     _convert_style_like(node, context, emphasis_style)
 
@@ -255,7 +255,7 @@ def _get_strong_style(context):
 
 
 def convert_strong(node, context):
-    strong_style = _get_strong_style(context).get_style_name()
+    strong_style = _get_strong_style(context).get_name()
     # Convert
     _convert_style_like(node, context, strong_style)
 
@@ -377,8 +377,8 @@ def convert_definition_list(node, context):
     "Definition List Definition" style is looked for definition paragraphs.
     """
     styles = context['styles']
-    term_style = _get_term_style(context).get_style_name()
-    definition_style = _get_definition_style(context).get_style_name()
+    term_style = _get_term_style(context).get_name()
+    definition_style = _get_definition_style(context).get_name()
 
     for item in node:
         if item.tagname != "definition_list_item":
@@ -480,9 +480,9 @@ def _add_image(image, caption, context, width=None, height=None):
     local_uri = context["doc"].add_file(image)
 
     # Frame style for the caption frame
-    caption_style = _get_caption_style(context).get_style_name()
+    caption_style = _get_caption_style(context).get_name()
     # Frame style for the image frame
-    image_style = _get_image_style(context).get_style_name()
+    image_style = _get_image_style(context).get_name()
 
     # In text application, image must be inserted in a paragraph
     if context["top"].get_tag() == "office:text":
@@ -600,7 +600,7 @@ def _get_cell_style(context):
 
 
 def convert_table(node, context):
-    cell_style = _get_cell_style(context).get_style_name()
+    cell_style = _get_cell_style(context).get_name()
 
     for tgroup in node:
         if tgroup.tagname != "tgroup":

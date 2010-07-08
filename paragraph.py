@@ -71,7 +71,7 @@ def _get_formatted_text(element, context, with_text=True):
                     result.append(text)
                     continue
                 style = document.get_style("text", style)
-                properties = style.get_style_properties()
+                properties = style.get_properties()
                 if properties is None:
                     continue
                 # Compute before, text and after
@@ -110,14 +110,14 @@ def _get_formatted_text(element, context, with_text=True):
                 result.append(after)
             # Footnote or endnote
             elif tag == 'text:note':
-                note_class = obj.get_note_class()
+                note_class = obj.get_class()
                 container = {'footnote': context['footnotes'],
                              'endnote': context['endnotes']}[note_class]
-                citation = obj.get_note_citation()
+                citation = obj.get_citation()
                 if not citation:
                     # Would only happen with hand-made documents
                     citation = len(container)
-                body = obj.get_note_body()
+                body = obj.get_body()
                 container.append((citation, body))
                 if rst_mode:
                     marker = {'footnote': u" [#]_ ",
@@ -128,7 +128,7 @@ def _get_formatted_text(element, context, with_text=True):
                 result.append(marker.format(citation=citation))
             # Annotations
             elif tag == 'office:annotation':
-                context['annotations'].append(obj.get_annotation_body())
+                context['annotations'].append(obj.get_body())
                 if rst_mode:
                     result.append(' [#]_ ')
                 else:
@@ -208,13 +208,13 @@ class odf_paragraph(odf_element):
         else:
             # XXX clone or modify the argument?
             if note_class:
-                note_element.set_note_class(note_class)
+                note_element.set_class(note_class)
             if note_id:
-                note_element.set_note_id(note_id, *args, **kw)
+                note_element.set_id(note_id, *args, **kw)
             if citation:
-                note_element.set_note_citation(citation)
+                note_element.set_citation(citation)
             if body:
-                note_element.set_note_body(body)
+                note_element.set_body(body)
         note_element.check_validity()
         if type(after) is unicode:
             self._insert(note_element, after=after)
@@ -233,7 +233,7 @@ class odf_paragraph(odf_element):
         else:
             # XXX clone or modify the argument?
             if body:
-                annotation_element.set_annotation_body(body)
+                annotation_element.set_body(body)
             if creator:
                 annotation_element.set_dc_creator(creator)
             if date:
@@ -269,7 +269,7 @@ class odf_paragraph(odf_element):
         from span import odf_create_span
 
         if isinstance(style, odf_style):
-            style = style.get_style_name()
+            style = style.get_name()
         if offset:
             # XXX quickly hacking the offset
             text = self.get_text()

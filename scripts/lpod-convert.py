@@ -54,29 +54,29 @@ class Converter(object):
             # Skip empty table
             clone = intable.clone()
             clone.rstrip_table()
-            if clone.get_table_size() == (0, 0):
+            if clone.get_size() == (0, 0):
                 continue
             # At least OOo Writer doesn't like formulas referencing merged
             # cells, so expand
-            outtable = odf_create_table(intable.get_table_name(),
-                    style=intable.get_table_style())
+            outtable = odf_create_table(intable.get_name(),
+                    style=intable.get_style())
             # Columns
             for column in intable.traverse_columns():
                 outtable.append(column)
             # Rows
             for inrow in intable.traverse_rows():
-                outrow = odf_create_row(style=inrow.get_row_style())
+                outrow = odf_create_row(style=inrow.get_style())
                 # Cells
                 for cell in inrow.traverse_cells():
                     # Formula
-                    formula = cell.get_cell_formula()
+                    formula = cell.get_formula()
                     if formula is not None:
                         if formula.startswith('oooc:'):
                             formula = oooc_to_ooow(formula)
                         else:
                             # Found an OpenFormula test case
                             raise NotImplementedError, formula
-                        cell.set_cell_formula(formula)
+                        cell.set_formula(formula)
                     outrow.append(cell)
                 outtable.append_row(outrow)
             outbody.append(outtable)

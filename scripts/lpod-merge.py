@@ -100,7 +100,7 @@ def _get_table_name(name, output_body):
     if isinstance(name, str):
         encoding = stdout.encoding or 'utf8'
         name = unicode(name, encoding)
-    already_names = set([ table.get_table_name()
+    already_names = set([ table.get_name()
                           for table in output_body.get_table_list() ])
     if name in already_names:
         i = 1
@@ -121,9 +121,9 @@ def add_ods(filename, output_doc):
     output_body = output_doc.get_body()
     ods_body = document.get_body()
     for table in ods_body.get_table_list():
-        name = table.get_table_name()
+        name = table.get_name()
         name = _get_table_name(name, output_body)
-        table.set_table_name(name)
+        table.set_name(name)
 
         output_body.append(table)
 
@@ -150,11 +150,11 @@ def add_odp(filename, output_doc):
 
     # Add the pages
     output_body = output_doc.get_body()
-    already_names = set([ page.get_page_name()
+    already_names = set([ page.get_name()
                           for page in output_body.get_draw_page_list() ])
     odp_body = document.get_body()
     for page in odp_body.get_draw_page_list():
-        name = page.get_page_name()
+        name = page.get_name()
 
         if name in already_names:
             i = 1
@@ -164,7 +164,7 @@ def add_odp(filename, output_doc):
                     name = new_name
                     break
                 i += 1
-            page.set_page_name(name)
+            page.set_name(name)
 
         already_names.add(name)
         output_body.append(page)

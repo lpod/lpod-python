@@ -153,12 +153,12 @@ class TestStyle(TestCase):
 
     def test_get_style_named(self):
         style = self.styles.get_style('paragraph', u'Heading_20_1')
-        self.assertEqual(style.get_style_display_name(), u"Heading 1")
+        self.assertEqual(style.get_display_name(), u"Heading 1")
 
 
     def test_get_style_display_name(self):
         style = self.styles.get_style('paragraph', display_name=u"Text body")
-        self.assertEqual(style.get_style_name(), u"Text_20_body")
+        self.assertEqual(style.get_name(), u"Text_20_body")
 
 
     def test_insert_style(self):
@@ -212,7 +212,7 @@ class TestInsertStyleCase(TestCase):
 
         style = odf_create_style('paragraph')
         doc.insert_style(style, automatic=True)
-        self.assertNotEqual(style.get_style_name(), None)
+        self.assertNotEqual(style.get_name(), None)
 
 
     def test_insert_with_error(self):

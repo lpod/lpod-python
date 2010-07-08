@@ -94,7 +94,7 @@ def spreadsheet_to_stdout(document):
 def spreadsheet_to_csv(document, target):
     body = document.get_body()
     for table in body.get_table_list():
-        name = table.get_table_name()
+        name = table.get_name()
         filename = clean_filename(name) + '.csv'
         csv_file = open(join(target, filename), 'wb')
 

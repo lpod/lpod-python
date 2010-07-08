@@ -233,10 +233,10 @@ class odf_toc(odf_element):
 
 
     def get_title(self):
-        body = self.get_body()
-        if body is None:
+        index_body = self.get_body()
+        if index_body is None:
             return None
-        index_title = body.get_element('text:index-title')
+        index_title = index_body.get_element('text:index-title')
         if index_title is None:
             return None
         return index_title.get_text_content()

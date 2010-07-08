@@ -117,7 +117,7 @@ data.append([u'Python version', '%d.%d.%d' % version_info[:3]])
 
 # Creation / Insertion
 table = odf_create_table(u'table1', width=2, height=2, style=u"Standard")
-table.set_table_values(data)
+table.set_values(data)
 body.append(table)
 
 

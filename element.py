@@ -878,7 +878,7 @@ class odf_element(object):
     # Element helpers usable from any context
     #
 
-    def get_body(self):
+    def get_document_body(self):
         return self.get_element('//office:body/*[1]')
 
 
@@ -1382,7 +1382,7 @@ class odf_element(object):
         variable_decls = self.get_element('//text:variable-decls')
         if variable_decls is None:
             from variable import odf_create_variable_decls
-            body = self.get_body()
+            body = self.get_document_body()
             body.insert(odf_create_variable_decls(), FIRST_CHILD)
             variable_decls = body.get_element('//text:variable-decls')
 
@@ -1465,7 +1465,7 @@ class odf_element(object):
         user_field_decls = self.get_element('//text:user-field-decls')
         if user_field_decls is None:
             from variable import odf_create_user_field_decls
-            body = self.get_body()
+            body = self.get_document_body()
             body.insert(odf_create_user_field_decls(), FIRST_CHILD)
             user_field_decls = body.get_element('//text:user-field-decls')
 

@@ -485,9 +485,9 @@ class odf_document(object):
         """
 
         # Get family and name
-        family = style.get_style_family()
+        family = style.get_family()
         if name is None:
-            name = style.get_style_name()
+            name = style.get_name()
 
         # Master page style
         if isinstance(style, odf_master_page):
@@ -521,7 +521,7 @@ class odf_document(object):
                     prefix = 'lpod_auto_'
 
                     styles = self.get_style_list(family=family, automatic=True)
-                    names = [ s.get_style_name () for s in styles ]
+                    names = [ s.get_name () for s in styles ]
                     numbers = [ int(name[len(prefix):]) for name in names
                                 if name and name.startswith(prefix) ]
                     if numbers:
@@ -531,7 +531,7 @@ class odf_document(object):
                     name = prefix + str(number)
 
                     # And set it
-                    style.set_style_name(name)
+                    style.set_name(name)
                     existing = None
                 else:
                     existing = part.get_style(family, name)
@@ -581,7 +581,7 @@ class odf_document(object):
     def show_styles(self, automatic=True, common=True, properties=False):
         infos = []
         for style in self.get_style_list():
-            name = style.get_style_name()
+            name = style.get_name()
             is_auto = (style.get_parent().get_tag()
                     == 'office:automatic-styles')
             if (is_auto and automatic is False
@@ -590,11 +590,11 @@ class odf_document(object):
             is_used = bool(self.get_styled_elements(name))
             infos.append({'type': u"auto  " if is_auto else u"common",
                           'used': u"y" if is_used else u"n",
-                          'family': style.get_style_family() or u"",
+                          'family': style.get_family() or u"",
                           'parent': style.get_parent_style_name() or u"",
                           'name': name or u"",
-                          'display_name': style.get_style_display_name(),
-                          'properties': style.get_style_properties() if
+                          'display_name': style.get_display_name(),
+                          'properties': style.get_properties() if
                                         properties else None})
         if not infos:
             return u""
@@ -636,7 +636,7 @@ class odf_document(object):
         # Then remove supposedly orphaned styles
         i = 0
         for style in self.get_style_list():
-            if style.get_style_name() is None:
+            if style.get_name() is None:
                 # Don't delete default styles
                 continue
             elif type(style) is odf_master_page:
@@ -657,10 +657,10 @@ class odf_document(object):
         content = self.get_content()
         for style in document.get_style_list():
             tagname = style.get_tag()
-            family = style.get_style_family()
+            family = style.get_family()
             if family is None:
                 family = _get_style_family(tagname)
-            stylename = style.get_style_name()
+            stylename = style.get_name()
             container = style.get_parent()
             container_name = container.get_tag()
             partname = container.get_parent().get_tag()

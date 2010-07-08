@@ -62,8 +62,8 @@ class ContentTestCase(TestCase):
 
     def test_get_style(self):
         style = self.content.get_style('section', u"Sect1")
-        self.assertEqual(style.get_style_name(), u"Sect1")
-        self.assertEqual(style.get_style_family(), 'section')
+        self.assertEqual(style.get_name(), u"Sect1")
+        self.assertEqual(style.get_family(), 'section')
 
 
 

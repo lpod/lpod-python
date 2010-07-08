@@ -268,7 +268,7 @@ def odf_create_cell(value=None, text=None, cell_type=None, currency=None,
     if repeated and repeated > 1:
         element.set_repeated(repeated)
     if style is not None:
-        element.set_stylename(style)
+        element.set_style(style)
     return element
 
 
@@ -297,7 +297,7 @@ def odf_create_row(width=None, repeated=None, style=None):
     if repeated:
         element.set_repeated(repeated)
     if style is not None:
-        element.set_stylename(style)
+        element.set_style(style)
     return element
 
 
@@ -348,7 +348,7 @@ def odf_create_column(default_cell_style=None, repeated=None, style=None):
     if repeated and repeated > 1:
         element.set_repeated(repeated)
     if style:
-        element.set_stylename(style)
+        element.set_style(style)
     return element
 
 
@@ -420,7 +420,7 @@ def odf_create_table(name, width=None, height=None, protected=False,
     if print_ranges:
         element.set_print_ranges(print_ranges)
     if style:
-        element.set_stylename(style)
+        element.set_style(style)
     # Prefill the table
     if width is not None or height is not None:
         width = width or 1
@@ -538,7 +538,7 @@ class odf_cell(odf_element):
         self.set_attribute('table:number-columns-repeated', str(repeated))
 
 
-    def get_stylename(self):
+    def get_style(self):
         """Get the style of the cell itself.
 
         Return: unicode
@@ -546,7 +546,7 @@ class odf_cell(odf_element):
         return self.get_attribute('table:style-name')
 
 
-    def set_stylename(self, style):
+    def set_style(self, style):
         """Set the style of the cell itself.
 
         Arguments:
@@ -627,7 +627,7 @@ class odf_row(odf_element):
         self.set_attribute('table:number-rows-repeated', str(repeated))
 
 
-    def get_stylename(self):
+    def get_style(self):
         """Get the style of the row itself.
 
         Return: unicode
@@ -635,7 +635,7 @@ class odf_row(odf_element):
         return self.get_attribute('table:style-name')
 
 
-    def set_stylename(self, style):
+    def set_style(self, style):
         """Set the style of the row itself.
 
         Arguments:
@@ -693,7 +693,7 @@ class odf_row(odf_element):
             if content and not cell.match(content):
                 continue
             # Filter the cells with the style
-            if style and style != cell.get_stylename():
+            if style and style != cell.get_style():
                 continue
             cells.append((x, cell))
         # Return the coordinate and element
@@ -867,7 +867,7 @@ class odf_row(odf_element):
         for cell in reversed(self._get_cells()):
             if cell.get_value():
                 return
-            if not aggressive and cell.get_stylename() is not None:
+            if not aggressive and cell.get_style() is not None:
                 return
             self.delete(cell)
 
@@ -887,7 +887,7 @@ class odf_row(odf_element):
         for cell in self._get_cells():
             if cell.get_value() is not None:
                 return False
-            if not aggressive and cell.get_stylename() is not None:
+            if not aggressive and cell.get_style() is not None:
                 return False
         return True
 
@@ -941,11 +941,11 @@ class odf_column(odf_element):
         self.set_attribute('table:number-columns-repeated', str(repeated))
 
 
-    def get_stylename(self):
+    def get_style(self):
         return self.get_attribute('table:style-name')
 
 
-    def set_stylename(self, style):
+    def set_style(self, style):
         self.set_attribute('table:style-name', style)
 
 
@@ -1216,11 +1216,11 @@ class odf_table(odf_element):
         self.set_attribute('table:print-ranges', print_ranges)
 
 
-    def get_stylename(self):
+    def get_style(self):
         return self.get_attribute('table:style-name')
 
 
-    def set_stylename(self, style):
+    def set_style(self, style):
         self.set_attribute('table:style-name', style)
 
 
@@ -1373,7 +1373,7 @@ class odf_table(odf_element):
         for y, row in enumerate(self.traverse()):
             if content and not row.match(content):
                 continue
-            if style and style != row.get_stylename():
+            if style and style != row.get_style():
                 continue
             rows.append((y, row))
         return rows
@@ -1685,7 +1685,7 @@ class odf_table(odf_element):
         """
         # Test document type
         if type is None:
-            body = self.get_body()
+            body = self.get_document_body()
             if body is None:
                 raise ValueError, "document type not found"
             type = {'office:spreadsheet': 'spreadsheet',
@@ -1703,7 +1703,7 @@ class odf_table(odf_element):
         if type == 'spreadsheet':
             image_frame.set_frame_anchor_type(None)
             # The frame needs end coordinates
-            width, height = image_frame.get_frame_size()
+            width, height = image_frame.get_size()
             image_frame.set_attribute('table:end-x', width)
             image_frame.set_attribute('table:end-y', height)
             # FIXME what happens when the address changes?
@@ -1870,7 +1870,7 @@ class odf_table(odf_element):
         """
         columns = []
         for w, column in enumerate(self.traverse_columns()):
-            if style and style != column.get_stylename():
+            if style and style != column.get_style():
                 continue
             columns.append((w, column))
         return columns
@@ -2114,7 +2114,7 @@ class odf_table(odf_element):
         for cell in self.get_column_cells(x):
             if cell.get_value() is not None:
                 return False
-            if not aggressive and cell.get_stylename() is not None:
+            if not aggressive and cell.get_style() is not None:
                 return False
         return True
 

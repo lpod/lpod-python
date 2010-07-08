@@ -45,8 +45,8 @@ table:
     set_cell_currency              set_currency
     get_cell_repeated              set_repeated
     set_cell_repeated              set_repeated
-    get_cell_style                 get_stylename
-    set_cell_style                 set_stylename
+    get_cell_style                 get_style
+    set_cell_style                 set_style
     get_cell_formula               get_formula
     set_cell_formula               set_formula
 
@@ -56,8 +56,8 @@ table:
     -----------------------------  ----------------------
     get_row_repeated               get_repeated
     set_row_repeated               set_repeated
-    get_row_style                  get_stylename
-    set_row_style                  set_stylename
+    get_row_style                  get_style
+    set_row_style                  set_style
     get_row_width                  get_width
     traverse_cells                 traverse
     get_cell_values                get_values
@@ -73,8 +73,8 @@ table:
     set_column_default_cell_style  set_default_cell_style
     get_column_repeated            get_repeated
     set_column_repeated            set_repeated
-    get_column_style               get_stylename
-    set_column_style               set_stylename
+    get_column_style               get_style
+    set_column_style               set_style
 
   odf_table:
 
@@ -93,8 +93,8 @@ table:
     set_table_printable            set_printable
     get_table_print_ranges         get_print_ranges
     set_table_print_ranges         set_print_ranges
-    get_table_style                set_stylename
-    set_table_style                set_stylename
+    get_table_style                set_style
+    set_table_style                set_style
     get_table_values               get_values
     iter_table_values              iter_values
     set_table_values               set_values
@@ -195,6 +195,15 @@ toc:
     get_toc_title                  get_title
     set_toc_title                  set_title
     toc_fill                       fill
+
+
+element:
+
+  odf_element:
+
+    Before                         After
+    -----------------------------  ----------------------
+    get_body                       get_document_body
 
 
 High-level API

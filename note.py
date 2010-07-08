@@ -147,7 +147,7 @@ class odf_note(odf_element):
             raise ValueError, "notes must have an id"
         if not self.get_citation():
             raise ValueError, "notes must have a citation"
-        if not self.get_note_body():
+        if not self.get_body():
             # XXX error?
             pass
 

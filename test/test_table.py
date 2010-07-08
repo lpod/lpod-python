@@ -496,15 +496,15 @@ class TestCell(TestCase):
 
 
     def test_get_cell_style(self):
-        self.assertEqual(self.cell.get_stylename(), u"ce1")
+        self.assertEqual(self.cell.get_style(), u"ce1")
 
 
     def test_set_cell_style(self):
         cell = self.cell.clone()
-        cell.set_stylename(u"ce2")
-        self.assertEqual(cell.get_stylename(), u"ce2")
-        cell.set_stylename(None)
-        self.assertEqual(cell.get_stylename(), None)
+        cell.set_style(u"ce2")
+        self.assertEqual(cell.get_style(), u"ce2")
+        cell.set_style(None)
+        self.assertEqual(cell.get_style(), None)
 
 
 
@@ -536,7 +536,7 @@ class TestRow(TestCase):
 
 
     def test_get_row_style(self):
-        self.assertEqual(self.row.get_stylename(), u"ro1")
+        self.assertEqual(self.row.get_style(), u"ro1")
 
 
     def test_get_row_width(self):
@@ -611,7 +611,7 @@ class TestRowCell(TestCase):
         self.assertEqual(cell_5.get_value(), 3)
         self.assertEqual(cell_5.get_text_content(), u"3")
         self.assertEqual(cell_5.get_type(), 'float')
-        self.assertEqual(cell_5.get_stylename(), u"ce1")
+        self.assertEqual(cell_5.get_style(), u"ce1")
 
 
     def test_get_cell_int(self):
@@ -620,7 +620,7 @@ class TestRowCell(TestCase):
         self.assertEqual(cell_5.get_value(), 3)
         self.assertEqual(cell_5.get_text_content(), u"3")
         self.assertEqual(cell_5.get_type(), 'float')
-        self.assertEqual(cell_5.get_stylename(), u"ce1")
+        self.assertEqual(cell_5.get_style(), u"ce1")
 
 
     def test_set_cell(self):
@@ -743,15 +743,15 @@ class TestColumn(TestCase):
 
 
     def test_get_column_style(self):
-        self.assertEqual(self.column.get_stylename(), u"co1")
+        self.assertEqual(self.column.get_style(), u"co1")
 
 
     def test_set_column_style(self):
         column = self.column.clone()
-        column.set_stylename(u"co2")
-        self.assertEqual(column.get_stylename(), u"co2")
-        column.set_stylename(None)
-        self.assertEqual(column.get_stylename(), None)
+        column.set_style(u"co2")
+        self.assertEqual(column.get_style(), u"co2")
+        column.set_style(None)
+        self.assertEqual(column.get_style(), None)
 
 
 
@@ -789,7 +789,7 @@ class TestTable(TestCase):
 
 
     def test_get_table_style(self):
-        self.assertEqual(self.table.get_stylename(), u"ta1")
+        self.assertEqual(self.table.get_style(), u"ta1")
 
 
     def test_get_table_printable(self):
@@ -881,7 +881,7 @@ class TestTableRow(TestCase):
         table = self.table.clone()
         # Set a different style manually
         row = table.get_element_list('table:table-row')[2]
-        row.set_stylename(u"A Style")
+        row.set_style(u"A Style")
         coordinates = [y for y, row in table.get_row_list(style=ur'A Style')]
         self.assertEqual(coordinates, [2])
 
@@ -1080,7 +1080,7 @@ class TestTableCell(TestCase):
         self.assertEqual(cell.get_value(), 2)
         self.assertEqual(cell.get_text_content(), u"2")
         self.assertEqual(cell.get_type(), 'float')
-        self.assertEqual(cell.get_stylename(), u"ce1")
+        self.assertEqual(cell.get_style(), u"ce1")
 
 
     def test_get_cell_tuple(self):
@@ -1089,7 +1089,7 @@ class TestTableCell(TestCase):
         self.assertEqual(cell.get_value(), 2)
         self.assertEqual(cell.get_text_content(), u"2")
         self.assertEqual(cell.get_type(), 'float')
-        self.assertEqual(cell.get_stylename(), u"ce1")
+        self.assertEqual(cell.get_style(), u"ce1")
 
 
     def test_set_cell_value(self):
@@ -1197,9 +1197,9 @@ class TestTableColumn(TestCase):
     def test_get_column(self):
         table = self.table
         column = table.get_column(3)
-        self.assertEqual(column.get_stylename(), u"co2")
+        self.assertEqual(column.get_style(), u"co2")
         column = table.get_column(4)
-        self.assertEqual(column.get_stylename(), u"co1")
+        self.assertEqual(column.get_style(), u"co1")
 
 
     def test_set_column(self):
@@ -1207,7 +1207,7 @@ class TestTableColumn(TestCase):
         column = table.get_column(3)
         table.set_column(4, column)
         column = table.get_column(4)
-        self.assertEqual(column.get_stylename(), u"co2")
+        self.assertEqual(column.get_style(), u"co2")
 
 
     def test_insert(self):
