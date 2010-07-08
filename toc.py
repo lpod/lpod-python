@@ -63,10 +63,10 @@ def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
     # XXX
     if name is None:
         name = u"%s1" % title
-    element.set_toc_name(name)
-    element.set_toc_protected(protected)
+    element.set_name(name)
+    element.set_protected(protected)
     if style:
-        element.set_toc_style(style)
+        element.set_style(style)
     # Create the source template
     source = odf_create_toc_source(title=title, outline_level=outline_level,
             title_style=title_style, entry_style=entry_style)
@@ -74,7 +74,7 @@ def odf_create_toc(title=u"Table of Contents", name=None, protected=True,
     # Create the index body automatically with the index title
     if title:
         # This style is in the template document
-        element.set_toc_title(title, text_style=title_style)
+        element.set_title(title, text_style=title_style)
     return element
 
 
@@ -179,22 +179,22 @@ class odf_toc(odf_element):
         return u''.join(result)
 
 
-    def get_toc_name(self):
+    def get_name(self):
         return self.get_attribute('text:name')
 
 
-    def set_toc_name(self, name):
+    def set_name(self, name):
         self.set_attribute('text:name', name)
 
 
-    def get_toc_outline_level(self):
+    def get_outline_level(self):
         source = self.get_element('text:table-of-content-source')
         if source is None:
             return None
         return source.get_outline_level()
 
 
-    def set_toc_outline_level(self, level):
+    def set_outline_level(self, level):
         source = self.get_element('text:table-of-content-source')
         if source is None:
             source = odf_create_element('text:table-of-content-source')
@@ -202,28 +202,28 @@ class odf_toc(odf_element):
         source.set_outline_level(level)
 
 
-    def is_toc_protected(self):
+    def get_protected(self):
         return self.get_boolean_attribute('text:protected')
 
 
-    def set_toc_protected(self, protected):
+    def set_protected(self, protected):
         self.set_boolean_attribute('text:protected', protected)
 
 
-    def get_toc_style(self):
+    def get_style(self):
         return self.get_text_style()
 
 
-    def set_toc_style(self, style):
+    def set_style(self, style):
         self.set_text_style(style)
 
 
-    def get_toc_body(self):
+    def get_body(self):
         return self.get_element('text:index-body')
 
 
-    def set_toc_body(self, body=None):
-        old_body = self.get_toc_body()
+    def set_body(self, body=None):
+        old_body = self.get_body()
         if old_body is not None:
             self.delete(old_body)
         if body is None:
@@ -232,8 +232,8 @@ class odf_toc(odf_element):
         return body
 
 
-    def get_toc_title(self):
-        body = self.get_toc_body()
+    def get_title(self):
+        body = self.get_body()
         if body is None:
             return None
         index_title = body.get_element('text:index-title')
@@ -242,13 +242,13 @@ class odf_toc(odf_element):
         return index_title.get_text_content()
 
 
-    def set_toc_title(self, title, style=None, text_style=None):
-        index_body = self.get_toc_body()
+    def set_title(self, title, style=None, text_style=None):
+        index_body = self.get_body()
         if index_body is None:
-            index_body = self.set_toc_body()
+            index_body = self.set_body()
         index_title = index_body.get_element('text:index-title')
         if index_title is None:
-            name = u"%s_Head" % self.get_toc_name()
+            name = u"%s_Head" % self.get_name()
             index_title = odf_create_index_title(title, name=name,
                     style=style, text_style=text_style)
             index_body.append(index_title)
@@ -264,7 +264,7 @@ class odf_toc(odf_element):
             paragraph.set_text(title)
 
 
-    def toc_fill(self, document=None, use_default_styles=True):
+    def fill(self, document=None, use_default_styles=True):
         """Fill the TOC with the titles found in the document. A TOC is not
         contextual so it will catch all titles before and after its insertion.
         If the TOC is not attached to a document, attach it beforehand or
@@ -282,16 +282,16 @@ class odf_toc(odf_element):
         if document is not None:
             body = document.get_body()
         else:
-            body = self.get_body()
+            body = self.get_document_body()
         if body is None:
             raise ValueError, "the TOC must be related to a document somehow"
 
         # Save the title
-        index_body = self.get_toc_body()
+        index_body = self.get_body()
         title = index_body.get_element('text:index-title')
 
         # Clean the old index-body
-        index_body = self.set_toc_body()
+        index_body = self.set_body()
 
         # Restore the title
         index_body.insert(title, position=0)
@@ -306,7 +306,7 @@ class odf_toc(odf_element):
                     automatic_styles.append(level_style)
 
         # Auto-fill the index
-        outline_level = self.get_toc_outline_level() or 10
+        outline_level = self.get_outline_level() or 10
         level_indexes = {}
         for heading in body.get_heading_list():
             level = heading.get_outline_level()
