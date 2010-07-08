@@ -55,13 +55,13 @@ def odf_create_note(note_class='footnote', note_id=None, citation=None,
               '<text:note-body/>'
             '</text:note>')
     element = odf_create_element(data)
-    element.set_note_class(note_class)
+    element.set_class(note_class)
     if note_id is not None:
-        element.set_note_id(note_id)
+        element.set_id(note_id)
     if citation is not None:
-        element.set_note_citation(citation)
+        element.set_citation(citation)
     if body is not None:
-        element.set_note_body(body)
+        element.set_body(body)
     return element
 
 
@@ -82,7 +82,7 @@ def odf_create_annotation(text_or_element=None, creator=None, date=None):
     """
     # TODO allow paragraph and text styles
     element = odf_create_element('office:annotation')
-    element.set_annotation_body(text_or_element)
+    element.set_body(text_or_element)
     if creator:
         element.set_dc_creator(creator)
     if date is None:
@@ -94,42 +94,41 @@ def odf_create_annotation(text_or_element=None, creator=None, date=None):
 
 class odf_note(odf_element):
 
-    def get_note_class(self):
+    def get_class(self):
         return self.get_attribute('text:note-class')
 
 
-    def set_note_class(self, note_class):
+    def set_class(self, note_class):
         return self.set_attribute('text:note-class', note_class)
 
 
-    def get_note_id(self):
-        # XXX maybe generic -> "get_text_id"?
+    def get_id(self):
         return self.get_attribute('text:id')
 
 
-    def set_note_id(self, note_id, *args, **kw):
-        # XXX maybe generic -> "set_text_id"?
+    def set_id(self, note_id, *args, **kw):
         if type(note_id) is FunctionType:
             note_id = note_id(*args, **kw)
         return self.set_attribute('text:id', note_id)
 
 
-    def get_note_citation(self):
+    def get_citation(self):
         note_citation = self.get_element('text:note-citation')
         return note_citation.get_text()
 
 
-    def set_note_citation(self, text):
+    def set_citation(self, text):
         note_citation = self.get_element('text:note-citation')
         note_citation.set_text(text)
 
 
-    def get_note_body(self):
+    def get_body(self):
+        # XXX conflict with element.get_body
         note_body = self.get_element('text:note-body')
         return note_body.get_text_content()
 
 
-    def set_note_body(self, text_or_element):
+    def set_body(self, text_or_element):
         note_body = self.get_element('text:note-body')
         if type(text_or_element) is unicode:
             note_body.set_text_content(text_or_element)
@@ -142,11 +141,11 @@ class odf_note(odf_element):
 
 
     def check_validity(self):
-        if not self.get_note_class():
+        if not self.get_class():
             raise ValueError, 'note class must be "footnote" or "endnote"'
-        if not self.get_note_id():
+        if not self.get_id():
             raise ValueError, "notes must have an id"
-        if not self.get_note_citation():
+        if not self.get_citation():
             raise ValueError, "notes must have a citation"
         if not self.get_note_body():
             # XXX error?
@@ -156,11 +155,11 @@ class odf_note(odf_element):
 
 class odf_annotation(odf_element):
 
-    def get_annotation_body(self):
+    def get_body(self):
         return self.get_text_content()
 
 
-    def set_annotation_body(self, text_or_element):
+    def set_body(self, text_or_element):
         if type(text_or_element) is unicode:
             self.set_text_content(text_or_element)
         elif isinstance(text_or_element, odf_element):
@@ -175,7 +174,7 @@ class odf_annotation(odf_element):
     #
 
     def check_validity(self):
-        if not self.get_annotation_body():
+        if not self.get_body():
             raise ValueError, "annotation must have a body"
         if not self.get_dc_creator():
             raise ValueError, "annotation must have a creator"
