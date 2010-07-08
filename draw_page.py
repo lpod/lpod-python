@@ -48,9 +48,9 @@ def odf_create_draw_page(page_id, name=None, master_page=None,
     Return: odf_element
     """
     element = odf_create_element('draw:page')
-    element.set_page_id(page_id)
+    element.set_id(page_id)
     if name:
-        element.set_page_name(name)
+        element.set_name(name)
     if style:
         element.set_attribute('draw:style-name', style)
     if master_page:
@@ -65,26 +65,26 @@ def odf_create_draw_page(page_id, name=None, master_page=None,
 class odf_draw_page(odf_element):
     """Specialised element for pages of presentation and drawing.
     """
-    def get_page_name(self):
+    def get_name(self):
         return self.get_attribute('draw:name')
 
 
-    def set_page_name(self, name):
+    def set_name(self, name):
         self.set_attribute('draw:name', name)
 
 
-    def get_page_id(self):
+    def get_id(self):
         return self.get_attribute('draw:id')
 
 
-    def set_page_id(self, page_id):
+    def set_id(self, page_id):
         self.set_attribute('draw:id', page_id)
 
 
     def set_transition(self, type, subtype=None, dur='2s'):
         # Create the new animation
         anim_page = odf_create_anim_par(presentation_node_type="timing-root")
-        my_page_id = self.get_page_id()
+        my_page_id = self.get_id()
         anim_begin = odf_create_anim_par(smil_begin="%s.begin" % my_page_id)
         transition = odf_create_anim_transitionFilter(smil_dur=dur,
                                                       smil_type=type,

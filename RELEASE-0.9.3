@@ -34,40 +34,40 @@ table:
 
   odf_cell:
 
-    Before             After
-    -----------------  ---------
-    get_cell_value     get_value
-    set_cell_value     set_value
-    get_cell_type      get_type
-    set_cell_type      set_type
-    get_cell_currency  get_currency
-    set_cell_currency  set_currency
-    get_cell_repeated  set_repeated
-    set_cell_repeated  set_repeated
-    get_cell_style     get_stylename
-    set_cell_style     set_stylename
-    get_cell_formula   get_formula
-    set_cell_formula   set_formula
+    Before                         After
+    -----------------------------  ----------------------
+    get_cell_value                 get_value
+    set_cell_value                 set_value
+    get_cell_type                  get_type
+    set_cell_type                  set_type
+    get_cell_currency              get_currency
+    set_cell_currency              set_currency
+    get_cell_repeated              set_repeated
+    set_cell_repeated              set_repeated
+    get_cell_style                 get_stylename
+    set_cell_style                 set_stylename
+    get_cell_formula               get_formula
+    set_cell_formula               set_formula
 
   odf_row:
 
-    Before             After
-    -----------------  ---------
-    get_row_repeated   get_repeated
-    set_row_repeated   set_repeated
-    get_row_style      get_stylename
-    set_row_style      set_stylename
-    get_row_width      get_width
-    traverse_cells     traverse
-    get_cell_values    get_values
-    set_cell_values    set_values
-    rstrip_row         rstrip
-    is_row_empty       is_empty
+    Before                         After
+    -----------------------------  ----------------------
+    get_row_repeated               get_repeated
+    set_row_repeated               set_repeated
+    get_row_style                  get_stylename
+    set_row_style                  set_stylename
+    get_row_width                  get_width
+    traverse_cells                 traverse
+    get_cell_values                get_values
+    set_cell_values                set_values
+    rstrip_row                     rstrip
+    is_row_empty                   is_empty
 
   odf_column:
 
     Before                         After
-    -----------------------------  ---------
+    -----------------------------  ----------------------
     get_column_default_cell_style  get_default_cell_style
     set_column_default_cell_style  set_default_cell_style
     get_column_repeated            get_repeated
@@ -78,7 +78,7 @@ table:
   odf_table:
 
     Before                         After
-    -----------------------------  ----------
+    -----------------------------  ----------------------
     get_table_height               get_height
     get_table_width                get_width
     get_table_size                 get_size
@@ -104,6 +104,18 @@ table:
     get_column_cell_values         get_column_values
     set_column_cell_values         set_column_values
     export_to_csv                  to_csv
+
+
+draw_page:
+
+  odf_draw_page:
+
+    Before                         After
+    -----------------------------  ----------------------
+    get_page_name                  get_name
+    set_page_name                  set_name
+    get_page_id                    get_id
+    set_page_id                    set_id
 
 
 

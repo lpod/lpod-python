@@ -87,16 +87,16 @@ class TestDrawPage(TestCase):
     def test_get_page_name(self):
         body = self.body
         page = body.get_draw_page(name=u"Titre")
-        self.assertEqual(page.get_page_name(), u"Titre")
+        self.assertEqual(page.get_name(), u"Titre")
 
 
     def test_set_page_name(self):
         body = self.body.clone()
         page = body.get_draw_page(position=0)
         name = u"Intitulé"
-        self.assertNotEqual(page.get_page_name(), name)
-        page.set_page_name(u"Intitulé")
-        self.assertEqual(page.get_page_name(), name)
+        self.assertNotEqual(page.get_name(), name)
+        page.set_name(u"Intitulé")
+        self.assertEqual(page.get_name(), name)
 
 
 
