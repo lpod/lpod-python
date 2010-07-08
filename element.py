@@ -163,7 +163,7 @@ def _make_odf_element(native_element):
 
         native_element -- lxml.Element
 
-    Returns: odf_element
+    Return: odf_element
     """
     tag = native_element.tag
     family = native_element.get("{%s}family" % ODF_NAMESPACES['style'])
@@ -518,7 +518,7 @@ class odf_element(object):
 
             name -- str
 
-        Returns: bool
+        Return: bool
         """
         return Boolean.decode(self.get_attribute(name))
 
