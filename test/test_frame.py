@@ -176,35 +176,35 @@ class TestOdfFrame(TestCase):
 
 
     def test_get_frame_size(self):
-        self.assertEqual(self.frame.get_frame_size(), self.size)
+        self.assertEqual(self.frame.get_size(), self.size)
 
 
     def test_set_size(self):
         frame = self.frame.clone()
-        frame.set_frame_size(self.position)
-        self.assertEqual(frame.get_frame_size(), self.position)
+        frame.set_size(self.position)
+        self.assertEqual(frame.get_size(), self.position)
 
 
     def test_get_frame_position(self):
-        self.assertEqual(self.frame.get_frame_position(), self.position)
+        self.assertEqual(self.frame.get_position(), self.position)
 
 
     def test_set_frame_position(self):
         frame = self.frame.clone()
-        frame.set_frame_position(self.size)
-        self.assertEqual(frame.get_frame_position(), self.size)
+        frame.set_position(self.size)
+        self.assertEqual(frame.get_position(), self.size)
 
 
     def test_get_frame_anchor_type(self):
-        self.assertEqual(self.frame.get_frame_anchor_type(), 'paragraph')
+        self.assertEqual(self.frame.get_anchor_type(), 'paragraph')
 
 
     def test_set_frame_anchor_type(self):
         frame = self.frame.clone()
-        self.assertEqual(frame.get_frame_page_number(), None)
-        frame.set_frame_anchor_type('page', 3)
-        self.assertEqual(frame.get_frame_anchor_type(), 'page')
-        self.assertEqual(frame.get_frame_page_number(), 3)
+        self.assertEqual(frame.get_page_number(), None)
+        frame.set_anchor_type('page', 3)
+        self.assertEqual(frame.get_anchor_type(), 'page')
+        self.assertEqual(frame.get_page_number(), 3)
 
 
 

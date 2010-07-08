@@ -60,12 +60,12 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
     Return: odf_element
     """
     element = odf_create_element('draw:frame')
-    element.set_frame_size(size)
-    element.set_frame_anchor_type(anchor_type, page_number=page_number)
+    element.set_size(size)
+    element.set_anchor_type(anchor_type, page_number=page_number)
     if name:
         element.set_attribute('draw:name', name)
     if position is not None:
-        element.set_frame_position(position)
+        element.set_position(position)
     if style is not None:
         element.set_attribute('draw:style-name', style)
     return element
@@ -154,15 +154,15 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
 
 class odf_frame(odf_element):
 
-    def get_frame_name(self):
+    def get_name(self):
         return self.get_attribute('draw:name')
 
 
-    def set_frame_name(self, name):
+    def set_name(self, name):
         self.set_attribute('draw:name', name)
 
 
-    def get_frame_size(self):
+    def get_size(self):
         """Get the size of the frame.
 
         Size is a (width, height) tuple with items including the unit,
@@ -175,7 +175,7 @@ class odf_frame(odf_element):
         return get_attr('svg:width'), get_attr('svg:height')
 
 
-    def set_frame_size(self, size):
+    def set_size(self, size):
         """Set the size of the frame.
 
         Size is a (width, height) tuple with items including the unit,
@@ -189,7 +189,7 @@ class odf_frame(odf_element):
         self.set_attribute('svg:height', size[1])
 
 
-    def get_frame_position(self):
+    def get_position(self):
         """Get the position of the frame relative to its anchor
         point.
 
@@ -202,7 +202,7 @@ class odf_frame(odf_element):
         return get_attr('svg:x'), get_attr('svg:y')
 
 
-    def set_frame_position(self, position):
+    def set_position(self, position):
         """Set the position of the frame relative to its anchor
         point.
 
@@ -217,7 +217,7 @@ class odf_frame(odf_element):
         self.set_attribute('svg:y', position[1])
 
 
-    def get_frame_anchor_type(self):
+    def get_anchor_type(self):
         """Get how the frame is attached to its environment.
 
         Return: 'page', 'frame', 'paragraph', 'char' or 'as-char'
@@ -225,7 +225,7 @@ class odf_frame(odf_element):
         return self.get_attribute('text:anchor-type')
 
 
-    def set_frame_anchor_type(self, anchor_type, page_number=None):
+    def set_anchor_type(self, anchor_type, page_number=None):
         """Set how the frame is attached to its environment.
 
         When the type is 'page', you can give the number of the page where to
@@ -239,10 +239,10 @@ class odf_frame(odf_element):
         """
         self.set_attribute('text:anchor-type', anchor_type)
         if anchor_type == 'page' and page_number:
-            self.set_frame_page_number(page_number)
+            self.set_page_number(page_number)
 
 
-    def get_frame_page_number(self):
+    def get_page_number(self):
         """Get the number of the page where the frame is attached when the
         anchor type is 'page'.
 
@@ -254,7 +254,7 @@ class odf_frame(odf_element):
         return int(page_number)
 
 
-    def set_frame_page_number(self, page_number):
+    def set_page_number(self, page_number):
         """Set the number of the page where the frame is attached when the
         anchor type is 'page', or None to delete it
 
