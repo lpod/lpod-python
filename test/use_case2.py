@@ -27,12 +27,12 @@
 
 # Import from the Standard Library
 from datetime import date, time, timedelta
+from os import mkdir
+from os.path import exists
 from sys import version_info
 
-# Import from itools
-from itools import vfs
-from itools.handlers import get_handler
-
+# Import from PIL
+from PIL import Image
 
 # Import from lpod
 from lpod.document import odf_new_document_from_type
@@ -68,8 +68,8 @@ body = document.get_body()
 
 # 1- The image
 # ------------
-image_file = get_handler('samples/image.png')
-width, height = image_file.get_size()
+image = Image.open('samples/image.png')
+width, height = image.size
 paragraph = odf_create_paragraph(style=u"Standard")
 # 72 ppp
 frame = odf_create_frame('frame1', 'Graphics',
@@ -83,7 +83,7 @@ body.append(paragraph)
 
 # And store the data
 container = document.container
-container.set_part(internal_name, image_file.to_str())
+container.set_part(internal_name, open('samples/image.png').read())
 
 
 # 2- Congratulations (=> style on paragraph)
@@ -170,7 +170,7 @@ body.append(paragraph)
 paragraph._insert_between(variable_set, u"Set", u"spam.")
 
 text = u'The value of spam is: '
-value = body.get_variable_value('spam')
+value = body.get_variable_set_value('spam')
 variable_get = odf_create_variable_get('spam', value)
 paragraph = odf_create_paragraph(text, style=u"Standard")
 body.append(paragraph)
@@ -305,7 +305,8 @@ paragraph._insert_between(odf_create_filename_variable(), u"The", u"is: ")
 # Save
 # ----
 
-vfs.make_folder('test_output')
+if not exists('test_output'):
+    mkdir('test_output')
 document.save('test_output/use_case2.odt', pretty=True)
 
 

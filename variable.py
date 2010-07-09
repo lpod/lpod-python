@@ -73,7 +73,7 @@ def odf_create_variable_get(name, value, value_type=None, text=None,
 
 
 def odf_create_user_field_decls():
-    return odf_create_element('text:user-field-decls>')
+    return odf_create_element('text:user-field-decls')
 
 
 

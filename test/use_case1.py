@@ -25,9 +25,14 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-# Import from itools
-from itools.csv import CSVFile
-from itools.handlers import get_handler, Image
+# Import from the Standard Library
+from csv import reader
+from os import listdir, mkdir
+from os.path import join, exists
+from mimetypes import guess_type
+
+# Import from PIL
+from PIL import Image
 
 # Import from lpod
 from lpod import __version__, __installation_path__
@@ -39,7 +44,6 @@ from lpod.image import odf_create_image
 from lpod.paragraph import odf_create_paragraph
 from lpod.table import odf_create_cell, odf_create_row
 from lpod.table import odf_create_column, odf_create_table
-from lpod.vfs import vfs
 
 
 # Hello messages
@@ -54,18 +58,19 @@ print 'Generating test_output/use_case1.odt ...'
 document = odf_new_document_from_type('text')
 body = document.get_body()
 
-samples = vfs.open('samples')
-for numero, filename in enumerate(samples.get_names()):
+for numero, filename in enumerate(listdir('samples')):
     # Heading
-    heading = odf_create_heading(2, text=unicode(filename, 'utf-8'))
+    heading = odf_create_heading(1, text=unicode(filename, 'utf-8'))
     body.append(heading)
-
-    uri = samples.get_uri(filename)
-    handler = get_handler(uri)
-    if isinstance(handler, Image):
+    path = join('samples', filename)
+    mimetype, _ = guess_type(path)
+    if mimetype is None:
+        mimetype = 'application/octet-stream'
+    if mimetype.startswith('image/'):
         # Add the image
         internal_name = 'Pictures/' + filename
-        width, height = handler.get_size()
+        image = Image.open(path)
+        width, height = image.size
         paragraph = odf_create_paragraph('Standard')
         # 72 ppp
         frame = odf_create_frame('frame_%d' % numero, 'Graphics',
@@ -78,14 +83,14 @@ for numero, filename in enumerate(samples.get_names()):
 
         # And store the data
         container = document.container
-        container.set_part(internal_name,
-                           samples.open(filename).read())
-    elif isinstance(handler, CSVFile):
+        container.set_part(internal_name, open(path).read())
+    elif mimetype in ('text/csv', 'text/comma-separated-values'):
         table = odf_create_table(u"table %d" % numero, style=u"Standard")
-        for csv_row in handler.get_rows():
-            size = len(csv_row)
+        csv = reader(open(path))
+        for line in csv:
+            size = len(line)
             row = odf_create_row()
-            for value in csv_row:
+            for value in line:
                 cell = odf_create_cell(value)
                 row.append(cell)
             table.append(row)
@@ -98,7 +103,6 @@ for numero, filename in enumerate(samples.get_names()):
                 style=u"Standard")
         body.append(paragraph)
 
-vfs.make_folder('test_output')
+if not exists('test_output'):
+    mkdir('test_output')
 document.save('test_output/use_case1.odt', pretty=True)
-
-
