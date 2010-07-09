@@ -35,7 +35,7 @@ from lxml.etree import _ElementStringResult, _ElementUnicodeResult
 
 # Import from lpod
 from datatype import DateTime, Boolean
-from utils import _get_abspath, _get_element_list, _get_element
+from utils import _get_abspath, _get_elements, _get_element
 from utils import _get_style_tagname, get_value
 
 
@@ -481,10 +481,11 @@ class odf_element(object):
         element = self.__element
         result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
         return [_make_odf_element(e) for e in result]
+    get_elements = get_element_list
 
 
     def get_element(self, xpath_query):
-        result = self.get_element_list(xpath_query)
+        result = self.get_elements(xpath_query)
         if result:
             return result[0]
         return None
@@ -723,10 +724,10 @@ class odf_element(object):
 
         Create the paragraph if missing.
         """
-        paragraphs = self.get_element_list('text:p')
+        paragraphs = self.get_elements('text:p')
         if not paragraphs:
             # E.g., text:p in draw:text-box in draw:frame
-            paragraphs = self.get_element_list('*/text:p')
+            paragraphs = self.get_elements('*/text:p')
         if paragraphs:
             paragraph = paragraphs.pop(0)
             for obsolete in paragraphs:
@@ -899,12 +900,11 @@ class odf_element(object):
         Return: list
         """
         # FIXME incomplete (and possibly inaccurate)
-        return (_get_element_list(self, 'descendant::*', text_style=name)
-                + _get_element_list(self, 'descendant::*', draw_style=name)
-                + _get_element_list(self, 'descendant::*',
-                    draw_text_style=name)
-                + _get_element_list(self, 'descendant::*', table_style=name)
-                + _get_element_list(self, 'descendant::*', page_layout=name))
+        return (_get_elements(self, 'descendant::*', text_style=name)
+                + _get_elements(self, 'descendant::*', draw_style=name)
+                + _get_elements(self, 'descendant::*', draw_text_style=name)
+                + _get_elements(self, 'descendant::*', table_style=name)
+                + _get_elements(self, 'descendant::*', page_layout=name))
 
     #
     # Common attributes
@@ -981,8 +981,9 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'text:section', text_style=style,
+        return _get_elements(self, 'text:section', text_style=style,
                 content=content)
+    get_sections = get_section_list
 
 
     def get_section(self, position=0, content=None):
@@ -1015,8 +1016,9 @@ class odf_element(object):
 
         Return: list of odf_paragraph
         """
-        return _get_element_list(self, 'descendant::text:p',
-                text_style=style, content=content)
+        return _get_elements(self, 'descendant::text:p', text_style=style,
+                content=content)
+    get_paragraphs = get_paragraph_list
 
 
     def get_paragraph(self, position=0, content=None):
@@ -1049,8 +1051,9 @@ class odf_element(object):
 
         Return: list of odf_span
         """
-        return _get_element_list(self, 'descendant::text:span',
-                text_style=style, content=content)
+        return _get_elements(self, 'descendant::text:span', text_style=style,
+                content=content)
+    get_spans = get_span_list
 
 
     def get_span(self, position=0, content=None):
@@ -1083,9 +1086,9 @@ class odf_element(object):
 
         Return: list of odf_heading
         """
-        return _get_element_list(self, 'descendant::text:h',
-                text_style=style, outline_level=outline_level,
-                content=content)
+        return _get_elements(self, 'descendant::text:h', text_style=style,
+                outline_level=outline_level, content=content)
+    get_headings = get_heading_list
 
 
     def get_heading(self, position=0, outline_level=None, content=None):
@@ -1118,8 +1121,9 @@ class odf_element(object):
 
         Return: list of odf_list
         """
-        return _get_element_list(self, 'descendant::text:list',
-                text_style=style, content=content)
+        return _get_elements(self, 'descendant::text:list', text_style=style,
+                content=content)
+    get_lists = get_list_list
 
 
     def get_list(self, position=0, content=None):
@@ -1157,9 +1161,9 @@ class odf_element(object):
 
         Return: list of odf_frame
         """
-        return _get_element_list(self, 'descendant::draw:frame',
-                draw_style=style, svg_title=title, svg_desc=description,
-                content=content)
+        return _get_elements(self, 'descendant::draw:frame', draw_style=style,
+                svg_title=title, svg_desc=description, content=content)
+    get_frames = get_frame_list
 
 
     def get_frame(self, position=0, name=None, title=None, description=None,
@@ -1200,8 +1204,9 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::draw:image',
-                text_style=style, href=href, content=content)
+        return _get_elements(self, 'descendant::draw:image', text_style=style,
+                href=href, content=content)
+    get_images = get_image_list
 
 
     def get_image(self, position=0, name=None, href=None, content=None):
@@ -1242,8 +1247,9 @@ class odf_element(object):
 
         Return: list of odf_table
         """
-        return _get_element_list(self, 'descendant::table:table',
+        return _get_elements(self, 'descendant::table:table',
                 table_style=style, content=content)
+    get_tables = get_table_list
 
 
     def get_table(self, position=0, name=None, content=None):
@@ -1278,8 +1284,9 @@ class odf_element(object):
 
         Return: list of odf_note
         """
-        return _get_element_list(self, 'descendant::text:note',
+        return _get_elements(self, 'descendant::text:note',
                 note_class=note_class, content=content)
+    get_notes = get_note_list
 
 
     def get_note(self, position=0, note_id=None, note_class=None,
@@ -1325,8 +1332,8 @@ class odf_element(object):
         Return: list of odf_annotation
         """
         annotations = []
-        for annotation in _get_element_list(self,
-                'descendant::office:annotation', content=content):
+        for annotation in _get_elements(self, 'descendant::office:annotation',
+                content=content):
             if (creator is not None
                     and creator != annotation.get_dc_creator()):
                 continue
@@ -1337,6 +1344,7 @@ class odf_element(object):
                 continue
             annotations.append(annotation)
         return annotations
+    get_annotations = get_annotation_list
 
 
     def get_annotation(self, position=0, creator=None, start_date=None,
@@ -1359,7 +1367,7 @@ class odf_element(object):
 
         Return: odf_annotation or None if not found
         """
-        annotations = self.get_annotation_list(creator=creator,
+        annotations = self.get_annotations(creator=creator,
                 start_date=start_date, end_date=end_date, content=content)
         if not annotations:
             return None
@@ -1394,7 +1402,7 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:variable-decl')
+        return _get_elements(self, 'descendant::text:variable-decl')
 
 
     def get_variable_decl(self, name, position=0):
@@ -1415,8 +1423,9 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:variable-set',
+        return _get_elements(self, 'descendant::text:variable-set',
                 text_name=name)
+    get_variable_sets = get_variable_set_list
 
 
     def get_variable_set(self, name, position=-1):
@@ -1477,7 +1486,7 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:user-field-decl')
+        return _get_elements(self, 'descendant::text:user-field-decl')
 
 
     def get_user_field_decl(self, name, position=0):
@@ -1521,8 +1530,9 @@ class odf_element(object):
 
         Return: list of odf_draw_page
         """
-        return _get_element_list(self, 'descendant::draw:page',
-                draw_style=style, content=content)
+        return _get_elements(self, 'descendant::draw:page', draw_style=style,
+                content=content)
+    get_draw_pages = get_draw_page_list
 
 
     def get_draw_page(self, position=0, name=None, content=None):
@@ -1561,9 +1571,9 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:a',
-                office_name=name, office_title=title, href=href,
-                content=content)
+        return _get_elements(self, 'descendant::text:a', office_name=name,
+                office_title=title, href=href, content=content)
+    get_links = get_link_list
 
 
     def get_link(self, position=0, name=None, title=None, href=None,
@@ -1598,7 +1608,8 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:bookmark')
+        return _get_elements(self, 'descendant::text:bookmark')
+    get_bookmarks = get_bookmark_list
 
 
     def get_bookmark(self, position=0, name=None):
@@ -1621,7 +1632,8 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:bookmark-start')
+        return _get_elements(self, 'descendant::text:bookmark-start')
+    get_bookmark_starts = get_bookmark_start_list
 
 
     def get_bookmark_start(self, position=0, name=None):
@@ -1644,7 +1656,8 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:bookmark-end')
+        return _get_elements(self, 'descendant::text:bookmark-end')
+    get_bookmark_ends = get_bookmark_end_list
 
 
     def get_bookmark_end(self, position=0, name=None):
@@ -1671,7 +1684,8 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:reference-mark')
+        return _get_elements(self, 'descendant::text:reference-mark')
+    get_reference_marks = get_reference_mark_list
 
 
     def get_reference_mark(self, position=0, name=None):
@@ -1694,8 +1708,8 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self,
-                'descendant::text:reference-mark-start')
+        return _get_elements(self, 'descendant::text:reference-mark-start')
+    get_reference_mark_starts = get_reference_mark_start_list
 
 
     def get_reference_mark_start(self, position=0, name=None):
@@ -1718,7 +1732,8 @@ class odf_element(object):
 
         Return: list of odf_element
         """
-        return _get_element_list(self, 'descendant::text:reference-mark-end')
+        return _get_elements(self, 'descendant::text:reference-mark-end')
+    get_reference_mark_ends = get_reference_mark_end_list
 
 
     def get_reference_mark_end(self, position=0, name=None):
@@ -1758,9 +1773,10 @@ class odf_element(object):
 
         Return: list of odf_shape
         """
-        return _get_element_list(self, 'descendant::draw:line',
+        return _get_elements(self, 'descendant::draw:line',
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
+    get_draw_lines = get_draw_line_list
 
 
     def get_draw_line(self, position=0, id=None, content=None):
@@ -1798,9 +1814,10 @@ class odf_element(object):
 
         Return: list of odf_shape
         """
-        return _get_element_list(self, 'descendant::draw:rect',
+        return _get_elements(self, 'descendant::draw:rect',
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
+    get_draw_rectangles = get_draw_rectangle_list
 
 
     def get_draw_rectangle(self, position=0, id=None, content=None):
@@ -1838,9 +1855,10 @@ class odf_element(object):
 
         Return: list of odf_shape
         """
-        return _get_element_list(self, 'descendant::draw:ellipse',
+        return _get_elements(self, 'descendant::draw:ellipse',
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
+    get_draw_ellipses = get_draw_ellipse_list
 
 
     def get_draw_ellipse(self, position=0, id=None, content=None):
@@ -1878,9 +1896,10 @@ class odf_element(object):
 
         Return: list of odf_shape
         """
-        return _get_element_list(self, 'descendant::draw:connector',
+        return _get_elements(self, 'descendant::draw:connector',
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
+    get_draw_connectors = get_draw_connector_list
 
 
     def get_draw_connector(self, position=0, id=None, content=None):
@@ -1905,7 +1924,7 @@ class odf_element(object):
         to them.
         """
         connectors = []
-        for connector in self.get_draw_connector_list():
+        for connector in self.get_draw_connectors():
             start_shape = connector.get_attribute('draw:start-shape')
             end_shape = connector.get_attribute('draw:end-shape')
             if start_shape is None and end_shape is None:
@@ -1943,7 +1962,8 @@ class odf_element(object):
 
         Return: list of odf_toc
         """
-        return _get_element_list(self, 'text:table-of-content')
+        return _get_elements(self, 'text:table-of-content')
+    get_tocs = get_toc_list
 
 
     def get_toc(self, position=0, content=None):
@@ -1986,7 +2006,8 @@ class odf_element(object):
     def get_style_list(self, family=None):
         # Both common and default styles
         tagname, famattr = self._get_style_tagname(family)
-        return _get_element_list(self, tagname, family=famattr)
+        return _get_elements(self, tagname, family=famattr)
+    get_styles = get_style_list
 
 
     def get_style(self, family, name_or_element=None, display_name=None):

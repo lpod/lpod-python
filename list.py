@@ -32,7 +32,7 @@ from re import search
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
 from paragraph import odf_create_paragraph
-from utils import _get_element_list
+from utils import _get_elements
 
 
 def odf_create_list_item(text_or_element=None):
@@ -99,7 +99,8 @@ class odf_list(odf_element):
 
         Return: list of odf_paragraph
         """
-        return _get_element_list(self, 'text:list-item', content=content)
+        return _get_elements(self, 'text:list-item', content=content)
+    get_items = get_item_list
 
 
     def get_item(self, position=0, content=None):
@@ -115,7 +116,7 @@ class odf_list(odf_element):
         Return: odf_element or None if not found
         """
         # Custom implementation because of nested lists
-        results = self.get_element_list('descendant::text:list-item')
+        results = self.get_elements('descendant::text:list-item')
         if content:
             # Don't search recursively but on the very own paragraph(s) of
             # each list item
@@ -131,7 +132,7 @@ class odf_list(odf_element):
         if not isinstance(text_or_element, (list, tuple)):
             text_or_element = [text_or_element]
         # Remove existing header
-        for element in self.get_element_list('text:p'):
+        for element in self.get_elements('text:p'):
             self.delete(element)
         for paragraph in reversed(text_or_element):
             if type(paragraph) is unicode:
@@ -169,7 +170,7 @@ class odf_list(odf_element):
         result = []
         if rst_mode:
             result.append('\n')
-        for list_item in self.get_element_list('text:list-item'):
+        for list_item in self.get_elements('text:list-item'):
             text = []
             for children in list_item.get_children():
                 text.append(children.get_formatted_text(context))

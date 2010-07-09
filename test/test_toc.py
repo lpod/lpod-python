@@ -34,7 +34,7 @@ from lpod.toc import odf_create_toc
 
 def get_toc_lines(toc):
     return [paragraph.get_text()
-            for paragraph in toc.get_paragraph_list()]
+            for paragraph in toc.get_paragraphs()]
 
 
 

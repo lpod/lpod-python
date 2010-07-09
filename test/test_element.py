@@ -80,7 +80,7 @@ class ElementTestCase(TestCase):
 
     def test_get_element_list(self):
         content_part = self.content_part
-        elements = content_part.get_element_list('//text:p')
+        elements = content_part.get_elements('//text:p')
         # The annotation paragraph is counted
         self.assertEqual(len(elements), 8)
 
@@ -301,7 +301,7 @@ class ElementTraverseTestCase(TestCase):
 
     def test_insert_element_next_sibling(self):
         root = odf_create_element('<root><a/><b/></root>')
-        element = root.get_element_list('//a')[0]
+        element = root.get_elements('//a')[0]
         sibling = odf_create_element('<c/>')
         element.insert(sibling, NEXT_SIBLING)
         self.assertEqual(root.serialize(), '<root><a/><c/><b/></root>')
@@ -309,7 +309,7 @@ class ElementTraverseTestCase(TestCase):
 
     def test_insert_element_prev_sibling(self):
         root = odf_create_element('<root><a/><b/></root>')
-        element = root.get_element_list('//a')[0]
+        element = root.get_elements('//a')[0]
         sibling = odf_create_element('<c/>')
         element.insert(sibling, PREV_SIBLING)
         self.assertEqual(root.serialize(), '<root><c/><a/><b/></root>')

@@ -438,7 +438,7 @@ class odf_meta(odf_xmlpart):
         """
 
         result = {}
-        for meta in self.get_element_list('//meta:user-defined'):
+        for meta in self.get_elements('//meta:user-defined'):
             # Read the values
             name = meta.get_attribute('meta:name')
             value_type = meta.get_attribute('meta:value-type')
@@ -486,7 +486,7 @@ class odf_meta(odf_xmlpart):
         else:
             raise TypeError, 'unexpected type "%s" for value' % type(value)
         # Already the same element ?
-        for metadata in self.get_element_list('//meta:user-defined'):
+        for metadata in self.get_elements('//meta:user-defined'):
             if metadata.get_attribute('meta:name') == name:
                 break
         else:

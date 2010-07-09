@@ -49,7 +49,7 @@ class XmlPartTestCase(TestCase):
 
     def test_get_element_list(self):
         content_part = odf_xmlpart('content', self.container)
-        elements = content_part.get_element_list('//text:p')
+        elements = content_part.get_elements('//text:p')
         # The annotation paragraph is counted
         self.assertEqual(len(elements), 8)
 
@@ -107,7 +107,7 @@ class XmlPartTestCase(TestCase):
     def test_delete(self):
         container = self.container
         content = odf_xmlpart('content', container)
-        paragraphs = content.get_element_list('//text:p')
+        paragraphs = content.get_elements('//text:p')
         for paragraph in paragraphs:
             content.delete_element(paragraph)
         serialized = content.serialize()

@@ -51,12 +51,12 @@ class ContentTestCase(TestCase):
 
 
     def test_get_style_list(self):
-        result = self.content.get_style_list()
+        result = self.content.get_styles()
         self.assertEqual(len(result), 4)
 
 
     def test_get_style_list_family(self):
-        result = self.content.get_style_list('font-face')
+        result = self.content.get_styles('font-face')
         self.assertEqual(len(result), 3)
 
 

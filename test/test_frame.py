@@ -63,13 +63,13 @@ class TestFrame(TestCase):
 
     def test_get_frame_list(self):
         body = self.body
-        result = body.get_frame_list()
+        result = body.get_frames()
         self.assertEqual(len(result), 4)
 
 
     def test_get_frame_list_title(self):
         body = self.body
-        result = body.get_frame_list(title=u"Intitulé")
+        result = body.get_frames(title=u"Intitulé")
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].get_tag(), 'draw:frame')
 
@@ -101,7 +101,7 @@ class TestFrame(TestCase):
                                   style='Graphics')
         body.append(frame1)
         body.append(frame2)
-        result = body.get_frame_list(style='Graphics')
+        result = body.get_frames(style='Graphics')
         self.assertEqual(len(result), 2)
         element = body.get_frame(name=u"frame1")
         self.assertEqual(element.get_tag(), 'draw:frame')

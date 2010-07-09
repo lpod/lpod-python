@@ -43,7 +43,7 @@ class TestParagraph(TestCase):
 
     def test_get_paragraph_list(self):
         body = self.body
-        paragraphs = body.get_paragraph_list()
+        paragraphs = body.get_paragraphs()
         self.assertEqual(len(paragraphs), 7)
         second = paragraphs[1]
         text = second.get_text()
@@ -52,7 +52,7 @@ class TestParagraph(TestCase):
 
     def test_get_paragraph_list_style(self):
         body = self.body
-        paragraphs = body.get_paragraph_list(style='Hanging_20_indent')
+        paragraphs = body.get_paragraphs(style='Hanging_20_indent')
         self.assertEqual(len(paragraphs), 1)
         paragraph = paragraphs[0]
         text = paragraph.get_text()
@@ -62,7 +62,7 @@ class TestParagraph(TestCase):
     def test_get_paragraph_list_context(self):
         body = self.body
         section2 = body.get_section(position=1)
-        paragraphs = section2.get_paragraph_list()
+        paragraphs = section2.get_paragraphs()
         self.assertEqual(len(paragraphs), 2)
         paragraph = paragraphs[0]
         text = paragraph.get_text()
@@ -105,7 +105,7 @@ class TestParagraph(TestCase):
         paragraph = odf_create_paragraph(u'An inserted test',
                                          style='Text_20_body')
         body.append(paragraph)
-        last_paragraph = body.get_paragraph_list()[-1]
+        last_paragraph = body.get_paragraphs()[-1]
         self.assertEqual(last_paragraph.get_text(), u'An inserted test')
 
 

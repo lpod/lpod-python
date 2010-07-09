@@ -239,10 +239,10 @@ def _merge_dicts(d, *args, **kw):
 # Non-public yet useful helpers
 #
 
-def _get_element_list(context, element_name, content=None, href=None,
+def _get_elements(context, element_name, content=None, href=None,
         svg_title=None, svg_desc=None, dc_creator=None, dc_date=None, **kw):
     query = _make_xpath_query(element_name, **kw)
-    elements = context.get_element_list(query)
+    elements = context.get_elements(query)
     # Filter the elements with the regex (TODO use XPath)
     if content is not None:
         elements = [element for element in elements if element.match(content)]
@@ -275,7 +275,7 @@ def _get_element_list(context, element_name, content=None, href=None,
 
 def _get_element(context, element_name, position, **kw):
     # TODO Transmit position not to load the whole list
-    result = _get_element_list(context, element_name, **kw)
+    result = _get_elements(context, element_name, **kw)
     try:
         return result[position]
     except IndexError:

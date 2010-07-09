@@ -50,7 +50,7 @@ class Converter(object):
         inbody = indoc.get_body()
         outbody = outdoc.get_body()
         # Copy tables
-        for intable in inbody.get_table_list():
+        for intable in inbody.get_tables():
             # Skip empty table
             clone = intable.clone()
             clone.rstrip_table()
@@ -84,7 +84,7 @@ class Converter(object):
             outbody.append(odf_create_paragraph())
         # Copy styles
         for family in ('table', 'table-column', 'table-row', 'table-cell'):
-            for style in indoc.get_style_list(family=family):
+            for style in indoc.get_styles(family=family):
                 automatic = (style.get_parent().get_tag()
                         == 'office:automatic-styles')
                 default = style.get_tag() == 'style:default-style'

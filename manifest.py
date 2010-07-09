@@ -50,6 +50,7 @@ class odf_manifest(odf_xmlpart):
         """
         expr = '//manifest:file-entry/attribute::manifest:full-path'
         return self.xpath(expr)
+    get_paths = get_path_list
 
 
     def get_path_media_list(self):
@@ -63,6 +64,7 @@ class odf_manifest(odf_xmlpart):
             result.append((file_entry.get_attribute('manifest:full-path'),
                            file_entry.get_attribute('manifest:media-type')))
         return result
+    get_path_medias = get_path_media_list
 
 
     def get_media_type(self, full_path):

@@ -584,7 +584,7 @@ class odf_row(odf_element):
     # Private API
 
     def _get_cells(self):
-        return self.get_element_list(
+        return self.get_elements(
                 '(table:table-cell|table:covered-table-cell)')
 
 
@@ -698,6 +698,7 @@ class odf_row(odf_element):
             cells.append((x, cell))
         # Return the coordinate and element
         return cells
+    get_cells = get_cell_list
 
 
     def get_cell(self, x):
@@ -1335,7 +1336,7 @@ class odf_table(odf_element):
     #
 
     def _get_rows(self):
-        return self.get_element_list('table:table-row')
+        return self.get_elements('table:table-row')
 
 
     def traverse(self):
@@ -1377,6 +1378,7 @@ class odf_table(odf_element):
                 continue
             rows.append((y, row))
         return rows
+    get_rows = get_row_list
 
 
     def get_row(self, y):
@@ -1571,10 +1573,11 @@ class odf_table(odf_element):
         """
         cells = []
         for y, row in enumerate(self.traverse()):
-            for x, cell in row.get_cell_list(style=style, content=content):
+            for x, cell in row.get_cells(style=style, content=content):
                 cells.append((x, y, cell))
         # Return the coordinates and element
         return cells
+    get_cells = get_cell_list
 
 
     def get_cell(self, coordinates):
@@ -1836,7 +1839,7 @@ class odf_table(odf_element):
     #
 
     def _get_columns(self):
-        return self.get_element_list('table:table-column')
+        return self.get_elements('table:table-column')
 
 
     def traverse_columns(self):
@@ -1874,6 +1877,7 @@ class odf_table(odf_element):
                 continue
             columns.append((w, column))
         return columns
+    get_columns = get_column_list
 
 
     def get_column(self, x):

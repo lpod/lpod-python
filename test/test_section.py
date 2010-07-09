@@ -61,7 +61,7 @@ class TestSection(TestCase):
 
     def test_get_section_list(self):
         body = self.body
-        sections = body.get_section_list()
+        sections = body.get_sections()
         self.assertEqual(len(sections), 2)
         second = sections[1]
         name = second.get_attribute('text:name')
@@ -70,7 +70,7 @@ class TestSection(TestCase):
 
     def test_get_section_list_style(self):
         body = self.body
-        sections = body.get_section_list(style='Sect1')
+        sections = body.get_sections(style='Sect1')
         self.assertEqual(len(sections), 2)
         section = sections[0]
         name = section.get_attribute('text:name')

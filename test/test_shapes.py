@@ -121,28 +121,28 @@ class TestShapes(TestCase):
     def test_get_draw_line_list(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        lines = page.get_draw_line_list()
+        lines = page.get_draw_lines()
         self.assertEqual(len(lines), 2)
 
 
     def test_get_draw_line_list_regex(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        lines = page.get_draw_line_list(content=ur'èche*')
+        lines = page.get_draw_lines(content=ur'èche*')
         self.assertEqual(len(lines), 1)
 
 
     def test_get_draw_line_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        lines = page.get_draw_line_list(draw_style=ur'gr2')
+        lines = page.get_draw_lines(draw_style=ur'gr2')
         self.assertEqual(len(lines), 1)
 
 
     def test_get_draw_line_list_draw_text_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        lines = page.get_draw_line_list(draw_text_style=ur'P1')
+        lines = page.get_draw_lines(draw_text_style=ur'P1')
         self.assertEqual(len(lines), 2)
 
 
@@ -175,28 +175,28 @@ class TestShapes(TestCase):
     def test_get_draw_rectangle_list(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        rectangles = page.get_draw_rectangle_list()
+        rectangles = page.get_draw_rectangles()
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_regex(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        rectangles = page.get_draw_rectangle_list(content=ur'angle')
+        rectangles = page.get_draw_rectangles(content=ur'angle')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        rectangles = page.get_draw_rectangle_list(draw_style=ur'gr1')
+        rectangles = page.get_draw_rectangles(draw_style=ur'gr1')
         self.assertEqual(len(rectangles), 1)
 
 
     def test_get_draw_rectangle_list_draw_text_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        rectangles = page.get_draw_rectangle_list(draw_text_style=ur'P1')
+        rectangles = page.get_draw_rectangles(draw_text_style=ur'P1')
         self.assertEqual(len(rectangles), 1)
 
 
@@ -230,28 +230,28 @@ class TestShapes(TestCase):
     def test_get_draw_ellipse_list(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        ellipses = page.get_draw_ellipse_list()
+        ellipses = page.get_draw_ellipses()
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_regex(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        ellipses = page.get_draw_ellipse_list(content=ur'rcle')
+        ellipses = page.get_draw_ellipses(content=ur'rcle')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        ellipses = page.get_draw_ellipse_list(draw_style=ur'gr1')
+        ellipses = page.get_draw_ellipses(draw_style=ur'gr1')
         self.assertEqual(len(ellipses), 1)
 
 
     def test_get_draw_ellipse_list_draw_text_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        ellipses = page.get_draw_ellipse_list(draw_text_style=ur'P1')
+        ellipses = page.get_draw_ellipses(draw_text_style=ur'P1')
         self.assertEqual(len(ellipses), 1)
 
 
@@ -285,28 +285,28 @@ class TestShapes(TestCase):
     def test_get_draw_connector_list(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        connectors = page.get_draw_connector_list()
+        connectors = page.get_draw_connectors()
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_regex(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        connectors = page.get_draw_connector_list(content=ur'Con')
+        connectors = page.get_draw_connectors(content=ur'Con')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_draw_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        connectors = page.get_draw_connector_list(draw_style=ur'gr4')
+        connectors = page.get_draw_connectors(draw_style=ur'gr4')
         self.assertEqual(len(connectors), 1)
 
 
     def test_get_draw_connector_list_draw_text_style(self):
         body = self.content.get_body()
         page = body.get_draw_page()
-        connectors = page.get_draw_connector_list(draw_text_style=ur'P1')
+        connectors = page.get_draw_connectors(draw_text_style=ur'P1')
         self.assertEqual(len(connectors), 1)
 
 

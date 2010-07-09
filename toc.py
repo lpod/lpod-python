@@ -308,7 +308,7 @@ class odf_toc(odf_element):
         # Auto-fill the index
         outline_level = self.get_outline_level() or 10
         level_indexes = {}
-        for heading in body.get_heading_list():
+        for heading in body.get_headings():
             level = heading.get_outline_level()
             if level > outline_level:
                 continue

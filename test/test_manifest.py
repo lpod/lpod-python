@@ -47,12 +47,12 @@ class ManifestTestCase(TestCase):
 
 
     def test_get_path_list(self):
-        results = self.manifest.get_path_list()
+        results = self.manifest.get_paths()
         self.assertEqual(len(results), 20)
 
 
     def test_get_path_media_list(self):
-        results = self.manifest.get_path_media_list()
+        results = self.manifest.get_path_medias()
         self.assertEqual(len(results), 20)
         root = results[0]
         self.assertEqual(root, ('/', ODF_PRESENTATION))

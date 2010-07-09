@@ -416,8 +416,8 @@ class odf_document(object):
     def get_style_list(self, family=None, automatic=False):
         content = self.get_content()
         styles = self.get_styles()
-        return (content.get_style_list(family=family)
-                + styles.get_style_list(family=family, automatic=automatic))
+        return (content.get_styles(family=family)
+                + styles.get_styles(family=family, automatic=automatic))
 
 
     def get_style(self, family, name_or_element=None, display_name=None):
@@ -690,7 +690,7 @@ class odf_document(object):
                 manifest = self.get_manifest()
                 document_manifest = document.get_manifest()
                 query = 'descendant::draw:image'
-                for image in style.get_element_list(query):
+                for image in style.get_elements(query):
                     full_path = image.get_attribute('xlink:href')
                     data = document.get_part(full_path)
                     media_type = document_manifest.get_media_type(full_path)

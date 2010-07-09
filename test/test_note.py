@@ -79,19 +79,19 @@ class TestNote(TestCase):
 
     def test_get_note_list(self):
         body = self.body
-        notes = body.get_note_list()
+        notes = body.get_notes()
         self.assertEqual(len(notes), 2)
 
 
     def test_get_note_list_footnote(self):
         body = self.body
-        notes = body.get_note_list(note_class='footnote')
+        notes = body.get_notes(note_class='footnote')
         self.assertEqual(len(notes), 1)
 
 
     def test_get_note_list_endnote(self):
         body = self.body
-        notes = body.get_note_list(note_class='endnote')
+        notes = body.get_notes(note_class='endnote')
         self.assertEqual(len(notes), 1)
 
 
@@ -111,7 +111,7 @@ class TestNote(TestCase):
 
     def test_get_note_by_class_footnote(self):
         body = self.body
-        footnotes = body.get_note_list(note_class='footnote')
+        footnotes = body.get_notes(note_class='footnote')
         footnote = footnotes[0]
         expected = ('<text:note text:id="ftn1" text:note-class="footnote">\n'
                     '  <text:note-citation>1</text:note-citation>\n'
@@ -126,7 +126,7 @@ class TestNote(TestCase):
 
     def test_get_note_by_class_endnote(self):
         body = self.body
-        endnotes = body.get_note_list(note_class='endnote')
+        endnotes = body.get_notes(note_class='endnote')
         endnote = endnotes[0]
         expected = ('<text:note text:id="ftn2" text:note-class="endnote">\n'
                     '  <text:note-citation>i</text:note-citation>\n'
@@ -233,7 +233,7 @@ class TestAnnotation(TestCase):
 
     def test_get_annotation_list(self):
         body = self.body
-        annotations = body.get_annotation_list()
+        annotations = body.get_annotations()
         self.assertEqual(len(annotations), 1)
         annotation = annotations[0]
         creator = annotation.get_dc_creator()
@@ -247,42 +247,42 @@ class TestAnnotation(TestCase):
     def test_get_annotation_list_author(self):
         body = self.body
         creator = u"Auteur inconnu"
-        annotations = body.get_annotation_list(creator=creator)
+        annotations = body.get_annotations(creator=creator)
         self.assertEqual(len(annotations), 1)
 
 
     def test_get_annotation_list_bad_author(self):
         body = self.body
         creator = u"Plato"
-        annotations = body.get_annotation_list(creator=creator)
+        annotations = body.get_annotations(creator=creator)
         self.assertEqual(len(annotations), 0)
 
 
     def test_get_annotation_list_start_date(self):
         body = self.body
         start_date = datetime(2009, 8, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(start_date=start_date)
+        annotations = body.get_annotations(start_date=start_date)
         self.assertEqual(len(annotations), 1)
 
 
     def test_get_annotation_list_bad_start_date(self):
         body = self.body
         start_date = datetime(2009, 9, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(start_date=start_date)
+        annotations = body.get_annotations(start_date=start_date)
         self.assertEqual(len(annotations), 0)
 
 
     def test_get_annotation_list_end_date(self):
         body = self.body
         end_date = datetime(2009, 9, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(end_date=end_date)
+        annotations = body.get_annotations(end_date=end_date)
         self.assertEqual(len(annotations), 1)
 
 
     def test_get_annotation_list_bad_end_date(self):
         body = self.body
         end_date = datetime(2009, 8, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(end_date=end_date)
+        annotations = body.get_annotations(end_date=end_date)
         self.assertEqual(len(annotations), 0)
 
 
@@ -290,7 +290,7 @@ class TestAnnotation(TestCase):
         body = self.body
         start_date = datetime(2009, 8, 1, 0, 0, 0)
         end_date = datetime(2009, 9, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(start_date=start_date,
+        annotations = body.get_annotations(start_date=start_date,
                                                    end_date=end_date)
         self.assertEqual(len(annotations), 1)
 
@@ -299,7 +299,7 @@ class TestAnnotation(TestCase):
         body = self.body
         start_date = datetime(2009, 5, 1, 0, 0, 0)
         end_date = datetime(2009, 6, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(start_date=start_date,
+        annotations = body.get_annotations(start_date=start_date,
                                                    end_date=end_date)
         self.assertEqual(len(annotations), 0)
 
@@ -309,7 +309,7 @@ class TestAnnotation(TestCase):
         creator = u"Auteur inconnu"
         start_date = datetime(2009, 8, 1, 0, 0, 0)
         end_date = datetime(2009, 9, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(creator=creator,
+        annotations = body.get_annotations(creator=creator,
                                                    start_date=start_date,
                                                    end_date=end_date)
         self.assertEqual(len(annotations), 1)
@@ -320,7 +320,7 @@ class TestAnnotation(TestCase):
         creator = u"Plato"
         start_date = datetime(2009, 6, 1, 0, 0, 0)
         end_date = datetime(2009, 7, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(creator=creator,
+        annotations = body.get_annotations(creator=creator,
                                                    start_date=start_date,
                                                    end_date=end_date)
         self.assertEqual(len(annotations), 0)
@@ -331,7 +331,7 @@ class TestAnnotation(TestCase):
         creator = u"Auteur inconnu"
         start_date = datetime(2009, 6, 23, 0, 0, 0)
         end_date = datetime(2009, 7, 1, 0, 0, 0)
-        annotations = body.get_annotation_list(creator=creator,
+        annotations = body.get_annotations(creator=creator,
                                                    start_date=start_date,
                                                    end_date=end_date)
         self.assertEqual(len(annotations), 0)

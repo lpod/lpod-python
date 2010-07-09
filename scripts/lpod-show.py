@@ -83,7 +83,7 @@ def spreadsheet_to_stdout(document):
     if encoding is None:
         encoding = 'utf-8'
     body = document.get_body()
-    for table in body.get_table_list():
+    for table in body.get_tables():
         table.rstrip_table(aggressive=True)
         table.export_to_csv(stdout, encoding=encoding)
         stdout.write("\n")
@@ -93,7 +93,7 @@ def spreadsheet_to_stdout(document):
 
 def spreadsheet_to_csv(document, target):
     body = document.get_body()
-    for table in body.get_table_list():
+    for table in body.get_tables():
         name = table.get_name()
         filename = clean_filename(name) + '.csv'
         csv_file = open(join(target, filename), 'wb')

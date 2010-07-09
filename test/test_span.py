@@ -49,7 +49,7 @@ class TestSpan(TestCase):
 
     def test_get_span_list(self):
         body = self.body
-        result = body.get_span_list()
+        result = body.get_spans()
         self.assertEqual(len(result), 2)
         element = result[0]
         expected = ('<text:span text:style-name="T1">'
@@ -60,7 +60,7 @@ class TestSpan(TestCase):
 
     def test_get_span_list_style(self):
         body = self.body
-        result = body.get_span_list(style='T2')
+        result = body.get_spans(style='T2')
         self.assertEqual(len(result), 1)
         element = result[0]
         expected = ('<text:span text:style-name="T2">'

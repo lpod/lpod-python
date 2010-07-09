@@ -57,14 +57,14 @@ class TestChangedRegionTestCase(TestCase):
 
 
     def test_get_changed_region_list(self):
-        regions = self.tracked_changes.get_changed_region_list()
+        regions = self.tracked_changes.get_changed_regions()
         self.assertEqual(len(regions), 3)
 
 
     def test_get_changed_region_list_creator(self):
         creator = u'Romain Gauthier'
         tracked_changes = self.tracked_changes
-        regions = tracked_changes.get_changed_region_list(creator=creator)
+        regions = tracked_changes.get_changed_regions(creator=creator)
         expected = ('<text:changed-region text:id="ct-1371898904">\n'
                     '     <text:deletion>\n'
                     '      <office:change-info>\n'
@@ -80,7 +80,7 @@ class TestChangedRegionTestCase(TestCase):
     def test_get_changed_region_list_date(self):
         date = datetime(2009, 8, 21, 17, 27, 00)
         tracked_changes = self.tracked_changes
-        regions = tracked_changes.get_changed_region_list(date=date)
+        regions = tracked_changes.get_changed_regions(date=date)
         expected = ('<text:changed-region text:id="ct-1371898456">\n'
                     '     <text:deletion>\n'
                     '      <office:change-info>\n'
@@ -95,7 +95,7 @@ class TestChangedRegionTestCase(TestCase):
 
     def test_get_changed_region_list_regex(self):
         tracked_changes = self.tracked_changes
-        regions = tracked_changes.get_changed_region_list(content=ur'amis')
+        regions = tracked_changes.get_changed_regions(content=ur'amis')
         expected = ('<text:changed-region text:id="ct-1371898456">\n'
                     '     <text:deletion>\n'
                     '      <office:change-info>\n'

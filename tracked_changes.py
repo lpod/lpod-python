@@ -27,14 +27,15 @@
 
 # Import from lpod
 from element import register_element_class, odf_element
-from utils import _get_element_list, _get_element
+from utils import _get_elements, _get_element
 
 
 class odf_tracked_changes(odf_element):
 
     def get_changed_region_list(self, creator=None, date=None, content=None):
-        return _get_element_list(self, 'text:changed-region',
-                dc_creator=creator, dc_date=date, content=content)
+        return _get_elements(self, 'text:changed-region', dc_creator=creator,
+                dc_date=date, content=content)
+    get_changed_regions = get_changed_region_list
 
 
     def get_changed_region(self, position=0, text_id=None, creator=None,

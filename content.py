@@ -63,8 +63,9 @@ class odf_content(odf_xmlpart):
         for context in self._get_style_contexts(family):
             if context is None:
                 continue
-            result.extend(context.get_style_list(family=family))
+            result.extend(context.get_styles(family=family))
         return result
+    get_styles = get_style_list
 
 
     def get_style(self, family, name_or_element=None, display_name=None):

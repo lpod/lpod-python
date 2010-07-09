@@ -41,7 +41,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list(self):
         body = self.body
-        headings = body.get_heading_list()
+        headings = body.get_headings()
         self.assertEqual(len(headings), 3)
         second = headings[1]
         text = second.get_text()
@@ -50,7 +50,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list_style(self):
         body = self.body
-        headings = body.get_heading_list(style='Heading_20_2')
+        headings = body.get_headings(style='Heading_20_2')
         self.assertEqual(len(headings), 1)
         heading = headings[0]
         text = heading.get_text()
@@ -59,7 +59,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list_level(self):
         body = self.body
-        headings = body.get_heading_list(outline_level=2)
+        headings = body.get_headings(outline_level=2)
         self.assertEqual(len(headings), 1)
         heading = headings[0]
         text = heading.get_text()
@@ -68,7 +68,7 @@ class TestHeading(TestCase):
 
     def test_get_heading_list_style_level(self):
         body = self.body
-        headings = body.get_heading_list(style='Heading_20_2', outline_level=2)
+        headings = body.get_headings(style='Heading_20_2', outline_level=2)
         self.assertEqual(len(headings), 1)
         heading = headings[0]
         text = heading.get_text()
@@ -78,7 +78,7 @@ class TestHeading(TestCase):
     def test_get_heading_list_context(self):
         body = self.body
         section2 = body.get_section(position=1)
-        headings = section2.get_heading_list()
+        headings = section2.get_headings()
         self.assertEqual(len(headings), 1)
         heading = headings[0]
         text = heading.get_text()
@@ -110,7 +110,7 @@ class TestHeading(TestCase):
         heading = odf_create_heading(2, u'An inserted heading',
                                      style='Heading_20_2')
         body.append(heading)
-        last_heading = body.get_heading_list()[-1]
+        last_heading = body.get_headings()[-1]
         self.assertEqual(last_heading.get_text(), u'An inserted heading')
 
 

@@ -71,10 +71,11 @@ class odf_xmlpart(object):
     def get_element_list(self, xpath_query):
         root = self.get_root()
         return root.xpath(xpath_query)
+    get_elements = get_element_list
 
 
     def get_element(self, xpath_query):
-        result = self.get_element_list(xpath_query)
+        result = self.get_elements(xpath_query)
         if not result:
             return None
         return result[0]

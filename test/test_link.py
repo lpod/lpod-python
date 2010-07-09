@@ -77,7 +77,7 @@ class TestLinks(TestCase):
         paragraph = self.paragraph
         paragraph.append(link1)
         paragraph.append(link2)
-        element = self.body.get_link_list()[1]
+        element = self.body.get_links()[1]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link2"/>')
         self.assertEqual(element.serialize(), expected)
@@ -92,7 +92,7 @@ class TestLinks(TestCase):
         paragraph.append(link1)
         paragraph.append(link2)
         # name
-        element = self.body.get_link_list(name='link1')[0]
+        element = self.body.get_links(name='link1')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link1" office:title="title1"/>')
         self.assertEqual(element.serialize(), expected)
@@ -107,7 +107,7 @@ class TestLinks(TestCase):
         paragraph.append(link1)
         paragraph.append(link2)
         # title
-        element = self.body.get_link_list(title='title2')[0]
+        element = self.body.get_links(title='title2')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link2" office:title="title2"/>')
         self.assertEqual(element.serialize(), expected)
@@ -122,13 +122,13 @@ class TestLinks(TestCase):
         paragraph.append(link1)
         paragraph.append(link2)
         # href
-        elements = self.body.get_link_list(href=ur'\.com')
+        elements = self.body.get_links(href=ur'\.com')
         self.assertEqual(len(elements), 2)
 
 
     def test_href_from_existing_document(self):
         body = self.body
-        links = body.get_link_list(href=ur'lpod')
+        links = body.get_links(href=ur'lpod')
         self.assertEqual(len(links), 1)
 
 
@@ -141,7 +141,7 @@ class TestLinks(TestCase):
         paragraph.append(link1)
         paragraph.append(link2)
         # name and title
-        element = self.body.get_link_list(name='link1', title='title1')[0]
+        element = self.body.get_links(name='link1', title='title1')[0]
         expected = ('<text:a xlink:href="http://example.com/" '
                     'office:name="link1" office:title="title1"/>')
         self.assertEqual(element.serialize(), expected)
@@ -171,7 +171,7 @@ class TestLinks(TestCase):
         paragraph.append(link1)
         paragraph.append(link2)
         # Not found
-        element = self.body.get_link_list(name='link1', title='title2')
+        element = self.body.get_links(name='link1', title='title2')
         self.assertEqual(element, [])
 
 

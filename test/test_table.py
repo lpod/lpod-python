@@ -589,18 +589,18 @@ class TestRowCell(TestCase):
 
 
     def test_get_cell_list(self):
-        self.assertEqual(len(list(self.row.get_cell_list())), 7)
+        self.assertEqual(len(list(self.row.get_cells())), 7)
 
 
     def test_get_cell_list_regex(self):
-        coordinates = [x for x, cell in self.row.get_cell_list(content=ur'3')]
+        coordinates = [x for x, cell in self.row.get_cells(content=ur'3')]
         expected = [4, 5, 6]
         self.assertEqual(coordinates, expected)
 
 
     def test_get_cell_list_style(self):
         coordinates = [x
-                for x, cell in self.row.get_cell_list(style=ur"ce1")]
+                for x, cell in self.row.get_cells(style=ur"ce1")]
         expected = [1, 5]
         self.assertEqual(coordinates, expected)
 
@@ -765,12 +765,12 @@ class TestTable(TestCase):
 
     def test_get_table_list(self):
         body = self.body
-        self.assertEqual(len(body.get_table_list()), 3)
+        self.assertEqual(len(body.get_tables()), 3)
 
 
     def test_get_table_list_style(self):
         body = self.body
-        self.assertEqual(len(body.get_table_list(style=u"ta1")), 3)
+        self.assertEqual(len(body.get_tables(style=u"ta1")), 3)
 
 
     def test_get_table_by_name(self):
@@ -869,20 +869,20 @@ class TestTableRow(TestCase):
 
 
     def test_get_row_list(self):
-        self.assertEqual(len(list(self.table.get_row_list())), 4)
+        self.assertEqual(len(list(self.table.get_rows())), 4)
 
 
     def test_get_row_list_regex(self):
-        coordinates = [y for y, row in self.table.get_row_list(content=ur'4')]
+        coordinates = [y for y, row in self.table.get_rows(content=ur'4')]
         self.assertEqual(coordinates, [3])
 
 
     def test_get_row_list_style(self):
         table = self.table.clone()
         # Set a different style manually
-        row = table.get_element_list('table:table-row')[2]
+        row = table.get_elements('table:table-row')[2]
         row.set_style(u"A Style")
-        coordinates = [y for y, row in table.get_row_list(style=ur'A Style')]
+        coordinates = [y for y, row in table.get_rows(style=ur'A Style')]
         self.assertEqual(coordinates, [2])
 
 
@@ -894,7 +894,7 @@ class TestTableRow(TestCase):
     def test_get_row_repeat(self):
         table = self.table.clone()
         # Set a repetition manually
-        table.get_element_list('table:table-row')[1].set_repeated(2)
+        table.get_elements('table:table-row')[1].set_repeated(2)
         row = table.get_row(4)
         self.assertEqual(row.get_values(), [1, 2, 3, 4, 5, 6, 7])
 
@@ -916,7 +916,7 @@ class TestTableRow(TestCase):
     def test_set_row_repeat(self):
         table = self.table.clone()
         # Set a repetition manually
-        table.get_element_list('table:table-row')[2].set_repeated(3)
+        table.get_elements('table:table-row')[2].set_repeated(3)
         row = table.get_row(5)
         row.set_value(3, u"Changed")
         table.set_row(2, row)
@@ -966,7 +966,7 @@ class TestTableRow(TestCase):
     def test_insert_row_repeated(self):
         table = self.table.clone()
         # Set a repetition manually
-        table.get_element_list('table:table-row')[2].set_repeated(3)
+        table.get_elements('table:table-row')[2].set_repeated(3)
         row = table.get_row(5)
         table.insert_row(2, row)
         self.assertEqual(table.get_values(),
@@ -1041,7 +1041,7 @@ class TestTableRow(TestCase):
     def test_delete_row_repeat(self):
         table = self.table.clone()
         # Set a repetition manually
-        table.get_element_list('table:table-row')[2].set_repeated(3)
+        table.get_elements('table:table-row')[2].set_repeated(3)
         table.delete_row(2)
         self.assertEqual(table.get_values(),
                 [[1, 1, 1, 2, 3, 3, 3],
@@ -1103,13 +1103,13 @@ class TestTableCell(TestCase):
 
 
     def test_get_cell_list(self):
-        self.assertEqual(len(list(self.table.get_cell_list())), 28)
+        self.assertEqual(len(list(self.table.get_cells())), 28)
 
 
     def test_get_cell_list_regex(self):
         table = self.table
         coordinates = [(x, y)
-                for x, y, cell in table.get_cell_list(content=ur'3')]
+                for x, y, cell in table.get_cells(content=ur'3')]
         expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
                 (5, 2), (6, 2), (2, 3)]
         self.assertEqual(coordinates, expected)
@@ -1118,7 +1118,7 @@ class TestTableCell(TestCase):
     def test_get_cell_list_style(self):
         table = self.table
         coordinates = [(x, y)
-                for x, y, cell in table.get_cell_list(style=ur"ce1")]
+                for x, y, cell in table.get_cells(style=ur"ce1")]
         expected = [(1, 1), (5, 1), (3, 2)]
         self.assertEqual(coordinates, expected)
 
@@ -1185,12 +1185,12 @@ class TestTableColumn(TestCase):
 
 
     def test_get_column_list(self):
-        self.assertEqual(len(list(self.table.get_column_list())), 7)
+        self.assertEqual(len(list(self.table.get_columns())), 7)
 
 
     def test_get_column_list_style(self):
         table = self.table
-        coordinates = [x for x, col in table.get_column_list(style=ur"co2")]
+        coordinates = [x for x, col in table.get_columns(style=ur"co2")]
         self.assertEqual(coordinates, [2, 3])
 
 

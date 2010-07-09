@@ -51,7 +51,7 @@ class TestImage(TestCase):
 
     def test_get_image_list(self):
         body = self.body
-        result = body.get_image_list()
+        result = body.get_images()
         self.assertEqual(len(result), 1)
         element = result[0]
         self.assertEqual(element.get_attribute('xlink:href'), self.path)

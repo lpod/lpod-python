@@ -58,15 +58,15 @@ class TestDrawPage(TestCase):
 
     def test_get_draw_page_list(self):
         body = self.body
-        result = body.get_draw_page_list()
+        result = body.get_draw_pages()
         self.assertEqual(len(result), 2)
 
 
     def test_get_draw_page_list_style(self):
         body = self.body.clone()
-        result = body.get_draw_page_list(style='dp1')
+        result = body.get_draw_pages(style='dp1')
         self.assertEqual(len(result), 2)
-        result = body.get_draw_page_list(style='dp2')
+        result = body.get_draw_pages(style='dp2')
         self.assertEqual(len(result), 0)
 
 

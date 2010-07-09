@@ -77,7 +77,7 @@ class reference_markTest(TestCase):
         body = self.body
         reference_mark = odf_create_reference_mark(u'你好 Zoé')
         body.append(reference_mark)
-        get = body.get_reference_mark_list()[0]
+        get = body.get_reference_marks()[0]
         expected = ('<text:reference-mark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
@@ -95,7 +95,7 @@ class reference_markTest(TestCase):
 
     def test_get_reference_mark_start_list(self):
         body = self.body
-        result = body.get_reference_mark_start_list()
+        result = body.get_reference_mark_starts()
         self.assertEqual(len(result), 1)
         element = result[0]
         expected = ('<text:reference-mark-start '
@@ -115,7 +115,7 @@ class reference_markTest(TestCase):
 
     def test_get_reference_mark_end_list(self):
         body = self.body
-        result = body.get_reference_mark_end_list()
+        result = body.get_reference_mark_ends()
         self.assertEqual(len(result), 1)
         element = result[0]
         expected = ('<text:reference-mark-end '

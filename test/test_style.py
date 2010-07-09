@@ -149,13 +149,13 @@ class TestStyle(TestCase):
 
     def test_get_style_list(self):
         content = self.content
-        styles = content.get_style_list()
+        styles = content.get_styles()
         self.assertEqual(len(styles), 6)
 
 
     def test_get_style_list_family(self):
         content = self.content
-        styles = content.get_style_list(family='paragraph')
+        styles = content.get_styles(family='paragraph')
         self.assertEqual(len(styles), 1)
 
 
