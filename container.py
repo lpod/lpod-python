@@ -177,22 +177,22 @@ class odf_container(object):
         raise NotImplementedError
 
 
-    def __get_xml_part(self, part_name):
+    def __get_xml_part(self, name):
         """Get bytes of a part from the XML-only ODF. No cache.
         """
-        if part_name not in ODF_PARTS and part_name != 'mimetype':
+        if name not in ODF_PARTS and name != 'mimetype':
             raise ValueError, ("Third-party parts are not supported "
                                "in an XML-only ODF document")
         data = self.__get_data()
-        if part_name == 'mimetype':
+        if name == 'mimetype':
             start_attr = 'office:mimetype="'
             start = data.index(start_attr) + len(start_attr)
             end = data.index('"', start)
             part = data[start:end]
         else:
-            start_tag = '<office:document-%s>' % part_name
+            start_tag = '<office:document-%s>' % name
             start = data.index(start_tag)
-            end_tag = '</office:document-%s>' % part_name
+            end_tag = '</office:document-%s>' % name
             end = data.index(end_tag) + len(end_tag)
             part = data[start:end]
         return part
@@ -233,15 +233,15 @@ class odf_container(object):
         return result
 
 
-    def __get_zip_part(self, part_name):
+    def __get_zip_part(self, name):
         """Get bytes of a part from the Zip ODF. No cache.
         """
         zipfile = self.__get_zipfile()
-        if part_name in ODF_PARTS:
-            part_name = '%s.xml' % part_name
-        elif part_name == 'manifest':
-            part_name = 'META-INF/manifest.xml'
-        return zipfile.read(part_name)
+        if name in ODF_PARTS:
+            name = name + '.xml'
+        elif name == 'manifest':
+            name = 'META-INF/manifest.xml'
+        return zipfile.read(name)
 
 
     def __save_zip(self, file):
@@ -262,16 +262,16 @@ class odf_container(object):
         filezip.writestr('mimetype', parts['mimetype'])
         filezip.compression = compression
         # XML parts
-        for part_name in ODF_PARTS:
-            filezip.writestr(part_name + '.xml', parts[part_name])
+        for name in ODF_PARTS:
+            filezip.writestr(name + '.xml', parts[name])
         # Everything else
-        for part_name, part_data in sorted(parts.iteritems()):
-            if part_data is None:
+        for name, data in sorted(parts.iteritems()):
+            if data is None:
                 # Deleted
                 continue
-            elif part_name in ODF_PARTS + ('mimetype', 'manifest'):
+            elif name in ODF_PARTS or name in ('mimetype', 'manifest'):
                 continue
-            filezip.writestr(part_name, part_data)
+            filezip.writestr(name, data)
         # Manifest
         filezip.writestr('META-INF/manifest.xml', parts['manifest'])
         filezip.close()
@@ -289,33 +289,33 @@ class odf_container(object):
         return self.__get_xml_parts()
 
 
-    def get_part(self, part_name):
+    def get_part(self, name):
         """Get the bytes of a part of the ODF.
         """
         loaded_parts = self.__parts
-        if part_name in loaded_parts:
-            part = loaded_parts[part_name]
+        if name in loaded_parts:
+            part = loaded_parts[name]
             if part is None:
-                raise ValueError, 'part "%s" is deleted' % part_name
+                raise ValueError, 'part "%s" is deleted' % name
             return part
         if self.__zip_packaging is True:
-            part = self.__get_zip_part(part_name)
+            part = self.__get_zip_part(name)
         else:
-            part = self.__get_xml_part(part_name)
-        loaded_parts[part_name] = part
+            part = self.__get_xml_part(name)
+        loaded_parts[name] = part
         return part
 
 
-    def set_part(self, part_name, data):
+    def set_part(self, name, data):
         """Replace or add a new part.
         """
-        self.__parts[part_name] = data
+        self.__parts[name] = data
 
 
-    def del_part(self, part_name):
+    def del_part(self, name):
         """Mark a part for deletion.
         """
-        self.__parts[part_name] = None
+        self.__parts[name] = None
 
 
     def clone(self):
@@ -355,9 +355,9 @@ class odf_container(object):
         if packaging not in ('zip', 'flat'):
             raise ValueError, 'packaging type "%s" not supported' % packaging
         # Load parts
-        for part_name in self.get_parts():
-            if part_name not in parts:
-                self.get_part(part_name)
+        for name in self.get_parts():
+            if name not in parts:
+                self.get_part(name)
         # Open output file
         close_after = False
         if target is None:

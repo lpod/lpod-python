@@ -105,25 +105,51 @@ class odf_document(object):
     # Public API
     #
 
-    def get_xmlpart(self, part_name):
-        if part_name not in ODF_PARTS and part_name != 'manifest':
-            raise ValueError, '"%s" is not an XML part' % part_name
-        parts = self.__xmlparts
-        part = parts.get(part_name)
-        if part is None:
-            container = self.container
-            if part_name == 'content':
-                part = odf_content(part_name, container)
-            elif part_name == 'meta':
-                part = odf_meta(part_name, container)
-            elif part_name == 'styles':
-                part = odf_styles(part_name, container)
-            elif part_name == 'manifest':
-                part = odf_manifest(part_name, container)
-            else:
-                part = odf_xmlpart(part_name, container)
-            parts[part_name] = part
+    def get_parts(self):
+        """Return available part names with path inside the archive, e.g.
+        ['content.xml', ..., 'Pictures/100000000000032000000258912EB1C3.jpg']
+        """
+        return self.container.get_parts()
+
+
+    def get_part(self, name):
+        """Return the bytes of the given part. The name includes the
+        path inside the archive, e.g.
+        "Pictures/100000000000032000000258912EB1C3.jpg"
+
+        "content", "meta", "settings", "styles" and "manifest" are special
+        names that return the dedicated object with its API.
+        """
+        # XML part?
+        if name in ODF_PARTS or name == 'manifest':
+            xmlparts = self.__xmlparts
+            part = xmlparts.get(name)
+            if part is None:
+                cls = {'content': odf_content,
+                        'meta': odf_meta,
+                        'styles': odf_styles,
+                        'manifest': odf_manifest}.get(name, odf_xmlpart)
+                container = self.container
+                xmlparts[name] = part = cls(name, container)
+        else:
+            part = self.container.get_part(name)
         return part
+
+
+    def set_part(self, name, data):
+        """Set the bytes of the given part. The name includes the
+        path inside the archive, e.g.
+        "Pictures/100000000000032000000258912EB1C3.jpg"
+        """
+        if name in ODF_PARTS or name == 'manifest':
+            del self.__xmlparts[name]
+        return self.container.set_part(name, data)
+
+
+    def del_part(self, name):
+        if name in ODF_PARTS or name == 'manifest':
+            raise ValueError, "these parts are mandatory"
+        return self.container.del_part(name)
 
 
     def get_content(self):
@@ -131,7 +157,7 @@ class odf_document(object):
 
         Return: odf_content
         """
-        return self.get_xmlpart('content')
+        return self.get_part('content')
 
 
     def get_meta(self):
@@ -139,7 +165,7 @@ class odf_document(object):
 
         Return: odf_meta
         """
-        return self.get_xmlpart('meta')
+        return self.get_part('meta')
 
 
     def get_styles(self):
@@ -147,7 +173,7 @@ class odf_document(object):
 
         Return: odf_styles
         """
-        return self.get_xmlpart('styles')
+        return self.get_part('styles')
 
 
     def get_manifest(self):
@@ -155,7 +181,7 @@ class odf_document(object):
 
         Return: odf_manifest
         """
-        return self.get_xmlpart('manifest')
+        return self.get_part('manifest')
 
 
     def get_mimetype(self):
@@ -187,29 +213,6 @@ class odf_document(object):
             content = self.get_content()
             self.__body = content.get_body()
         return self.__body
-
-
-    def get_parts(self):
-        """Return available part names with path inside the archive, e.g.
-        ['content.xml', ..., 'Pictures/100000000000032000000258912EB1C3.jpg']
-        """
-        return self.container.get_parts()
-
-
-    def get_part(self, part_name):
-        """Return the bytes of the given part. The part_name includes the
-        path inside the archive, e.g.
-        "Pictures/100000000000032000000258912EB1C3.jpg"
-        """
-        return self.container.get_part(part_name)
-
-
-    def set_part(self, part_name, data):
-        """Set the bytes of the given part. The part_name includes the
-        path inside the archive, e.g.
-        "Pictures/100000000000032000000258912EB1C3.jpg"
-        """
-        return self.container.set_part(part_name, data)
 
 
     def get_formatted_text(self, rst_mode=False):
@@ -402,11 +405,12 @@ class odf_document(object):
         if not meta._generator_modified:
             meta.set_generator(u"lpOD Python %s" % __version__)
         # Synchronize data with container
-        for part_name, part in self.__xmlparts.iteritems():
+        container = self.container
+        for name, part in self.__xmlparts.iteritems():
             if part is not None:
-                self.container.set_part(part_name, part.serialize(pretty))
+                container.set_part(name, part.serialize(pretty))
         # Save the container
-        self.container.save(target, packaging)
+        container.save(target, packaging)
 
 
     #

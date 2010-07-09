@@ -23,11 +23,19 @@ The name shortenings are numerous so we group them by module.
 
 The basic idea is:
 
-    get_cell_xxx -> get_xxx
-    get_row_xxx -> get_xxx
-    get_column_xxx -> get_xxx
-    get_table_xxx -> get_xxx
-    is_table_xxx -> get_xxx
+    Before                         After
+    -----------------------------  ----------------------
+    get_cell_xxx                   get_xxx
+    get_row_xxx                    get_xxx
+    get_column_xxx                 get_xxx
+    get_table_xxx                  get_xxx
+    is_table_xxx                   get_xxx
+    get_page_xxx                   get_xxx
+    get_frame_xxx                  get_xxx
+    get_note_xxx                   get_xxx
+    get_annotation_xxx             get_xxx
+    get_style_xxx                  get_xxx
+    get_toc_xxx                    get_xxx
 
 But some remain (e.g., get_xxx_list).
 
@@ -204,6 +212,15 @@ element:
     Before                         After
     -----------------------------  ----------------------
     get_body                       get_document_body
+
+
+document:
+
+  odf_document:
+
+    Before                         After
+    -----------------------------  ----------------------
+    get_xmlpart                    get_part
 
 
 High-level API
