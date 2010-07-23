@@ -580,7 +580,10 @@ class odf_element(object):
 
         Inspired by lxml.
         """
-        return unicode(self.__element.tail)
+        tail = self.__element.tail
+        if tail is None:
+            return None
+        return unicode(tail)
 
 
     def set_tail(self, text):
