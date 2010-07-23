@@ -86,7 +86,8 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         table_name=None, table_style=None, style_name=None,
         display_name=None, note_class=None, text_id=None, text_name=None,
         office_name=None, office_title=None, outline_level=None, level=None,
-        page_layout=None, position=None, **kw):
+        page_layout=None, master_page=None, parent_style=None,
+        position=None, **kw):
     query = [element_name]
     attributes = kw
     if text_style:
@@ -125,6 +126,10 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         attributes['text:level'] = level
     if page_layout:
         attributes['style:page-layout-name'] = page_layout
+    if master_page:
+        attributes['draw:master-page-name'] = master_page
+    if parent_style:
+        attributes['style:parent-style-name'] = parent_style
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]

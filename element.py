@@ -907,7 +907,9 @@ class odf_element(object):
                 + _get_elements(self, 'descendant::*', draw_style=name)
                 + _get_elements(self, 'descendant::*', draw_text_style=name)
                 + _get_elements(self, 'descendant::*', table_style=name)
-                + _get_elements(self, 'descendant::*', page_layout=name))
+                + _get_elements(self, 'descendant::*', page_layout=name)
+                + _get_elements(self, 'descendant::*', master_page=name)
+                + _get_elements(self, 'descendant::*', parent_style=name))
 
     #
     # Common attributes
