@@ -551,6 +551,14 @@ class odf_master_page(odf_style):
         self.set_attribute('style:page-layout-name', name)
 
 
+    def get_draw_style_name(self):
+        return self.get_attribute('draw:style-name')
+
+
+    def set_draw_style_name(self, name):
+        self.set_attribute('draw:style-name', name)
+
+
     def get_header(self):
         """Get the element that contains the header contents.
 
