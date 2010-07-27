@@ -267,19 +267,19 @@ class odf_frame(odf_element):
         self.set_attribute('text:anchor-page-number', str(page_number))
 
 
-    def get_presentation_style_name(self):
+    def get_presentation_style(self):
         return self.get_attribute('presentation:style-name')
 
 
-    def set_presentation_style_name(self, name):
+    def set_presentation_style(self, name):
         return self.set_attribute('presentation:style-name', name)
 
 
-    def get_draw_text_style_name(self):
+    def get_draw_text_style(self):
         return self.get_attribute('draw:text-style-name')
 
 
-    def set_draw_text_style_name(self, name):
+    def set_draw_text_style(self, name):
         return self.set_attribute('draw:text-style-name', name)
 
 

@@ -143,6 +143,10 @@ frame:
     set_frame_anchor_type          set_anchor_type
     get_frame_page_number          get_page_number
     set_frame_page_number          set_page_number
+    get_presentation_style_name    get_presentation_style
+    set_presentation_style_name    set_presentation_style
+    get_draw_text_style_name       get_draw_text_style
+    set_draw_text_style_name       set_draw_text_style
 
 
 note:
@@ -182,6 +186,17 @@ style:
     get_style_properties           get_properties
     set_style_properties           set_properties
     del_style_properties           del_properties
+    get_parent_style_name          get_parent_style
+    set_parent_style_name          set_parent_style
+
+  odf_master_page:
+
+    Before                         After
+    -----------------------------  ----------------------
+    get_page_layout_name           get_page_layout
+    set_page_layout_name           set_page_layout
+    get_draw_style_name            get_draw_style (moved to odf_element)
+    set_draw_style_name            set_draw_style (moved to odf_element)
 
 
 toc:

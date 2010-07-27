@@ -937,6 +937,14 @@ class odf_element(object):
         self.set_attribute('text:style-name', style)
 
 
+    def get_draw_style(self):
+        return self.get_attribute('draw:style-name')
+
+
+    def set_draw_style(self, name):
+        self.set_attribute('draw:style-name', name)
+
+
     #
     # Dublin core
     #

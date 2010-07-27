@@ -200,6 +200,10 @@ class odf_style(odf_element):
         return self.get_attribute('style:display-name')
 
 
+    def set_display_name(self, name):
+        return self.set_attribute('style:display-name', name)
+
+
     def get_family(self):
         return self.get_attribute('style:family')
 
@@ -208,7 +212,7 @@ class odf_style(odf_element):
         self.set_attribute('style:family', family)
 
 
-    def get_parent_style_name(self):
+    def get_parent_style(self):
         """Will only return a name, not an object, because we don't have
         access to the XML part from here.
 
@@ -217,7 +221,7 @@ class odf_style(odf_element):
         return self.get_attribute('style:parent-style-name')
 
 
-    def set_parent_style_name(self, name):
+    def set_parent_style(self, name):
         self.set_attribute('style:parent-style-name', name)
 
 
@@ -543,20 +547,12 @@ class odf_master_page(odf_style):
         raise ValueError, 'family is read-only'
 
 
-    def get_page_layout_name(self):
+    def get_page_layout(self):
         return self.get_attribute('style:page-layout-name')
 
 
-    def set_page_layout_name(self, name):
+    def set_page_layout(self, name):
         self.set_attribute('style:page-layout-name', name)
-
-
-    def get_draw_style_name(self):
-        return self.get_attribute('draw:style-name')
-
-
-    def set_draw_style_name(self, name):
-        self.set_attribute('draw:style-name', name)
 
 
     def get_header(self):
