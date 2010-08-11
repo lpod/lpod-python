@@ -352,9 +352,11 @@ class TestCreateColumn(TestCase):
     def test_all(self):
         column =  odf_create_column(style=u"co1",
                 default_cell_style="Standard", repeated=3)
-        expected = ('<table:table-column table:style-name="co1" '
-                      'table:default-cell-style-name="A Style"/>'
-                      'table:number-columns-repeated="3"/>')
+        expected = ('<table:table-column '
+                      'table:default-cell-style-name="Standard" '
+                      'table:number-columns-repeated="3" '
+                      'table:style-name="co1"/>')
+        self.assertEqual(column.serialize(), expected)
 
 
 
