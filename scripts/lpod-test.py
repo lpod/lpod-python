@@ -27,21 +27,11 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from subprocess import Popen, PIPE
 from sys import exit
 
 # Import from lpod
 from lpod import __version__
-
-
-
-def run_command(command):
-    popen = Popen(command, stdout=PIPE, stderr=PIPE)
-    stdoutdata, stderrdata = popen.communicate()
-    if popen.returncode != 0 or stderrdata:
-        raise ValueError
-    return stdoutdata, stderrdata
-
+from lpod.release import _run_command
 
 
 if  __name__ == "__main__":
@@ -61,4 +51,4 @@ if  __name__ == "__main__":
     document = args[0]
 
     # Finish me :-)
-    run_command(["odflint"])
+    print _run_command(["odflint", document])
