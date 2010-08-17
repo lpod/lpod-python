@@ -580,6 +580,16 @@ class odf_cell(odf_element):
         self.set_attribute('table:formula', formula)
 
 
+    def get_text(self):
+        """Not blindly return text nodes because it may contain an annotation
+        """
+        return self.get_text_content()
+
+
+    def set_text(self, text):
+        return self.set_text_content(text)
+
+
 
 class odf_row(odf_element):
 
@@ -2158,16 +2168,22 @@ class odf_table(odf_element):
             encoding -- str
         """
         close_after = False
+        # In-memory
         if path_or_file is None:
             file = StringIO()
+        # Path
         elif type(path_or_file) is str or type(path_or_file) is unicode:
             file = open(path_or_file, 'wb')
             close_after = True
+        # Open file
+        else:
+            file = path_or_file
         quoted = quotechar * 2
         for values in self.iter_values():
             line = []
             for value in values:
-                if type(value) is unicode:
+                # Also testing lxml.etree._ElementUnicodeResult
+                if isinstance(value, unicode):
                     value = value.encode(encoding)
                 if type(value) is str:
                     value = value.strip()
