@@ -191,6 +191,8 @@ class odf_style(odf_element):
     def get_name(self):
         return self.get_attribute('style:name')
 
+    get_style_name = obsolete('get_style_name', get_name)
+
 
     def set_name(self, name):
         self.set_attribute('style:name', name)
