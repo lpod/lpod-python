@@ -222,6 +222,9 @@ class odf_style(odf_element):
         """
         return self.get_attribute('style:parent-style-name')
 
+    get_parent_style_name = obsolete('get_parent_style_name',
+            get_parent_style)
+
 
     def set_parent_style(self, name):
         self.set_attribute('style:parent-style-name', name)

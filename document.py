@@ -595,7 +595,7 @@ class odf_document(object):
             infos.append({'type': u"auto  " if is_auto else u"common",
                           'used': u"y" if is_used else u"n",
                           'family': style.get_family() or u"",
-                          'parent': style.get_parent_style_name() or u"",
+                          'parent': style.get_parent_style() or u"",
                           'name': name or u"",
                           'display_name': style.get_display_name(),
                           'properties': style.get_properties() if
