@@ -53,7 +53,7 @@ class Converter(object):
         for intable in inbody.get_tables():
             # Skip empty table
             clone = intable.clone()
-            clone.rstrip_table()
+            clone.rstrip()
             if clone.get_size() == (0, 0):
                 continue
             # At least OOo Writer doesn't like formulas referencing merged

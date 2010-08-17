@@ -84,8 +84,8 @@ def spreadsheet_to_stdout(document):
         encoding = 'utf-8'
     body = document.get_body()
     for table in body.get_tables():
-        table.rstrip_table(aggressive=True)
-        table.export_to_csv(stdout, encoding=encoding)
+        table.rstrip(aggressive=True)
+        table.to_csv(stdout, encoding=encoding)
         stdout.write("\n")
     stdout.flush()
 
@@ -98,8 +98,8 @@ def spreadsheet_to_csv(document, target):
         filename = clean_filename(name) + '.csv'
         csv_file = open(join(target, filename), 'wb')
 
-        table.rstrip_table(aggressive=True)
-        table.export_to_csv(csv_file)
+        table.rstrip(aggressive=True)
+        table.to_csv(csv_file)
         csv_file.close()
 
 
