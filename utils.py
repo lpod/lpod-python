@@ -33,6 +33,7 @@ from os import getcwd
 from os.path import splitdrive, join, sep
 from re import search
 from sys import _getframe, modules
+from warnings import warn
 
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
@@ -471,3 +472,13 @@ def oooc_to_ooow(formula):
     # Convert functions
     formula = formula.replace("SUM(", "sum ").replace(")", "")
     return "ooow:" + formula
+
+
+
+def obsolete(old_name, new_func):
+    def decorate(*args, **kwargs):
+        new_name = new_func.__name__
+        message = '"%s" is obsolete, call "%s" instead' % (old_name,
+                new_name)
+        warn(message, category=DeprecationWarning)
+    return decorate

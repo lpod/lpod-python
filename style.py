@@ -28,7 +28,7 @@
 from datatype import Boolean
 from element import register_element_class, odf_create_element, odf_element
 from utils import _get_style_tagname, _expand_properties, _merge_dicts
-from utils import _get_element
+from utils import _get_element, obsolete
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
@@ -283,6 +283,8 @@ class odf_style(odf_element):
                 element.del_attribute(key)
             else:
                 element.set_attribute(key, value)
+
+    set_style_properties = obsolete('set_style_properties', set_properties)
 
 
     def del_properties(self, properties=[], area=None, *args):

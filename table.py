@@ -34,7 +34,7 @@ from textwrap import wrap
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
-from utils import get_value, _set_value_and_type
+from utils import get_value, _set_value_and_type, obsolete
 
 
 def _alpha_to_digit(alpha):
@@ -473,6 +473,8 @@ class odf_cell(odf_element):
         if text is not None:
             self.set_text_content(text)
 
+    set_cell_value = obsolete('set_cell_value', set_value)
+
 
     def get_type(self):
         """Get the type of the cell: boolean, float, date, string or time.
@@ -643,6 +645,8 @@ class odf_row(odf_element):
             style -- unicode
         """
         self.set_attribute('table:style-name', style)
+
+    set_row_style = obsolete('set_row_style', set_style)
 
 
     def get_width(self):
@@ -1146,6 +1150,8 @@ class odf_table(odf_element):
         unrepeated = len(rows) - len(repeated)
         return sum(int(r) for r in repeated) + unrepeated
 
+    get_table_height = obsolete('get_table_height', get_height)
+
 
     def get_width(self):
         """Get the current width of the table, measured on columns.
@@ -1161,6 +1167,8 @@ class odf_table(odf_element):
                 'table:table-column/@table:number-columns-repeated')
         unrepeated = len(columns) - len(repeated)
         return sum(int(r) for r in repeated) + unrepeated
+
+    get_table_width = obsolete('get_table_width', get_width)
 
 
     def get_size(self):
@@ -1313,6 +1321,8 @@ class odf_table(odf_element):
                     diff = -repeated
                     if diff == 0:
                         break
+
+    rstrip_table = obsolete('rstrip_table', rstrip)
 
 
     def is_empty(self, aggressive=False):

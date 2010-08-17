@@ -29,6 +29,7 @@
 from image import odf_create_image
 from element import odf_create_element, odf_element, register_element_class
 from paragraph import odf_create_paragraph
+from utils import obsolete
 
 
 def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
@@ -240,6 +241,8 @@ class odf_frame(odf_element):
         self.set_attribute('text:anchor-type', anchor_type)
         if anchor_type == 'page' and page_number:
             self.set_page_number(page_number)
+
+    set_frame_anchor_type = obsolete('set_frame_anchor_type', set_anchor_type)
 
 
     def get_page_number(self):
