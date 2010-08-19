@@ -47,6 +47,8 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         height=None, use_optimal_height=None,
         # For family 'table-column'
         width=None, break_before=None, break_after=None,
+        # For family 'graphic'
+        min_height=None,
         # Every other property
         **kw):
     """Create a style of the given family. The name is not mandatory at this
@@ -179,6 +181,10 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
             kw['fo:break-before'] = break_before
         if break_after:
             kw['fo:break-after'] = break_after
+    # Graphic
+    elif area == 'graphic':
+        if min_height:
+            kw['fo:min-height'] = min_height
     if kw:
         element.set_properties(kw, area=area)
     return element
