@@ -207,7 +207,11 @@ class odf_style(odf_element):
 
 
     def get_family(self):
-        return self.get_attribute('style:family')
+        family = self.get_attribute('style:family')
+        # Where the family is known from the tag, it must be defined
+        if family is None:
+            raise ValueError, "family undefined"
+        return family
 
 
     def set_family(self, family):
