@@ -210,7 +210,8 @@ class odf_style(odf_element):
         family = self.get_attribute('style:family')
         # Where the family is known from the tag, it must be defined
         if family is None:
-            raise ValueError, "family undefined"
+            raise ValueError, 'family undefined in %s "%s"' % (self,
+                    self.get_name())
         return family
 
 
@@ -619,7 +620,6 @@ class odf_master_page(odf_style):
                                            style=u"Footer")
 
 
-# FIXME stub
 class odf_font_style(odf_style):
 
     def get_family(self):
@@ -627,7 +627,6 @@ class odf_font_style(odf_style):
 
 
 
-# FIXME stub
 class odf_number_style(odf_style):
 
     def get_family(self):
@@ -635,7 +634,6 @@ class odf_number_style(odf_style):
 
 
 
-# FIXME stub
 class odf_percentage_style(odf_style):
 
     def get_family(self):
@@ -643,7 +641,6 @@ class odf_percentage_style(odf_style):
 
 
 
-# FIXME stub
 class odf_time_style(odf_style):
 
     def get_family(self):
@@ -651,7 +648,6 @@ class odf_time_style(odf_style):
 
 
 
-# FIXME stub
 class odf_date_style(odf_style):
 
     def get_family(self):
@@ -659,11 +655,17 @@ class odf_date_style(odf_style):
 
 
 
-# FIXME stub
 class odf_currency_style(odf_style):
 
     def get_family(self):
         return 'currency'
+
+
+
+class odf_presentation_page_layout(odf_style):
+
+    def get_family(self):
+        return 'presentation-page-layout'
 
 
 
@@ -746,8 +748,7 @@ def register_style(tagname, cls):
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
         'style:footer-style', 'text:list-level-style-number',
-        'text:list-level-style-bullet', 'text:list-level-style-image',
-        'style:presentation-page-layout'):
+        'text:list-level-style-bullet', 'text:list-level-style-image'):
     register_style(name, odf_style)
 register_style('text:list-style', odf_list_style)
 register_style('text:outline-style', odf_outline_style)
@@ -759,3 +760,5 @@ register_style('number:percentage-style', odf_percentage_style)
 register_style('number:time-style', odf_time_style)
 register_style('number:date-style', odf_date_style)
 register_style('number:currency-style', odf_currency_style)
+register_style('style:presentation-page-layout',
+        odf_presentation_page_layout)

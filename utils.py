@@ -45,7 +45,8 @@ CELL_TYPES = ('boolean', 'currency', 'date', 'float', 'percentage', 'string',
 STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'table-column',
                   'table-row', 'table-cell', 'table-page', 'chart',
                   'default', 'drawing-page', 'graphic', 'presentation',
-                  'control', 'ruby', 'page-layout')
+                  'control', 'ruby', 'list', 'number', 'page-layout',
+                  'presentation-page-layout', 'font-face', 'master-page')
 
 NOTE_CLASSES = ('footnote', 'endnote')
 
@@ -169,6 +170,7 @@ family_mapping = {
         'list': ('text:list-style', None),
         'outline': ('text:outline-style', None),
         'page-layout': ('style:page-layout', None),
+        'presentation-page-layout': ('style:presentation-page-layout', None),
         'master-page': ('style:master-page', None),
         'font-face': ('style:font-face', None),
         'number': ('number:number-style', None),
