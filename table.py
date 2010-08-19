@@ -1192,31 +1192,31 @@ class odf_table(odf_element):
 
 
     def get_protected(self):
-        return self.get_attribute('table:protected') == 'true'
+        return self.get_attribute('table:protected')
 
 
     def set_protected(self, protect):
-        self.set_boolean_attribute('table:protected', protect)
+        self.set_attribute('table:protected', protect)
 
 
     def get_displayed(self):
-        return self.get_boolean_attribute('table:display') is True
+        return self.get_attribute('table:display')
 
 
     def set_displayed(self, display):
-        self.set_boolean_attribute('table:display', display)
+        self.set_attribute('table:display', display)
 
 
     def get_printable(self):
         printable = self.get_attribute('table:print')
         # Default value
         if printable is None:
-            printable = 'true'
-        return printable == 'true'
+            return True
+        return printable
 
 
     def set_printable(self, printable):
-        self.set_boolean_attribute('table:print', printable)
+        self.set_attribute('table:print', printable)
 
 
     def get_print_ranges(self):

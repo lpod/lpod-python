@@ -204,11 +204,11 @@ class odf_toc(odf_element):
 
 
     def get_protected(self):
-        return self.get_boolean_attribute('text:protected')
+        return self.get_attribute('text:protected')
 
 
     def set_protected(self, protected):
-        self.set_boolean_attribute('text:protected', protected)
+        self.set_attribute('text:protected', protected)
 
 
     def get_style(self):

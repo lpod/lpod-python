@@ -508,20 +508,9 @@ class odf_element(object):
         value = element.get(name)
         if value is None:
             return None
+        elif value in ('true', 'false'):
+            return Boolean.decode(value)
         return unicode(value)
-
-
-    def get_boolean_attribute(self, name):
-        """Shortcut to get the value of an attribute that contains "true" or
-        "false" as a boolean value.
-
-        Arguments:
-
-            name -- str
-
-        Return: bool
-        """
-        return Boolean.decode(self.get_attribute(name))
 
 
     def set_attribute(self, name, value):
@@ -529,26 +518,15 @@ class odf_element(object):
         uri, name = _decode_qname(name)
         if uri is not None:
             name = '{%s}%s' % (uri, name)
-        if value is None:
+        if type(value) is bool:
+            value = Boolean.encode(value)
+        elif value is None:
             try:
                 del element.attrib[name]
             except KeyError:
                 pass
             return
         element.set(name, value)
-
-
-    def set_boolean_attribute(self, name, value):
-        """Shortcut to set an attribute that expects "true" or "false" from a
-        boolean value. "true" and "false" accepted as well.
-
-        Arguments:
-
-            name -- str
-
-            value -- bool or "true" or "false"
-        """
-        self.set_attribute(name, Boolean.encode(value))
 
 
     def del_attribute(self, name):
