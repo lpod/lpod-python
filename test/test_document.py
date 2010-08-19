@@ -31,7 +31,7 @@
 from cStringIO import StringIO
 from ftplib import FTP
 from unittest import TestCase, main
-from urllib import urlopen
+from urllib2 import urlopen
 
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
