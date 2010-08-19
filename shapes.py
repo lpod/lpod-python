@@ -205,6 +205,22 @@ def odf_create_connector(style=None, text_style=None, shape_id=None,
 
 class odf_shape(odf_element):
 
+    def get_style(self):
+        return self.get_attribute('draw:style-name')
+
+
+    def set_style(self, name):
+        return self.set_attribute('draw:style-name', name)
+
+
+    def get_text_style(self):
+        return self.get_attribute('draw:text-style-name')
+
+
+    def set_text_style(self, name):
+        return self.set_attribute('draw:text-style-name', name)
+
+
     def get_formatted_text(self, context):
         result = []
         for child in self.get_children():

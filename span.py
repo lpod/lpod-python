@@ -52,7 +52,13 @@ def odf_create_span(text=None, style=None):
 
 
 class odf_span(odf_paragraph):
-    pass
+
+    def get_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_style(self, name):
+        return self.set_attribute('text:style-name', name)
 
 
 

@@ -924,25 +924,8 @@ class odf_element(object):
 
     def set_outline_level(self, outline_level):
         if outline_level is None:
-            self.set_attribute('text:outline-level', outline_level)
-        else:
-            self.set_attribute('text:outline-level', str(outline_level))
-
-
-    def get_text_style(self):
-        return self.get_attribute('text:style-name')
-
-
-    def set_text_style(self, style):
-        self.set_attribute('text:style-name', style)
-
-
-    def get_draw_style(self):
-        return self.get_attribute('draw:style-name')
-
-
-    def set_draw_style(self, name):
-        self.set_attribute('draw:style-name', name)
+            return self.set_attribute('text:outline-level', outline_level)
+        return self.set_attribute('text:outline-level', str(outline_level))
 
 
     #
@@ -2020,11 +2003,12 @@ class odf_element(object):
         # Both common and default styles
         tagname, famattr = self._get_style_tagname(family)
         return _get_elements(self, tagname, family=famattr)
+
     get_styles = get_style_list
 
 
     def get_style(self, family, name_or_element=None, display_name=None):
-        """Return the style uniquely identified by the name/family pair. If
+        """Return the style uniquely identified by the family/name pair. If
         the argument is already a style object, it will return it.
 
         If the name is not the internal name but the name you gave in the

@@ -87,6 +87,13 @@ def odf_create_list(text=[], style=None):
 class odf_list(odf_element):
     """Specialised element for lists.
     """
+    def get_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_style(self, name):
+        return self.set_attribute('text:style-name', name)
+
 
     def get_item_list(self, content=None):
         """Return all the list items that match the criteria.

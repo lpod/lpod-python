@@ -64,11 +64,11 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
     element.set_size(size)
     element.set_anchor_type(anchor_type, page_number=page_number)
     if name:
-        element.set_attribute('draw:name', name)
+        element.set_name(name)
     if position is not None:
         element.set_position(position)
     if style is not None:
-        element.set_attribute('draw:style-name', style)
+        element.set_style(style)
     return element
 
 
@@ -160,7 +160,23 @@ class odf_frame(odf_element):
 
 
     def set_name(self, name):
-        self.set_attribute('draw:name', name)
+        return self.set_attribute('draw:name', name)
+
+
+    def get_style(self):
+        return self.get_attribute('draw:style-name')
+
+
+    def set_style(self, name):
+        return self.set_attribute('draw:style-name', name)
+
+
+    def get_text_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_text_style(self, name):
+        return self.set_attribute('text:style-name', name)
 
 
     def get_size(self):

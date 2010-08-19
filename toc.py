@@ -212,11 +212,11 @@ class odf_toc(odf_element):
 
 
     def get_style(self):
-        return self.get_text_style()
+        return self.get_attribute('text:style-name')
 
 
-    def set_style(self, style):
-        self.set_text_style(style)
+    def set_style(self, name):
+        return self.set_attribute('text:style-name', name)
 
 
     def get_body(self):

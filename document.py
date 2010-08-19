@@ -87,6 +87,7 @@ def _show_styles(element, level=0):
     return '\n'.join(output)
 
 
+
 class odf_document(object):
     """Abstraction of the ODF document.
     """

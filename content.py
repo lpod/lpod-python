@@ -72,6 +72,8 @@ class odf_content(odf_xmlpart):
         """Return the style uniquely identified by the name/family pair. If
         the argument is already a style object, it will return it.
 
+        If the name is None, the default style is fetched.
+
         If the name is not the internal name but the name you gave in the
         desktop application, use display_name instead.
 

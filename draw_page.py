@@ -52,12 +52,11 @@ def odf_create_draw_page(page_id, name=None, master_page=None,
     if name:
         element.set_name(name)
     if style:
-        element.set_attribute('draw:style-name', style)
+        element.set_style(style)
     if master_page:
-        element.set_attribute('draw:master-page-name', master_page)
+        element.set_master_page(master_page)
     if page_layout:
-        element.set_attribute('presentation:presentation-page-layout-name',
-                              page_layout)
+        element.set_presentation_page_layout(page_layout)
     return element
 
 
@@ -70,7 +69,31 @@ class odf_draw_page(odf_element):
 
 
     def set_name(self, name):
-        self.set_attribute('draw:name', name)
+        return self.set_attribute('draw:name', name)
+
+
+    def get_style(self):
+        return self.get_attribute('draw:style-name')
+
+
+    def set_style(self, name):
+        return self.set_attribute('draw:style-name', name)
+
+
+    def get_master_page(self):
+        return self.get_attribute('draw:master-page-name')
+
+
+    def set_master_page(self, name):
+        return self.set_attribute('draw:master-page-name', name)
+
+
+    def get_presentation_page_layout(self):
+        return self.get_attribute('presentation:presentation-page-layout-name')
+
+
+    def set_presentation_page_layout(self, name):
+        return self.set_attribute('presentation:presentation-page-layout-name', name)
 
 
     def get_id(self):
