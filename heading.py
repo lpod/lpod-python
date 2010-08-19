@@ -62,7 +62,7 @@ def odf_create_heading(level, text=None, restart_numbering=False,
     if suppress_numbering:
         element.set_attribute('text:suppress-numbering', 'true')
     if style:
-        element.set_text_style(style)
+        element.set_style(style)
     return element
 
 

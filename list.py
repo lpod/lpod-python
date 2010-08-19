@@ -79,7 +79,7 @@ def odf_create_list(text=[], style=None):
     for value in text:
         element.append(odf_create_list_item(text_or_element=value))
     if style is not None:
-        element.set_text_style(style)
+        element.set_style(style)
     return element
 
 

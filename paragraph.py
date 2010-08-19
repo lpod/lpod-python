@@ -184,7 +184,7 @@ def odf_create_paragraph(text=None, style=None):
     if text:
         element.set_text(text)
     if style:
-        element.set_text_style(style)
+        element.set_style(style)
     return element
 
 

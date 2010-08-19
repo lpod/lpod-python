@@ -215,7 +215,15 @@ class odf_style(odf_element):
 
 
     def set_family(self, family):
-        self.set_attribute('style:family', family)
+        return self.set_attribute('style:family', family)
+
+
+    def get_text_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_text_style(self, style):
+        self.set_attribute('text:style-name', style)
 
 
     def get_parent_style(self):

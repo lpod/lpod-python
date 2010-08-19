@@ -41,7 +41,7 @@ def odf_create_section(style=None):
     """
     element = odf_create_element('text:section')
     if style:
-        element.set_text_style(style)
+        element.set_style(style)
     return element
 
 
@@ -49,6 +49,14 @@ def odf_create_section(style=None):
 class odf_section(odf_element):
     """Specialised element for sections.
     """
+
+    def get_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_style(self, style):
+        self.set_attribute('text:style-name', style)
+
 
     def get_formatted_text(self, context):
         result = []

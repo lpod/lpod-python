@@ -25,7 +25,8 @@
 #
 
 # Import from lpod
-from element import odf_create_element
+from element import odf_create_element, register_element_class
+from paragraph import odf_paragraph
 
 
 def odf_create_link(href, name=None, title=None, target_frame=None,
@@ -59,7 +60,15 @@ def odf_create_link(href, name=None, title=None, target_frame=None,
         else:
             element.set_attribute('xlink:show', 'replace')
     if style is not None:
-        element.set_text_style(style)
+        element.set_style(style)
     if visited_style is not None:
         element.set_attribute('text:visited-style-name', visited_style)
     return element
+
+
+
+class odf_link(odf_paragraph):
+    pass
+
+
+register_element_class('text:a', odf_link)
