@@ -40,13 +40,13 @@ from sys import stdin, stdout, stderr
 def check_target_file(path, kind="file"):
     if exists(path):
         message = 'The %s "%s" exists, overwrite it? [y/N]'
-        stdout.write(message % (kind, path))
-        stdout.flush()
+        stderr.write(message % (kind, path))
+        stderr.flush()
         line = stdin.readline()
         line = line.strip().lower()
         if line != 'y':
-            stdout.write('Operation aborted\n')
-            stdout.flush()
+            stderr.write('Operation aborted\n')
+            stderr.flush()
             exit(0)
 
 
