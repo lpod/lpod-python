@@ -39,7 +39,7 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         # For family 'paragraph'
         master_page=None,
         # For family 'master-page'
-        layout=None, next=None,
+        page_layout=None, next_style=None,
         # For family 'table-cell'
         data_style=None, border=None, border_top=None, border_right=None,
         border_bottom=None, border_left=None, shadow=None,
@@ -90,9 +90,9 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
 
     'master-page' Properties:
 
-        layout -- unicode
+        page_layout -- unicode
 
-        next -- unicode
+        next_style -- unicode
 
     'table-cell' Properties:
 
@@ -123,21 +123,21 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
     if name:
         element.set_name(name)
     if famattr:
-        element.set_attribute('style:family', famattr)
+        element.set_family(famattr)
     if display_name:
-        element.set_attribute('style:display-name', display_name)
+        element.set_display_name(display_name)
     if parent:
-        element.set_attribute('style:parent-style-name', parent)
+        element.set_parent_style(parent)
     # Paragraph
     if family == 'paragraph':
         if master_page:
-            element.set_attribute('style:master-page-name', master_page)
+            element.set_master_page(master_page)
     # Master Page
     if family == 'master-page':
-        if layout:
-            element.set_attribute('style:page-layout-name', layout)
-        if next:
-            element.set_attribute('style:next-style-name', next)
+        if page_layout:
+            element.set_page_layout(page_layout)
+        if next_style:
+            element.set_next_style(next_style)
     # Properties
     if area is None:
         area = family
@@ -209,7 +209,7 @@ class odf_style(odf_element):
 
 
     def set_display_name(self, name):
-        return self.set_attribute('style:display-name', name)
+        return self.set_style_attribute('style:display-name', name)
 
 
     def get_family(self):
@@ -225,14 +225,6 @@ class odf_style(odf_element):
         return self.set_attribute('style:family', family)
 
 
-    def get_text_style(self):
-        return self.get_attribute('text:style-name')
-
-
-    def set_text_style(self, style):
-        self.set_attribute('text:style-name', style)
-
-
     def get_parent_style(self):
         """Will only return a name, not an object, because we don't have
         access to the XML part from here.
@@ -246,7 +238,7 @@ class odf_style(odf_element):
 
 
     def set_parent_style(self, name):
-        self.set_attribute('style:parent-style-name', name)
+        self.set_style_attribute('style:parent-style-name', name)
 
 
     def get_properties(self, area=None):
@@ -398,15 +390,23 @@ class odf_style(odf_element):
             if bg_image is None:
                 bg_image = odf_create_element('style:background-image')
                 properties.append(bg_image)
-            bg_image.set_attribute('xlink:href',  uri)
+            bg_image.set_href(uri)
             if position:
-                bg_image.set_attribute('style:position', position)
+                bg_image.set_position(position)
             if repeat:
-                bg_image.set_attribute('style:repeat', repeat)
+                bg_image.set_repeat(repeat)
             if opacity:
-                bg_image.set_attribute('draw:opacity', str(opacity))
+                bg_image.set_opacity(opacity)
             if filter:
-                bg_image.set_attribute('style:filter-name', filter)
+                bg_image.set_filter(filter)
+
+
+    def get_master_page(self):
+        return self.get_attributes('style:master-page-name')
+
+
+    def set_master_page(self, name):
+        return self.set_style_attribute('style:master-page-name', name)
 
 
 
@@ -578,7 +578,15 @@ class odf_master_page(odf_style):
 
 
     def set_page_layout(self, name):
-        self.set_attribute('style:page-layout-name', name)
+        self.set_style_attribute('style:page-layout-name', name)
+
+
+    def get_next_style(self):
+        return self.get_attribute('style:next-style-name')
+
+
+    def set_next_style(self, name):
+        self.set_style_attribute('style:next-style-name', name)
 
 
     def get_header(self):
@@ -675,6 +683,17 @@ class odf_presentation_page_layout(odf_style):
 
 
 
+class odf_list_level_style_number(odf_style):
+
+    def get_text_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_text_style(self, style):
+        self.set_style_attribute('text:style-name', style)
+
+
+
 # Some predefined styles
 def odf_create_default_number_style():
     return odf_create_element(
@@ -753,8 +772,8 @@ def register_style(tagname, cls):
 
 # FIXME there are (many) more
 for name in ('style:style', 'style:default-style', 'style:header-style',
-        'style:footer-style', 'text:list-level-style-number',
-        'text:list-level-style-bullet', 'text:list-level-style-image'):
+        'style:footer-style', 'text:list-level-style-bullet',
+        'text:list-level-style-image'):
     register_style(name, odf_style)
 register_style('text:list-style', odf_list_style)
 register_style('text:outline-style', odf_outline_style)
@@ -768,3 +787,4 @@ register_style('number:date-style', odf_date_style)
 register_style('number:currency-style', odf_currency_style)
 register_style('style:presentation-page-layout',
         odf_presentation_page_layout)
+register_style('text:list-level-style-number', odf_list_level_style_number)

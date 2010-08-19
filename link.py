@@ -41,7 +41,7 @@ def odf_create_link(href, name=None, title=None, target_frame=None,
 
         title -- unicode
 
-        target_name -- '_self', '_blank', '_parent', '_top'
+        target_frame -- '_self', '_blank', '_parent', '_top'
 
         style -- string
 
@@ -50,25 +50,66 @@ def odf_create_link(href, name=None, title=None, target_frame=None,
     element = odf_create_element('text:a')
     element.set_attribute('xlink:href', href)
     if name is not None:
-        element.set_attribute('office:name', name)
+        element.set_name(name)
     if title is not None:
-        element.set_attribute('office:title', title)
+        element.set_title(title)
     if target_frame is not None:
-        element.set_attribute('office:target-frame-name', target_frame)
+        element.set_target_frame(target_frame)
         if target_frame == '_blank':
-            element.set_attribute('xlink:show', 'new')
+            element.set_show('new')
         else:
-            element.set_attribute('xlink:show', 'replace')
+            element.set_show('replace')
     if style is not None:
         element.set_style(style)
     if visited_style is not None:
-        element.set_attribute('text:visited-style-name', visited_style)
+        element.set_visited_style(visited_style)
     return element
 
 
 
 class odf_link(odf_paragraph):
-    pass
+
+    def get_name(self):
+        return self.get_attribute('office:name')
+
+
+    def set_name(self, name):
+        return self.set_attribute('office:name', name)
+
+
+    def get_title(self):
+        return self.get_attribute('office:title')
+
+
+    def set_title(self, title):
+        return self.set_attribute('office:title', title)
+
+
+    def get_target_frame(self):
+        return self.get_attribute('office:target-frame-name')
+
+
+    def set_target_frame(self, name):
+        return self.set_style_attribute('office:target-frame-name', name)
+
+
+    def get_show(self):
+        return self.get_attribute('xlink:show')
+
+
+    def set_show(self, value):
+        """'new' or 'replace'
+        """
+        return self.set_attribute('xlink:show', value)
+
+
+    def get_visited_style(self):
+        return self.get_attribute('text:visited-style-name')
+
+
+    def set_visited_style(self, name):
+        attribute = 'text:visited-style-name'
+        return self.set_style_attribute(attribute, name)
 
 
 register_element_class('text:a', odf_link)

@@ -77,7 +77,7 @@ class odf_draw_page(odf_element):
 
 
     def set_style(self, name):
-        return self.set_attribute('draw:style-name', name)
+        return self.set_style_attribute('draw:style-name', name)
 
 
     def get_master_page(self):
@@ -85,7 +85,7 @@ class odf_draw_page(odf_element):
 
 
     def set_master_page(self, name):
-        return self.set_attribute('draw:master-page-name', name)
+        return self.set_style_attribute('draw:master-page-name', name)
 
 
     def get_presentation_page_layout(self):
@@ -93,7 +93,8 @@ class odf_draw_page(odf_element):
 
 
     def set_presentation_page_layout(self, name):
-        return self.set_attribute('presentation:presentation-page-layout-name', name)
+        attribute = 'presentation:presentation-page-layout-name'
+        return self.set_style_attribute(attribute, name)
 
 
     def get_id(self):

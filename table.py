@@ -555,7 +555,7 @@ class odf_cell(odf_element):
 
             style -- unicode
         """
-        self.set_attribute('table:style-name', style)
+        self.set_style_attribute('table:style-name', style)
 
 
     def get_formula(self):
@@ -648,7 +648,7 @@ class odf_row(odf_element):
 
             style -- unicode
         """
-        self.set_attribute('table:style-name', style)
+        self.set_style_attribute('table:style-name', style)
 
     set_row_style = obsolete('set_row_style', set_style)
 
@@ -917,7 +917,7 @@ class odf_column(odf_element):
 
 
     def set_default_cell_style(self, style):
-        self.set_attribute('table:default-cell-style-name', style)
+        self.set_style_attribute('table:default-cell-style-name', style)
 
 
     def get_repeated(self):
@@ -955,7 +955,7 @@ class odf_column(odf_element):
 
 
     def set_style(self, style):
-        self.set_attribute('table:style-name', style)
+        self.set_style_attribute('table:style-name', style)
 
 
 
@@ -1234,7 +1234,7 @@ class odf_table(odf_element):
 
 
     def set_style(self, style):
-        self.set_attribute('table:style-name', style)
+        self.set_style_attribute('table:style-name', style)
 
 
     def get_formatted_text(self, context):

@@ -54,7 +54,7 @@ def odf_create_variable_set(name, value, value_type=None, display=False,
     else:
         element.set_text(text)
     if style is not None:
-        element.set_attribute('style:data-style-name', style)
+        element.set_style_attribute('style:data-style-name', style)
     return element
 
 
@@ -67,7 +67,7 @@ def odf_create_variable_get(name, value, value_type=None, text=None,
             text=text)
     element.set_text(text)
     if style is not None:
-        element.set_attribute('style:data-style-name', style)
+        element.set_style_attribute('style:data-style-name', style)
     return element
 
 
@@ -93,7 +93,7 @@ def odf_create_user_field_get(name, value, value_type=None, text=None,
             text=text)
     element.set_text(text)
     if style is not None:
-        element.set_attribute('style:data-style-name', style)
+        element.set_style_attribute('style:data-style-name', style)
     return element
 
 
@@ -127,7 +127,7 @@ def odf_create_date_variable(date, fixed=False, data_style=None, text=None,
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        element.set_attribute('style:data-style-name', data_style)
+        element.set_style_attribute('style:data-style-name', data_style)
     if text is None:
         text = Date.encode(date)
     element.set_text(text)
@@ -145,7 +145,7 @@ def odf_create_time_variable(time, fixed=False, data_style=None, text=None,
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        element.set_attribute('style:data-style-name', data_style)
+        element.set_style_attribute('style:data-style-name', data_style)
     if text is None:
         text = time.strftime('%H:%M:%S')
     element.set_text(text)
@@ -192,7 +192,7 @@ def odf_create_creation_date_variable(fixed=False, data_style=None):
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        element.set_attribute('style:data-style-name', data_style)
+        element.set_style_attribute('style:data-style-name', data_style)
     return element
 
 
@@ -202,7 +202,7 @@ def odf_create_creation_time_variable(fixed=False, data_style=None):
     if fixed:
         element.set_attribute('text:fixed', 'true')
     if data_style is not None:
-        element.set_attribute('style:data-style-name', data_style)
+        element.set_style_attribute('style:data-style-name', data_style)
     return element
 
 

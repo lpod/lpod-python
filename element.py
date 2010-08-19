@@ -529,6 +529,14 @@ class odf_element(object):
         element.set(name, value)
 
 
+    def set_style_attribute(self, name, value):
+        """Shortcut to accept a style object as a value.
+        """
+        if isinstance(value, odf_element):
+            value = value.get_name()
+        return self.set_attribute(name, value)
+
+
     def del_attribute(self, name):
         element = self.__element
         uri, name = _decode_qname(name)

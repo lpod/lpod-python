@@ -92,7 +92,7 @@ class odf_list(odf_element):
 
 
     def set_style(self, name):
-        return self.set_attribute('text:style-name', name)
+        return self.set_style_attribute('text:style-name', name)
 
 
     def get_item_list(self, content=None):

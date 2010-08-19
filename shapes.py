@@ -49,13 +49,13 @@ def _odf_create_shape(type, style=None, text_style=None, shape_id=None,
     """
     element = odf_create_element(type)
     if style:
-        element.set_attribute('draw:style-name', style)
+        element.set_style(style)
     if text_style:
-        element.set_attribute('draw:text-style-name', text_style)
+        element.set_text_style(text_style)
     if shape_id:
-        element.set_attribute('draw:id', shape_id)
+        element.set_id(shape_id)
     if layer:
-        element.set_attribute('draw:layer', layer)
+        element.set_layer(layer)
     return element
 
 
@@ -205,12 +205,28 @@ def odf_create_connector(style=None, text_style=None, shape_id=None,
 
 class odf_shape(odf_element):
 
+    def get_id(self):
+        return self.get_attribute('draw:id')
+
+
+    def set_id(self, name):
+        return self.set_attribute('draw:id', name)
+
+
+    def get_layer(self):
+        return self.get_attribute('draw:layer')
+
+
+    def set_layer(self, name):
+        return self.set_attribute('draw:layer', name)
+
+
     def get_style(self):
         return self.get_attribute('draw:style-name')
 
 
     def set_style(self, name):
-        return self.set_attribute('draw:style-name', name)
+        return self.set_style_attribute('draw:style-name', name)
 
 
     def get_text_style(self):
@@ -218,7 +234,7 @@ class odf_shape(odf_element):
 
 
     def set_text_style(self, name):
-        return self.set_attribute('draw:text-style-name', name)
+        return self.set_style_attribute('draw:text-style-name', name)
 
 
     def get_formatted_text(self, context):

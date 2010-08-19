@@ -55,7 +55,7 @@ class odf_section(odf_element):
 
 
     def set_style(self, style):
-        self.set_attribute('text:style-name', style)
+        self.set_style_attribute('text:style-name', style)
 
 
     def get_formatted_text(self, context):

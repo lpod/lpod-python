@@ -31,6 +31,7 @@ from unittest import TestCase, main
 from lpod.container import odf_get_container
 from lpod.document import odf_get_document
 from lpod.style import odf_create_style, odf_style
+from lpod.style import odf_list_level_style_number
 from lpod.xmlpart import odf_xmlpart
 
 
@@ -355,7 +356,7 @@ class LevelStyleTestCase(TestCase):
 
     def test_set_level_style_number(self):
         level_style = self.style.set_level_style(1, 'number', format='1')
-        self.assert_(type(level_style) is odf_style)
+        self.assert_(type(level_style) is odf_list_level_style_number)
         expected = ('<text:list-level-style-number '
                       'text:level="1" fo:num-format="1"/>')
         self.assertEqual(level_style.serialize(), expected)
