@@ -33,7 +33,8 @@ from utils import obsolete
 
 
 def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
-        page_number=None, position=None, style=None):
+        page_number=None, position=None, layer=None, presentation_class=None,
+        style=None):
     """Create a frame element of the given size. If positioned by page, give
     the page number and the x, y position.
 
@@ -67,6 +68,10 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
         element.set_name(name)
     if position is not None:
         element.set_position(position)
+    if layer is not None:
+        element.set_layer(layer)
+    if presentation_class is not None:
+        element.set_presentation_class(presentation_class)
     if style is not None:
         element.set_style(style)
     return element
@@ -74,7 +79,8 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
 
 
 def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
-        anchor_type='paragraph', page_number=None, position=None, style=None):
+        anchor_type='paragraph', page_number=None, position=None, layer=None,
+        presentation_class=None, style=None):
     """Create a ready-to-use image, since it must be embedded in a
     frame.
 
@@ -102,7 +108,8 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
     Return: odf_element
     """
     frame = odf_create_frame(size=size, anchor_type=anchor_type,
-            page_number=page_number, position=position, style=style)
+            page_number=page_number, position=position, layer=layer,
+            presentation_class=presentation_class, style=style)
     image = odf_create_image(uri)
     if text:
         image.set_text_content(text)
@@ -112,8 +119,8 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
 
 
 def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
-        anchor_type='paragraph', page_number=None, position=None, style=None,
-        text_style=None):
+        anchor_type='paragraph', page_number=None, position=None, layer=None,
+        presentation_class=None, style=None, text_style=None):
     """Create a ready-to-use text box, since it must be embedded in a frame.
 
     Size is a (width, height) tuple and position is a (left, top) tuple; items
@@ -138,7 +145,8 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
     Return: odf_element
     """
     frame = odf_create_frame(size=size, anchor_type=anchor_type,
-            page_number=page_number, position=position, style=style)
+            page_number=page_number, position=position, layer=layer,
+            presentation_class=presentation_class, style=style)
     if text_style:
         # FIXME set_text_style and set_draw_text_style
         frame.set_draw_text_style(text_style)
@@ -285,6 +293,22 @@ class odf_frame(odf_element):
         if page_number is None:
             self.set_attribute('text:anchor-page-number', None)
         self.set_attribute('text:anchor-page-number', str(page_number))
+
+
+    def get_layer(self):
+        return self.get_attribute('draw:layer')
+
+
+    def set_layer(self, layer):
+        return self.set_attribute('draw:layer', layer)
+
+
+    def get_presentation_class(self):
+        return self.get_attribute('presentation:class')
+
+
+    def set_presentation_class(self, presentation_class):
+        return self.set_attribute('presentation:class', presentation_class)
 
 
     def get_presentation_style(self):

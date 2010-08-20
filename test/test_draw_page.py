@@ -48,7 +48,8 @@ class TestDrawPage(TestCase):
     def test_create_complex_page(self):
         element = odf_create_draw_page('id1', name=u"Introduction",
                                        master_page='prs-novelty',
-                                       page_layout='AL1T0', style='dp1')
+                                       presentation_page_layout='AL1T0',
+                                       style='dp1')
         expected = ('<draw:page draw:id="id1" draw:name="Introduction" '
                     'draw:style-name="dp1" '
                     'draw:master-page-name="prs-novelty" '

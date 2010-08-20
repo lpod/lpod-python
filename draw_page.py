@@ -28,8 +28,8 @@
 from element import register_element_class, odf_element, odf_create_element
 from smil import odf_create_anim_par, odf_create_anim_transitionFilter
 
-def odf_create_draw_page(page_id, name=None, master_page=None,
-                         page_layout=None, style=None):
+def odf_create_draw_page(page_id=None, name=None, master_page=None,
+                         presentation_page_layout=None, style=None):
     """This element is a container for content in a drawing or presentation
     document.
 
@@ -41,22 +41,23 @@ def odf_create_draw_page(page_id, name=None, master_page=None,
 
         master_page -- str
 
-        page_layout -- str
+        presentation_page_layout -- str
 
         style -- str
 
     Return: odf_element
     """
     element = odf_create_element('draw:page')
-    element.set_id(page_id)
+    if page_id:
+        element.set_id(page_id)
     if name:
         element.set_name(name)
     if style:
         element.set_style(style)
     if master_page:
         element.set_master_page(master_page)
-    if page_layout:
-        element.set_presentation_page_layout(page_layout)
+    if presentation_page_layout:
+        element.set_presentation_page_layout(presentation_page_layout)
     return element
 
 
