@@ -44,7 +44,6 @@ from meta import odf_meta
 from style import odf_style, odf_master_page, odf_font_style
 from style import registered_styles
 from styles import odf_styles
-from utils import _get_style_family
 from xmlpart import odf_xmlpart
 
 
@@ -644,9 +643,9 @@ class odf_document(object):
             if style.get_name() is None:
                 # Don't delete default styles
                 continue
-            elif type(style) is odf_master_page:
-                # Don't suppress header and footer, just styling was removed
-                continue
+            #elif type(style) is odf_master_page:
+            #    # Don't suppress header and footer, just styling was removed
+            #    continue
             style.delete()
             i += 1
         return i
@@ -660,11 +659,11 @@ class odf_document(object):
         """
         styles = self.get_styles()
         content = self.get_content()
+        manifest = self.get_manifest()
+        document_manifest = document.get_manifest()
         for style in document.get_style_list():
             tagname = style.get_tag()
             family = style.get_family()
-            if family is None:
-                family = _get_style_family(tagname)
             stylename = style.get_name()
             container = style.get_parent()
             container_name = container.get_tag()
@@ -692,16 +691,21 @@ class odf_document(object):
             dest.append(style)
             # Copy images from the header/footer
             if tagname == 'style:master-page':
-                manifest = self.get_manifest()
-                document_manifest = document.get_manifest()
                 query = 'descendant::draw:image'
                 for image in style.get_elements(query):
-                    full_path = image.get_attribute('xlink:href')
-                    data = document.get_part(full_path)
-                    media_type = document_manifest.get_media_type(full_path)
+                    href = image.get_href()
+                    part = document.get_part(href)
                     # Manually add the part to keep the name
-                    self.set_part(full_path, data)
-                    manifest.add_full_path(full_path, media_type)
+                    self.set_part(href, part)
+                    media_type = document_manifest.get_media_type(href)
+                    manifest.add_full_path(href, media_type)
+            # Copy images from the fill-image
+            elif tagname == 'draw:fill-image':
+                href = style.get_href()
+                part = document.get_part(href)
+                self.set_part(href, part)
+                media_type = document_manifest.get_media_type(href)
+                manifest.add_full_path(href, media_type)
 
 
 
