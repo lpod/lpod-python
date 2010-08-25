@@ -1127,8 +1127,8 @@ class odf_element(object):
     # Frames
     #
 
-    def get_frame_list(self, style=None, title=None, description=None,
-                       content=None):
+    def get_frame_list(self, presentation_class=None, style=None, title=None,
+            description=None, content=None):
         """Return all the frames that match the criteria.
 
         Arguments:
@@ -1143,12 +1143,14 @@ class odf_element(object):
 
         Return: list of odf_frame
         """
-        return _get_elements(self, 'descendant::draw:frame', draw_style=style,
+        return _get_elements(self, 'descendant::draw:frame',
+                presentation_class=presentation_class, draw_style=style,
                 svg_title=title, svg_desc=description, content=content)
     get_frames = get_frame_list
 
 
-    def get_frame(self, position=0, name=None, title=None, description=None,
+    def get_frame(self, position=0, name=None,
+            presentation_class=None, title=None, description=None,
             content=None):
         """Return the section that matches the criteria.
 
@@ -1165,8 +1167,8 @@ class odf_element(object):
         Return: odf_frame or None if not found
         """
         return _get_element(self, 'descendant::draw:frame', position,
-                draw_name=name, svg_title=title, svg_desc=description,
-                content=content)
+                draw_name=name, presentation_class=presentation_class,
+                svg_title=title, svg_desc=description, content=content)
 
 
     #

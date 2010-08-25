@@ -89,7 +89,7 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         display_name=None, note_class=None, text_id=None, text_name=None,
         office_name=None, office_title=None, outline_level=None, level=None,
         page_layout=None, master_page=None, parent_style=None,
-        position=None, **kw):
+        presentation_class=None, position=None, **kw):
     query = [element_name]
     attributes = kw
     if text_style:
@@ -132,6 +132,8 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         attributes['draw:master-page-name'] = master_page
     if parent_style:
         attributes['style:parent-style-name'] = parent_style
+    if presentation_class:
+        attributes['presentation:class'] = presentation_class
     # Sort attributes for reproducible test cases
     for qname in sorted(attributes):
         value = attributes[qname]
