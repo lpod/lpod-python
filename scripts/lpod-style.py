@@ -69,9 +69,13 @@ def merge_styles(document, from_file, target=None, pretty=True):
         # Apply master page found
         styles = document.get_part('styles')
         first_master_page = styles.get_master_page()
+        first_page = source.get_body().get_draw_page()
         body = document.get_body()
         for page in body.get_draw_pages():
+            page.set_style(first_page.get_style())
             page.set_master_page(first_master_page)
+            page.set_presentation_page_layout(
+                    first_page.get_presentation_page_layout())
         # Adjust layout
         for model in first_master_page.get_frames():
             presentation_class = model.get_presentation_class()
