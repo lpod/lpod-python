@@ -426,9 +426,35 @@ class odf_list_style(odf_style):
         return _get_element(self, self.any_style, 0, level=level)
 
 
-    def set_level_style(self, level, type=None, format=None, prefix=None,
-            suffix=None, character=None, uri=None, display_levels=None,
+    def set_level_style(self, level, num_format=None, bullet_char=None,
+            uri=None, display_levels=None, prefix=None, suffix=None,
             start_value=None, style=None, clone=None):
+        """
+        Arguments:
+
+            level -- int
+
+            num_format (for number) -- int
+
+            bullet_char (for bullet) -- unicode
+
+            uri (for image) -- str
+
+            display_levels -- int
+
+            prefix -- unicode
+
+            suffix -- unicode
+
+            start_value -- int
+
+            style -- unicode
+
+            clone -- odf_list_style
+
+        Return:
+            level_style created
+        """
         # Expected name
         level_style_name = 'text:list-level-style-%s' % type
         was_created = False
@@ -448,20 +474,14 @@ class odf_list_style(odf_style):
         # Set the level
         level_style.set_attribute('text:level', str(level))
         # Set the main attribute
-        if type == 'number':
-            if clone is None and format is None:
-                raise ValueError, "format is missing"
+        if num_format is not None:
             level_style.set_attribute('fo:num-format', format)
-        elif type == 'bullet':
-            if clone is None and character is None:
-                raise ValueError, "bullet character is missing"
-            level_style.set_attribute('text:bullet-char', character)
-        elif type == 'image':
-            if clone is None and uri is None:
-                raise ValueError, "image URI is missing"
+        elif bullet_char is not None:
+            level_style.set_attribute('text:bullet-char', bullet_char)
+        elif uri is not None:
             level_style.set_attribute('xlink:href', uri)
         elif clone is None:
-            raise ValueError, "unknown level style type: %s" % type
+            raise ValueError, "unknown level style type"
         # Set attributes
         if prefix:
             level_style.set_attribute('style:num-prefix', prefix)
@@ -469,7 +489,7 @@ class odf_list_style(odf_style):
             level_style.set_attribute('style:num-suffix', suffix)
         if display_levels:
             level_style.set_attribute('text:display-levels',
-                                      str(display_levels))
+                    str(display_levels))
         if start_value:
             level_style.set_attribute('text:start-value', str(start_value))
         if style:
