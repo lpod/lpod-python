@@ -74,19 +74,14 @@ def merge_styles(document, from_file, target=None, pretty=True):
             page.set_master_page(first_master_page)
         # Adjust layout
         for model in first_master_page.get_frames():
-            print "model", model
             presentation_class = model.get_presentation_class()
-            print "presentation_class", presentation_class
             if presentation_class is None:
                 continue
             position = model.get_position()
-            print "position", position
             size = model.get_size()
-            print "size", size
             for page in body.get_draw_pages():
                 for frame in page.get_frames(
                         presentation_class=presentation_class):
-                    print "! frame", frame
                     frame.set_position(position)
                     frame.set_size(size)
     document.save(target=target, pretty=pretty)
