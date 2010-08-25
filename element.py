@@ -1973,7 +1973,8 @@ class odf_element(object):
         """Widely match possible tag names given the family (or not).
         """
         if family is None:
-            tagname = '(style:default-style|*[@style:name])'
+            tagname = '(' + '|'.join(['style:default-style',
+                '*[@style:name]', 'draw:fill-image', 'draw:marker']) + ')'
             famattr = None
         elif is_default is True:
             # Default style

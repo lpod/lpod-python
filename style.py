@@ -27,6 +27,7 @@
 # Import from lpod
 from datatype import Boolean
 from element import register_element_class, odf_create_element, odf_element
+from image import odf_image
 from utils import _get_style_tagname, _expand_properties, _merge_dicts
 from utils import _get_element, obsolete
 
@@ -714,6 +715,55 @@ class odf_list_level_style_number(odf_style):
 
 
 
+class odf_marker(odf_style):
+
+    def get_family(self):
+        return 'marker'
+
+
+
+class odf_background_image(odf_image):
+
+    def get_position(self):
+        return self.get_attribute('style:position')
+
+
+    def set_position(self, position):
+        return self.set_attribute('style:position', position)
+
+
+    def get_repeat(self):
+        return self.get_attribute('style:repeat')
+
+
+    def set_repeat(self, repeat):
+        return self.set_attribute('style:repeat', repeat)
+
+
+    def get_opacity(self):
+        return self.get_attribute('draw:opacity')
+
+
+    def set_opacity(self, opacity):
+        return self.set_attribute('draw:opacity', str(opacity))
+
+
+    def get_filter(self):
+        return self.get_attribute('style:filter-name')
+
+
+    def set_filter(self, filter):
+        return self.set_style_attribute('style:filter-name', filter)
+
+
+
+class odf_fill_image(odf_style, odf_image):
+
+    def get_family(self):
+        return 'fill-image'
+
+
+
 # Some predefined styles
 def odf_create_default_number_style():
     return odf_create_element(
@@ -808,3 +858,6 @@ register_style('number:currency-style', odf_currency_style)
 register_style('style:presentation-page-layout',
         odf_presentation_page_layout)
 register_style('text:list-level-style-number', odf_list_level_style_number)
+register_style('draw:marker', odf_marker)
+register_style('style:background-image', odf_background_image)
+register_style('draw:fill-image', odf_fill_image)
