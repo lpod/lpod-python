@@ -27,6 +27,7 @@
 
 # Import from lpod
 from xmlpart import odf_xmlpart
+from utils import _get_elements, _get_element
 
 
 # TODO Read from a shipped file
@@ -186,3 +187,11 @@ class odf_styles(odf_xmlpart):
             if style is not None:
                 return style
         return None
+
+
+    def get_master_pages(self):
+        return _get_elements(self, 'descendant::style:master-page')
+
+
+    def get_master_page(self, position=0):
+        return _get_element(self, 'descendant::style:master-page', position)
