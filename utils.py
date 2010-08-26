@@ -478,10 +478,13 @@ def oooc_to_ooow(formula):
 
 
 
-def obsolete(old_name, new_func):
-    def decorate(*args, **kwargs):
+def obsolete(old_name, new_func, *args, **kw):
+    def decorate(*dec_args, **dec_kw):
         new_name = new_func.__name__
+        if args:
+            new_name += '(' + ', '.join(repr(x) for x in args) + ')'
         message = '"%s" is obsolete, call "%s" instead' % (old_name,
                 new_name)
         warn(message, category=DeprecationWarning)
+        return new_func(*(dec_args + args), **dec_kw)
     return decorate
