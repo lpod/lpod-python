@@ -32,7 +32,7 @@ from paragraph import odf_create_paragraph
 from utils import obsolete
 
 
-def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
+def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type=None,
         page_number=None, position=None, layer=None, presentation_class=None,
         style=None, presentation_style=None):
     """Create a frame element of the given size. If positioned by page, give
@@ -53,7 +53,7 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
         anchor_type -- 'page', 'frame', 'paragraph' (default), 'char'
                        or 'as-char'
 
-        page_number -- int (when anchor_type == 'page')
+        page_number (anchor_type='page') -- int
 
         position -- (str, str)
 
@@ -63,9 +63,10 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type='paragraph',
     """
     element = odf_create_element('draw:frame')
     element.set_size(size)
-    element.set_anchor_type(anchor_type, page_number=page_number)
     if name:
         element.set_name(name)
+    if anchor_type:
+        element.set_anchor_type(anchor_type, page_number=page_number)
     if position is not None:
         element.set_position(position)
     if layer is not None:
