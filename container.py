@@ -33,7 +33,7 @@ from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 
 # Import from lpod
 from manifest import odf_manifest
-from utils import _get_abspath
+from utils import _get_abspath, obsolete
 
 
 # Types and their default template
@@ -386,10 +386,12 @@ def odf_get_container(path_or_file):
 
 
 
-def odf_new_container_from_template(template_path_or_file):
+def odf_new_container(path_or_file):
     """Return an odf_container instance based on the given template.
     """
-    template_container = odf_get_container(template_path_or_file)
+    if path_or_file in ODF_TYPES:
+        path_or_file = _get_abspath(ODF_TYPES[path_or_file])
+    template_container = odf_get_container(path_or_file)
     # Return a copy of the template container
     clone = template_container.clone()
     # Change type from template to regular
@@ -401,12 +403,7 @@ def odf_new_container_from_template(template_path_or_file):
     clone.set_part('manifest', manifest.serialize())
     return clone
 
-
-
-def odf_new_container_from_type(odf_type):
-    """Return an "odf_container" instance of the given type.
-    """
-    if odf_type not in ODF_TYPES:
-        raise ValueError, 'unknown ODF type "%s"' % odf_type
-    template_path = _get_abspath(ODF_TYPES[odf_type])
-    return odf_new_container_from_template(template_path)
+odf_new_document_from_template = obsolete('odf_new_document_from_template',
+        odf_new_container)
+odf_new_document_from_type = obsolete('odf_new_document_from_template',
+        odf_new_container)

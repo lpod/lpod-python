@@ -36,14 +36,14 @@ from uuid import uuid4
 # Import from lpod
 from __init__ import __version__
 from container import ODF_PARTS, odf_get_container
-from container import odf_new_container_from_template
-from container import odf_new_container_from_type, odf_container
+from container import odf_new_container, odf_container
 from content import odf_content
 from manifest import odf_manifest
 from meta import odf_meta
 from style import odf_style, odf_master_page, odf_font_style
 from style import registered_styles
 from styles import odf_styles
+from utils import obsolete
 from xmlpart import odf_xmlpart
 
 
@@ -135,6 +135,11 @@ class odf_document(object):
             part = self.container.get_part(name)
         return part
 
+    get_content = obsolete('get_content', get_part, 'content')
+    get_meta = obsolete('get_meta', get_part, 'meta')
+    get_styles = obsolete('get_styles', get_part, 'styles')
+    get_manifest = obsolete('get_manifest', get_part, 'manifest')
+
 
     def set_part(self, name, data):
         """Set the bytes of the given part. The name includes the
@@ -150,38 +155,6 @@ class odf_document(object):
         if name in ODF_PARTS or name == 'manifest':
             raise ValueError, "these parts are mandatory"
         return self.container.del_part(name)
-
-
-    def get_content(self):
-        """Return the content part.
-
-        Return: odf_content
-        """
-        return self.get_part('content')
-
-
-    def get_meta(self):
-        """Return the meta part.
-
-        Return: odf_meta
-        """
-        return self.get_part('meta')
-
-
-    def get_styles(self):
-        """Return the styles part.
-
-        Return: odf_styles
-        """
-        return self.get_part('styles')
-
-
-    def get_manifest(self):
-        """Return the manifest part.
-
-        Return: odf_manifest
-        """
-        return self.get_part('manifest')
 
 
     def get_mimetype(self):
@@ -417,6 +390,7 @@ class odf_document(object):
     # Styles over several parts
     #
 
+    # TODO rename to get_styles in next version
     def get_style_list(self, family=None, automatic=False):
         content = self.get_content()
         styles = self.get_styles()
@@ -730,28 +704,30 @@ def odf_get_document(path_or_file):
 
 
 
-def odf_new_document_from_template(template_path):
-    """Return an "odf_document" instance using the given template.
+def odf_new_document(path_or_file):
+    """Return an "odf_document" instance using the given template or the
+    template found at the given path.
 
-    Example::
+    Examples::
+
+        >>> document = odf_new_document(template)
 
         >>> path = 'models/invoice.ott'
-        >>> document = odf_new_document_from_template(path)
+        >>> document = odf_new_document(path)
+
+    if "path" is one of 'text', 'spreadsheet', 'presentation', 'drawing' or
+    'graphics', then the lpOD default template is used.
+
+    Examples::
+
+        >>> document = odf_new_document('text')
+
+        >>> document = odf_new_document('spreadsheet')
     """
-    container = odf_new_container_from_template(template_path)
+    container = odf_new_container(path_or_file)
     return odf_document(container)
 
-
-
-def odf_new_document_from_type(odf_type):
-    """Return an "odf_document" instance of the given type.
-    Arguments:
-
-        odf_type -- 'text', 'spreadsheet', 'presentation' or 'drawing'
-
-    Example::
-
-        >>> document = odf_new_document_from_type('spreadsheet')
-    """
-    container = odf_new_container_from_type(odf_type)
-    return odf_document(container)
+odf_new_document_from_template = obsolete('odf_new_document_from_template',
+    odf_new_document)
+odf_new_document_from_type = obsolete('odf_new_document_from_type',
+    odf_new_document)

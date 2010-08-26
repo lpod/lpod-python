@@ -231,11 +231,29 @@ element:
 
 document:
 
+  Before                          After
+  ------------------------------  ----------------------
+  odf_new_document_from_template  odf_new_document
+  odf_new_document_from_type      odf_new_document
+
   odf_document:
 
     Before                         After
     -----------------------------  ----------------------
     get_xmlpart                    get_part
+    get_content                    get_part('content')
+    get_meta                       get_part('meta')
+    get_styles                     get_part('styles')
+    get_manifest                   get_part('manifest')
+
+
+container:
+
+  Before                          After
+  ------------------------------  ----------------------
+  odf_new_container_from_template  odf_new_container
+  odf_new_container_from_type      odf_new_container
+
 
 
 High-level API
