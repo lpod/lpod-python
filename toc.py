@@ -88,7 +88,7 @@ def odf_create_toc_source(title=None, outline_level=10,
         title_template = odf_create_element('text:index-title-template')
         if title_style:
             # This style is in the template document
-            title_template.set_text_style(title_style)
+            title_template.set_style(title_style)
         title_template.set_text(title)
         element.append(title_template)
     for level in range(1, 11):
@@ -101,7 +101,7 @@ def odf_create_toc_source(title=None, outline_level=10,
           <text:index-entry-page-number/>
          </text:table-of-content-entry-template>''' % level)
         if entry_style:
-            template.set_text_style(entry_style % level)
+            template.set_style(entry_style % level)
         element.append(template)
     return element
 
@@ -338,4 +338,29 @@ class odf_toc(odf_element):
 
 
 
+class odf_index_title_template(odf_element):
+
+    def get_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_style(self, name):
+        return self.set_style_attribute('text:style-name', name)
+
+
+
+class odf_toc_entry_template(odf_element):
+
+    def get_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_style(self, name):
+        return self.set_style_attribute('text:style-name', name)
+
+
+
 register_element_class('text:table-of-content', odf_toc)
+register_element_class('text:index-title-template', odf_index_title_template)
+register_element_class('text:table-of-content-entry-template',
+        odf_toc_entry_template)

@@ -200,6 +200,14 @@ class odf_paragraph(odf_element):
         return self.set_style_attribute('text:style-name', name)
 
 
+    def get_text_style(self):
+        return self.get_attribute('text:style-name')
+
+
+    def set_text_style(self, name):
+        return self.set_style_attribute('text:style-name', name)
+
+
     def get_formatted_text(self, context):
         result = [_get_formatted_text(self, context, with_text=True)]
         result.append(u'\n')
