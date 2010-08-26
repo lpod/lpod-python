@@ -152,9 +152,6 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
             page_number=page_number, position=position, layer=layer,
             presentation_class=presentation_class, style=style,
             presentation_style=presentation_style)
-    if text_style:
-        # FIXME set_text_style and set_draw_text_style
-        frame.set_draw_text_style(text_style)
     text_box = odf_create_element('draw:text-box')
     if not isinstance(text_or_element, (list, tuple)):
         text_or_element = [text_or_element]
@@ -183,14 +180,6 @@ class odf_frame(odf_element):
 
     def set_style(self, name):
         return self.set_style_attribute('draw:style-name', name)
-
-
-    def get_text_style(self):
-        return self.get_attribute('draw:text-style-name')
-
-
-    def set_text_style(self, name):
-        return self.set_style_attribute('draw:text-style-name', name)
 
 
     def get_size(self):
