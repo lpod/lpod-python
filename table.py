@@ -683,7 +683,7 @@ class odf_row(odf_element):
                 yield cell
 
 
-    def get_cell_list(self, style=None, content=None):
+    def get_cells(self, style=None, content=None):
         """Get the list of cells matching the criteria. Each result is a
         tuple of (x, y, cell).
 
@@ -706,7 +706,8 @@ class odf_row(odf_element):
             cells.append((x, cell))
         # Return the coordinate and element
         return cells
-    get_cells = get_cell_list
+
+    get_cell_list = obsolete('get_cell_list', get_cells)
 
 
     def get_cell(self, x):
@@ -1369,7 +1370,7 @@ class odf_table(odf_element):
                 yield row
 
 
-    def get_row_list(self, style=None, content=None):
+    def get_rows(self, style=None, content=None):
         """Get the list of rows matching the criteria. Each result is a
         tuple of (y, row).
 
@@ -1392,7 +1393,8 @@ class odf_table(odf_element):
                 continue
             rows.append((y, row))
         return rows
-    get_rows = get_row_list
+
+    get_row_list = obsolete('get_row_list', get_rows)
 
 
     def get_row(self, y):
@@ -1573,7 +1575,7 @@ class odf_table(odf_element):
     # Cells
     #
 
-    def get_cell_list(self, style=None, content=None):
+    def get_cells(self, style=None, content=None):
         """Get the list of cells matching the criteria. Each result is a
         tuple of (x, y, cell).
 
@@ -1591,7 +1593,8 @@ class odf_table(odf_element):
                 cells.append((x, y, cell))
         # Return the coordinates and element
         return cells
-    get_cells = get_cell_list
+
+    get_cell_list = obsolete('get_cell_list', get_cells)
 
 
     def get_cell(self, coordinates):
@@ -1872,7 +1875,7 @@ class odf_table(odf_element):
                 yield column
 
 
-    def get_column_list(self, style=None):
+    def get_columns(self, style=None):
         """Get the list of columns matching the criteria. Each result is a
         tuple of (x, column).
 
@@ -1891,7 +1894,8 @@ class odf_table(odf_element):
                 continue
             columns.append((w, column))
         return columns
-    get_columns = get_column_list
+
+    get_column_list = obsolete('get_column_list', get_columns)
 
 
     def get_column(self, x):

@@ -82,6 +82,7 @@ class odf_meta(odf_xmlpart):
             return None
         return element.get_text()
 
+    # As named in OOo
     get_comments = get_description
 
 

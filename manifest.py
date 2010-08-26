@@ -27,6 +27,7 @@
 
 # Import from lpod
 from element import odf_create_element
+from utils import obsolete
 from xmlpart import odf_xmlpart
 
 
@@ -43,17 +44,18 @@ class odf_manifest(odf_xmlpart):
     # Public API
     #
 
-    def get_path_list(self):
+    def get_paths(self):
         """Return the list of full paths in the manifest.
 
         Return: list of unicode
         """
         expr = '//manifest:file-entry/attribute::manifest:full-path'
         return self.xpath(expr)
-    get_paths = get_path_list
+
+    get_path_list = obsolete('get_path_list', get_paths)
 
 
-    def get_path_media_list(self):
+    def get_path_medias(self):
         """Return the list of (full_path, media_type) pairs in the manifest.
 
         Return: list of (unicode, str) tuples
@@ -64,7 +66,8 @@ class odf_manifest(odf_xmlpart):
             result.append((file_entry.get_attribute('manifest:full-path'),
                            file_entry.get_attribute('manifest:media-type')))
         return result
-    get_path_medias = get_path_media_list
+
+    get_path_media_list = obsolete('get_path_media_list', get_path_medias)
 
 
     def get_media_type(self, full_path):

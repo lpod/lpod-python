@@ -27,7 +27,7 @@
 
 # Import from lpod
 from xmlpart import odf_xmlpart
-from utils import _get_elements, _get_element
+from utils import _get_elements, _get_element, obsolete
 
 
 # TODO Read from a shipped file
@@ -141,7 +141,7 @@ class odf_styles(odf_xmlpart):
         return [self.get_element(query) for query in queries]
 
 
-    def get_style_list(self, family=None, automatic=False):
+    def get_styles(self, family=None, automatic=False):
         """Return the list of styles in the Content part, optionally limited
         to the given family.
 
@@ -157,7 +157,8 @@ class odf_styles(odf_xmlpart):
                 continue
             result.extend(context.get_styles(family=family))
         return result
-    get_styles = get_style_list
+
+    get_style_list = obsolete('get_style_list', get_styles)
 
 
     def get_style(self, family, name_or_element=None, display_name=None):
