@@ -65,8 +65,8 @@ def init_doc(filename, mimetype):
 
 def _add_pictures(document, output_doc):
     # Copy extra parts (images...)
-    manifest = output_doc.get_manifest()
-    document_manifest = document.get_manifest()
+    manifest = output_doc.get_part('manifest')
+    document_manifest = document.get_part('manifest')
     for partname in document.get_parts():
         if partname.startswith('Pictures/'):
             data = document.get_part(partname)

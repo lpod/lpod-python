@@ -38,7 +38,7 @@ class TestList(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/list.odt')
-        self.content = document.get_content()
+        self.content = document.get_part('content')
 
 
     def tearDown(self):

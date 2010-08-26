@@ -116,7 +116,7 @@ class TestStyle(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/example.odt')
-        self.styles = document.get_styles()
+        self.styles = document.get_part('styles')
 
 
     def tearDown(self):

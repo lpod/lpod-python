@@ -38,7 +38,7 @@ class ManifestTestCase(TestCase):
 
     def setUp(self):
         self.document = odf_get_document('samples/frame_image.odp')
-        self.manifest = self.document.get_manifest()
+        self.manifest = self.document.get_part('manifest')
         self.image_path = 'Pictures/10000000000001D40000003C8B3889D9.png'
 
 

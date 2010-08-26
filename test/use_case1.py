@@ -36,7 +36,7 @@ from PIL import Image
 
 # Import from lpod
 from lpod import __version__, __installation_path__
-from lpod.document import odf_new_document_from_type
+from lpod.document import odf_new_document
 from lpod.element import FIRST_CHILD
 from lpod.frame import odf_create_frame
 from lpod.heading import odf_create_heading
@@ -55,7 +55,7 @@ print 'Generating test_output/use_case1.odt ...'
 
 
 # Go
-document = odf_new_document_from_type('text')
+document = odf_new_document('text')
 body = document.get_body()
 
 for numero, filename in enumerate(listdir('samples')):

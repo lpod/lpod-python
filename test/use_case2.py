@@ -35,7 +35,7 @@ from sys import version_info
 from PIL import Image
 
 # Import from lpod
-from lpod.document import odf_new_document_from_type
+from lpod.document import odf_new_document
 from lpod.paragraph import odf_create_paragraph
 from lpod.heading import odf_create_heading
 from lpod.frame import odf_create_frame
@@ -63,7 +63,7 @@ print
 print 'Generating test_output/use_case2.odt ...'
 
 # Go
-document = odf_new_document_from_type('text')
+document = odf_new_document('text')
 body = document.get_body()
 
 # 1- The image

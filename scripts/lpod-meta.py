@@ -37,7 +37,7 @@ from lpod.scriptutils import printerr
 
 
 def set_metadata(doc, set_list):
-    meta = doc.get_meta()
+    meta = doc.get_part('meta')
     for set_info in set_list:
         if '=' not in set_info:
             printerr('Bad argument -s "%s" (must be "name=value")' % set_info)

@@ -84,7 +84,7 @@ class Converter(object):
             outbody.append(odf_create_paragraph())
         # Copy styles
         for family in ('table', 'table-column', 'table-row', 'table-cell'):
-            for style in indoc.get_styles(family=family):
+            for style in indoc.get_style_list(family=family):
                 automatic = (style.get_parent().get_tag()
                         == 'office:automatic-styles')
                 default = style.get_tag() == 'style:default-style'

@@ -37,40 +37,39 @@ from urllib import urlopen
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
 from lpod.container import odf_get_container
-from lpod.container import odf_new_container_from_type
-from lpod.container import odf_new_container_from_template
+from lpod.container import odf_new_container
 
 
 class NewContainerFromTemplateTestCase(TestCase):
 
     def test_bad_template(self):
-        self.assertRaises(IOError, odf_new_container_from_template,
-                          '../templates/notexisting')
+        self.assertRaises(IOError, odf_new_container,
+                '../templates/notexisting')
 
     def test_text_template(self):
         path = '../templates/text.ott'
-        container = odf_new_container_from_template(path)
+        container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_template(self):
         path = '../templates/spreadsheet.ots'
-        container = odf_new_container_from_template(path)
+        container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_template(self):
         path = '../templates/presentation.otp'
-        container = odf_new_container_from_template(path)
+        container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_template(self):
         path = '../templates/drawing.otg'
-        container = odf_new_container_from_template(path)
+        container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odg'])
 
@@ -79,30 +78,29 @@ class NewContainerFromTemplateTestCase(TestCase):
 class NewContainerFromTypeTestCase(TestCase):
 
     def test_bad_type(self):
-        self.assertRaises(ValueError, odf_new_container_from_type,
-                          'foobar')
+        self.assertRaises(IOError, odf_new_container, 'foobar')
 
 
     def test_text_type(self):
-        container = odf_new_container_from_type('text')
+        container = odf_new_container('text')
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_type(self):
-        container = odf_new_container_from_type('spreadsheet')
+        container = odf_new_container('spreadsheet')
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_type(self):
-        container = odf_new_container_from_type('presentation')
+        container = odf_new_container('presentation')
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_type(self):
-        container = odf_new_container_from_type('drawing')
+        container = odf_new_container('drawing')
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odg'])
 
@@ -147,7 +145,7 @@ class GetContainerTestCase(TestCase):
 class ContainerTestCase(TestCase):
 
     def test_clone(self):
-        container = odf_new_container_from_type('text')
+        container = odf_new_container('text')
         clone = container.clone()
         self.assertEqual(clone.path, None)
         self.assertNotEqual(clone._odf_container__data, None)

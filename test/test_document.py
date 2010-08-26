@@ -36,8 +36,7 @@ from urllib2 import urlopen
 # Import from lpod
 from lpod.container import ODF_EXTENSIONS
 from lpod.content import odf_content
-from lpod.document import odf_new_document_from_template
-from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.document import odf_new_document, odf_get_document
 from lpod.manifest import odf_manifest
 from lpod.meta import odf_meta
 from lpod.styles import odf_styles
@@ -46,35 +45,35 @@ from lpod.styles import odf_styles
 class NewDocumentFromTemplateTestCase(TestCase):
 
     def test_bad_template(self):
-        self.assertRaises(IOError, odf_new_document_from_template,
-                          '../templates/notexisting')
+        self.assertRaises(IOError, odf_new_document,
+                '../templates/notexisting')
 
     def test_text_template(self):
         path = '../templates/text.ott'
-        self.assert_(odf_new_document_from_template(path))
+        self.assert_(odf_new_document(path))
 
 
     def test_spreadsheet_template(self):
         path = '../templates/spreadsheet.ots'
-        self.assert_(odf_new_document_from_template(path))
+        self.assert_(odf_new_document(path))
 
 
     def test_presentation_template(self):
         path = '../templates/presentation.otp'
-        self.assert_(odf_new_document_from_template(path))
+        self.assert_(odf_new_document(path))
 
 
     def test_drawing_template(self):
         path = '../templates/drawing.otg'
-        self.assert_(odf_new_document_from_template(path))
+        self.assert_(odf_new_document(path))
 
 
     def test_mimetype(self):
         path = '../templates/drawing.otg'
-        document = odf_new_document_from_template(path)
+        document = odf_new_document(path)
         mimetype = document.get_part('mimetype')
         self.assertFalse('template' in mimetype)
-        manifest = document.get_manifest()
+        manifest = document.get_part('manifest')
         media_type = manifest.get_media_type('/')
         self.assertFalse('template' in media_type)
 
@@ -83,27 +82,26 @@ class NewDocumentFromTemplateTestCase(TestCase):
 class NewdocumentFromTypeTestCase(TestCase):
 
     def test_bad_type(self):
-        self.assertRaises(ValueError, odf_new_document_from_type,
-                          'foobar')
+        self.assertRaises(IOError, odf_new_document, 'foobar')
 
 
     def test_text_type(self):
-        document = odf_new_document_from_type('text')
+        document = odf_new_document('text')
         self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_type(self):
-        document = odf_new_document_from_type('spreadsheet')
+        document = odf_new_document('spreadsheet')
         self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_type(self):
-        document = odf_new_document_from_type('presentation')
+        document = odf_new_document('presentation')
         self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_type(self):
-        document = odf_new_document_from_type('drawing')
+        document = odf_new_document('drawing')
         self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odg'])
 
 
@@ -149,22 +147,22 @@ class DocumentTestCase(TestCase):
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
     def test_get_content(self):
-        content = self.document.get_content()
+        content = self.document.get_part('content')
         self.assert_(type(content) is odf_content)
 
 
     def test_get_meta(self):
-        meta = self.document.get_meta()
+        meta = self.document.get_part('meta')
         self.assert_(type(meta) is odf_meta)
 
 
     def test_get_styles(self):
-        styles = self.document.get_styles()
+        styles = self.document.get_part('styles')
         self.assert_(type(styles) is odf_styles)
 
 
     def test_get_manifest(self):
-        manifest = self.document.get_manifest()
+        manifest = self.document.get_part('manifest')
         self.assert_(type(manifest) is odf_manifest)
 
 
@@ -175,7 +173,7 @@ class DocumentTestCase(TestCase):
 
     def test_clone(self):
         document = self.document
-        document.get_content()
+        document.get_part('content')
         self.assertNotEqual(document._odf_document__xmlparts, {})
         clone = document.clone()
         self.assertNotEqual(clone._odf_document__xmlparts, {})
@@ -192,18 +190,18 @@ class DocumentTestCase(TestCase):
         document.save(temp)
         temp.seek(0)
         new = odf_get_document(temp)
-        generator = new.get_meta().get_generator()
+        generator = new.get_part('meta').get_generator()
         self.assert_(generator.startswith(u"lpOD Python"))
 
 
     def test_save_generator(self):
         document = self.document.clone()
-        document.get_meta().set_generator(u"toto")
+        document.get_part('meta').set_generator(u"toto")
         temp = StringIO()
         document.save(temp)
         temp.seek(0)
         new = odf_get_document(temp)
-        generator = new.get_meta().get_generator()
+        generator = new.get_part('meta').get_generator()
         self.assertEqual(generator, u"toto")
 
 

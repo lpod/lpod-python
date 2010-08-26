@@ -183,7 +183,7 @@ class odf_document(object):
         is inserted.
         """
         if self.__body is None:
-            content = self.get_content()
+            content = self.get_part('content')
             self.__body = content.get_body()
         return self.__body
 
@@ -258,7 +258,7 @@ class odf_document(object):
     def get_formated_meta(self):
         result = []
 
-        meta = self.get_meta()
+        meta = self.get_part('meta')
 
         # Simple values
         def print_info(name, value):
@@ -326,7 +326,7 @@ class odf_document(object):
             name = uuid + extension.lower()
             media_type, encoding = guess_type(name)
         # Folder for added files (FIXME hard-coded and copied)
-        manifest = self.get_manifest()
+        manifest = self.get_part('manifest')
         if manifest.get_media_type('Pictures/') is None:
             manifest.add_full_path('Pictures/')
         full_path = 'Pictures/%s' % (name)
@@ -374,7 +374,7 @@ class odf_document(object):
             pretty -- bool
         """
         # Some advertising
-        meta = self.get_meta()
+        meta = self.get_part('meta')
         if not meta._generator_modified:
             meta.set_generator(u"lpOD Python %s" % __version__)
         # Synchronize data with container
@@ -392,8 +392,8 @@ class odf_document(object):
 
     # TODO rename to get_styles in next version
     def get_style_list(self, family=None, automatic=False):
-        content = self.get_content()
-        styles = self.get_styles()
+        content = self.get_part('content')
+        styles = self.get_part('styles')
         return (content.get_styles(family=family)
                 + styles.get_styles(family=family, automatic=automatic))
 
@@ -419,13 +419,13 @@ class odf_document(object):
         Return: odf_style or None if not found.
         """
         # 1. content.xml
-        content = self.get_content()
+        content = self.get_part('content')
         element = content.get_style(family, name_or_element=name_or_element,
                 display_name=display_name)
         if element is not None:
             return element
         # 2. styles.xml
-        styles = self.get_styles()
+        styles = self.get_part('styles')
         return styles.get_style(family, name_or_element=name_or_element,
                 display_name=display_name)
 
@@ -469,26 +469,26 @@ class odf_document(object):
 
         # Master page style
         if isinstance(style, odf_master_page):
-            part = self.get_styles()
+            part = self.get_part('styles')
             container = part.get_element("office:master-styles")
             existing = part.get_style(family, name)
         # Font face declarations
         elif isinstance(style, odf_font_style):
             # XXX If inserted in styles.xml => It doesn't work, it's normal?
-            part = self.get_content()
+            part = self.get_part('content')
             container = part.get_element("office:font-face-decls")
             existing = part.get_style(family, name)
         # Common style
         elif isinstance(style, odf_style):
             # Common style
             if name and automatic is False and default is False:
-                part = self.get_styles()
+                part = self.get_part('styles')
                 container = part.get_element("office:styles")
                 existing = part.get_style(family, name)
 
             # Automatic style
             elif automatic is True and default is False:
-                part = self.get_content()
+                part = self.get_part('content')
                 container = part.get_element("office:automatic-styles")
 
                 # A name ?
@@ -516,7 +516,7 @@ class odf_document(object):
 
             # Default style
             elif automatic is False and default is True:
-                part = self.get_styles()
+                part = self.get_part('styles')
                 container = part.get_element("office:styles")
 
                 # Force default style
@@ -549,9 +549,9 @@ class odf_document(object):
 
         Return: list
         """
-        content = self.get_content()
+        content = self.get_part('content')
         # Header, footer, etc. have styles too
-        styles = self.get_styles()
+        styles = self.get_part('styles')
         return (content.get_root().get_styled_elements(name)
                 + styles.get_root().get_styled_elements(name))
 
@@ -631,10 +631,10 @@ class odf_document(object):
         Styles with the same type and name will be replaced, so only unique
         styles will be preserved.
         """
-        styles = self.get_styles()
-        content = self.get_content()
-        manifest = self.get_manifest()
-        document_manifest = document.get_manifest()
+        styles = self.get_part('styles')
+        content = self.get_part('content')
+        manifest = self.get_part('manifest')
+        document_manifest = document.get_part('manifest')
         for style in document.get_style_list():
             tagname = style.get_tag()
             family = style.get_family()
