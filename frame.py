@@ -186,11 +186,11 @@ class odf_frame(odf_element):
 
 
     def get_text_style(self):
-        return self.get_attribute('text:style-name')
+        return self.get_attribute('draw:text-style-name')
 
 
     def set_text_style(self, name):
-        return self.set_style_attribute('text:style-name', name)
+        return self.set_style_attribute('draw:text-style-name', name)
 
 
     def get_size(self):
