@@ -67,27 +67,46 @@ def merge_styles(document, from_file, target=None, pretty=True):
     # Enhance Presentation merge
     if type in ('presentation', 'presentation-template'):
         # Apply master page found
-        styles = document.get_part('styles')
-        first_master_page = styles.get_master_page()
-        first_page = source.get_body().get_draw_page()
+        source_body = source.get_body()
+        first_page = source_body.get_draw_page()
+        master_page_name = first_page.get_master_page()
+        first_master_page = document.get_style('master-page',
+                master_page_name)
         body = document.get_body()
         for page in body.get_draw_pages():
             page.set_style(first_page.get_style())
-            page.set_master_page(first_master_page)
+            page.set_master_page(first_page.get_master_page())
             page.set_presentation_page_layout(
                     first_page.get_presentation_page_layout())
         # Adjust layout
-        for model in first_master_page.get_frames():
-            presentation_class = model.get_presentation_class()
-            if presentation_class is None:
+        for presentation_class in ('title', 'outline', 'graphic', 'notes'):
+            first_frame = source_body.get_frame(
+                    presentation_class=presentation_class)
+            if first_frame is None:
                 continue
-            position = model.get_position()
-            size = model.get_size()
+            style = first_frame.get_style()
+            presentation_style = first_frame.get_presentation_style()
+            text_style = first_frame.get_text_style()
+            position = first_frame.get_position()
+            size = first_frame.get_size()
             for page in body.get_draw_pages():
                 for frame in page.get_frames(
                         presentation_class=presentation_class):
+                    frame.set_style(style)
+                    frame.set_presentation_style(presentation_style)
+                    frame.set_text_style(text_style)
                     frame.set_position(position)
                     frame.set_size(size)
+            if presentation_class == 'outline':
+                first_list = first_frame.get_list()
+                if first_list is None:
+                    continue
+                list_style = first_list.get_style()
+                for page in body.get_draw_pages():
+                    for frame in page.get_frames(
+                            presentation_class='outline'):
+                        for list in frame.get_lists():
+                            list.set_style(list_style)
     document.save(target=target, pretty=pretty)
     printinfo("Done (0 error, 0 warning).")
 
