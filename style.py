@@ -457,12 +457,20 @@ class odf_list_style(odf_style):
             level_style created
         """
         # Expected name
-        level_style_name = 'text:list-level-style-%s' % type
+        if num_format is not None:
+            level_style_name = 'text:list-level-style-number'
+        elif bullet_char is not None:
+            level_style_name = 'text:list-level-style-bullet'
+        elif uri is not None:
+            level_style_name = 'text:list-level-style-image'
+        elif clone is not None:
+            level_style_name = clone.get_tag()
+        else:
+            raise ValueError, "unknown level style type"
         was_created = False
         # Cloning or reusing an existing element
         if clone is not None:
             level_style = clone.clone()
-            level_style_name = level_style.get_tag()
             was_created = True
         else:
             level_style = self.get_level_style(level)
@@ -476,13 +484,11 @@ class odf_list_style(odf_style):
         level_style.set_attribute('text:level', str(level))
         # Set the main attribute
         if num_format is not None:
-            level_style.set_attribute('fo:num-format', format)
+            level_style.set_attribute('fo:num-format', num_format)
         elif bullet_char is not None:
             level_style.set_attribute('text:bullet-char', bullet_char)
         elif uri is not None:
             level_style.set_attribute('xlink:href', uri)
-        elif clone is None:
-            raise ValueError, "unknown level style type"
         # Set attributes
         if prefix:
             level_style.set_attribute('style:num-prefix', prefix)

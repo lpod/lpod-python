@@ -82,7 +82,7 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type=None,
 
 
 def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
-        anchor_type='paragraph', page_number=None, position=None, layer=None,
+        anchor_type=None, page_number=None, position=None, layer=None,
         presentation_class=None, style=None):
     """Create a ready-to-use image, since it must be embedded in a
     frame.
@@ -102,7 +102,7 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
 
         anchor_type -- 'page', 'frame', 'paragraph', 'char' or 'as-char'
 
-        page_number -- int (when anchor_type == 'page')
+        page_number (anchor_type='page') -- int
 
         position -- (str, str)
 
@@ -122,7 +122,7 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
 
 
 def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
-        anchor_type='paragraph', page_number=None, position=None, layer=None,
+        anchor_type=None, page_number=None, position=None, layer=None,
         presentation_class=None, style=None, text_style=None,
         presentation_style=None):
     """Create a ready-to-use text box, since it must be embedded in a frame.
@@ -138,7 +138,7 @@ def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
 
         anchor_type -- 'page', 'frame', 'paragraph', 'char' or 'as-char'
 
-        page_number -- int (when anchor_type == 'page')
+        page_number (anchor_type='page') -- int
 
         position -- (str, str)
 
