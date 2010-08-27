@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Romain Gauthier <romain@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
