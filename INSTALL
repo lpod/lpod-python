@@ -2,8 +2,5 @@ Install Dependencies:
   - python >= 2.6: http://www.python.org/
   - lxml >= 2.0: http://codespeak.net/lxml/
 
-Use Case Dependencies:
-  - itools = 0.60: http://www.hforge.org/itools
-
 Installation:
   $ python setup.py install
