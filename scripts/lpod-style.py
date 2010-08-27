@@ -28,7 +28,7 @@
 
 # Import from the standard library
 from optparse import OptionParser
-from sys import exit, stdout, stderr
+from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
@@ -76,7 +76,7 @@ def merge_presentation_styles(document, source):
     master_page_name = first_page.get_master_page()
     first_master_page = document.get_style('master-page',
             master_page_name)
-    print >> stderr, "master page used:", first_master_page.get_display_name()
+    printinfo("master page used:", first_master_page.get_display_name())
     body = document.get_body()
     for page in body.get_draw_pages():
         page.set_style(first_page.get_style())
@@ -116,7 +116,7 @@ def merge_styles(document, from_file, target=None, pretty=True):
     type = document.get_type()
     # Enhance Presentation merge
     if type in ('presentation', 'presentation-template'):
-        print >> stderr, "merging presentation styles..."
+        printinfo("merging presentation styles...")
         merge_presentation_styles(document, source)
     document.save(target=target, pretty=pretty)
     printinfo("Done (0 error, 0 warning).")
