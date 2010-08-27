@@ -34,7 +34,7 @@ from urlparse import urlsplit
 
 # Import from lpod
 from lpod import __version__
-from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.document import odf_new_document, odf_get_document
 from lpod.draw_page import odf_create_draw_page
 from lpod.frame import odf_create_frame
 from lpod.list import odf_create_list
@@ -93,7 +93,7 @@ if  __name__ == '__main__':
         exit(1)
     check_target_file(target)
 
-    output_document = odf_new_document_from_type('presentation')
+    output_document = odf_new_document('presentation')
     output_meta = output_document.get_part('meta')
     output_meta.set_title(u"Interop Budapest Demo")
 

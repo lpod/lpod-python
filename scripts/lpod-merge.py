@@ -34,7 +34,7 @@ from sys import exit, stdout
 # Import from lpod
 from lpod import __version__
 from lpod.const import ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION
-from lpod.document import odf_new_document_from_type, odf_get_document
+from lpod.document import odf_new_document, odf_get_document
 from lpod.element import FIRST_CHILD
 from lpod.table import import_from_csv
 from lpod.toc import odf_create_toc
@@ -55,7 +55,7 @@ def init_doc(filename, mimetype):
             output_body = output_doc.get_body()
             output_body.insert(odf_create_toc(), FIRST_CHILD)
     elif mimetype in (CSV_SHORT, CSV_LONG):
-        output_doc = odf_new_document_from_type('spreadsheet')
+        output_doc = odf_new_document('spreadsheet')
         add_csv(filename, output_doc)
     else:
         raise NotImplementedError, mimetype

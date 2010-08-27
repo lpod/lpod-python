@@ -8,7 +8,7 @@ from os.path import exists
 from sys import argv, stderr, exit
 
 # Import from lpod
-from lpod.document import odf_new_document_from_template
+from lpod.document import odf_new_document
 from lpod.span import odf_create_span
 from lpod.template import stl_odf
 
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     except IndexError:
         print >>stderr, "Usage: %s <output document>" % argv[0]
         exit(1)
-    document = odf_new_document_from_template('test_template.ott')
+    document = odf_new_document('test_template.ott')
     stl_odf(document, get_namespace())
     if exists(output):
         remove(output)

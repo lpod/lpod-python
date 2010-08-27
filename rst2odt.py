@@ -36,7 +36,7 @@ from docutils.core import publish_doctree
 from PIL import Image
 
 # Import from lpod
-from document import odf_new_document_from_type
+from document import odf_new_document
 from frame import odf_create_image_frame, odf_create_text_frame
 from heading import odf_create_heading
 from link import odf_create_link
@@ -734,6 +734,6 @@ def rst2odt(rst_body, template=None, heading_level=1):
         document.get_body().clear()
     # Or create a new document
     else:
-        document = odf_new_document_from_type("text")
+        document = odf_new_document("text")
 
     return convert(document, rst_body, heading_level=heading_level)

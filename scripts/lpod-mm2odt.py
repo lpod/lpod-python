@@ -37,7 +37,7 @@ from lxml.etree import parse
 # Import from lpod
 from lpod import __version__
 from lpod.toc import odf_create_toc
-from lpod.document import odf_new_document_from_type
+from lpod.document import odf_new_document
 from lpod.heading import odf_create_heading
 from lpod.scriptutils import add_option_output, check_target_file
 
@@ -94,7 +94,7 @@ if  __name__ == '__main__':
     mm_structure = make_mm_structure(first_node, 0)
 
     # Create a new ODT document
-    document = odf_new_document_from_type('text')
+    document = odf_new_document('text')
     body = document.get_body()
     # Remove the default paragraph
     body.clear()
