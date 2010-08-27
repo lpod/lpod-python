@@ -91,11 +91,15 @@ def merge_presentation_styles(document, source):
         if first_frame is None:
             continue
         # Mimic frame style
+        position = first_frame.get_position()
+        size = first_frame.get_size()
         style = first_frame.get_style()
         presentation_style = first_frame.get_presentation_style()
         for page in body.get_draw_pages():
             for frame in page.get_frames(
                     presentation_class=presentation_class):
+                frame.set_position(position)
+                frame.set_size(size)
                 frame.set_style(style)
                 frame.set_presentation_style(presentation_style)
         # Mimic list style (XXX only first level)
