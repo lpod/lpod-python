@@ -35,8 +35,8 @@ from uuid import uuid4
 
 # Import from lpod
 from __init__ import __version__
-from container import ODF_PARTS, odf_get_container
-from container import odf_new_container, odf_container
+from const import ODF_PARTS
+from container import odf_get_container, odf_new_container, odf_container
 from content import odf_content
 from manifest import odf_manifest
 from meta import odf_meta

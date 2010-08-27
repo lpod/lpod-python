@@ -33,7 +33,7 @@ from sys import exit
 
 # Import from lpod
 from lpod import __version__
-from lpod.container import ODF_EXTENSIONS
+from lpod.const import ODF_EXTENSIONS
 from lpod.document import odf_get_document, odf_new_document_from_type
 from lpod.paragraph import odf_create_paragraph
 from lpod.rst2odt import convert as rst_convert

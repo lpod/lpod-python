@@ -34,7 +34,7 @@ from unittest import TestCase, main
 from urllib2 import urlopen
 
 # Import from lpod
-from lpod.container import ODF_EXTENSIONS
+from lpod.const import ODF_EXTENSIONS
 from lpod.content import odf_content
 from lpod.document import odf_new_document, odf_get_document
 from lpod.manifest import odf_manifest

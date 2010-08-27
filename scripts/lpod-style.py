@@ -32,6 +32,7 @@ from sys import exit, stdout, stderr
 
 # Import from lpod
 from lpod import __version__
+from lpod.const import ODF_CLASSES
 from lpod.document import odf_get_document
 from lpod.scriptutils import add_option_output, StdoutWriter, printinfo
 from lpod.scriptutils import check_target_file, printerr

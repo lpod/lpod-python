@@ -32,90 +32,9 @@ from os.path import isdir
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 
 # Import from lpod
+from const import ODF_MIMETYPES, ODF_PARTS, ODF_TYPES
 from manifest import odf_manifest
 from utils import _get_abspath, obsolete
-
-
-# Types and their default template
-ODF_TYPES = {
-        'text': 'templates/text.ott',
-        'spreadsheet': 'templates/spreadsheet.ots',
-        'presentation': 'templates/presentation.otp',
-        # Follow the spec
-        'drawing': 'templates/drawing.otg',
-        # Follow the mimetype
-        'graphics': 'templates/drawing.otg',
-        # TODO
-        #'chart': 'templates/chart.otc',
-        #'image': 'templates/image.oti',
-        #'formula': 'templates/image.otf',
-        #'master': 'templates/image.odm',
-        #'web': 'templates/image.oth',
-}
-
-
-ODF_TEXT = 'application/vnd.oasis.opendocument.text'
-ODF_TEXT_TEMPLATE = 'application/vnd.oasis.opendocument.text-template'
-ODF_SPREADSHEET = 'application/vnd.oasis.opendocument.spreadsheet'
-ODF_SPREADSHEET_TEMPLATE = 'application/vnd.oasis.opendocument.spreadsheet-template'
-ODF_PRESENTATION = 'application/vnd.oasis.opendocument.presentation'
-ODF_PRESENTATION_TEMPLATE = 'application/vnd.oasis.opendocument.presentation-template'
-ODF_DRAWING = 'application/vnd.oasis.opendocument.graphics'
-ODF_DRAWING_TEMPLATE = 'application/vnd.oasis.opendocument.graphics-template'
-ODF_CHART = 'application/vnd.oasis.opendocument.chart'
-ODF_CHART_TEMPLATE = 'application/vnd.oasis.opendocument.chart-template'
-ODF_IMAGE = 'application/vnd.oasis.opendocument.image'
-ODF_IMAGE_TEMPLATE = 'application/vnd.oasis.opendocument.image-template'
-ODF_FORMULA = 'application/vnd.oasis.opendocument.formula'
-ODF_FORMULA_TEMPLATE = 'application/vnd.oasis.opendocument.formula-template'
-ODF_MASTER = 'application/vnd.oasis.opendocument.text-master'
-ODF_WEB = 'application/vnd.oasis.opendocument.text-web'
-
-
-# File extensions and their mimetype
-ODF_EXTENSIONS = {
-        'odt': ODF_TEXT,
-        'ott': ODF_TEXT_TEMPLATE,
-        'ods': ODF_SPREADSHEET,
-        'ots': ODF_SPREADSHEET_TEMPLATE,
-        'odp': ODF_PRESENTATION,
-        'otp': ODF_PRESENTATION_TEMPLATE,
-        'odg': ODF_DRAWING,
-        'otg': ODF_DRAWING_TEMPLATE,
-        'odc': ODF_CHART,
-        'otc': ODF_CHART_TEMPLATE,
-        'odi': ODF_IMAGE,
-        'oti': ODF_IMAGE_TEMPLATE,
-        'odf': ODF_FORMULA,
-        'otf': ODF_FORMULA_TEMPLATE,
-        'odm': ODF_MASTER,
-        'oth': ODF_WEB,
-}
-
-
-# Mimetypes and their file extension
-ODF_MIMETYPES = {
-        ODF_TEXT: 'odt',
-        ODF_TEXT_TEMPLATE: 'ott',
-        ODF_SPREADSHEET: 'ods',
-        ODF_SPREADSHEET_TEMPLATE: 'ots',
-        ODF_PRESENTATION: 'odp',
-        ODF_PRESENTATION_TEMPLATE: 'otp',
-        ODF_DRAWING: 'odg',
-        ODF_DRAWING_TEMPLATE: 'otg',
-        ODF_CHART: 'odc',
-        ODF_CHART_TEMPLATE: 'otc',
-        ODF_IMAGE: 'odi',
-        ODF_IMAGE_TEMPLATE: 'oti',
-        ODF_FORMULA: 'odf',
-        ODF_FORMULA_TEMPLATE: 'otf',
-        ODF_MASTER: 'odm',
-        ODF_WEB: 'oth',
-}
-
-
-# Standard parts in the container (other are regular paths)
-ODF_PARTS = ('content', 'meta', 'settings', 'styles')
 
 
 class odf_container(object):

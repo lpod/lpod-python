@@ -33,7 +33,7 @@ from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
-from lpod.container import ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION
+from lpod.const import ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION
 from lpod.document import odf_new_document_from_type, odf_get_document
 from lpod.element import FIRST_CHILD
 from lpod.table import import_from_csv

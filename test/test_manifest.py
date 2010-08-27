@@ -29,7 +29,7 @@
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.container import ODF_PRESENTATION
+from lpod.const import ODF_PRESENTATION
 from lpod.document import odf_get_document
 from lpod.manifest import odf_manifest
 

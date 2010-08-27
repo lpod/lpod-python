@@ -35,9 +35,8 @@ from unittest import TestCase, main
 from urllib import urlopen
 
 # Import from lpod
-from lpod.container import ODF_EXTENSIONS
-from lpod.container import odf_get_container
-from lpod.container import odf_new_container
+from lpod.const import ODF_EXTENSIONS
+from lpod.container import odf_get_container, odf_new_container
 
 
 class NewContainerFromTemplateTestCase(TestCase):
