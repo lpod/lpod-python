@@ -915,39 +915,63 @@ class odf_element(object):
         return self.set_attribute('text:outline-level', str(outline_level))
 
 
+    def _get_inner_text(self, tag):
+        element = self.get_element(tag)
+        if element is None:
+            return None
+        return element.get_text()
+
+
+    def _set_inner_text(self, tag, text):
+        element = self.get_element(tag)
+        if element is None:
+            element = odf_create_element(tag)
+            self.append(element)
+        element.set_text(text)
+
+
     #
     # Dublin core
     #
 
     def get_dc_creator(self):
-        dc_creator = self.get_element('descendant::dc:creator')
-        if dc_creator is None:
-            return None
-        return dc_creator.get_text()
+        return self._get_inner_text('dc:creator')
 
 
     def set_dc_creator(self, creator):
-        dc_creator = self.get_element('descendant::dc:creator')
-        if dc_creator is None:
-            dc_creator = odf_create_element('dc:creator')
-            self.append(dc_creator)
-        dc_creator.set_text(creator)
+        return self._set_inner_text('dc:creator', creator)
 
 
     def get_dc_date(self):
-        dc_date = self.get_element('descendant::dc:date')
-        if dc_date is None:
+        date = self._get_inner_text('dc:date')
+        if date is None:
             return None
-        date = dc_date.get_text()
         return DateTime.decode(date)
 
 
     def set_dc_date(self, date):
-        dc_date = self.get_element('descendant::dc:date')
-        if dc_date is None:
-            dc_date = odf_create_element('dc:date')
-            self.append(dc_date)
-        dc_date.set_text(DateTime.encode(date))
+        return self._set_inner_text('dc:date', DateTime.encode(date))
+
+
+    #
+    # SVG
+    #
+
+    def get_svg_title(self):
+        return self._get_inner_text('svg:title')
+
+
+    def set_svg_title(self, title):
+        return self._set_inner_text('svg:title', title)
+
+
+    def get_svg_description(self):
+        return self._get_inner_text('svg:desc')
+
+
+    def set_svg_description(self, description):
+        return self._set_inner_text('svg:desc', description)
+
 
     #
     # Sections
