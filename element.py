@@ -704,8 +704,10 @@ class odf_element(object):
         """Like "get_text" but return the text of the embedded paragraph:
         annotations, cells...
         """
-        element = self.__element
-        return element.xpath('string(text:p)', namespaces=ODF_NAMESPACES)
+        text = []
+        for child in self.get_elements('descendant::text:p'):
+            text.append(child.get_text(recursive=True))
+        return u"\n".join(text)
 
 
     def set_text_content(self, text):

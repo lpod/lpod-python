@@ -26,13 +26,12 @@
 #
 
 # Import from the Standard Library
-from re import search
 
 # Import from lpod
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
 from paragraph import odf_create_paragraph
-from utils import _get_elements, obsolete
+from utils import _get_element, _get_elements, obsolete
 
 
 def odf_create_list_item(text_or_element=None):
@@ -124,16 +123,14 @@ class odf_list(odf_element):
         Return: odf_element or None if not found
         """
         # Custom implementation because of nested lists
-        results = self.get_elements('descendant::text:list-item')
         if content:
             # Don't search recursively but on the very own paragraph(s) of
             # each list item
-            results = [e for e in results
-                    if search(content, e.get_text_content()) is not None]
-        try:
-            return results[position]
-        except IndexError:
+            for paragraph in self.get_elements('descendant::text:p'):
+                if paragraph.match(content):
+                    return paragraph.get_element('parent::text:list-item')
             return None
+        return _get_element(self, 'text:list-item', position)
 
 
     def set_header(self, text_or_element):

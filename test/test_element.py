@@ -247,7 +247,8 @@ class ElementTextTestCase(TestCase):
     def test_get_text_content(self):
         element = self.annotation_element
         text = element.get_text_content()
-        self.assertEqual(text, u"This is an annotation.")
+        self.assertEqual(text, u"This is an annotation.\n"
+                u"With diacritical signs: éè")
 
 
     def test_set_text_content(self):
