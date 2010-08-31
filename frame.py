@@ -205,8 +205,8 @@ class odf_frame(odf_element):
 
             size -- (str, str)
         """
-        self.set_attribute('svg:width', size[0])
-        self.set_attribute('svg:height', size[1])
+        self.set_attribute('svg:width', str(size[0]))
+        self.set_attribute('svg:height', str(size[1]))
 
 
     def get_position(self):
@@ -233,8 +233,8 @@ class odf_frame(odf_element):
 
             position -- (str, str)
         """
-        self.set_attribute('svg:x', position[0])
-        self.set_attribute('svg:y', position[1])
+        self.set_attribute('svg:x', str(position[0]))
+        self.set_attribute('svg:y', str(position[1]))
 
 
     def get_anchor_type(self):

@@ -26,10 +26,11 @@
 
 # Import from the Standard Library
 from datetime import datetime, timedelta
+from decimal import Decimal
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.datatype import DateTime, Duration, Boolean
+from lpod.datatype import DateTime, Duration, Boolean, Unit
 
 
 class DateTimeTestCase(TestCase):
@@ -84,6 +85,80 @@ class BooleanTestCase(TestCase):
     def test_bad_decode(self):
         self.assertRaises(ValueError, Boolean.decode, 'True')
         self.assertRaises(ValueError, Boolean.decode, '1')
+
+
+
+class UnitTestCase(TestCase):
+
+    def test_str(self):
+        unit = Unit('1.847mm')
+        self.assertEqual(unit.value, Decimal('1.847'))
+        self.assertEqual(unit.unit, 'mm')
+
+
+    def test_int(self):
+        unit = Unit(1)
+        self.assertEqual(unit.value, Decimal('1'))
+        self.assertEqual(unit.unit, 'cm')
+
+
+    def test_float(self):
+        self.assertRaises(TypeError, Unit, 3.14)
+
+
+    def test_encode(self):
+        value = '1.847mm'
+        unit = Unit(value)
+        self.assertEqual(str(unit), value)
+
+
+    # TODO use other units once conversion implemented
+
+    def test_eq(self):
+        unit1 = Unit('2.54cm')
+        unit2 = Unit('2.54cm')
+        self.assertTrue(unit1 == unit2)
+
+
+    def test_lt(self):
+        unit1 = Unit('2.53cm')
+        unit2 = Unit('2.54cm')
+        self.assertTrue(unit1 < unit2)
+
+
+    def test_nlt(self):
+        unit1 = Unit('2.53cm')
+        unit2 = Unit('2.54cm')
+        self.assertFalse(unit1 > unit2)
+
+
+    def test_gt(self):
+        unit1 = Unit('2.54cm')
+        unit2 = Unit('2.53cm')
+        self.assertTrue(unit1 > unit2)
+
+
+    def test_ngt(self):
+        unit1 = Unit('2.54cm')
+        unit2 = Unit('2.53cm')
+        self.assertFalse(unit1 < unit2)
+
+
+    def test_le(self):
+        unit1 = Unit('2.54cm')
+        unit2 = Unit('2.54cm')
+        self.assertTrue(unit1 <= unit2)
+
+
+    def test_ge(self):
+        unit1 = Unit('2.54cm')
+        unit2 = Unit('2.54cm')
+        self.assertTrue(unit1 >= unit2)
+
+
+    def test_convert(self):
+        unit = Unit('10cm')
+        self.assertEqual(unit.convert('px'), Unit('283px'))
 
 
 

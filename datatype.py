@@ -26,6 +26,7 @@
 
 # Import from the Standard Library
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 
 DATE_FORMAT = '%Y-%m-%d'
@@ -152,3 +153,46 @@ class Duration(object):
         seconds = microseconds / 1000000
 
         return sign + DURATION_FORMAT % (hours, minutes, seconds)
+
+
+# I chose not to inherit from Decimal to avoid operations on different units
+class Unit(object):
+
+    def __init__(self, value, unit='cm'):
+        if isinstance(value, (str, unicode)):
+            digits = []
+            nondigits = []
+            for char in value:
+                if char.isdigit() or char == '.':
+                    digits.append(char)
+                else:
+                    nondigits.append(char)
+            value = ''.join(digits)
+            if nondigits:
+                unit = ''.join(nondigits)
+        self.value = Decimal(value)
+        self.unit = unit
+
+
+    def __str__(self):
+        return str(self.value) + self.unit
+
+
+    def __repr__(self):
+        return "%s %s" % (object.__repr__(self), self)
+
+
+    def __cmp__(self, other):
+        if type(other) is not type(self):
+            raise ValueError, "can only compare Unit"
+        if self.unit != other.unit:
+            raise NotImplementedError, "no conversion yet"
+        return cmp(self.value, other.value)
+
+
+    def convert(self, unit, dpi=72):
+        if unit == 'px':
+            if self.unit == 'cm':
+                return Unit(int(self.value / Decimal('2.54') * dpi), 'px')
+            raise NotImplementedError, self.unit
+        raise NotImplementedError, unit
