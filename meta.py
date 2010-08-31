@@ -253,6 +253,40 @@ class odf_meta(odf_xmlpart):
         element.set_text(creator)
 
 
+    def get_creator(self):
+        """Get the creator of the document.
+
+        Return: unicode (or None if inexistant)
+
+        Example::
+
+            >>> document.get_creator()
+            Unknown
+        """
+        element = self.get_element('//dc:creator')
+        if element is None:
+            return None
+        return element.get_text()
+
+
+    def set_creator(self, creator):
+        """Set the creator of the document.
+
+        Arguments:
+
+            creator -- unicode
+
+        Example::
+
+            >>> document.set_creator(u"Plato")
+        """
+        element = self.get_element('//dc:creator')
+        if element is None:
+            element = odf_create_element('dc:creator')
+            self.get_meta_body().append(element)
+        element.set_text(creator)
+
+
     def get_keywords(self):
         """Get the keywords of the document. Return the field as-is, without
         any assumption on the keyword separator.
