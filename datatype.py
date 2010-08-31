@@ -33,6 +33,7 @@ DATE_FORMAT = '%Y-%m-%d'
 
 
 DATETIME_FORMAT = DATE_FORMAT + 'T%H:%M:%S'
+DATETIME_FORMAT_MICRO = DATETIME_FORMAT + '.%f'
 
 
 DURATION_FORMAT = 'PT%02dH%02dM%02dS'
@@ -77,7 +78,10 @@ class DateTime(object):
 
     @staticmethod
     def decode(data):
-        return datetime.strptime(data, DATETIME_FORMAT)
+        try:
+            return datetime.strptime(data, DATETIME_FORMAT_MICRO)
+        except ValueError:
+            return datetime.strptime(data, DATETIME_FORMAT)
 
 
     @staticmethod
