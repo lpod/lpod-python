@@ -26,7 +26,9 @@
 
 # Import from lpod
 from element import register_element_class, odf_element, odf_create_element
+from shapes import registered_shapes
 from smil import odf_create_anim_par, odf_create_anim_transitionFilter
+
 
 def odf_create_draw_page(page_id=None, name=None, master_page=None,
                          presentation_page_layout=None, style=None):
@@ -125,6 +127,12 @@ class odf_draw_page(odf_element):
         if existing:
             self.delete(existing)
         self.append(anim_page)
+
+
+    def get_shapes(self):
+        query = ('(descendant::'
+                + '|descendant::'.join(registered_shapes) + ')')
+        return self.get_elements(query)
 
 
     def get_formatted_text(self, context):

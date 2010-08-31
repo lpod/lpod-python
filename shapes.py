@@ -221,6 +221,66 @@ class odf_shape(odf_element):
         return self.set_attribute('draw:layer', name)
 
 
+    def get_size(self):
+        """Get the size of the shape.
+
+        Size is a (width, height) tuple with items including the unit,
+        e.g. ('10cm', '15cm').
+
+
+        Return: (str, str)
+        """
+        get_attr = self.get_attribute
+        return get_attr('svg:width'), get_attr('svg:height')
+
+
+    def set_size(self, size):
+        """Set the size of the shape.
+
+        Size is a (width, height) tuple with items including the unit,
+        e.g. ('10cm', '15cm'). The dimensions can be None.
+
+        Arguments:
+
+            size -- (str, str)
+        """
+        self.set_attribute('svg:width', str(size[0]))
+        self.set_attribute('svg:height', str(size[1]))
+
+
+    def get_position(self):
+        """Get the position of the shape relative to its anchor
+        point.
+
+        Position is a (left, top) tuple with items including the unit,
+        e.g. ('10cm', '15cm').
+
+        Return: (str, str)
+        """
+        get_attr = self.get_attribute
+        return get_attr('svg:x'), get_attr('svg:y')
+
+
+    def set_position(self, position):
+        """Set the position of the shape relative to its anchor
+        point.
+
+        Position is a (left, top) tuple with items including the unit,
+        e.g. ('10cm', '15cm').
+
+        Arguments:
+
+            position -- (str, str)
+        """
+        self.set_attribute('svg:x', str(position[0]))
+        self.set_attribute('svg:y', str(position[1]))
+
+
+    # XXX stub
+    def get_presentation_class(self):
+        return self.get_attribute('presentation:class')
+
+
     def get_style(self):
         return self.get_attribute('draw:style-name')
 
@@ -246,7 +306,28 @@ class odf_shape(odf_element):
 
 
 
+# XXX better place?
+class draw_group(odf_element):
+
+    def get_name(self):
+        return self.get_attribute('draw:name')
+
+
+    def set_name(self, name):
+        return self.set_attribute('draw:name', name)
+
+
+
+registered_shapes = []
+
+def register_shape(tagname, cls):
+    register_element_class(tagname, cls)
+    registered_shapes.append(tagname)
+
+
+
 for name in ('draw:custom-shape', 'draw:line', 'draw:polyline',
         'draw:polygon', 'draw:regular-polygon', 'draw:path', 'draw:rect',
         'draw:ellipse', 'draw:circle', 'draw:connector'):
-    register_element_class(name, odf_shape)
+    register_shape(name, odf_shape)
+register_element_class('draw:g', draw_group)

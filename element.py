@@ -1792,6 +1792,22 @@ class odf_element(object):
     #
 
     #
+    # Groups
+    #
+
+    def get_draw_groups(self, title=None, description=None, content=None):
+        return _get_elements(self, 'descendant::draw:g', svg_title=title,
+                svg_desc=description, content=content)
+
+
+    def get_draw_group(self, position=0, name=None, title=None,
+            description=None, content=None):
+        return _get_element(self, 'descendant::draw:g', position,
+                draw_name=name, svg_title=title, svg_desc=description,
+                content=content)
+
+
+    #
     # Lines
     #
 

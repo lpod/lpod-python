@@ -840,10 +840,10 @@ def odf_create_default_currency_style():
 
 registered_styles = []
 
-
 def register_style(tagname, cls):
     register_element_class(tagname, cls)
     registered_styles.append(tagname)
+
 
 
 # FIXME there are (many) more
