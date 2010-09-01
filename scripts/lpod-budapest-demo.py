@@ -150,16 +150,28 @@ if  __name__ == '__main__':
         first_image = input_body.get_image(1)
         if not first_image:
             first_image = input_body.get_image(0)
-        if not first_image:
+        sibling = (first_image is not None
+                and first_image.get_prev_sibling() or None)
+        if sibling is not None and sibling.get_tag() == 'draw:object-ole':
+            # TODO in lpOD
+            first_image = None
+        if first_image is None:
             printwarn('no image found in "%s"' % filename, indent=2)
             continue
-        href = first_image.get_href().lstrip('./')
-        part = input_document.get_part(href)
-        output_document.set_part(href, part)
+        input_href = first_image.get_href()
+        part = input_document.get_part(input_href)
+        try:
+            output_document.get_part(input_href)
+        except KeyError:
+            output_href = input_href
+        else:
+            # XXX Quick & dirty
+            output_href = "%s-1" % input_href
+        output_document.set_part(output_href, part)
         input_manifest = input_document.get_part('manifest')
-        media_type = input_manifest.get_media_type(href)
+        media_type = input_manifest.get_media_type(input_href)
         output_manifest = output_document.get_part('manifest')
-        output_manifest.add_full_path(href, media_type)
+        output_manifest.add_full_path(output_href, media_type)
         graphic_frame = get_graphic_frame(first_master_page)
         graphic_frame.append(first_image)
         page.append(graphic_frame)

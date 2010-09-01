@@ -120,6 +120,8 @@ class odf_document(object):
         "content", "meta", "settings", "styles" and "manifest" are special
         names that return the dedicated object with its API.
         """
+        # "./ObjectReplacements/Object 1"
+        name = name.lstrip('./')
         # XML part?
         if name in ODF_PARTS or name == 'manifest':
             xmlparts = self.__xmlparts
@@ -146,6 +148,8 @@ class odf_document(object):
         path inside the archive, e.g.
         "Pictures/100000000000032000000258912EB1C3.jpg"
         """
+        # "./ObjectReplacements/Object 1"
+        name = name.lstrip('./')
         if name in ODF_PARTS or name == 'manifest':
             del self.__xmlparts[name]
         return self.container.set_part(name, data)
