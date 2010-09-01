@@ -29,8 +29,9 @@
 # Import from the standard library
 from optparse import OptionParser
 from sys import exit, stderr
-from urllib2 import urlopen
-from urlparse import urlsplit
+from urllib2 import urlopen, HTTPPasswordMgrWithDefaultRealm
+from urllib2 import HTTPBasicAuthHandler, build_opener
+from urlparse import urlsplit, urlunsplit
 
 # Import from lpod
 from lpod import __version__
@@ -38,9 +39,8 @@ from lpod.document import odf_new_document, odf_get_document
 from lpod.draw_page import odf_create_draw_page
 from lpod.frame import odf_create_frame
 from lpod.list import odf_create_list
-from lpod.scriptutils import add_option_output
-from lpod.scriptutils import printerr
-from lpod.scriptutils import check_target_file
+from lpod.scriptutils import add_option_output, check_target_file
+from lpod.scriptutils import printerr, printinfo
 
 
 def get_frame(presentation_class, position, size,
@@ -105,11 +105,21 @@ if  __name__ == '__main__':
 
     for i, filename in enumerate(filenames):
         # TODO folders and collections
-        print >> stderr, "Processing %s..." % filename
+        printinfo("Processing %s..." % filename)
         result = urlsplit(filename)
         scheme = result.scheme
         if not scheme:
             file = open(filename)
+        elif result.username:
+            netloc = '%s:%s' % (result.hostname, result.port)
+            url = urlunsplit((scheme, netloc, result.path, result.query,
+                result.fragment))
+            password_mgr = HTTPPasswordMgrWithDefaultRealm()
+            password_mgr.add_password(None, url, result.username,
+                    result.password)
+            handler = HTTPBasicAuthHandler(password_mgr)
+            opener = build_opener(handler)
+            file = opener.open(url)
         else:
             file = urlopen(filename)
         input_document = odf_get_document(file)
