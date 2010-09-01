@@ -40,7 +40,7 @@ from lpod.draw_page import odf_create_draw_page
 from lpod.frame import odf_create_frame
 from lpod.list import odf_create_list
 from lpod.scriptutils import add_option_output, check_target_file
-from lpod.scriptutils import printerr, printinfo
+from lpod.scriptutils import printerr, printinfo, printwarn
 
 
 def get_frame(presentation_class, position, size,
@@ -151,7 +151,7 @@ if  __name__ == '__main__':
         if not first_image:
             first_image = input_body.get_image(0)
         if not first_image:
-            printerr('no image found in "%s"' % filename)
+            printwarn('no image found in "%s"' % filename, indent=2)
             continue
         href = first_image.get_href().lstrip('./')
         part = input_document.get_part(href)

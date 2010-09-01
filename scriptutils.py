@@ -77,19 +77,22 @@ def add_option_output(parser, metavar="FILE", complement=""):
 
 
 
-def printinfo(*args):
+def printinfo(*args, **kw):
     # TODO switch to print function
+    indent = kw.get('indent', 0)
+    if indent:
+        stderr.write(' ' * indent)
     output = ' '.join(str(arg) for arg in args)
     stderr.write(output)
     stderr.write("\n")
 
 
-def printwarn(*args):
-    printinfo("Warning:", *args)
+def printwarn(*args, **kw):
+    printinfo("Warning:", *args, **kw)
 
 
-def printerr(*args):
-    printinfo("Error:", *args)
+def printerr(indent=0, *args, **kw):
+    printinfo("Error:", *args, **kw)
 
 
 
