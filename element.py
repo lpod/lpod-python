@@ -553,7 +553,10 @@ class odf_element(object):
         """
         if recursive:
             return u''.join(self.__element.itertext())
-        return unicode(self.__element.text)
+        text = self.__element.text
+        if text is None:
+            return None
+        return unicode(text)
 
 
     def set_text(self, text):
