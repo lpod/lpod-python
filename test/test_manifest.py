@@ -29,7 +29,7 @@
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.const import ODF_PRESENTATION
+from lpod.const import ODF_PRESENTATION, ODF_MANIFEST
 from lpod.document import odf_get_document
 from lpod.manifest import odf_manifest
 
@@ -38,7 +38,7 @@ class ManifestTestCase(TestCase):
 
     def setUp(self):
         self.document = odf_get_document('samples/frame_image.odp')
-        self.manifest = self.document.get_part('manifest')
+        self.manifest = self.document.get_part(ODF_MANIFEST)
         self.image_path = 'Pictures/10000000000001D40000003C8B3889D9.png'
 
 

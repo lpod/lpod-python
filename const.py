@@ -107,6 +107,14 @@ ODF_MIMETYPES = {
 ODF_PARTS = ('content', 'meta', 'settings', 'styles')
 
 
+# Paths of standard parts
+ODF_CONTENT = 'content.xml'
+ODF_META = 'meta.xml'
+ODF_SETTINGS = 'settings.xml'
+ODF_STYLES = 'styles.xml'
+ODF_MANIFEST = 'META-INF/manifest.xml'
+
+
 # Presentation classes (for layout)
 ODF_CLASSES = ('title', 'outline', 'subtitle', 'text', 'graphic', 'object',
         'chart', 'table', 'orgchart', 'page', 'notes', 'handout')

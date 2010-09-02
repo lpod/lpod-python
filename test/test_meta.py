@@ -31,6 +31,7 @@ from decimal import Decimal
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.const import ODF_META
 from lpod.document import odf_get_document
 from lpod.datatype import DateTime, Duration
 
@@ -39,7 +40,7 @@ class TestMetadata(TestCase):
 
     def setUp(self):
         document = odf_get_document('samples/meta.odt')
-        self.meta = document.get_part('meta')
+        self.meta = document.get_part(ODF_META)
 
 
     def tearDown(self):

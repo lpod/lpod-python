@@ -30,15 +30,16 @@
 from unittest import TestCase, main
 
 # Import from lpod
-from lpod.document import odf_get_document
+from lpod.const import ODF_CONTENT
 from lpod.content import odf_content
+from lpod.document import odf_get_document
 
 
 class ContentTestCase(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/base_text.odt')
-        self.content = document.get_part('content')
+        self.content = document.get_part(ODF_CONTENT)
 
 
     def test_get_content(self):

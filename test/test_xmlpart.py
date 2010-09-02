@@ -32,6 +32,7 @@ from unittest import TestCase, main
 from lxml.etree import _ElementTree
 
 # Import from lpod
+from lpod.const import ODF_CONTENT
 from lpod.container import odf_get_container
 from lpod.element import odf_create_element, odf_element
 from lpod.xmlpart import odf_xmlpart
@@ -48,7 +49,7 @@ class XmlPartTestCase(TestCase):
 
 
     def test_get_element_list(self):
-        content_part = odf_xmlpart('content', self.container)
+        content_part = odf_xmlpart(ODF_CONTENT, self.container)
         elements = content_part.get_elements('//text:p')
         # The annotation paragraph is counted
         self.assertEqual(len(elements), 8)
@@ -56,14 +57,14 @@ class XmlPartTestCase(TestCase):
 
     def test_tree(self):
         # Testing a private but important method
-        content = odf_xmlpart('content', self.container)
+        content = odf_xmlpart(ODF_CONTENT, self.container)
         tree = content._odf_xmlpart__get_tree()
         self.assert_(isinstance(tree, _ElementTree))
         self.assertNotEqual(content._odf_xmlpart__tree, None)
 
 
     def test_root(self):
-        content = odf_xmlpart('content', self.container)
+        content = odf_xmlpart(ODF_CONTENT, self.container)
         root = content.get_root()
         self.assert_(isinstance(root, odf_element))
         self.assertEqual(root.get_tag(), "office:document-content")
@@ -72,8 +73,8 @@ class XmlPartTestCase(TestCase):
 
     def test_serialize(self):
         container = self.container
-        content_bytes = container.get_part('content')
-        content_part = odf_xmlpart('content', container)
+        content_bytes = container.get_part(ODF_CONTENT)
+        content_part = odf_xmlpart(ODF_CONTENT, container)
         # differences with lxml
         serialized = content_part.serialize().replace("'", "&apos;")
         # XXX OOo is adding two carriage returns behind the XML declaration
@@ -97,7 +98,7 @@ class XmlPartTestCase(TestCase):
         # Testing that the clone works on subclasses too
         from lpod.content import odf_content
         container = self.container
-        content = odf_content('content', container)
+        content = odf_content(ODF_CONTENT, container)
         clone = content.clone()
         self.assertEqual(clone.part_name, content.part_name)
         self.assertNotEqual(id(container), id(clone.container))
@@ -106,7 +107,7 @@ class XmlPartTestCase(TestCase):
 
     def test_delete(self):
         container = self.container
-        content = odf_xmlpart('content', container)
+        content = odf_xmlpart(ODF_CONTENT, container)
         paragraphs = content.get_elements('//text:p')
         for paragraph in paragraphs:
             content.delete_element(paragraph)

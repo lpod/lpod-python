@@ -33,7 +33,7 @@ from os.path import splitext, join, dirname, exists, isabs
 from sys import exit
 
 # Import from lpod
-from lpod import __version__
+from lpod import __version__, ODF_META
 from lpod.const import ODF_EXTENSIONS
 from lpod.datatype import Unit
 from lpod.document import odf_get_document, odf_new_document, odf_document
@@ -104,7 +104,7 @@ def get_string(value, encoding):
 
 
 def write_presentation_header(indoc, outdoc, encoding):
-    meta = indoc.get_part('meta')
+    meta = indoc.get_part(ODF_META)
     lang = meta.get_language() or ''
     description = get_string(meta.get_description(), encoding)
     subject = get_string(meta.get_subject(), encoding)

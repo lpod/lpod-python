@@ -29,6 +29,7 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.const import ODF_CONTENT
 from lpod.document import odf_get_document
 from lpod.list import odf_create_list, odf_create_list_item
 from lpod.utils import convert_unicode
@@ -38,7 +39,7 @@ class TestList(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/list.odt')
-        self.content = document.get_part('content')
+        self.content = document.get_part(ODF_CONTENT)
 
 
     def tearDown(self):

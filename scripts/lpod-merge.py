@@ -32,7 +32,7 @@ from os.path import basename, splitext, exists
 from sys import exit, stdout
 
 # Import from lpod
-from lpod import __version__
+from lpod import __version__, ODF_MANIFEST
 from lpod.const import ODF_TEXT, ODF_SPREADSHEET, ODF_PRESENTATION
 from lpod.document import odf_new_document, odf_get_document
 from lpod.element import FIRST_CHILD
@@ -65,8 +65,8 @@ def init_doc(filename, mimetype):
 
 def _add_pictures(document, output_doc):
     # Copy extra parts (images...)
-    manifest = output_doc.get_part('manifest')
-    document_manifest = document.get_part('manifest')
+    manifest = output_doc.get_part(ODF_MANIFEST)
+    document_manifest = document.get_part(ODF_MANIFEST)
     for partname in document.get_parts():
         if partname.startswith('Pictures/'):
             data = document.get_part(partname)

@@ -241,10 +241,19 @@ document:
     Before                         After
     -----------------------------  ----------------------
     get_xmlpart                    get_part
-    get_content                    get_part('content')
-    get_meta                       get_part('meta')
-    get_styles                     get_part('styles')
-    get_manifest                   get_part('manifest')
+    get_content                    get_part(ODF_CONTENT)
+    get_meta                       get_part(ODF_META)
+    get_styles                     get_part(ODF_STYLES)
+    get_manifest                   get_part(ODF_MANIFEST)
+    get_part('settings')           get_part(ODF_SETTINGS)
+
+    with:
+
+      from lpod import ODF_CONTENT, ...
+
+    acces by filename is also possible:
+
+      content = document.get_part('content.xml')
 
 
 container:

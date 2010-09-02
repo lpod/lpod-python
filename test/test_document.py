@@ -34,7 +34,8 @@ from unittest import TestCase, main
 from urllib2 import urlopen
 
 # Import from lpod
-from lpod.const import ODF_EXTENSIONS
+from lpod.const import ODF_EXTENSIONS, ODF_CONTENT, ODF_MANIFEST, ODF_META
+from lpod.const import ODF_STYLES
 from lpod.content import odf_content
 from lpod.document import odf_new_document, odf_get_document
 from lpod.manifest import odf_manifest
@@ -73,7 +74,7 @@ class NewDocumentFromTemplateTestCase(TestCase):
         document = odf_new_document(path)
         mimetype = document.get_part('mimetype')
         self.assertFalse('template' in mimetype)
-        manifest = document.get_part('manifest')
+        manifest = document.get_part(ODF_MANIFEST)
         media_type = manifest.get_media_type('/')
         self.assertFalse('template' in media_type)
 
@@ -147,22 +148,22 @@ class DocumentTestCase(TestCase):
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
     def test_get_content(self):
-        content = self.document.get_part('content')
+        content = self.document.get_part(ODF_CONTENT)
         self.assert_(type(content) is odf_content)
 
 
     def test_get_meta(self):
-        meta = self.document.get_part('meta')
+        meta = self.document.get_part(ODF_META)
         self.assert_(type(meta) is odf_meta)
 
 
     def test_get_styles(self):
-        styles = self.document.get_part('styles')
+        styles = self.document.get_part(ODF_STYLES)
         self.assert_(type(styles) is odf_styles)
 
 
     def test_get_manifest(self):
-        manifest = self.document.get_part('manifest')
+        manifest = self.document.get_part(ODF_MANIFEST)
         self.assert_(type(manifest) is odf_manifest)
 
 
@@ -173,13 +174,13 @@ class DocumentTestCase(TestCase):
 
     def test_clone(self):
         document = self.document
-        document.get_part('content')
+        document.get_part(ODF_CONTENT)
         self.assertNotEqual(document._odf_document__xmlparts, {})
         clone = document.clone()
         self.assertNotEqual(clone._odf_document__xmlparts, {})
         parts = clone._odf_document__xmlparts
         self.assertEqual(len(parts), 1)
-        self.assertEqual(parts.keys(), ['content'])
+        self.assertEqual(parts.keys(), ['content.xml'])
         container = clone.container
         self.assertEqual(container.path, None)
 
@@ -190,18 +191,18 @@ class DocumentTestCase(TestCase):
         document.save(temp)
         temp.seek(0)
         new = odf_get_document(temp)
-        generator = new.get_part('meta').get_generator()
+        generator = new.get_part(ODF_META).get_generator()
         self.assert_(generator.startswith(u"lpOD Python"))
 
 
     def test_save_generator(self):
         document = self.document.clone()
-        document.get_part('meta').set_generator(u"toto")
+        document.get_part(ODF_META).set_generator(u"toto")
         temp = StringIO()
         document.save(temp)
         temp.seek(0)
         new = odf_get_document(temp)
-        generator = new.get_part('meta').get_generator()
+        generator = new.get_part(ODF_META).get_generator()
         self.assertEqual(generator, u"toto")
 
 

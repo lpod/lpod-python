@@ -29,7 +29,7 @@ from optparse import OptionParser
 from sys import exit, stdin
 
 # Import from lpod
-from lpod import __version__
+from lpod import __version__, ODF_META
 from lpod.document import odf_get_document
 from lpod.datatype import Date, DateTime
 from lpod.scriptutils import printerr
@@ -37,7 +37,7 @@ from lpod.scriptutils import printerr
 
 
 def set_metadata(doc, set_list):
-    meta = doc.get_part('meta')
+    meta = doc.get_part(ODF_META)
     for set_info in set_list:
         if '=' not in set_info:
             printerr('Bad argument -s "%s" (must be "name=value")' % set_info)

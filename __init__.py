@@ -37,6 +37,10 @@ except:
 __installation_path__ = _get_abspath('')
 
 
+# Constants at the first level
+from const import *
+
+
 # Register element classes
 import draw_page
 import frame

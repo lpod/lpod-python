@@ -34,7 +34,7 @@ from urllib2 import HTTPBasicAuthHandler, build_opener
 from urlparse import urlsplit, urlunsplit
 
 # Import from lpod
-from lpod import __version__
+from lpod import __version__, ODF_META, ODF_STYLES, ODF_MANIFEST
 from lpod.document import odf_new_document, odf_get_document
 from lpod.draw_page import odf_create_draw_page
 from lpod.frame import odf_create_frame
@@ -94,11 +94,11 @@ if  __name__ == '__main__':
     check_target_file(target)
 
     output_document = odf_new_document('presentation')
-    output_meta = output_document.get_part('meta')
+    output_meta = output_document.get_part(ODF_META)
     output_meta.set_title(u"Interop Budapest Demo")
 
     # Styles
-    styles = output_document.get_part('styles')
+    styles = output_document.get_part(ODF_STYLES)
     first_master_page = styles.get_master_page()
     if first_master_page is None:
         raise ValueError, "no master page found"
@@ -137,7 +137,7 @@ if  __name__ == '__main__':
         page.append(title_frame)
         # Get info
         info = []
-        input_meta = input_document.get_part('meta')
+        input_meta = input_document.get_part(ODF_META)
         info.append(u"Title: %s" % input_meta.get_title())
         stats = input_meta.get_statistic()
         info.append(u"# pages: %s" % stats['meta:page-count'])
@@ -171,9 +171,9 @@ if  __name__ == '__main__':
             # XXX Quick & dirty
             output_href = "%s-1" % input_href
         output_document.set_part(output_href, part)
-        input_manifest = input_document.get_part('manifest')
+        input_manifest = input_document.get_part(ODF_MANIFEST)
         media_type = input_manifest.get_media_type(input_href)
-        output_manifest = output_document.get_part('manifest')
+        output_manifest = output_document.get_part(ODF_MANIFEST)
         output_manifest.add_full_path(output_href, media_type)
         graphic_frame = get_graphic_frame(first_master_page)
         graphic_frame.append(first_image)

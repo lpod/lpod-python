@@ -30,6 +30,7 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.const import ODF_STYLES
 from lpod.document import odf_get_document
 from lpod.style import odf_create_style
 from lpod.styles import hex2rgb, rgb2hex
@@ -116,7 +117,7 @@ class TestStyle(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/example.odt')
-        self.styles = document.get_part('styles')
+        self.styles = document.get_part(ODF_STYLES)
 
 
     def tearDown(self):

@@ -28,6 +28,7 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.const import ODF_CONTENT
 from lpod.container import odf_get_container
 from lpod.document import odf_get_document
 from lpod.style import odf_create_style, odf_style
@@ -145,7 +146,7 @@ class TestStyle(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/span_style.odt')
-        self.content = document.get_part('content')
+        self.content = document.get_part(ODF_CONTENT)
 
 
     def test_get_style_list(self):
@@ -187,7 +188,7 @@ class StylePropertiesTestCase(TestCase):
 
     def setUp(self):
         self.container = container = odf_get_container('samples/example.odt')
-        self.content_part = content_part = odf_xmlpart('content', container)
+        self.content_part = content_part = odf_xmlpart(ODF_CONTENT, container)
         self.paragraph_element = content_part.get_element('//text:p[1]')
         query = '//style:style[@style:family="paragraph"][1]'
         self.style_element = content_part.get_element(query)

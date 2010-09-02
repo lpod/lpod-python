@@ -35,7 +35,8 @@ from uuid import uuid4
 
 # Import from lpod
 from __init__ import __version__
-from const import ODF_PARTS
+from const import ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES
+from const import ODF_MANIFEST
 from container import odf_get_container, odf_new_container, odf_container
 from content import odf_content
 from manifest import odf_manifest
@@ -87,6 +88,25 @@ def _show_styles(element, level=0):
 
 
 
+# Transition to real path of XML parts
+def _get_part_path(path):
+    return {'content': ODF_CONTENT,
+            'meta': ODF_META,
+            'settings': ODF_SETTINGS,
+            'styles': ODF_STYLES,
+            'manifest': ODF_MANIFEST}.get(path, path)
+
+
+
+def _get_part_class(path):
+    return {ODF_CONTENT: odf_content,
+            ODF_META: odf_meta,
+            ODF_SETTINGS: odf_xmlpart,
+            ODF_STYLES: odf_styles,
+            ODF_MANIFEST: odf_manifest}.get(path)
+
+
+
 class odf_document(object):
     """Abstraction of the ODF document.
     """
@@ -112,53 +132,55 @@ class odf_document(object):
         return self.container.get_parts()
 
 
-    def get_part(self, name):
-        """Return the bytes of the given part. The name includes the
-        path inside the archive, e.g.
-        "Pictures/100000000000032000000258912EB1C3.jpg"
+    def get_part(self, path):
+        """Return the bytes of the given part. The path is relative to the
+        archive, e.g. "Pictures/100000000000032000000258912EB1C3.jpg".
 
-        "content", "meta", "settings", "styles" and "manifest" are special
-        names that return the dedicated object with its API.
+        "content", "meta", "settings", "styles" and "manifest" are shortcuts
+        to the real path, e.g. content.xml, and return a dedicated object with
+        its own API.
         """
         # "./ObjectReplacements/Object 1"
-        name = name.lstrip('./')
-        # XML part?
-        if name in ODF_PARTS or name == 'manifest':
-            xmlparts = self.__xmlparts
-            part = xmlparts.get(name)
-            if part is None:
-                cls = {'content': odf_content,
-                        'meta': odf_meta,
-                        'styles': odf_styles,
-                        'manifest': odf_manifest}.get(name, odf_xmlpart)
-                container = self.container
-                xmlparts[name] = part = cls(name, container)
-        else:
-            part = self.container.get_part(name)
+        path = path.lstrip('./')
+        path = _get_part_path(path)
+        cls = _get_part_class(path)
+        container = self.container
+        # Raw bytes
+        if cls is None:
+            return container.get_part(path)
+        # XML part
+        xmlparts = self.__xmlparts
+        part = xmlparts.get(path)
+        if part is None:
+            xmlparts[path] = part = cls(path, container)
         return part
 
-    get_content = obsolete('get_content', get_part, 'content')
-    get_meta = obsolete('get_meta', get_part, 'meta')
-    get_styles = obsolete('get_styles', get_part, 'styles')
-    get_manifest = obsolete('get_manifest', get_part, 'manifest')
+    get_content = obsolete('get_content', get_part, ODF_CONTENT)
+    get_meta = obsolete('get_meta', get_part, ODF_META)
+    get_styles = obsolete('get_styles', get_part, ODF_STYLES)
+    get_manifest = obsolete('get_manifest', get_part, ODF_MANIFEST)
 
 
-    def set_part(self, name, data):
-        """Set the bytes of the given part. The name includes the
-        path inside the archive, e.g.
-        "Pictures/100000000000032000000258912EB1C3.jpg"
+    def set_part(self, path, data):
+        """Set the bytes of the given part. The path is relative to the
+        archive, e.g. "Pictures/100000000000032000000258912EB1C3.jpg".
         """
         # "./ObjectReplacements/Object 1"
-        name = name.lstrip('./')
-        if name in ODF_PARTS or name == 'manifest':
-            del self.__xmlparts[name]
-        return self.container.set_part(name, data)
+        path = path.lstrip('./')
+        path = _get_part_path(path)
+        cls = _get_part_class(path)
+        # XML part overwritten
+        if cls is not None:
+            del self.__xmlparts[path]
+        return self.container.set_part(path, data)
 
 
-    def del_part(self, name):
-        if name in ODF_PARTS or name == 'manifest':
-            raise ValueError, "these parts are mandatory"
-        return self.container.del_part(name)
+    def del_part(self, path):
+        path = _get_part_path(path)
+        cls = _get_part_class(path)
+        if path == ODF_MANIFEST or cls is not None:
+            raise ValueError, 'part "%s" is mandatory' % path
+        return self.container.del_part(path)
 
 
     def get_mimetype(self):
@@ -187,7 +209,7 @@ class odf_document(object):
         is inserted.
         """
         if self.__body is None:
-            content = self.get_part('content')
+            content = self.get_part(ODF_CONTENT)
             self.__body = content.get_body()
         return self.__body
 
@@ -262,7 +284,7 @@ class odf_document(object):
     def get_formated_meta(self):
         result = []
 
-        meta = self.get_part('meta')
+        meta = self.get_part(ODF_META)
 
         # Simple values
         def print_info(name, value):
@@ -330,7 +352,7 @@ class odf_document(object):
             name = uuid + extension.lower()
             media_type, encoding = guess_type(name)
         # Folder for added files (FIXME hard-coded and copied)
-        manifest = self.get_part('manifest')
+        manifest = self.get_part(ODF_MANIFEST)
         if manifest.get_media_type('Pictures/') is None:
             manifest.add_full_path('Pictures/')
         full_path = 'Pictures/%s' % (name)
@@ -378,14 +400,14 @@ class odf_document(object):
             pretty -- bool
         """
         # Some advertising
-        meta = self.get_part('meta')
+        meta = self.get_part(ODF_META)
         if not meta._generator_modified:
             meta.set_generator(u"lpOD Python %s" % __version__)
         # Synchronize data with container
         container = self.container
-        for name, part in self.__xmlparts.iteritems():
+        for path, part in self.__xmlparts.iteritems():
             if part is not None:
-                container.set_part(name, part.serialize(pretty))
+                container.set_part(path, part.serialize(pretty))
         # Save the container
         container.save(target, packaging)
 
@@ -396,8 +418,8 @@ class odf_document(object):
 
     # TODO rename to get_styles in next version
     def get_style_list(self, family=None, automatic=False):
-        content = self.get_part('content')
-        styles = self.get_part('styles')
+        content = self.get_part(ODF_CONTENT)
+        styles = self.get_part(ODF_STYLES)
         return (content.get_styles(family=family)
                 + styles.get_styles(family=family, automatic=automatic))
 
@@ -423,13 +445,13 @@ class odf_document(object):
         Return: odf_style or None if not found.
         """
         # 1. content.xml
-        content = self.get_part('content')
+        content = self.get_part(ODF_CONTENT)
         element = content.get_style(family, name_or_element=name_or_element,
                 display_name=display_name)
         if element is not None:
             return element
         # 2. styles.xml
-        styles = self.get_part('styles')
+        styles = self.get_part(ODF_STYLES)
         return styles.get_style(family, name_or_element=name_or_element,
                 display_name=display_name)
 
@@ -473,26 +495,26 @@ class odf_document(object):
 
         # Master page style
         if isinstance(style, odf_master_page):
-            part = self.get_part('styles')
+            part = self.get_part(ODF_STYLES)
             container = part.get_element("office:master-styles")
             existing = part.get_style(family, name)
         # Font face declarations
         elif isinstance(style, odf_font_style):
             # XXX If inserted in styles.xml => It doesn't work, it's normal?
-            part = self.get_part('content')
+            part = self.get_part(ODF_CONTENT)
             container = part.get_element("office:font-face-decls")
             existing = part.get_style(family, name)
         # Common style
         elif isinstance(style, odf_style):
             # Common style
             if name and automatic is False and default is False:
-                part = self.get_part('styles')
+                part = self.get_part(ODF_STYLES)
                 container = part.get_element("office:styles")
                 existing = part.get_style(family, name)
 
             # Automatic style
             elif automatic is True and default is False:
-                part = self.get_part('content')
+                part = self.get_part(ODF_CONTENT)
                 container = part.get_element("office:automatic-styles")
 
                 # A name ?
@@ -520,7 +542,7 @@ class odf_document(object):
 
             # Default style
             elif automatic is False and default is True:
-                part = self.get_part('styles')
+                part = self.get_part(ODF_STYLES)
                 container = part.get_element("office:styles")
 
                 # Force default style
@@ -553,9 +575,9 @@ class odf_document(object):
 
         Return: list
         """
-        content = self.get_part('content')
+        content = self.get_part(ODF_CONTENT)
         # Header, footer, etc. have styles too
-        styles = self.get_part('styles')
+        styles = self.get_part(ODF_STYLES)
         return (content.get_root().get_styled_elements(name)
                 + styles.get_root().get_styled_elements(name))
 
@@ -635,10 +657,10 @@ class odf_document(object):
         Styles with the same type and name will be replaced, so only unique
         styles will be preserved.
         """
-        styles = self.get_part('styles')
-        content = self.get_part('content')
-        manifest = self.get_part('manifest')
-        document_manifest = document.get_part('manifest')
+        styles = self.get_part(ODF_STYLES)
+        content = self.get_part(ODF_CONTENT)
+        manifest = self.get_part(ODF_MANIFEST)
+        document_manifest = document.get_part(ODF_MANIFEST)
         for style in document.get_style_list():
             tagname = style.get_tag()
             family = style.get_family()

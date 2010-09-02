@@ -29,6 +29,7 @@
 from unittest import TestCase, main
 
 # Import from lpod
+from lpod.const import ODF_CONTENT
 from lpod.document import odf_get_document
 from lpod.draw_page import odf_create_draw_page
 from lpod.paragraph import odf_create_paragraph
@@ -41,7 +42,7 @@ class TestShapes(TestCase):
 
     def setUp(self):
         self.document = document = odf_get_document('samples/base_shapes.odg')
-        self.content = document.get_part('content')
+        self.content = document.get_part(ODF_CONTENT)
 
 
     def tearDown(self):

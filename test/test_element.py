@@ -30,6 +30,7 @@ from unittest import TestCase, main
 from re import compile
 
 # Import from lpod
+from lpod.const import ODF_CONTENT
 from lpod.container import odf_get_container
 from lpod.element import register_element_class, odf_create_element
 from lpod.element import odf_element, FIRST_CHILD, NEXT_SIBLING, PREV_SIBLING
@@ -61,7 +62,7 @@ class ElementTestCase(TestCase):
     def setUp(self):
         container = odf_get_container('samples/example.odt')
         self.container = container
-        self.content_part = content_part = odf_xmlpart('content', container)
+        self.content_part = content_part = odf_xmlpart(ODF_CONTENT, container)
         self.paragraph_element = content_part.get_element('//text:p[1]')
         self.annotation_element = (
                 content_part.get_element('//office:annotation[1]'))
@@ -139,7 +140,7 @@ class ElementAttributeTestCase(TestCase):
     def setUp(self):
         container = odf_get_container('samples/example.odt')
         self.container = container
-        content_part = odf_xmlpart('content', container)
+        content_part = odf_xmlpart(ODF_CONTENT, container)
         self.paragraph_element = content_part.get_element('//text:p[1]')
 
 
@@ -214,7 +215,7 @@ class ElementTextTestCase(TestCase):
     def setUp(self):
         container = odf_get_container('samples/example.odt')
         self.container = container
-        content_part = odf_xmlpart('content', container)
+        content_part = odf_xmlpart(ODF_CONTENT, container)
         self.annotation_element = (
                 content_part.get_element('//office:annotation[1]'))
         self.paragraph_element = content_part.get_element('//text:p[1]')
@@ -267,7 +268,7 @@ class ElementTraverseTestCase(TestCase):
     def setUp(self):
         container = odf_get_container('samples/example.odt')
         self.container = container
-        self.content_part = content_part = odf_xmlpart('content', container)
+        self.content_part = content_part = odf_xmlpart(ODF_CONTENT, container)
         self.annotation_element = (
                 content_part.get_element('//office:annotation[1]'))
         self.paragraph_element = content_part.get_element('//text:p[1]')
@@ -353,7 +354,7 @@ class SearchTestCase(TestCase):
 
     def setUp(self):
         self.container = odf_get_container('samples/span_style.odt')
-        self.content = odf_xmlpart('content', self.container)
+        self.content = odf_xmlpart(ODF_CONTENT, self.container)
         self.paragraph = self.content.get_element('//text:p')
         self.span = self.paragraph.get_element('//text:span')
 
@@ -422,7 +423,7 @@ class MatchTestCase(TestCase):
 
     def setUp(self):
         self.container = odf_get_container('samples/span_style.odt')
-        self.content = odf_xmlpart('content', self.container)
+        self.content = odf_xmlpart(ODF_CONTENT, self.container)
         self.paragraph = self.content.get_element('//text:p')
         self.span = self.paragraph.get_element('//text:span')
 
@@ -491,7 +492,7 @@ class ReplaceTestCase(TestCase):
 
     def setUp(self):
         self.container = odf_get_container('samples/span_style.odt')
-        self.content = odf_xmlpart('content', self.container)
+        self.content = odf_xmlpart(ODF_CONTENT, self.container)
         self.paragraph = self.content.get_element('//text:p')
         self.span = self.paragraph.get_element('//text:span')
 

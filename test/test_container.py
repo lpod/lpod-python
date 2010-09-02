@@ -35,7 +35,7 @@ from unittest import TestCase, main
 from urllib import urlopen
 
 # Import from lpod
-from lpod.const import ODF_EXTENSIONS
+from lpod.const import ODF_EXTENSIONS, ODF_CONTENT, ODF_META
 from lpod.container import odf_get_container, odf_new_container
 
 
@@ -152,7 +152,7 @@ class ContainerTestCase(TestCase):
 
     def test_get_part_xml(self):
         container = odf_get_container('samples/example.odt')
-        content = container.get_part('content')
+        content = container.get_part(ODF_CONTENT)
         self.assert_('<office:document-content' in content)
 
 
