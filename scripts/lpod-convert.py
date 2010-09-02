@@ -297,15 +297,26 @@ def write_presentation_list(liste, outdoc, encoding):
     outdoc.write('<ul>\n')
     for item in liste.get_children():
         tag = item.get_tag()
-        if tag != 'text:list-item':
+        if tag == 'text:list-header':
+            for child in item.get_children():
+                tag = child.get_tag()
+                if tag == 'text:list':
+                    write_presentation_list(child, outdoc, encoding)
+                elif tag == 'text:p':
+                    write_presentation_para(child, outdoc, encoding)
+                else:
+                    print item.serialize()
+                    raise NotImplementedError, tag
+            continue
+        elif tag != 'text:list-item':
             raise NotImplementedError, tag
         outdoc.write('<li>\n')
-        for element in item.get_children():
-            tag = element.get_tag()
+        for child in item.get_children():
+            tag = child.get_tag()
             if tag == 'text:list':
-                write_presentation_list(element, outdoc, encoding)
+                write_presentation_list(child, outdoc, encoding)
             elif tag == 'text:p':
-                write_presentation_para(element, outdoc, encoding)
+                write_presentation_para(child, outdoc, encoding)
             else:
                 print item.serialize()
                 raise NotImplementedError, tag
