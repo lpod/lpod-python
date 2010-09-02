@@ -111,7 +111,10 @@ if  __name__ == '__main__':
         if not scheme:
             file = open(filename)
         elif result.username:
-            netloc = '%s:%s' % (result.hostname, result.port)
+            if result.port:
+                netloc = '%s:%s' % (result.hostname, result.port)
+            else:
+                netloc = result.hostname
             url = urlunsplit((scheme, netloc, result.path, result.query,
                 result.fragment))
             password_mgr = HTTPPasswordMgrWithDefaultRealm()
