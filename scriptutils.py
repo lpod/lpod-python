@@ -91,7 +91,7 @@ def printwarn(*args, **kw):
     printinfo("Warning:", *args, **kw)
 
 
-def printerr(indent=0, *args, **kw):
+def printerr(*args, **kw):
     printinfo("Error:", *args, **kw)
 
 
