@@ -62,10 +62,10 @@ def spreadsheet_to_text(indoc, outdoc):
         for column in intable.traverse_columns():
             outtable.append(column)
         # Rows
-        for inrow in intable.traverse_rows():
+        for inrow in intable.traverse():
             outrow = odf_create_row(style=inrow.get_style())
             # Cells
-            for cell in inrow.traverse_cells():
+            for cell in inrow.traverse():
                 # Formula
                 formula = cell.get_formula()
                 if formula is not None:
