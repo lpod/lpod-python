@@ -168,21 +168,23 @@ def odf_create_undividable_space(number=1):
 
 
 
-def odf_create_paragraph(text=None, style=None):
+def odf_create_paragraph(text_or_element=None, style=None):
     """Create a paragraph element of the given style containing the optional
     given text.
 
     Arguments:
 
-        style -- unicode
+        text -- unicode or odf_element
 
-        text -- unicode
+        style -- unicode
 
     Return: odf_element
     """
     paragraph = odf_create_element('text:p')
-    if text is not None:
-        paragraph.set_text(text)
+    if isinstance(text_or_element, odf_element):
+        paragraph.append(text_or_element)
+    else:
+        paragraph.set_text(text_or_element)
     if style is not None:
         paragraph.set_style(style)
     return paragraph
