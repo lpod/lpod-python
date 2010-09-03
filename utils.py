@@ -492,6 +492,8 @@ def obsolete(old_name, new_func, *args, **kw):
 
 
 def isiterable(obj):
+    if isinstance(obj, basestring):
+        return False
     try:
         iter(obj)
     except TypeError:
