@@ -693,19 +693,19 @@ class odf_document(object):
             if tagname == 'style:master-page':
                 query = 'descendant::draw:image'
                 for image in style.get_elements(query):
-                    href = image.get_href()
-                    part = document.get_part(href)
+                    url = image.get_url()
+                    part = document.get_part(url)
                     # Manually add the part to keep the name
-                    self.set_part(href, part)
-                    media_type = document_manifest.get_media_type(href)
-                    manifest.add_full_path(href, media_type)
+                    self.set_part(url, part)
+                    media_type = document_manifest.get_media_type(url)
+                    manifest.add_full_path(url, media_type)
             # Copy images from the fill-image
             elif tagname == 'draw:fill-image':
-                href = style.get_href()
-                part = document.get_part(href)
-                self.set_part(href, part)
-                media_type = document_manifest.get_media_type(href)
-                manifest.add_full_path(href, media_type)
+                url = style.get_url()
+                part = document.get_part(url)
+                self.set_part(url, part)
+                media_type = document_manifest.get_media_type(url)
+                manifest.add_full_path(url, media_type)
 
 
 

@@ -291,7 +291,7 @@ class StyleBackgroundTestCase(TestCase):
 
     def test_image(self):
         style = self.style.clone()
-        style.set_background(uri='Pictures/toto')
+        style.set_background(url='Pictures/toto')
         expected = ('<style:style style:family="paragraph">'
                       '<style:paragraph-properties '
                         'fo:background-color="transparent">'
@@ -305,7 +305,7 @@ class StyleBackgroundTestCase(TestCase):
 
     def test_image_full(self):
         style = self.style.clone()
-        style.set_background(uri='Pictures/toto', position='top left',
+        style.set_background(url='Pictures/toto', position='top left',
                              repeat='no-repeat', opacity=50,
                              filter='myfilter')
         expected = ('<style:style style:family="paragraph">'
@@ -361,7 +361,7 @@ class LevelStyleTestCase(TestCase):
 
 
     def test_set_level_style_image(self):
-        level_style = self.style.set_level_style(3, uri='bullet.png')
+        level_style = self.style.set_level_style(3, url='bullet.png')
         self.assert_(type(level_style) is odf_style)
         expected = ('<text:list-level-style-image '
                       'text:level="3" xlink:href="bullet.png"/>')

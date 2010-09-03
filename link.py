@@ -29,13 +29,13 @@ from element import odf_create_element, register_element_class
 from paragraph import odf_paragraph
 
 
-def odf_create_link(href, name=None, title=None, target_frame=None,
-                    style=None, visited_style=None):
+def odf_create_link(url, name=None, title=None, target_frame=None, style=None,
+        visited_style=None):
     """Return a text:a odf_element.
 
     Arguments:
 
-        href -- string (an URI)
+        url -- str
 
         name -- unicode
 
@@ -47,23 +47,23 @@ def odf_create_link(href, name=None, title=None, target_frame=None,
 
         visited_style -- string
     """
-    element = odf_create_element('text:a')
-    element.set_attribute('xlink:href', href)
+    link = odf_create_element('text:a')
+    link.set_url(url)
     if name is not None:
-        element.set_name(name)
+        link.set_name(name)
     if title is not None:
-        element.set_title(title)
+        link.set_title(title)
     if target_frame is not None:
-        element.set_target_frame(target_frame)
+        link.set_target_frame(target_frame)
         if target_frame == '_blank':
-            element.set_show('new')
+            link.set_show('new')
         else:
-            element.set_show('replace')
+            link.set_show('replace')
     if style is not None:
-        element.set_style(style)
+        link.set_style(style)
     if visited_style is not None:
-        element.set_visited_style(visited_style)
-    return element
+        link.set_visited_style(visited_style)
+    return link
 
 
 
@@ -75,6 +75,13 @@ class odf_link(odf_paragraph):
 
     def set_name(self, name):
         return self.set_attribute('office:name', name)
+
+    def get_url(self):
+        return self.get_attribute('xlink:href')
+
+
+    def set_url(self, url):
+        return self.set_attribute('xlink:href', url)
 
 
     def get_title(self):

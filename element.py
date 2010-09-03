@@ -562,7 +562,10 @@ class odf_element(object):
     def set_text(self, text):
         """Set the text content of the element.
         """
-        self.__element.text = text
+        try:
+            self.__element.text = text
+        except TypeError:
+            raise TypeError, 'unicode expected, not "%s"' % type(text)
 
 
     def get_tail(self):
@@ -1208,26 +1211,26 @@ class odf_element(object):
     # Images
     #
 
-    def get_images(self, style=None, href=None, content=None):
+    def get_images(self, style=None, url=None, content=None):
         """Return all the sections that match the criteria.
 
         Arguments:
 
             style -- str
 
-            href -- unicode regex
+            url -- unicode regex
 
             content -- unicode regex
 
         Return: list of odf_element
         """
         return _get_elements(self, 'descendant::draw:image', text_style=style,
-                href=href, content=content)
+                url=url, content=content)
 
     get_image_list = obsolete('get_image_list', get_images)
 
 
-    def get_image(self, position=0, name=None, href=None, content=None):
+    def get_image(self, position=0, name=None, url=None, content=None):
         """Return the image that matches the criteria.
 
         Arguments:
@@ -1247,7 +1250,7 @@ class odf_element(object):
             # The name is supposedly unique
             return frame.get_element('draw:image')
         return _get_element(self, 'descendant::draw:image', position,
-                href=href, content=content)
+                url=url, content=content)
 
 
     #
@@ -1580,7 +1583,7 @@ class odf_element(object):
     # Links
     #
 
-    def get_links(self, name=None, title=None, href=None, content=None):
+    def get_links(self, name=None, title=None, url=None, content=None):
         """Return all the links that match the criteria.
 
         Arguments:
@@ -1589,19 +1592,19 @@ class odf_element(object):
 
             title -- unicode
 
-            href -- unicode regex
+            url -- unicode regex
 
             content -- unicode regex
 
         Return: list of odf_element
         """
         return _get_elements(self, 'descendant::text:a', office_name=name,
-                office_title=title, href=href, content=content)
+                office_title=title, url=url, content=content)
 
     get_link_list = obsolete('get_link_list', get_links)
 
 
-    def get_link(self, position=0, name=None, title=None, href=None,
+    def get_link(self, position=0, name=None, title=None, url=None,
             content=None):
         """Return the link that matches the criteria.
 
@@ -1613,14 +1616,14 @@ class odf_element(object):
 
             title -- unicode
 
-            href -- unicode regex
+            url -- unicode regex
 
             content -- unicode regex
 
         Return: odf_element or None if not found
         """
         return _get_element(self, 'descendant::text:a', position,
-                office_name=name, office_title=title, href=href,
+                office_name=name, office_title=title, url=url,
                 content=content)
 
 

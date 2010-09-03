@@ -219,7 +219,7 @@ def write_presentation_image(frame, indoc, outdoc, encoding):
                 href = get_string(href, encoding)
                 outdoc.write('  <a href="%s">' % href)
     image = frame.get_image()
-    src = get_string(image.get_href(), encoding)
+    src = get_string(image.get_url(), encoding)
     src = src.lstrip('./')
     if not isabs(src):
         f = open(make_image_path(outdoc, src), 'wb')

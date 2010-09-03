@@ -180,12 +180,12 @@ def odf_create_paragraph(text=None, style=None):
 
     Return: odf_element
     """
-    element = odf_create_element('text:p')
-    if text:
-        element.set_text(text)
-    if style:
-        element.set_style(style)
-    return element
+    paragraph = odf_create_element('text:p')
+    if text is not None:
+        paragraph.set_text(text)
+    if style is not None:
+        paragraph.set_style(style)
+    return paragraph
 
 
 

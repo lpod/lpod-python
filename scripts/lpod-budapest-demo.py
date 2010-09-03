@@ -161,7 +161,7 @@ if  __name__ == '__main__':
         if first_image is None:
             printwarn('no image found in "%s"' % filename, indent=2)
             continue
-        input_href = first_image.get_href()
+        input_href = first_image.get_url()
         part = input_document.get_part(input_href)
         try:
             output_document.get_part(input_href)

@@ -72,7 +72,7 @@ class TestImage(TestCase):
 
     def test_get_image_by_path(self):
         body = self.body
-        element = body.get_image(href='.png')
+        element = body.get_image(url='.png')
         self.assertEqual(element.get_attribute('xlink:href'), self.path)
 
 

@@ -324,7 +324,7 @@ class odf_style(odf_element):
             element.del_attribute(key)
 
 
-    def set_background(self, color=None, uri=None, position='center',
+    def set_background(self, color=None, url=None, position='center',
                        repeat=None, opacity=None, filter=None):
         """Set the background color of a text style, or the background color
         or image of a paragraph style or page layout.
@@ -347,7 +347,7 @@ class odf_style(odf_element):
 
             color -- '#rrggbb'
 
-            uri -- str
+            url -- str
 
             position -- str
 
@@ -361,7 +361,7 @@ class odf_style(odf_element):
         if family not in ('text', 'paragraph', 'page-layout', 'section',
                           'table', 'table-row', 'table-cell', 'graphic'):
             raise TypeError, 'no background support for this family'
-        if uri is not None and family == 'text':
+        if url is not None and family == 'text':
             raise TypeError, 'no background image for text styles'
         properties = self.get_element('style:%s-properties' % family)
         if properties is None:
@@ -369,7 +369,7 @@ class odf_style(odf_element):
         else:
             bg_image = properties.get_element('style:background-image')
         # Erasing
-        if color is None and uri is None:
+        if color is None and url is None:
             if properties is None:
                 return
             properties.del_attribute('fo:background-color')
@@ -386,12 +386,12 @@ class odf_style(odf_element):
             if bg_image is not None:
                 properties.delete(bg_image)
         # ... or the background
-        elif uri:
+        elif url:
             properties.set_attribute('fo:background-color', 'transparent')
             if bg_image is None:
                 bg_image = odf_create_element('style:background-image')
                 properties.append(bg_image)
-            bg_image.set_href(uri)
+            bg_image.set_url(url)
             if position:
                 bg_image.set_position(position)
             if repeat:
@@ -428,7 +428,7 @@ class odf_list_style(odf_style):
 
 
     def set_level_style(self, level, num_format=None, bullet_char=None,
-            uri=None, display_levels=None, prefix=None, suffix=None,
+            url=None, display_levels=None, prefix=None, suffix=None,
             start_value=None, style=None, clone=None):
         """
         Arguments:
@@ -439,7 +439,7 @@ class odf_list_style(odf_style):
 
             bullet_char (for bullet) -- unicode
 
-            uri (for image) -- str
+            url (for image) -- str
 
             display_levels -- int
 
@@ -461,7 +461,7 @@ class odf_list_style(odf_style):
             level_style_name = 'text:list-level-style-number'
         elif bullet_char is not None:
             level_style_name = 'text:list-level-style-bullet'
-        elif uri is not None:
+        elif url is not None:
             level_style_name = 'text:list-level-style-image'
         elif clone is not None:
             level_style_name = clone.get_tag()
@@ -487,8 +487,8 @@ class odf_list_style(odf_style):
             level_style.set_attribute('fo:num-format', num_format)
         elif bullet_char is not None:
             level_style.set_attribute('text:bullet-char', bullet_char)
-        elif uri is not None:
-            level_style.set_attribute('xlink:href', uri)
+        elif url is not None:
+            level_style.set_attribute('xlink:href', url)
         # Set attributes
         if prefix:
             level_style.set_attribute('style:num-prefix', prefix)

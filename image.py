@@ -28,31 +28,31 @@
 from element import odf_create_element, odf_element, register_element_class
 
 
-def odf_create_image(uri):
-    """Create an image element showing the image at the given URI.
+def odf_create_image(url):
+    """Create an image element showing the image at the given URL.
 
     Warning: image elements must be stored in a frame.
 
     Arguments:
 
-        uri -- str
+        url -- str
 
     Return: odf_element
     """
-    element = odf_create_element('draw:image')
-    element.set_href(uri)
-    return element
+    image = odf_create_element('draw:image')
+    image.set_url(url)
+    return image
 
 
 
 class odf_image(odf_element):
 
-    def get_href(self):
+    def get_url(self):
         return self.get_attribute('xlink:href')
 
 
-    def set_href(self, href):
-        return self.set_attribute('xlink:href', href)
+    def set_url(self, url):
+        return self.set_attribute('xlink:href', url)
 
 
 

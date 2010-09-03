@@ -121,14 +121,14 @@ class TestLinks(TestCase):
         paragraph = self.paragraph
         paragraph.append(link1)
         paragraph.append(link2)
-        # href
-        elements = self.body.get_links(href=ur'\.com')
+        # url
+        elements = self.body.get_links(url=ur'\.com')
         self.assertEqual(len(elements), 2)
 
 
     def test_href_from_existing_document(self):
         body = self.body
-        links = body.get_links(href=ur'lpod')
+        links = body.get_links(url=ur'lpod')
         self.assertEqual(len(links), 1)
 
 
@@ -149,17 +149,17 @@ class TestLinks(TestCase):
 
     def test_get_link_by_href(self):
         body = self.body
-        link = body.get_link(href=ur'lpod')
-        href = link.get_attribute('xlink:href')
-        self.assertEqual(href, u'http://lpod-project.org/')
+        link = body.get_link(url=ur'lpod')
+        url = link.get_attribute('xlink:href')
+        self.assertEqual(url, u'http://lpod-project.org/')
 
 
     def test_get_link_by_path_context(self):
         body = self.body
         section2 = body.get_section(position=1)
-        link = section2.get_link(href=ur'\.org')
-        href = link.get_attribute('xlink:href')
-        self.assertEqual(href, u'http://lpod-project.org/')
+        link = section2.get_link(url=ur'\.org')
+        url = link.get_url()
+        self.assertEqual(url, u'http://lpod-project.org/')
 
 
     def test_get_link_list_not_found(self):

@@ -249,18 +249,18 @@ def _merge_dicts(d, *args, **kw):
 # Non-public yet useful helpers
 #
 
-def _get_elements(context, element_name, content=None, href=None,
+def _get_elements(context, element_name, content=None, url=None,
         svg_title=None, svg_desc=None, dc_creator=None, dc_date=None, **kw):
     query = _make_xpath_query(element_name, **kw)
     elements = context.get_elements(query)
     # Filter the elements with the regex (TODO use XPath)
     if content is not None:
         elements = [element for element in elements if element.match(content)]
-    if href is not None:
+    if url is not None:
         filtered = []
         for element in elements:
-            href_attr = element.get_attribute('xlink:href')
-            if search(href, href_attr) is not None:
+            url_attr = element.get_attribute('xlink:href')
+            if search(url, url_attr) is not None:
                 filtered.append(element)
         elements = filtered
     if dc_date is not None:
