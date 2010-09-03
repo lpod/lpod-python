@@ -488,3 +488,12 @@ def obsolete(old_name, new_func, *args, **kw):
         warn(message, category=DeprecationWarning)
         return new_func(*(dec_args + args), **dec_kw)
     return decorate
+
+
+
+def isiterable(obj):
+    try:
+        iter(obj)
+    except TypeError:
+        return False
+    return True

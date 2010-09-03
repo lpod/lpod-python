@@ -34,7 +34,7 @@ from textwrap import wrap
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
-from utils import get_value, _set_value_and_type, obsolete
+from utils import get_value, _set_value_and_type, obsolete, isiterable
 
 
 def _alpha_to_digit(alpha):
@@ -70,10 +70,10 @@ def _get_cell_coordinates(obj):
     """Translates "D3" to (3, 2) or return (1, 2) untouched.
     """
     # By (1, 2) ?
-    if isinstance(obj, (list, tuple)):
+    if isiterable(obj):
         return tuple(obj)
     # Or by 'B3' notation ?
-    if not isinstance(obj, (str, unicode)):
+    if not isinstance(obj, basestring):
         raise ValueError, 'bad coordinates type: "%s"' % type(obj)
     # First "B"
     alpha = ''
@@ -1225,7 +1225,7 @@ class odf_table(odf_element):
 
 
     def set_print_ranges(self, print_ranges):
-        if isinstance(print_ranges, (tuple, list)):
+        if isiterable(print_ranges):
             print_ranges = ' '.join(print_ranges)
         self.set_attribute('table:print-ranges', print_ranges)
 
@@ -2181,7 +2181,7 @@ class odf_table(odf_element):
             line = []
             for value in values:
                 # Also testing lxml.etree._ElementUnicodeResult
-                if isinstance(value, unicode):
+                if type(value) is unicode:
                     value = value.encode(encoding)
                 if type(value) is str:
                     value = value.strip()

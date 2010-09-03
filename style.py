@@ -29,7 +29,7 @@ from datatype import Boolean
 from element import register_element_class, odf_create_element, odf_element
 from image import odf_image
 from utils import _get_style_tagname, _expand_properties, _merge_dicts
-from utils import _get_element, obsolete
+from utils import _get_element, obsolete, isiterable
 
 
 def odf_create_style(family, name=None, display_name=None, parent=None,
@@ -570,7 +570,7 @@ class odf_master_page(odf_style):
             self.append(header_or_footer)
         else:
             header_or_footer.clear()
-        if not isinstance(text_or_element, (list, tuple)):
+        if not isiterable(text_or_element):
             # Already a header or footer?
             if (isinstance(text_or_element, odf_element)
                     and text_or_element.get_tag() == 'style:%s' % name):

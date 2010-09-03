@@ -781,29 +781,26 @@ class odf_element(object):
 
         # Unicode ?
         if isinstance(unicode_or_element, unicode):
-
             # Has children ?
             children = current.getchildren()
             if children:
                 # Append to tail of the last child
                 last_child = children[-1]
-
                 text = last_child.tail
                 text = text if text is not None else u""
                 text += unicode_or_element
-
                 last_child.tail = text
             else:
                 # Append to text of the element
                 text = current.text
-
                 text = text if text is not None else u""
                 text += unicode_or_element
-
                 current.text = text
-        # Element ?
-        else:
+        elif isinstance(unicode_or_element, odf_element):
             current.append(unicode_or_element.__element)
+        else:
+            raise TypeError, 'odf_element or unicode expected, not "%s"' % (
+                    type(unicode_or_element))
 
 
     def delete(self, child=None):

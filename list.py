@@ -31,7 +31,7 @@
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
 from paragraph import odf_create_paragraph
-from utils import _get_element, _get_elements, obsolete
+from utils import _get_element, _get_elements, obsolete, isiterable
 
 
 def odf_create_list_item(text_or_element=None):
@@ -134,7 +134,7 @@ class odf_list(odf_element):
 
 
     def set_header(self, text_or_element):
-        if not isinstance(text_or_element, (list, tuple)):
+        if not isiterable(text_or_element):
             text_or_element = [text_or_element]
         # Remove existing header
         for element in self.get_elements('text:p'):
