@@ -190,15 +190,15 @@ def odf_create_element(element_data):
     element_data = element_data.strip()
     if not element_data:
         raise ValueError, "element data is empty"
-    if '<' in element_data:
-        # XML fragment
-        data = ns_document_data % element_data
-        root = fromstring(data)
-        element = root[0]
-    else:
+    if '<' not in element_data:
         # Qualified name
-        uri, name = _decode_qname(element_data)
-        element = Element('{%s}%s' % (uri, name), nsmap=ODF_NAMESPACES)
+        # XXX don't build the element from scratch or lxml will pollute with
+        # repeated namespace declarations
+        element_data = '<%s/>' % element_data
+    # XML fragment
+    data = ns_document_data % element_data
+    root = fromstring(data)
+    element = root[0]
     return _make_odf_element(element)
 
 
