@@ -28,7 +28,7 @@
 from element import odf_create_element, odf_element, register_element_class
 
 
-def odf_create_image(url):
+def odf_create_image(url, type='simple', show='embed', actuate='onLoad'):
     """Create an image element showing the image at the given URL.
 
     Warning: image elements must be stored in a frame.
@@ -41,6 +41,9 @@ def odf_create_image(url):
     """
     image = odf_create_element('draw:image')
     image.set_url(url)
+    image.set_type(type)
+    image.set_show(show)
+    image.set_actuate(actuate)
     return image
 
 
@@ -53,6 +56,30 @@ class odf_image(odf_element):
 
     def set_url(self, url):
         return self.set_attribute('xlink:href', url)
+
+
+    def get_type(self):
+        return self.get_attribute('xlink:type')
+
+
+    def set_type(self, type):
+        return self.set_attribute('xlink:type', type)
+
+
+    def get_show(self):
+        return self.get_attribute('xlink:show')
+
+
+    def set_show(self, show):
+        return self.set_attribute('xlink:show', show)
+
+
+    def get_actuate(self):
+        return self.get_attribute('xlink:actuate')
+
+
+    def set_actuate(self, actuate):
+        return self.set_attribute('xlink:actuate', actuate)
 
 
 

@@ -26,17 +26,20 @@
 #
 
 # Import from lpod
-from image import odf_create_image
 from element import odf_create_element, odf_element, register_element_class
+from image import odf_create_image
 from paragraph import odf_create_paragraph
-from utils import obsolete
+from style import odf_create_style
+from utils import obsolete, isiterable
 
 
-def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type=None,
-        page_number=None, position=None, layer=None, presentation_class=None,
-        style=None, presentation_style=None):
-    """Create a frame element of the given size. If positioned by page, give
-    the page number and the x, y position.
+def odf_create_frame(name=None, draw_id=None, style=None, position=None,
+        size=('1cm', '1cm'), z_index=0, presentation_class=None,
+        anchor_type=None, page_number=None, layer=None,
+        presentation_style=None):
+    """Create a frame element of the given size. Position is relative to the
+    context the frame is inserted in. If positioned by page, give the page
+    number and the x, y position.
 
     Size is a (width, height) tuple and position is a (left, top) tuple; items
     are strings including the unit, e.g. ('10cm', '15cm').
@@ -48,42 +51,55 @@ def odf_create_frame(name=None, size=('1cm', '1cm'), anchor_type=None,
 
         name -- unicode
 
-        size -- (str, str)
-
-        anchor_type -- 'page', 'frame', 'paragraph' (default), 'char'
-                       or 'as-char'
-
-        page_number (anchor_type='page') -- int
-
-        position -- (str, str)
+        draw_id -- unicode
 
         style -- unicode
 
-    Return: odf_element
+        position -- (str, str)
+
+        size -- (str, str)
+
+        z_index -- int (default 0)
+
+        presentation_class -- unicode
+
+        anchor_type -- 'page', 'frame', 'paragraph', 'char' or 'as-char'
+
+        page_number (anchor_type='page') -- int
+
+        layer -- unicode
+
+        presentation_style -- unicode
+
+    Return: odf_frame
     """
-    element = odf_create_element('draw:frame')
-    element.set_size(size)
+    frame = odf_create_element('draw:frame')
+    frame.set_size(size)
+    frame.set_z_index(z_index)
     if name:
-        element.set_name(name)
+        frame.set_name(name)
+    if page_number:
+        frame.set_anchor_type('page', page_number=page_number)
     if anchor_type:
-        element.set_anchor_type(anchor_type, page_number=page_number)
+        frame.set_anchor_type(anchor_type)
     if position is not None:
-        element.set_position(position)
+        frame.set_position(position)
     if layer is not None:
-        element.set_layer(layer)
+        frame.set_layer(layer)
     if presentation_class is not None:
-        element.set_presentation_class(presentation_class)
+        frame.set_presentation_class(presentation_class)
     if style is not None:
-        element.set_style(style)
+        frame.set_style(style)
     if presentation_style is not None:
-        element.set_presentation_style(presentation_style)
-    return element
+        frame.set_presentation_style(presentation_style)
+    return frame
 
 
 
-def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
-        anchor_type=None, page_number=None, position=None, layer=None,
-        presentation_class=None, style=None):
+def odf_create_image_frame(url, text=None, name=None, draw_id=None,
+        style=None, position=None, size=('1cm', '1cm'), z_index=0,
+        presentation_class=None, anchor_type=None, page_number=None,
+        layer=None, presentation_style=None):
     """Create a ready-to-use image, since it must be embedded in a
     frame.
 
@@ -94,73 +110,112 @@ def odf_create_image_frame(uri, text=None, size=('1cm', '1cm'),
 
     Arguments:
 
-        uri -- str
+        url -- str
 
         text -- unicode
 
+        name -- unicode
+
+        draw_id -- unicode
+
+        style -- unicode
+
+        position -- (str, str)
+
         size -- (str, str)
+
+        z_index -- int (default 0)
+
+        presentation_class -- unicode
 
         anchor_type -- 'page', 'frame', 'paragraph', 'char' or 'as-char'
 
         page_number (anchor_type='page') -- int
 
-        position -- (str, str)
+        layer -- unicode
 
-        style -- unicode
+        presentation_style -- unicode
 
-    Return: odf_element
+    Return: odf_frame
     """
-    frame = odf_create_frame(size=size, anchor_type=anchor_type,
-            page_number=page_number, position=position, layer=layer,
-            presentation_class=presentation_class, style=style)
-    image = odf_create_image(uri)
+    frame = odf_create_frame(name=name, draw_id=draw_id, style=style,
+            position=position, size=size, z_index=z_index,
+            presentation_class=presentation_class, anchor_type=anchor_type,
+            page_number=page_number, layer=layer,
+            presentation_style=presentation_style)
+    image = frame.set_image(url)
     if text:
         image.set_text_content(text)
-    frame.append(image)
     return frame
 
 
 
-def odf_create_text_frame(text_or_element, size=('1cm', '1cm'),
-        anchor_type=None, page_number=None, position=None, layer=None,
-        presentation_class=None, style=None, text_style=None,
-        presentation_style=None):
+def odf_create_text_frame(text_or_element=None, text_style=None, name=None,
+        draw_id=None, style=None, position=None, size=('1cm', '1cm'),
+        z_index=0, presentation_class=None, anchor_type=None,
+        page_number=None, layer=None, presentation_style=None):
     """Create a ready-to-use text box, since it must be embedded in a frame.
 
-    Size is a (width, height) tuple and position is a (left, top) tuple; items
-    are strings including the unit, e.g. ('21cm', '29.7cm').
+    Size is a (width, height) tuple and position is a (left, top) tuple;
+    items are strings including the unit, e.g. ('21cm', '29.7cm').
 
     Arguments:
 
         text_or_element -- unicode or odf_element
 
+        text_style -- unicode
+
+        name -- unicode
+
+        draw_id -- unicode
+
+        style -- unicode
+
+        position -- (str, str)
+
         size -- (str, str)
+
+        z_index -- int (default 0)
+
+        presentation_class -- unicode
 
         anchor_type -- 'page', 'frame', 'paragraph', 'char' or 'as-char'
 
         page_number (anchor_type='page') -- int
 
-        position -- (str, str)
+        layer -- unicode
 
-        style -- unicode
+        presentation_style -- unicode
 
-        text_style -- unicode
-
-    Return: odf_element
+    Return: odf_frame
     """
-    frame = odf_create_frame(size=size, anchor_type=anchor_type,
-            page_number=page_number, position=position, layer=layer,
-            presentation_class=presentation_class, style=style,
+    frame = odf_create_frame(name=name, draw_id=draw_id, style=style,
+            position=position, size=size, z_index=z_index,
+            presentation_class=presentation_class, anchor_type=anchor_type,
+            page_number=page_number, layer=layer,
             presentation_style=presentation_style)
-    text_box = odf_create_element('draw:text-box')
-    if not isinstance(text_or_element, (list, tuple)):
-        text_or_element = [text_or_element]
-    for item in text_or_element:
-        if type(item) is unicode:
-            item = odf_create_paragraph(item, style=text_style)
-        text_box.append(item)
-    frame.append(text_box)
+    frame.set_text_box(text_or_element=text_or_element,
+            text_style=text_style)
     return frame
+
+
+
+def odf_create_frame_position_style(name=u"FramePosition",
+        horizontal_pos="from-left", vertical_pos="from-top",
+        horizontal_rel="paragraph", vertical_rel="paragraph"):
+    """Helper style for positioning frames in desktop applications that need
+    it.
+
+    Default arguments should be enough.
+
+    Use the return value as the frame style or build a new graphic style with
+    this style as the parent.
+    """
+    return odf_create_style('graphic', u"FramePositioning",
+            **{'style:horizontal-pos': "from-left",
+                'style:vertical-pos': "from-top",
+                'style:horizontal-rel': "paragraph",
+                'style:vertical-rel': "paragraph"})
 
 
 
@@ -174,12 +229,48 @@ class odf_frame(odf_element):
         return self.set_attribute('draw:name', name)
 
 
+    def get_id(self):
+        return self.get_attribute('draw:id')
+
+
+    def set_id(self, frame_id):
+        return self.set_attribute('draw:id', frame_id)
+
+
     def get_style(self):
         return self.get_attribute('draw:style-name')
 
 
     def set_style(self, name):
         return self.set_style_attribute('draw:style-name', name)
+
+
+    def get_position(self):
+        """Get the position of the frame relative to its anchor
+        point.
+
+        Position is a (left, top) tuple with items including the unit,
+        e.g. ('10cm', '15cm').
+
+        Return: (str, str)
+        """
+        get_attr = self.get_attribute
+        return get_attr('svg:x'), get_attr('svg:y')
+
+
+    def set_position(self, position):
+        """Set the position of the frame relative to its anchor
+        point.
+
+        Position is a (left, top) tuple with items including the unit,
+        e.g. ('10cm', '15cm').
+
+        Arguments:
+
+            position -- (str, str)
+        """
+        self.set_attribute('svg:x', str(position[0]))
+        self.set_attribute('svg:y', str(position[1]))
 
 
     def get_size(self):
@@ -209,32 +300,17 @@ class odf_frame(odf_element):
         self.set_attribute('svg:height', str(size[1]))
 
 
-    def get_position(self):
-        """Get the position of the frame relative to its anchor
-        point.
-
-        Position is a (left, top) tuple with items including the unit,
-        e.g. ('10cm', '15cm').
-
-        Return: (str, str)
-        """
-        get_attr = self.get_attribute
-        return get_attr('svg:x'), get_attr('svg:y')
+    def get_z_index(self):
+        z_index = self.get_attribute('draw:z-index')
+        if z_index is None:
+            return None
+        return int(z_index)
 
 
-    def set_position(self, position):
-        """Set the position of the frame relative to its anchor
-        point.
-
-        Position is a (left, top) tuple with items including the unit,
-        e.g. ('10cm', '15cm').
-
-        Arguments:
-
-            position -- (str, str)
-        """
-        self.set_attribute('svg:x', str(position[0]))
-        self.set_attribute('svg:y', str(position[1]))
+    def set_z_index(self, z_index):
+        if z_index is None:
+            self.set_attribute('draw:z-index', z_index)
+        return self.set_attribute('draw:z-index', str(z_index))
 
 
     def get_anchor_type(self):
@@ -331,12 +407,47 @@ class odf_frame(odf_element):
         return self.set_style_attribute('presentation:style-name', name)
 
 
-    def get_draw_text_style(self):
-        return self.get_attribute('draw:text-style-name')
+    def get_image(self):
+        return self.get_element('draw:image')
 
 
-    def set_draw_text_style(self, name):
-        return self.set_style_attribute('draw:text-style-name', name)
+    def set_image(self, url_or_element, text=None):
+        image = self.get_image()
+        if image is None:
+            if isinstance(url_or_element, odf_element):
+                image = url_or_element
+                self.append(image)
+            else:
+                image = odf_create_image(url_or_element)
+                self.append(image)
+        else:
+            if isinstance(url_or_element, odf_element):
+                image.delete()
+                image = url_or_element
+                self.append(image)
+            else:
+                image.set_url(url_or_element)
+        return image
+
+
+    def get_text_box(self):
+        return self.get_element('draw:text-box')
+
+
+    def set_text_box(self, text_or_element=None, text_style=None):
+        text_box = self.get_text_box()
+        if text_box is None:
+            text_box = odf_create_element('draw:text-box')
+            self.append(text_box)
+        else:
+            text_box.clear()
+        if not isiterable(text_or_element):
+            text_or_element = [text_or_element]
+        for item in text_or_element:
+            if isinstance(item, unicode):
+                item = odf_create_paragraph(item, style=text_style)
+            text_box.append(item)
+        return text_box
 
 
     def get_formatted_text(self, context):

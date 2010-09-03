@@ -45,7 +45,8 @@ class TestFrame(TestCase):
         frame = odf_create_frame(u"A Frame", size=('10cm', '10cm'),
                                  style='Graphics')
         expected = ('<draw:frame svg:width="10cm" svg:height="10cm" '
-                      'draw:name="A Frame" draw:style-name="Graphics"/>')
+                      'draw:z-index="0" draw:name="A Frame" '
+                      'draw:style-name="Graphics"/>')
         self.assertEqual(frame.serialize(), expected)
 
 
@@ -54,9 +55,10 @@ class TestFrame(TestCase):
                                  anchor_type='page', page_number=1,
                                  position=('10mm', '10mm'), style='Graphics')
         expected = ('<draw:frame svg:width="10cm" svg:height="10cm" '
-                      'draw:name="Another Frame" text:anchor-type="page" '
-                      'text:anchor-page-number="1" svg:x="10mm" '
-                      'svg:y="10mm" draw:style-name="Graphics"/>')
+                      'draw:z-index="0" draw:name="Another Frame" '
+                      'text:anchor-type="page" text:anchor-page-number="1" '
+                      'svg:x="10mm" svg:y="10mm" '
+                      'draw:style-name="Graphics"/>')
         self.assertEqual(frame.serialize(), expected)
 
 
@@ -113,7 +115,8 @@ class TestImageFrame(TestCase):
 
     def test_create_image_frame(self):
         frame = odf_create_image_frame('Pictures/zoe.jpg')
-        expected = ('<draw:frame svg:width="1cm" svg:height="1cm">'
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'draw:z-index="0">'
                       '<draw:image xlink:href="Pictures/zoe.jpg"/>'
                     '</draw:frame>')
         self.assertEqual(frame.serialize(), expected)
@@ -122,7 +125,8 @@ class TestImageFrame(TestCase):
     def test_create_image_frame_text(self):
         frame = odf_create_image_frame('Pictures/zoe.jpg',
                                          text=u"Zoé")
-        expected = ('<draw:frame svg:width="1cm" svg:height="1cm">'
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'draw:z-index="0">'
                       '<draw:image xlink:href="Pictures/zoe.jpg">'
                         '<text:p>Zo&#233;</text:p>'
                       '</draw:image>'
@@ -134,7 +138,8 @@ class TestTextFrame(TestCase):
 
     def test_create_text_frame(self):
         frame = odf_create_text_frame(u"Zoé")
-        expected = ('<draw:frame svg:width="1cm" svg:height="1cm">'
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'draw:z-index="0">'
                       '<draw:text-box>'
                         '<text:p>Zo&#233;</text:p>'
                       '</draw:text-box>'
@@ -145,7 +150,8 @@ class TestTextFrame(TestCase):
     def test_create_text_frame_element(self):
         heading = odf_create_heading(1, u"Zoé")
         frame = odf_create_text_frame(heading)
-        expected = ('<draw:frame svg:width="1cm" svg:height="1cm">'
+        expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
+                      'draw:z-index="0">'
                       '<draw:text-box>'
                         '<text:h text:outline-level="1">Zo&#233;</text:h>'
                       '</draw:text-box>'
