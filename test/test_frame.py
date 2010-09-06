@@ -117,7 +117,9 @@ class TestImageFrame(TestCase):
         frame = odf_create_image_frame('Pictures/zoe.jpg')
         expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
                       'draw:z-index="0">'
-                      '<draw:image xlink:href="Pictures/zoe.jpg"/>'
+                      '<draw:image xlink:href="Pictures/zoe.jpg" '
+                        'xlink:type="simple" xlink:show="embed" '
+                        'xlink:actuate="onLoad"/>'
                     '</draw:frame>')
         self.assertEqual(frame.serialize(), expected)
 
@@ -127,7 +129,9 @@ class TestImageFrame(TestCase):
                                          text=u"Zoé")
         expected = ('<draw:frame svg:width="1cm" svg:height="1cm" '
                       'draw:z-index="0">'
-                      '<draw:image xlink:href="Pictures/zoe.jpg">'
+                      '<draw:image xlink:href="Pictures/zoe.jpg" '
+                        'xlink:type="simple" xlink:show="embed" '
+                        'xlink:actuate="onLoad">'
                         '<text:p>Zo&#233;</text:p>'
                       '</draw:image>'
                     '</draw:frame>')

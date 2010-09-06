@@ -45,7 +45,8 @@ class TestImage(TestCase):
 
     def test_create_image(self):
         image = odf_create_image(self.path)
-        expected = '<draw:image xlink:href="%s"/>' % self.path
+        expected = ('<draw:image xlink:href="%s" xlink:type="simple" '
+                'xlink:show="embed" xlink:actuate="onLoad"/>' % self.path)
         self.assertEqual(image.serialize(), expected)
 
 
