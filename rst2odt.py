@@ -388,7 +388,7 @@ def convert_definition_list(node, context):
         for child in item:
             tagname = child.tagname
             if tagname == "term":
-                paragraph = odf_create_paragraph(text=child.astext(),
+                paragraph = odf_create_paragraph(child.astext(),
                         style=term_style)
                 context["top"].append(paragraph)
             elif tagname == "definition":

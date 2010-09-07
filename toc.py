@@ -124,7 +124,7 @@ def odf_create_index_title(title=None, name=None, style=None,
     """
     element = odf_create_element('text:index-title')
     if title or text_style:
-        title = odf_create_paragraph(text=title, style=text_style)
+        title = odf_create_paragraph(title, style=text_style)
         element.append(title)
     if name:
         element.set_attribute('text:name', name)
