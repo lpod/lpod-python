@@ -395,9 +395,11 @@ def get_value(element, value_type=None, try_get_text=True):
         if value is not None:
             return unicode(value)
         if try_get_text:
-            value = element.get_element('text:p').get_text()
-            if value != '':
-                return value
+            value = []
+            for para in element.get_elements('text:p'):
+                value.append(para.get_text(recursive=True))
+            if value:
+                return u"\n".join(value)
         return None
     elif value_type == 'time':
         value = element.get_attribute('office:time-value')
