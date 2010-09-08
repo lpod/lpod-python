@@ -373,10 +373,8 @@ def _set_value_and_type(element, value=None, value_type=None, text=None,
 def get_value(element, value_type=None, try_get_text=True):
     """Only for "with office:value-type" elements
     """
-
     if value_type is None:
         value_type = element.get_attribute('office:value-type')
-
     if value_type == 'boolean':
         value = element.get_attribute('office:boolean-value')
         return Boolean.decode(value)
@@ -397,11 +395,10 @@ def get_value(element, value_type=None, try_get_text=True):
         if value is not None:
             return unicode(value)
         if try_get_text:
-            value = element.get_text()
+            value = element.get_element('text:p').get_text()
             if value != '':
                 return value
         return None
-
     elif value_type == 'time':
         value = element.get_attribute('office:time-value')
         return Duration.decode(value)
