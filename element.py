@@ -805,6 +805,8 @@ class odf_element(object):
             raise TypeError, 'odf_element or unicode expected, not "%s"' % (
                     type(unicode_or_element))
 
+    append_element = obsolete('append_element', append)
+
 
     def delete(self, child=None):
         """Delete the given element from the XML tree. If no element is given,

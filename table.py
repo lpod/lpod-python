@@ -557,6 +557,8 @@ class odf_cell(odf_element):
         """
         self.set_style_attribute('table:style-name', style)
 
+    set_cell_style = obsolete('set_cell_style', set_style)
+
 
     def get_formula(self):
         """Get the formula of the cell, or None if undefined.
@@ -685,7 +687,7 @@ class odf_row(odf_element):
 
     def get_cells(self, style=None, content=None):
         """Get the list of cells matching the criteria. Each result is a
-        tuple of (x, y, cell).
+        tuple of (x, cell).
 
         Arguments:
 
@@ -1237,6 +1239,8 @@ class odf_table(odf_element):
     def set_style(self, style):
         self.set_style_attribute('table:style-name', style)
 
+    set_table_style = obsolete('set_table_style', set_style)
+
 
     def get_formatted_text(self, context):
         if context["rst_mode"]:
@@ -1287,6 +1291,8 @@ class odf_table(odf_element):
         for y, row in enumerate(self.traverse()):
             row.set_values(values.next())
             self.set_row(y, row)
+
+    set_table_values = obsolete('set_table_values', set_values)
 
 
     def rstrip(self, aggressive=False):
