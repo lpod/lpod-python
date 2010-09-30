@@ -55,6 +55,14 @@ from toc import odf_create_toc
 DPI = 72
 
 
+def push_convert_pop(node, element, context):
+    old_top = context["top"]
+    context["top"] = element
+    for child in node:
+        convert_node(child, context)
+    context["top"] = old_top
+
+
 def convert_text(node, context):
     context["top"].append(node.astext())
 
@@ -81,9 +89,9 @@ def convert_title(node, context):
     if level == 0:
         # The document did not start with a section
         level = 1
-    heading = odf_create_heading(level, node.astext(),
-            style='Heading_20_%s' % level)
-    context["body"].append(heading)
+    heading = odf_create_heading(level, style='Heading_20_%s' % level)
+    context["top"].append(heading)
+    push_convert_pop(node, heading, context)
 
 
 
@@ -92,17 +100,7 @@ def convert_paragraph(node, context):
     style = context['styles'].get('paragraph')
     paragraph = odf_create_paragraph(style=style)
     context["top"].append(paragraph)
-
-    # Save the current top
-    old_top = context["top"]
-
-    # Convert
-    context["top"] = paragraph
-    for child in node:
-        convert_node(child, context)
-
-    # And restore the top
-    context["top"] = old_top
+    push_convert_pop(node, paragraph, context)
 
 
 
@@ -120,18 +118,14 @@ def convert_list(node, context, list_type):
     old_top = context["top"]
 
     for item in node:
-
         if item.tagname != "list_item":
             printwarn("node not supported: %s" % item.tagname)
             continue
-
         # Create a new item
         odf_item = odf_create_list_item()
         odf_list.append(odf_item)
-
         # A new top
         context["top"] = odf_item
-
         for child in item:
             convert_node(child, context)
 
@@ -209,17 +203,7 @@ def _convert_style_like(node, context, style_name):
     # Create the span
     span = odf_create_span(style=style_name)
     context["top"].append(span)
-
-    # Save the current top
-    old_top = context["top"]
-
-    # Convert
-    context["top"] = span
-    for child in node:
-        convert_node(child, context)
-
-    # And restore the top
-    context["top"] = old_top
+    push_convert_pop(node, span, context)
 
 
 
@@ -388,9 +372,9 @@ def convert_definition_list(node, context):
         for child in item:
             tagname = child.tagname
             if tagname == "term":
-                paragraph = odf_create_paragraph(child.astext(),
-                        style=term_style)
+                paragraph = odf_create_paragraph(style=term_style)
                 context["top"].append(paragraph)
+                push_convert_pop(child, paragraph, context)
             elif tagname == "definition":
                 # Push a style on the stack for next paragraphs to use
                 styles['paragraph'] = definition_style
@@ -572,16 +556,7 @@ def _convert_table_rows(container, node, context, cell_style=None):
                 odf_cell.set_attribute('table:number-rows-spanned',
                                        str(morerows))
 
-            # Save the current top
-            old_top = context["top"]
-
-            # Convert
-            context["top"] = odf_cell
-            for child in entry:
-                convert_node(child, context)
-
-            # And restore the top
-            context["top"] = old_top
+            push_convert_pop(entry, odf_cell, context)
 
 
 
