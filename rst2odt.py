@@ -380,8 +380,8 @@ def convert_definition_list(node, context):
                 styles['paragraph'] = definition_style
                 for subchildren in child:
                     convert_node(subchildren, context)
-                # Pop the paragraph style
-                del styles['paragraph']
+                # Pop the paragraph style (may already be popped)
+                styles.pop('paragraph', None)
             else:
                 printwarn('node "%s" not supported in definition_list_item' %
                         tagname)
