@@ -771,12 +771,12 @@ class odf_row(odf_element):
                 odf_cell.set_repeated)
 
 
-    def set_value(self, x, value):
+    def set_value(self, x, value, style=None):
         """Shortcut to set the value of the cell at position "x".
 
         See ``get_cell`` and ``odf_cell.get_value``.
         """
-        self.set_cell(x, odf_create_cell(value))
+        self.set_cell(x, odf_create_cell(value, style=style))
 
 
     def insert_cell(self, x, cell=None):
@@ -853,18 +853,19 @@ class odf_row(odf_element):
         return [cell.get_value() for cell in self.traverse()]
 
 
-    def set_values(self, values):
+    def set_values(self, values, style=None):
         """Shortcut to set the list of all cell values in this row.
 
         Arguments:
 
             values -- list of Python types
+            style -- cell style
         """
         width = self.get_width()
         for x, value in enumerate(values[:width]):
-            self.set_value(x, value)
+            self.set_value(x, value, style=style)
         for value in values[width:]:
-            self.append_cell(odf_create_cell(value))
+            self.append_cell(odf_create_cell(value, style=style))
 
 
     def rstrip(self, aggressive=False):
