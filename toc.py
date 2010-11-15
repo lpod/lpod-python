@@ -166,7 +166,7 @@ class odf_toc(odf_element):
             return u''
 
         if context["rst_mode"]:
-            return u"\n.. contents::\n"
+            return u"\n.. contents::\n\n"
 
         result = []
         for element in index_body.get_children():
