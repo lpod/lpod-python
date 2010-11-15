@@ -1119,7 +1119,7 @@ class odf_table(odf_element):
                 wrapped_row.append(wrapped_value)
 
             # Append!
-            for j in range(max([len(values) for values in wrapped_row ])):
+            for j in range(max([1]+[len(values) for values in wrapped_row ])):
                 txt_row = [u'|']
                 for i, values in enumerate(wrapped_row):
                     # An empty cell ?
