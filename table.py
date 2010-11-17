@@ -1121,7 +1121,9 @@ class odf_table(odf_element):
             # Append!
             for j in range(max([1]+[len(values) for values in wrapped_row ])):
                 txt_row = [u'|']
-                for i, values in enumerate(wrapped_row):
+                for i in range(cols_nb):
+                    values = wrapped_row[i] if i < len(wrapped_row) else []
+
                     # An empty cell ?
                     if len(values) - 1 < j:
                         txt_row.append(u' ' * (cols_size[i] + 2))
