@@ -586,6 +586,14 @@ class odf_cell(odf_element):
         return self.set_text_content(text)
 
 
+    def is_empty(self, aggressive):
+        if self.get_value() is not None or self.get_children():
+            return False
+        if not aggressive and self.get_style() is not None:
+            return False
+        return True
+
+
 
 class odf_row(odf_element):
 
@@ -878,15 +886,13 @@ class odf_row(odf_element):
             aggressive -- bool
         """
         for cell in reversed(self._get_cells()):
-            if cell.get_value():
-                return
-            if not aggressive and cell.get_style() is not None:
+            if not cell.is_empty(aggressive=aggressive):
                 return
             self.delete(cell)
 
 
     def is_empty(self, aggressive=False):
-        """Return wether every cell in the row has no value or the value
+        """Return whether every cell in the row has no value or the value
         evaluates to False (empty string), and no style.
 
         If aggressive is True, empty cells with style are considered empty.
@@ -898,9 +904,7 @@ class odf_row(odf_element):
         Return: bool
         """
         for cell in self._get_cells():
-            if cell.get_value() is not None:
-                return False
-            if not aggressive and cell.get_style() is not None:
+            if not cell.is_empty(aggressive=aggressive):
                 return False
         return True
 
@@ -1340,7 +1344,7 @@ class odf_table(odf_element):
 
 
     def is_empty(self, aggressive=False):
-        """Return wether every cell in the table has no value or the value
+        """Return whether every cell in the table has no value or the value
         evaluates to False (empty string), and no style.
 
         If aggressive is True, empty cells with style are considered empty.
@@ -2143,9 +2147,7 @@ class odf_table(odf_element):
         Return: bool
         """
         for cell in self.get_column_cells(x):
-            if cell.get_value() is not None:
-                return False
-            if not aggressive and cell.get_style() is not None:
+            if not cell.is_empty(aggressive=aggressive):
                 return False
         return True
 
