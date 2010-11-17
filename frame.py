@@ -456,8 +456,14 @@ class odf_frame(odf_element):
             tag = element.get_tag()
             if tag == 'draw:image':
                 if context['rst_mode']:
-                    result.append(u'\n.. image:: %s\n' %
-                                  element.get_attribute('xlink:href'))
+                    filename = element.get_attribute('xlink:href')
+                    if context['table_level']:
+                        context['img_counter'] += 1
+                        ref = u'|img%d|' % context['img_counter']
+                        result.append(ref)
+                        context['images'].append( (ref, filename) )
+                    else:
+                        result.append(u'\n.. image:: %s\n' % filename)
                 else:
                     result.append(u'[Image %s]\n' %
                                   element.get_attribute('xlink:href'))

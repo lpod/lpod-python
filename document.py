@@ -226,7 +226,10 @@ class odf_document(object):
                    'footnotes': [],
                    'endnotes': [],
                    'annotations': [],
-                   'rst_mode': rst_mode}
+                   'rst_mode': rst_mode,
+                   'img_counter': 0,
+                   'images': [],
+                   'table_level': 0}
         body = self.get_body()
         # Get the text
         result = []
@@ -266,6 +269,14 @@ class odf_document(object):
                         else:
                             result.append('[*] %s\n' % annotation)
                     context['annotations'] = []
+                # Insert the images ref, only in rst mode, after a table
+                images = context['images']
+                if images:
+                    result.append(u'\n')
+                    for ref, filename in images:
+                        result.append(u'.. %s image:: %s\n\n' %
+                                      (ref, filename))
+                    context['images'] = []
         # Append the end notes
         endnotes = context['endnotes']
         if endnotes:

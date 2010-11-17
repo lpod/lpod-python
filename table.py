@@ -1027,6 +1027,7 @@ class odf_table(odf_element):
 
 
     def __get_formatted_text_rst(self, context):
+        context['table_level'] += 1
         # Strip the table => We must clone
         table = self.clone()
         table.rstrip(aggressive=True)
@@ -1147,6 +1148,7 @@ class odf_table(odf_element):
         result.append(u'')
         result = u'\n'.join(result)
 
+        context['table_level'] -= 1
         return result
 
     #
