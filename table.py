@@ -1147,6 +1147,7 @@ class odf_table(odf_element):
 
         result.append(line)
         result.append(u'')
+        result.append(u'')
         result = u'\n'.join(result)
 
         context['table_level'] -= 1
