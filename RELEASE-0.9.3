@@ -7,10 +7,10 @@ Definition of a Free Software API implementing the ISO/IEC 26300 standard.
 Development, for higher level use cases, in Python, Perl and Ruby languages.
 of a top-down oriented API.
 
-This release is mostly a clean-up release with method names shortened. But
-the table API was much improved with repetitions now completely transparent
-without having to care about committing the changes contrary to the previous
-version.
+This release is mostly a clean-up release with method names shortened.
+
+The table API simplification was delayed to 0.9.4 which will hopefully take
+less time to release. Integration of charts and OpenFormula is also planned.
 
 - Web: http://lpod-project.org
 - Documentation: http://docs.lpod-project.org
@@ -268,7 +268,5 @@ container:
 High-level API
 ==============
 
-- The table API now returns the real elements. If a requested cell is part of
-  a repetition, that repetition will be cut to isolate the cell. Methods
-  "set_cell", "row" and "column" are now seen as methods to replace an object
-  by another.
+- Importing and exporting to reStructuredText format was much improved by David
+  Versmisse.
