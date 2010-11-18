@@ -1053,8 +1053,8 @@ class odf_table(odf_element):
                 # Strip the empty columns
                 if value:
                     cols_nb = max(cols_nb, i + 1)
-                # Compute the size of each columns
-                cols_size[i] = max(cols_size.get(i, 0), len(value))
+                # Compute the size of each columns (at least 2)
+                cols_size[i] = max(cols_size.get(i, 2), len(value))
                 # Append
                 row.append(value)
             rows.append(row)
@@ -1092,11 +1092,11 @@ class odf_table(odf_element):
 
         # Convert !
         result = [u'']
-        # Construct the separated line
-        line = [u'+']
+        # Construct the first/last line
+        line = []
         for i in range(cols_nb):
-            line.append(u'-' * (cols_size[i] + 2))
-            line.append(u'+')
+            line.append(u'=' * cols_size[i])
+            line.append(u' ')
         line = u''.join(line)
 
         # Add the lines
@@ -1125,26 +1125,27 @@ class odf_table(odf_element):
 
             # Append!
             for j in range(max([1]+[len(values) for values in wrapped_row ])):
-                txt_row = [u'|']
+                txt_row = []
                 for i in range(cols_nb):
                     values = wrapped_row[i] if i < len(wrapped_row) else []
 
                     # An empty cell ?
-                    if len(values) - 1 < j:
-                        txt_row.append(u' ' * (cols_size[i] + 2))
-                        txt_row.append(u'|')
+                    if len(values) - 1 < j or not values[j]:
+                        if i == 0 and j == 0:
+                            txt_row.append(u'..')
+                            txt_row.append(u' ' * (cols_size[i] - 1))
+                        else:
+                            txt_row.append(u' ' * (cols_size[i] + 1))
                         continue
 
                     # Not empty
                     value = values[j]
-                    txt_row.append(u' ')
                     txt_row.append(value)
                     txt_row.append(u' ' * (cols_size[i] - len(value) + 1))
-                    txt_row.append(u'|')
                 txt_row = u''.join(txt_row)
                 result.append(txt_row)
 
-            result.append(line)
+        result.append(line)
         result.append(u'')
         result = u'\n'.join(result)
 
