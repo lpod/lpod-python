@@ -49,20 +49,21 @@ def spreadsheet_to_text(indoc, outdoc):
     outbody = outdoc.get_body()
     # Copy tables
     for intable in inbody.get_tables():
-        # Skip empty table
+        # clone/rstrip the table
         clone = intable.clone()
-        clone.rstrip()
+        clone.rstrip(aggressive=True)
+        # Skip empty table
         if clone.get_size() == (0, 0):
             continue
         # At least OOo Writer doesn't like formulas referencing merged
         # cells, so expand
-        outtable = odf_create_table(intable.get_name(),
-                style=intable.get_style())
+        outtable = odf_create_table(clone.get_name(),
+                style=clone.get_style())
         # Columns
-        for column in intable.traverse_columns():
+        for column in clone.traverse_columns():
             outtable.append(column)
         # Rows
-        for inrow in intable.traverse():
+        for inrow in clone.traverse():
             outrow = odf_create_row(style=inrow.get_style())
             # Cells
             for cell in inrow.traverse():
