@@ -100,8 +100,11 @@ if  __name__ == '__main__':
     # Begin with a TOC
     toc = odf_create_toc()
     body.append(toc)
+    # Set the title
+    meta = document.get_meta()
+    meta.set_title(mm_structure[1])
     # Make the document from the structure
-    make_document([mm_structure], body)
+    make_document(mm_structure[2], body)
     # Fill the TOC
     toc.toc_fill()
 
