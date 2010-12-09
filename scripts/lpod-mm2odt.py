@@ -44,8 +44,8 @@ from lpod.scriptutils import add_option_output, check_target_file
 
 def make_mm_structure(node, level):
     sub_struct = []
-    for node in node.xpath('node'):
-        sub_struct.append(make_mm_structure(node, level + 1))
+    for sub_node in node.xpath('node'):
+        sub_struct.append(make_mm_structure(sub_node, level + 1))
     text = node.attrib['TEXT']
     return (level, text, sub_struct)
 
@@ -65,8 +65,7 @@ if  __name__ == '__main__':
     # Options initialisation
     usage = '%prog [-o output.odt] <input.mm>'
     description = 'Transform a mind-map file to an OpenDocument Text file.'
-    parser = OptionParser(usage, version=__version__,
-            description=description)
+    parser = OptionParser(usage, version=__version__, description=description)
     # --output
     add_option_output(parser, complement="(<file>.odt by default)")
 
