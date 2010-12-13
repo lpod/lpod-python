@@ -205,6 +205,11 @@ def _expand_properties(properties):
                'style': 'fo:font-style',
                'underline': 'style:text-underline-style',
                'display': 'text:display',
+               'outline': 'style:text-outline',
+               'family_generic': 'style:font-family-generic',
+               'pitch': 'style:font-pitch',
+               # compliance with office suites
+               'font_style_name': 'style:font-style-name',
                # paragraph
                'align': 'fo:text-align',
                'align-last': 'fo:text-align-last',
@@ -212,7 +217,17 @@ def _expand_properties(properties):
                'together': 'fo:keep-together',
                # TODO 'page-break-before': 'fo:page-break-before',
                # TODO 'page-break-after': 'fo:page-break-after',
-               'shadow': 'fo:text-shadow'}
+               'shadow': 'fo:text-shadow',
+               # Graphic
+               'stroke': 'draw:stroke',
+               'fill_color': 'draw:fill-color',
+               'fill_image_width': 'draw:fill-image-width',
+               'fill_image_height': 'draw:fill-image-height',
+               'textarea_vertical_align': 'draw:textarea-vertical-align',
+               'line_distance': 'draw:line-distance',
+               'guide_overhang': 'draw:guide-overhang',
+               'guide_distance': 'draw:guide-distance'
+               }
 
     def map_key(key):
         key = mapping.get(key, key).replace('_', '-')
