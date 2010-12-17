@@ -2198,7 +2198,7 @@ class odf_table(odf_element):
                 # Also testing lxml.etree._ElementUnicodeResult
                 if type(value) is unicode:
                     value = value.encode(encoding)
-                if type(value) is str:
+                elif type(value) is str:
                     value = value.strip()
                 value = '' if value is None else str(value)
                 value = value.replace(quotechar, quoted)
