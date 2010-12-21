@@ -1650,7 +1650,7 @@ class odf_table(odf_element):
 
         Return: Python type
         """
-        return self.get_cell().get_value()
+        return self.get_cell(coordinates).get_value()
 
 
     def set_cell(self, coordinates, cell=None):
