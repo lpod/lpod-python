@@ -770,8 +770,9 @@ class odf_row(odf_element):
         x = self._translate_x(x)
         # Outside the defined row
         diff = x - self.get_width()
-        if diff > 0:
-            self.append_cell(odf_create_cell(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_cell(odf_create_cell(repeated=diff))
             self.append_cell(cell.clone())
             return
         # Inside the defined row
@@ -806,8 +807,9 @@ class odf_row(odf_element):
         x = self._translate_x(x)
         # Outside the defined row
         diff = x - self.get_width()
-        if diff > 0:
-            self.append_cell(odf_create_cell(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_cell(odf_create_cell(repeated=diff))
             self.append_cell(cell.clone())
             return
         # Inside the defined row
@@ -1455,8 +1457,9 @@ class odf_table(odf_element):
         y = self._translate_y(y)
         # Outside the defined table
         diff = y - self.get_height()
-        if diff > 0:
-            self.append_row(odf_create_row(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_row(odf_create_row(repeated=diff))
             self.append_row(row.clone())
             return
         # Inside the defined table
@@ -1482,8 +1485,9 @@ class odf_table(odf_element):
         y = self._translate_y(y)
         # Outside the defined table
         diff = y - self.get_height()
-        if diff > 0:
-            self.append_row(odf_create_row(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_row(odf_create_row(repeated=diff))
             self.append_row(row.clone())
             return row
         # Inside the defined table
@@ -1509,7 +1513,7 @@ class odf_table(odf_element):
             row -- odf_row
         """
         if row is None:
-            row = odf_create_row(self.get_width())
+            row = odf_create_row(self.get_width() or 1)
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
         self.append(row)
@@ -1670,8 +1674,9 @@ class odf_table(odf_element):
         x, y = self._translate_coordinates(coordinates)
         # Outside the defined table
         diff = y - self.get_height()
-        if diff > 0:
-            self.append_row(odf_create_row(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_row(odf_create_row(repeated=diff))
             row = odf_create_row()
             row.set_cell(x, cell.clone())
             self.append_row(row)
@@ -1777,8 +1782,9 @@ class odf_table(odf_element):
         x, y = self._translate_coordinates(coordinates)
         # Outside the defined table
         diff = y - self.get_height()
-        if diff > 0:
-            self.append_row(odf_create_row(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_row(odf_create_row(repeated=diff))
             row = odf_create_row()
             row.set_cell(x, cell.clone())
             self.append_row(row)
@@ -1825,8 +1831,9 @@ class odf_table(odf_element):
         y = self._translate_y(y)
         # Outside the defined table
         diff = y - self.get_height()
-        if diff > 0:
-            self.append_row(odf_create_row(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_row(odf_create_row(repeated=diff))
             row = odf_create_row()
             row.append_cell(cell.clone())
             self.append_row(row)
@@ -1960,8 +1967,9 @@ class odf_table(odf_element):
             column = odf_create_column()
         # Outside the defined table
         diff = x - self.get_width()
-        if diff > 0:
-            self.append_column(odf_create_column(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_column(odf_create_column(repeated=diff))
             self.append_column(column.clone())
             return
         # Inside the defined table
@@ -1991,8 +1999,9 @@ class odf_table(odf_element):
         x = self._translate_x(x)
         # Outside the defined table
         diff = x - self.get_width()
-        if diff > 0:
-            self.append_column(odf_create_column(repeated=diff))
+        if diff >= 0:
+            if diff > 0:
+                self.append_column(odf_create_column(repeated=diff))
             self.append_column(column.clone())
             return column
         # Inside the defined table
