@@ -1174,19 +1174,19 @@ class odf_table(odf_element):
 
 
     def get_width(self):
-        """Get the current width of the table, measured on columns.
+        """Get the current width of the table. We return the max width of the
+        rows.
 
         Rows may have different widths, use the odf_table API to ensure width
         consistency.
 
         Return: int
         """
-        # Columns are our reference for user expected width
-        columns = self._get_columns()
-        repeated = self.xpath(
-                'table:table-column/@table:number-columns-repeated')
-        unrepeated = len(columns) - len(repeated)
-        return sum(int(r) for r in repeated) + unrepeated
+        rows = self._get_rows()
+        if rows:
+            return max ([row.get_width() for row in rows])
+        else:
+            return 0
 
     get_table_width = obsolete('get_table_width', get_width)
 
@@ -1332,7 +1332,7 @@ class odf_table(odf_element):
             # keep count of the biggest row
             max_width = max(max_width, row.get_width())
         # Step 3: trim columns to match max_width
-        diff = self.get_width() - max_width
+        diff = self.get_columns_width() - max_width
         if diff > 0:
             for column in reversed(self._get_columns()):
                 repeated = column.get_repeated() or 1
@@ -1883,6 +1883,14 @@ class odf_table(odf_element):
         return self.get_elements('table:table-column')
 
 
+    def get_columns_width(self):
+        columns = self._get_columns()
+        repeated = self.xpath(
+                'table:table-column/@table:number-columns-repeated')
+        unrepeated = len(columns) - len(repeated)
+        return sum(int(r) for r in repeated) + unrepeated
+
+
     def traverse_columns(self):
         """Yield as many column elements as expected columns in the table,
         i.e. expand repetitions by returning the same column as many times as
@@ -1940,7 +1948,7 @@ class odf_table(odf_element):
         """
         x = self._translate_x(x)
         # Outside the defined table
-        if x >= self.get_width():
+        if x >= self.get_columns_width():
             return odf_create_column()
         # Inside the defined table
         for w, column in enumerate(self.traverse_columns()):
@@ -1966,7 +1974,7 @@ class odf_table(odf_element):
         if column is None:
             column = odf_create_column()
         # Outside the defined table
-        diff = x - self.get_width()
+        diff = x - self.get_columns_width()
         if diff >= 0:
             if diff > 0:
                 self.append_column(odf_create_column(repeated=diff))
@@ -1998,7 +2006,7 @@ class odf_table(odf_element):
             column = odf_create_column()
         x = self._translate_x(x)
         # Outside the defined table
-        diff = x - self.get_width()
+        diff = x - self.get_columns_width()
         if diff >= 0:
             if diff > 0:
                 self.append_column(odf_create_column(repeated=diff))
@@ -2055,14 +2063,14 @@ class odf_table(odf_element):
         """
         x = self._translate_x(x)
         # Outside the defined table
-        if x >= self.get_width():
+        if x >= self.get_columns_width():
             return
         # Inside the defined table
         _delete_element(x, self._get_columns(),
                 odf_column.get_repeated,
                 odf_column.set_repeated)
         # Update width
-        width = self.get_width()
+        width = self.get_columns_width()
         for y, row in enumerate(self._get_rows()):
             if row.get_width() >= width:
                 row.delete_cell(x)
