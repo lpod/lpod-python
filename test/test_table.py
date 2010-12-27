@@ -1234,7 +1234,7 @@ class TestTableColumn(TestCase):
     def test_append_column(self):
         table = self.table.clone()
         table.append_column(odf_create_column())
-        self.assertEqual(table.get_width(), 8)
+        self.assertEqual(table.get_columns_width(), 8)
         self.assertEqual(table.get_row(0).get_width(),  7)
         # The column must be inserted between the columns and the rows
         self.assert_(type(table.get_children()[-1]) is not odf_column)
