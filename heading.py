@@ -88,8 +88,8 @@ class odf_heading(odf_paragraph):
 
         # And return the result
         title = title.strip()
-        result = ['\n', title, u'\n', LEVEL_STYLES[level - 1] * len(title),
-                  '\n']
+        result = [u'\n', title, u'\n', LEVEL_STYLES[level - 1] * len(title),
+                u'\n']
         return u''.join(result)
 
 

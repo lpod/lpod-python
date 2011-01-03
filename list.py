@@ -176,14 +176,24 @@ class odf_list(odf_element):
         if rst_mode:
             result.append('\n')
         for list_item in self.get_elements('text:list-item'):
-            text = []
-            for children in list_item.get_children():
-                text.append(children.get_formatted_text(context))
-            text = u''.join(text)
-            text = text.strip('\n')
+            textbuf = []
+            for child in list_item.get_children():
+                text = child.get_formatted_text(context)
+                tag = child.get_tag()
+                if tag == 'text:h':
+                    # A title in a list is a bug
+                    return text
+                elif tag == 'text:list':
+                    if not text.lstrip().startswith(u'-'):
+                        # If the list didn't indent, don't either
+                        # (inner title)
+                        return text
+                textbuf.append(text)
+            textbuf = u''.join(textbuf)
+            textbuf = textbuf.strip('\n')
             # Indent the text
-            text = u'- %s\n' % text.replace(u'\n', u'\n  ')
-            result.append(text)
+            textbuf = u'- %s\n' % textbuf.replace(u'\n', u'\n  ')
+            result.append(textbuf)
         if rst_mode:
             result.append('\n')
         return u''.join(result)
