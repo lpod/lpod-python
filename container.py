@@ -65,7 +65,7 @@ class odf_container(object):
         try:
             mimetype = self.__get_zip_part('mimetype')
             self.__zip_packaging = True
-        except BadZipfile, e:
+        except BadZipfile:
             if zip_expected:
                 raise ValueError, "corrupted or not an OpenDocument archive"
             # Maybe XML document

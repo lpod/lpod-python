@@ -385,7 +385,6 @@ class odf_element(object):
         """
         current = self.__element
         wrapper = element.__element
-        end_element = deepcopy(wrapper)
         for text in current.xpath('descendant::text()'):
             if not from_ in text:
                 continue
