@@ -56,41 +56,41 @@ DPI = 72
 
 
 def push_convert_pop(node, element, context):
-    old_top = context["top"]
-    context["top"] = element
+    old_top = context['top']
+    context['top'] = element
     for child in node:
         convert_node(child, context)
-    context["top"] = old_top
+    context['top'] = old_top
 
 
 def convert_text(node, context):
-    context["top"].append(node.astext())
+    context['top'].append(node.astext())
 
 
 
 def convert_section(node, context):
     # Inc the heading level
-    context["heading-level"] += 1
+    context['heading_level'] += 1
 
     # Reset the top to body
-    context["top"] = context["body"]
+    context['top'] = context['body']
 
     # Convert
     for child in node:
         convert_node(child, context)
 
     # Restore the heading level
-    context["heading-level"] -= 1
+    context['heading_level'] -= 1
 
 
 
 def convert_title(node, context):
-    level = context["heading-level"]
+    level = context['heading_level']
     if level == 0:
         # The document did not start with a section
         level = 1
     heading = odf_create_heading(level, style='Heading_20_%s' % level)
-    context["top"].append(heading)
+    context['top'].append(heading)
     push_convert_pop(node, heading, context)
 
 
@@ -99,7 +99,7 @@ def convert_paragraph(node, context):
     # Search for a default style
     style = context['styles'].get('paragraph')
     paragraph = odf_create_paragraph(style=style)
-    context["top"].append(paragraph)
+    context['top'].append(paragraph)
     push_convert_pop(node, paragraph, context)
 
 
@@ -112,10 +112,10 @@ def convert_list(node, context, list_type):
         style_name = "List_20_1"
 
     odf_list = odf_create_list(style=style_name)
-    context["top"].append(odf_list)
+    context['top'].append(odf_list)
 
     # Save the current top
-    old_top = context["top"]
+    old_top = context['top']
 
     for item in node:
         if item.tagname != "list_item":
@@ -125,12 +125,12 @@ def convert_list(node, context, list_type):
         odf_item = odf_create_list_item()
         odf_list.append(odf_item)
         # A new top
-        context["top"] = odf_item
+        context['top'] = odf_item
         for child in item:
             convert_node(child, context)
 
     # And restore the top
-    context["top"] = old_top
+    context['top'] = old_top
 
 
 
@@ -146,18 +146,18 @@ def convert_list_bullet(node, context):
 
 def convert_topic(node, context):
     # Reset the top to body
-    context["top"] = context["body"]
+    context['top'] = context['body']
 
     # Yet an other TOC ?
-    if context["skip_toc"]:
+    if context['skip_toc']:
         return
-    if context["toc"] is not None:
+    if context['toc'] is not None:
         printwarn("a TOC is already inserted")
         return
     title = node.next_node(condition=nodes.title).astext()
     toc = odf_create_toc(title=title)
-    context["body"].append(toc)
-    context["toc"] = toc
+    context['body'].append(toc)
+    context['toc'] = toc
 
 
 
@@ -166,17 +166,17 @@ def convert_footnote(node, context):
     refid = node.get("ids")[0]
 
     # Find the footnote
-    footnotes = context["footnotes"]
+    footnotes = context['footnotes']
     if refid not in footnotes:
         printwarn('unknown footnote "%s"' % refid)
         return
     footnote_body = footnotes[refid].get_element("text:note-body")
 
     # Save the current top
-    old_top = context["top"]
+    old_top = context['top']
 
     # Fill the note
-    context["top"] = footnote_body
+    context['top'] = footnote_body
     for child in node:
         # We skip the label (already added)
         if child.tagname == "label":
@@ -184,7 +184,7 @@ def convert_footnote(node, context):
         convert_node(child, context)
 
     # And restore the top
-    context["top"] = old_top
+    context['top'] = old_top
 
 
 
@@ -193,16 +193,16 @@ def convert_footnote_reference(node, context):
     citation = node.astext()
 
     footnote = odf_create_note(note_id=refid, citation=citation)
-    context["top"].append(footnote)
+    context['top'].append(footnote)
 
-    context["footnotes"][refid] = footnote
+    context['footnotes'][refid] = footnote
 
 
 
 def _convert_style_like(node, context, style_name):
     # Create the span
     span = odf_create_span(style=style_name)
-    context["top"].append(span)
+    context['top'].append(span)
     push_convert_pop(node, span, context)
 
 
@@ -253,7 +253,7 @@ def convert_literal(node, context):
 
 def convert_literal_block(node, context):
     paragraph = odf_create_paragraph(style="Preformatted_20_Text")
-    context["top"].append(paragraph)
+    context['top'].append(paragraph)
 
     # Convert
     for child in node:
@@ -306,7 +306,7 @@ def convert_reference(node, context):
 
     link = odf_create_link(refuri)
     link.set_text(text)
-    context["top"].append(link)
+    context['top'].append(link)
 
 
 
@@ -373,7 +373,7 @@ def convert_definition_list(node, context):
             tagname = child.tagname
             if tagname == "term":
                 paragraph = odf_create_paragraph(style=term_style)
-                context["top"].append(paragraph)
+                context['top'].append(paragraph)
                 push_convert_pop(child, paragraph, context)
             elif tagname == "definition":
                 # Push a style on the stack for next paragraphs to use
@@ -461,7 +461,7 @@ def _add_image(image, caption, context, width=None, height=None):
     size = ("%sin" % (float(size[0]) / DPI), "%sin" % (float(size[1]) / DPI))
 
     # Add the image
-    local_uri = context["doc"].add_file(image)
+    local_uri = context['doc'].add_file(image)
 
     # Frame style for the caption frame
     caption_style = _get_caption_style(context).get_name()
@@ -469,11 +469,11 @@ def _add_image(image, caption, context, width=None, height=None):
     image_style = _get_image_style(context).get_name()
 
     # In text application, image must be inserted in a paragraph
-    if context["top"].get_tag() == "office:text":
+    if context['top'].get_tag() == "office:text":
         container = odf_create_paragraph()
-        context["top"].append(container)
+        context['top'].append(container)
     else:
-        container = context["top"]
+        container = context['top']
 
     if caption:
         paragraph = odf_create_paragraph()
@@ -588,10 +588,10 @@ def convert_table(node, context):
             if tagname == "thead" or tagname == "tbody":
                 # Create a new table with the info columns_number
                 if odf_table is None:
-                    context["tables_number"] += 1
+                    context['tables_number'] += 1
                     # TODO Make it possible directly with odf_create_table
                     odf_table = odf_create_table(name="table%d" %
-                                                 context["tables_number"])
+                                                 context['tables_number'])
                     columns = odf_create_column(repeated=columns_number)
                     odf_table.append(columns)
                 # Convert!
@@ -611,11 +611,11 @@ def convert_table(node, context):
                     child.tagname))
                 continue
 
-        context["top"].append(odf_table)
+        context['top'].append(odf_table)
 
 
 
-convert_methods = {
+__convert_methods = {
         '#text': convert_text,
         'block_quote': convert_block_quote,
         'bullet_list': convert_list_bullet,
@@ -638,19 +638,49 @@ convert_methods = {
         'topic': convert_topic
 }
 
+def register_convert_method(name, method):
+    __convert_methods[name] = method
+
 
 
 def convert_node(node, context):
     tagname = node.tagname
-    convert_method = convert_methods.get(tagname)
+    # From the context
+    convert_method = context.get('convert_' + tagname)
+    if convert_method is None:
+        # Default method
+        convert_method = __convert_methods.get(tagname)
     if convert_method is not None:
-        convert_method(node, context)
-    else:
-        printwarn("node not supported: %s" % tagname)
+        return convert_method(node, context)
+    message = "node not supported: %s" % tagname
+    if context['strict']:
+        raise ValueError, message
+    printwarn(message)
 
 
 
-def convert(document, doctree, heading_level=1, skip_toc=False):
+def make_context(document, body=None, top=None, **kwargs):
+    if body is None:
+        body = document.get_body()
+    if top is None:
+        top = body
+    context = {
+        'doc': document,
+        'body': body,
+        'top': body,
+        'styles': {},
+        'heading_level': 1,
+        'toc': None,
+        'skip_toc': False,
+        'footnotes': {},
+        'tables_number': 0,
+        'strict': False}
+    context.update(kwargs)
+    return context
+
+
+
+def convert(document, doctree, context=None):
     """Convert a reStructuredText source into an existing document.
 
     If the document contains its own TOC, you can ignore others with
@@ -669,10 +699,8 @@ def convert(document, doctree, heading_level=1, skip_toc=False):
     Return: odf_document
     """
     # Init a context
-    body = document.get_body()
-    context = {"doc": document, "body": body, "top": body, "styles": {},
-            "heading-level": heading_level, "toc": None,
-            "skip_toc": skip_toc, "footnotes": {}, "tables_number": 0}
+    if context is None:
+        context = make_context(document)
 
     # Go!
     if isinstance(doctree, str):
@@ -681,9 +709,9 @@ def convert(document, doctree, heading_level=1, skip_toc=False):
         convert_node(child, context)
 
     # Finish the work
-    toc = context["toc"]
+    toc = context['toc']
     if toc is not None:
-        toc.toc_fill()
+        toc.fill()
 
     return document
 
@@ -711,4 +739,5 @@ def rst2odt(rst_body, template=None, heading_level=1):
     else:
         document = odf_new_document("text")
 
-    return convert(document, rst_body, heading_level=heading_level)
+    context = make_context(document, heading_level=heading_level)
+    return convert(document, rst_body, context=context)
