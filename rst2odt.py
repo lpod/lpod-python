@@ -445,7 +445,7 @@ def _add_image(image, caption, context, width=None, height=None):
             raise NotImplementedError, 'only pixel units supported'
         if height:
             try:
-                height = int(height)
+                height = int(height.replace('px', ''))
             except ValueError:
                 raise NotImplementedError, 'only pixel units supported'
         else:
