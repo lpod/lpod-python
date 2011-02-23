@@ -25,32 +25,41 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-# Import from the standard library
-from optparse import OptionParser
-from sys import exit
-
 # Import from lpod
-from lpod import __version__
-from lpod.document import odf_get_document
-from lpod.cleaner import clean_document
+from lpod.element import PREV_SIBLING
 
 
-if  __name__ == '__main__':
 
-    # Options initialisation
-    usage = "%prog <input.odt> <output.odt>"
-    description = "Clean malformed ODT documents"
-    parser = OptionParser(usage, version=__version__, description=description)
+def _fix_text_h(document):
+    body = document.get_body()
 
-    # Parse !
-    options, args = parser.parse_args()
+    error_detected = True
+    while error_detected:
+        error_detected = False
+        for heading in body.get_headings():
+            parent = heading.get_parent()
+            # Ok ?
+            if parent.get_tag() == 'office:text':
+                continue
 
-    # Go !
-    if len(args) != 2:
-        parser.print_help()
-        exit(1)
+            # Else, ...
+            error_detected = True
 
-    indoc = odf_get_document(args[0])
-    outdoc = clean_document(indoc)
-    outdoc.save(target=args[1])
+            # XXX The texts are not children ??
+            # We move all elements outside this "bad" container
+            for element in parent.get_children():
+                parent.insert(element, xmlposition=PREV_SIBLING)
+            # And we remove it
+            parent.delete()
+
+
+
+def clean_document(document):
+    """This method returns a cloned, cleaned document"""
+    outdoc = document.clone()
+
+    # Fix, ...
+    _fix_text_h(outdoc)
+
+    return outdoc
 
