@@ -30,8 +30,21 @@ from lpod.element import PREV_SIBLING
 
 
 
+def _test_text_h(document):
+    body = document.get_body()
+
+    for heading in body.get_headings():
+        parent = heading.get_parent()
+        # Ok ?
+        if parent.get_tag() != 'office:text':
+            return 'nested "text:h" detected'
+
+    return True
+
+
 def _fix_text_h(document):
     body = document.get_body()
+    error_nb = 0
 
     error_detected = True
     while error_detected:
@@ -44,6 +57,7 @@ def _fix_text_h(document):
 
             # Else, ...
             error_detected = True
+            error_nb += 1
 
             # XXX The texts are not children ??
             # We move all elements outside this "bad" container
@@ -52,14 +66,32 @@ def _fix_text_h(document):
             # And we remove it
             parent.delete()
 
+    return error_nb
+
+
+
+def test_document(document):
+    """Test if the document is valid.
+
+       Returns: True if the document is valid
+                or a <str> otherwise. This str describes the problem.
+    """
+
+    # Test, ...
+    return _test_text_h(document)
+
 
 
 def clean_document(document):
-    """This method returns a cloned, cleaned document"""
+    """This method returns a cloned, cleaned document and the number of fixed
+       errors"""
     outdoc = document.clone()
 
     # Fix, ...
-    _fix_text_h(outdoc)
+    error_nb = _fix_text_h(outdoc)
 
-    return outdoc
+    return outdoc, error_nb
+
+
+
 

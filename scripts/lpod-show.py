@@ -35,6 +35,7 @@ from sys import exit, stdout
 
 # Import from lpod
 from lpod import __version__
+from lpod.cleaner import test_document
 from lpod.document import odf_get_document
 from lpod.scriptutils import add_option_output, printerr
 from lpod.scriptutils import check_target_directory
@@ -137,6 +138,13 @@ if  __name__ == '__main__':
     # Open it!
     document = odf_get_document(container_url)
     doc_type = document.get_type()
+    # Test it! XXX for TEXT only
+    if doc_type == 'text':
+        result = test_document(document)
+        if result is not True:
+            print 'This file is malformed: %s' % result
+            print 'Please use lpod-clean.py to fix it'
+            exit(1)
     if options.output:
         target = options.output
         check_target_directory(target)
