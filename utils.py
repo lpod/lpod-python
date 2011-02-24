@@ -313,7 +313,7 @@ def _set_value_and_type(element, value=None, value_type=None, text=None,
     # Remove possible previous value and type
     for name in ('office:value-type', 'office:boolean-value',
             'office:value', 'office:date-value', 'office:string-value',
-            'office:time-value'):
+            'office:time-value', 'table:formula'):
         try:
             element.del_attribute(name)
         except KeyError:

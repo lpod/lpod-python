@@ -236,7 +236,7 @@ def _delete_element(position, real_elements, get_repeated, set_repeated):
 
 
 def odf_create_cell(value=None, text=None, cell_type=None, currency=None,
-        repeated=None, style=None):
+        formula=None, repeated=None, style=None):
     """Create a cell element containing the given value. The textual
     representation is automatically formatted but can be provided. Cell type
     can be deduced as well, unless the number is a percentage or currency. If
@@ -264,7 +264,7 @@ def odf_create_cell(value=None, text=None, cell_type=None, currency=None,
 
     element = odf_create_element('table:table-cell')
     element.set_value(value, text=text, cell_type=cell_type,
-            currency=currency)
+            currency=currency, formula=formula)
     if repeated and repeated > 1:
         element.set_repeated(repeated)
     if style is not None:
@@ -450,7 +450,8 @@ class odf_cell(odf_element):
         return get_value(self)
 
 
-    def set_value(self, value, text=None, cell_type=None, currency=None):
+    def set_value(self, value, text=None, cell_type=None, currency=None,
+            formula=None):
         """Set the cell state from the Python value type.
 
         Text is how the cell is displayed. Cell type is guessed,
@@ -472,6 +473,8 @@ class odf_cell(odf_element):
                 value_type=cell_type, currency=currency)
         if text is not None:
             self.set_text_content(text)
+        if formula is not None:
+            self.set_formula(formula)
 
     set_cell_value = obsolete('set_cell_value', set_value)
 
