@@ -73,6 +73,7 @@ def _get_formatted_text(element, context, with_text=True):
                 style = document.get_style("text", style)
                 properties = style.get_properties()
                 if properties is None:
+                    result.append(text)
                     continue
                 # Compute before, text and after
                 before = ''
