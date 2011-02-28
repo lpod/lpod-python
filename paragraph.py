@@ -213,7 +213,7 @@ class odf_paragraph(odf_element):
 
     def get_formatted_text(self, context):
         result = [_get_formatted_text(self, context, with_text=True)]
-        result.append(u'\n')
+        result.append(u'\n\n')
         return u''.join(result)
 
 
