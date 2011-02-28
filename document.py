@@ -31,6 +31,7 @@ from copy import deepcopy
 from mimetypes import guess_type
 from operator import itemgetter
 from os.path import splitext
+from textwrap import fill
 from uuid import uuid4
 
 # Import from lpod
@@ -237,7 +238,11 @@ class odf_document(object):
             if element.get_tag() == 'table:table':
                 result.append(element.get_formatted_text(context))
             else:
-                result.append(element.get_formatted_text(context))
+                text = element.get_formatted_text(context)
+                if rst_mode and element.get_tag() == 'text:p':
+                    text = fill(text, width=80, break_long_words=False)
+                    text += '\n'
+                result.append(text)
                 # Insert the notes
                 footnotes = context['footnotes']
                 # Separate text from notes
