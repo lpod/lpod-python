@@ -92,6 +92,28 @@ def spreadsheet_to_text(indoc, outdoc):
 
 
 
+def spreadsheet_to_csv(indoc, outdoc):
+    inbody = indoc.get_body()
+
+    # Copy only the first table
+    tables =  inbody.get_tables()
+    if not tables:
+        return
+    table = tables[0]
+
+    # clone/rstrip the table
+    table = table.clone()
+    table.rstrip(aggressive=True)
+
+    # Skip empty table
+    if table.get_size() == (0, 0):
+        return
+
+    # And save
+    table.to_csv(outdoc)
+
+
+
 def txt_to_text(indoc, outdoc):
     rst_convert(outdoc, indoc)
 
@@ -403,11 +425,13 @@ def get_extension(filename):
 if  __name__ == '__main__':
     # Options initialisation
     usage = ("%prog [options] <input.ods> <output.odt>\n"
+      "       %prog [options] <input.ods> <output.csv>\n"
       "       %prog [options] <input.txt> <output.odt>\n"
       "       %prog [options] <input.odp> <output.html>")
     description = ("Convert an OpenDocument to another format. Possible "
-            "combinations: ODS to ODT (tables and styles), ODP to HTML (S5 "
-            "format), and TXT to ODT " "(reStructuredText format)")
+            "combinations: ODS to ODT (tables and styles), ODS to CSV (only "
+            "the first tab), ODP to HTML (S5 format), and TXT to ODT "
+            "(reStructuredText format)")
     parser = OptionParser(usage, version=__version__, description=description)
     # --styles
     help = "import the styles from the given file"
@@ -431,9 +455,9 @@ if  __name__ == '__main__':
     # Open output document
     outfile = args[1]
     extension = get_extension(outfile)
-    if extension == 'html':
+    if extension in ('csv', 'html'):
         outdoc = open(outfile, 'wb')
-        outtype = 'html'
+        outtype = extension
     else:
         if options.styles_from:
             outdoc = odf_get_document(options.styles_from).clone()
@@ -444,7 +468,8 @@ if  __name__ == '__main__':
             try:
                 mimetype = ODF_EXTENSIONS[extension]
             except KeyError:
-                raise ValueError, "output filename not recognized: " + extension
+                raise ValueError, ("output filename not recognized: " +
+                                   extension)
             outtype = mimetype[mimetype.rindex('.') + 1:]
             if '-template' in outtype:
                 outtype = mimetype[mimetype.rindex('-') + 1:]
