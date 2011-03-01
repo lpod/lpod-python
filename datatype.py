@@ -124,7 +124,7 @@ class Duration(object):
             elif c == 'S':
                 seconds = int(buffer)
                 break
-        else:
+        if buffer != '':
             raise ValueError, "duration not valid"
 
         return timedelta(days=sign*days,
