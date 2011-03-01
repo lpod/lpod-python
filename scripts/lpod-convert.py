@@ -114,6 +114,38 @@ def spreadsheet_to_csv(indoc, outdoc):
 
 
 
+def spreadsheet_to_rst(indoc, outdoc):
+    inbody = indoc.get_body()
+
+    context = {'document': indoc,
+               'footnotes': [],
+               'endnotes': [],
+               'annotations': [],
+               'rst_mode': True,
+               'img_counter': 0,
+               'images': [],
+               'no_img_level': 0}
+
+    # Convert tables
+    for table in inbody.get_tables():
+        # clone/rstrip the table
+        table = table.clone()
+        table.rstrip(aggressive=True)
+
+        # Skip empty table
+        if table.get_size() == (0, 0):
+            continue
+
+        name = table.get_name().encode('utf-8')
+        outdoc.write(name)
+        outdoc.write('\n')
+        outdoc.write('=' * len(name))
+        outdoc.write('\n')
+        outdoc.write(table.get_formatted_text(context).encode('utf-8'))
+        outdoc.write('\n\n')
+
+
+
 def txt_to_text(indoc, outdoc):
     rst_convert(outdoc, indoc)
 
@@ -426,12 +458,13 @@ if  __name__ == '__main__':
     # Options initialisation
     usage = ("%prog [options] <input.ods> <output.odt>\n"
       "       %prog [options] <input.ods> <output.csv>\n"
+      "       %prog [options] <input.ods> <output.rst>\n"
       "       %prog [options] <input.txt> <output.odt>\n"
       "       %prog [options] <input.odp> <output.html>")
     description = ("Convert an OpenDocument to another format. Possible "
             "combinations: ODS to ODT (tables and styles), ODS to CSV (only "
-            "the first tab), ODP to HTML (S5 format), and TXT to ODT "
-            "(reStructuredText format)")
+            "the first tab), ODS to RST, ODP to HTML (S5 format), and "
+            "TXT to ODT (reStructuredText format)")
     parser = OptionParser(usage, version=__version__, description=description)
     # --styles
     help = "import the styles from the given file"
@@ -455,7 +488,7 @@ if  __name__ == '__main__':
     # Open output document
     outfile = args[1]
     extension = get_extension(outfile)
-    if extension in ('csv', 'html'):
+    if extension in ('csv', 'html', 'rst'):
         outdoc = open(outfile, 'wb')
         outtype = extension
     else:
