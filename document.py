@@ -31,7 +31,6 @@ from copy import deepcopy
 from mimetypes import guess_type
 from operator import itemgetter
 from os.path import splitext
-from textwrap import fill
 from uuid import uuid4
 
 # Import from lpod
@@ -230,7 +229,7 @@ class odf_document(object):
                    'rst_mode': rst_mode,
                    'img_counter': 0,
                    'images': [],
-                   'table_level': 0}
+                   'no_img_level': 0}
         body = self.get_body()
         # Get the text
         result = []
@@ -238,11 +237,7 @@ class odf_document(object):
             if element.get_tag() == 'table:table':
                 result.append(element.get_formatted_text(context))
             else:
-                text = element.get_formatted_text(context)
-                if rst_mode and element.get_tag() == 'text:p':
-                    text = fill(text, width=80, break_long_words=False)
-                    text += '\n'
-                result.append(text)
+                result.append(element.get_formatted_text(context))
                 # Insert the notes
                 footnotes = context['footnotes']
                 # Separate text from notes
@@ -274,7 +269,7 @@ class odf_document(object):
                         else:
                             result.append('[*] %s\n' % annotation)
                     context['annotations'] = []
-                # Insert the images ref, only in rst mode, after a table
+                # Insert the images ref, only in rst mode
                 images = context['images']
                 if images:
                     result.append(u'\n')

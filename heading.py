@@ -24,6 +24,9 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
+# Import from the Standard Library
+from re import sub
+
 # Import from lpod
 from paragraph import odf_paragraph
 from element import register_element_class, odf_create_element
@@ -73,7 +76,11 @@ class odf_heading(odf_paragraph):
     """
 
     def get_formatted_text(self, context):
+        context['no_img_level'] += 1
         title = odf_paragraph.get_formatted_text(self, context)
+        context['no_img_level'] -= 1
+        title = title.strip()
+        title = sub(r'\s+', ' ', title)
 
         # No rst_mode ?
         if not context["rst_mode"]:
@@ -87,9 +94,8 @@ class odf_heading(odf_paragraph):
             raise ValueError, "Too many levels of heading"
 
         # And return the result
-        title = title.strip()
         result = [u'\n', title, u'\n', LEVEL_STYLES[level - 1] * len(title),
-                u'\n']
+                  u'\n']
         return u''.join(result)
 
 
