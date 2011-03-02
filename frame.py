@@ -34,7 +34,13 @@ from datatype import Unit
 from image import odf_create_image
 from paragraph import odf_create_paragraph
 from style import odf_create_style
-from utils import obsolete, isiterable, get_img_dpi
+from utils import obsolete, isiterable
+
+# Import from PIL
+from PIL import Image
+
+
+DPI = 72
 
 
 def odf_create_frame(name=None, draw_id=None, style=None, position=None,
@@ -463,19 +469,20 @@ class odf_frame(odf_element):
                     filename = element.get_attribute('xlink:href')
 
                     # Compute width and height
-                    width, height = (None, None)
                     data = context['document'].get_part(filename)
-                    dpi = get_img_dpi(StringIO(data))
-                    if dpi is not None:
-                        width, height = self.get_size()
-                        if width is not None:
-                            width = Unit(width)
-                            width = width.convert('px', dpi[0])
-                        if height is not None:
-                            height = Unit(height)
-                            height = height.convert('px', dpi[1])
-                    else:
-                        width = '350px'
+                    try:
+                        img = Image.open(StringIO(data))
+                        dpi = img.info.get('dpi')
+                    except (IOError, OverflowError):
+                        dpi = None
+                    dpi = dpi if dpi is not None else (DPI, DPI)
+                    width, height = self.get_size()
+                    if width is not None:
+                        width = Unit(width)
+                        width = width.convert('px', dpi[0])
+                    if height is not None:
+                        height = Unit(height)
+                        height = height.convert('px', dpi[1])
 
                     # Insert or not ?
                     if context['no_img_level']:

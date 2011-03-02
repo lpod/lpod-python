@@ -35,9 +35,6 @@ from re import search
 from sys import _getframe, modules
 from warnings import warn
 
-# Import from PIL
-from PIL import Image
-
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
 
@@ -517,14 +514,4 @@ def isiterable(obj):
         return False
     return True
 
-
-
-def get_img_dpi(fileobj):
-    """Return the img dpi (a tuple)
-    """
-    try:
-        img = Image.open(fileobj)
-    except (IOError, OverflowError):
-        return None
-    return img.info.get('dpi')
 

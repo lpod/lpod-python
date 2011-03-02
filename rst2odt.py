@@ -436,6 +436,7 @@ def _add_image(image, caption, context, width=None, height=None):
         printwarn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size
+    dpi = image_object.info.get('dpi', (DPI, DPI))
 
     # Convert pixels to inches
     if width:
@@ -458,7 +459,8 @@ def _add_image(image, caption, context, width=None, height=None):
             raise NotImplementedError, 'only pixel units supported'
         width = int(height * (float(size[0]) / float(size[1])))
         size = (width, height)
-    size = ("%sin" % (float(size[0]) / DPI), "%sin" % (float(size[1]) / DPI))
+    size = ( "%sin" % (float(size[0]) / dpi[0]),
+             "%sin" % (float(size[1]) / dpi[1]) )
 
     # Add the image
     local_uri = context['doc'].add_file(image)
