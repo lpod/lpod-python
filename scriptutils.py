@@ -82,7 +82,8 @@ def printinfo(*args, **kw):
     indent = kw.get('indent', 0)
     if indent:
         stderr.write(' ' * indent)
-    output = ' '.join(arg.encode(stderr.encoding) for arg in args)
+    encoding = stderr.encoding if stderr.encoding is not None else 'utf-8'
+    output = ' '.join(arg.encode(encoding) for arg in args)
     stderr.write(output)
     stderr.write("\n")
 
