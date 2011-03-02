@@ -25,12 +25,16 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
+# Import from the Standard Library
+from cStringIO import StringIO
+
 # Import from lpod
 from element import odf_create_element, odf_element, register_element_class
+from datatype import Unit
 from image import odf_create_image
 from paragraph import odf_create_paragraph
 from style import odf_create_style
-from utils import obsolete, isiterable
+from utils import obsolete, isiterable, get_img_dpi
 
 
 def odf_create_frame(name=None, draw_id=None, style=None, position=None,
@@ -457,13 +461,35 @@ class odf_frame(odf_element):
             if tag == 'draw:image':
                 if context['rst_mode']:
                     filename = element.get_attribute('xlink:href')
+
+                    # Compute width and height
+                    width, height = (None, None)
+                    data = context['document'].get_part(filename)
+                    dpi = get_img_dpi(StringIO(data))
+                    if dpi is not None:
+                        width, height = self.get_size()
+                        if width is not None:
+                            width = Unit(width)
+                            width = width.convert('px', dpi[0])
+                        if height is not None:
+                            height = Unit(height)
+                            height = height.convert('px', dpi[1])
+                    else:
+                        width = '350px'
+
+                    # Insert or not ?
                     if context['no_img_level']:
                         context['img_counter'] += 1
                         ref = u'|img%d|' % context['img_counter']
                         result.append(ref)
-                        context['images'].append( (ref, filename) )
+                        context['images'].append( (ref, filename,
+                                                   (width, height) ) )
                     else:
                         result.append(u'\n.. image:: %s\n' % filename)
+                        if width is not None:
+                            result.append(u'   :width: %s\n' % width)
+                        if height is not None:
+                            result.append(u'   :height: %s\n' % height)
                 else:
                     result.append(u'[Image %s]\n' %
                                   element.get_attribute('xlink:href'))

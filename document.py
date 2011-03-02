@@ -273,9 +273,14 @@ class odf_document(object):
                 images = context['images']
                 if images:
                     result.append(u'\n')
-                    for ref, filename in images:
-                        result.append(u'.. %s image:: %s\n\n' %
+                    for ref, filename, (width, height) in images:
+                        result.append(u'.. %s image:: %s\n' %
                                       (ref, filename))
+                        if width is not None:
+                            result.append(u'   :width: %s\n' % width)
+                        if height is not None:
+                            result.append(u'   :height: %s\n' % height)
+                        result.append(u'\n')
                     context['images'] = []
         # Append the end notes
         endnotes = context['endnotes']
