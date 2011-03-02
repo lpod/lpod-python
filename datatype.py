@@ -123,6 +123,7 @@ class Duration(object):
                 buffer = ''
             elif c == 'S':
                 seconds = int(buffer)
+                buffer = ''
                 break
         if buffer != '':
             raise ValueError, "duration not valid"
