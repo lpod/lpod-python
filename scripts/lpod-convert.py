@@ -146,8 +146,18 @@ def spreadsheet_to_rst(indoc, outdoc):
 
 
 
-def txt_to_text(indoc, outdoc):
+def rst_to_text(indoc, outdoc):
     rst_convert(outdoc, indoc)
+
+
+
+def text_to_rst(indoc, outdoc):
+    outdoc.write(indoc.get_formatted_text(True).encode('utf-8'))
+
+
+
+def text_to_txt(indoc, outdoc):
+    outdoc.write(indoc.get_formatted_text(False).encode('utf-8'))
 
 
 
@@ -459,12 +469,14 @@ if  __name__ == '__main__':
     usage = ("%prog [options] <input.ods> <output.odt>\n"
       "       %prog [options] <input.ods> <output.csv>\n"
       "       %prog [options] <input.ods> <output.rst>\n"
-      "       %prog [options] <input.txt> <output.odt>\n"
+      "       %prog [options] <input.odt> <output.txt>\n"
+      "       %prog [options] <input.odt> <output.rst>\n"
+      "       %prog [options] <input.rst> <output.odt>\n"
       "       %prog [options] <input.odp> <output.html>")
     description = ("Convert an OpenDocument to another format. Possible "
             "combinations: ODS to ODT (tables and styles), ODS to CSV (only "
             "the first tab), ODS to RST, ODP to HTML (S5 format), and "
-            "TXT to ODT (reStructuredText format)")
+            "RST <=> ODT (RST = reStructuredText format)")
     parser = OptionParser(usage, version=__version__, description=description)
     # --styles
     help = "import the styles from the given file"
@@ -479,16 +491,16 @@ if  __name__ == '__main__':
     # Open input document
     infile = args[0]
     extension = get_extension(infile)
-    if extension == 'txt':
+    if extension == 'rst':
         indoc = open(infile, 'rb').read()
-        intype = 'txt'
+        intype = 'rst'
     else:
         indoc = odf_get_document(infile)
         intype = indoc.get_type()
     # Open output document
     outfile = args[1]
     extension = get_extension(outfile)
-    if extension in ('csv', 'html', 'rst'):
+    if extension in ('csv', 'html', 'rst', 'txt'):
         outdoc = open(outfile, 'wb')
         outtype = extension
     else:
