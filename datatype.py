@@ -197,7 +197,9 @@ class Unit(object):
 
     def convert(self, unit, dpi=72):
         if unit == 'px':
-            if self.unit == 'cm':
+            if self.unit == 'in':
+                return Unit(int(self.value * dpi), 'px')
+            elif self.unit == 'cm':
                 return Unit(int(self.value / Decimal('2.54') * dpi), 'px')
             raise NotImplementedError, self.unit
         raise NotImplementedError, unit
