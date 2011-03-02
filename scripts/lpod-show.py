@@ -168,7 +168,7 @@ if  __name__ == '__main__':
     if doc_type in ('text', 'text-template', 'presentation',
             'presentation-template'):
         if options.output:
-            to_file = open(join(target, 'content.txt'), 'wb')
+            to_file = open(join(target, 'content.rst'), 'wb')
             dump(document.get_formatted_text(rst_mode=options.rst), to_file)
         elif not options.no_content:
             dump(document.get_formatted_text(rst_mode=options.rst), stdout)
