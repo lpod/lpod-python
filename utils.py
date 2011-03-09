@@ -51,6 +51,11 @@ STYLE_FAMILIES = ('paragraph', 'text', 'section', 'table', 'table-column',
 NOTE_CLASSES = ('footnote', 'endnote')
 
 
+# This DPI is computed to have:
+# 640 px (width of your wiki) <==> 17 cm (width of a normal ODT page)
+DPI = 640 * dec(2.54) / 17
+
+
 ######################################################################
 # Private API
 ######################################################################

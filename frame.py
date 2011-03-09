@@ -25,22 +25,14 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-# Import from the Standard Library
-from cStringIO import StringIO
-
 # Import from lpod
 from element import odf_create_element, odf_element, register_element_class
 from datatype import Unit
 from image import odf_create_image
 from paragraph import odf_create_paragraph
 from style import odf_create_style
-from utils import obsolete, isiterable
+from utils import obsolete, isiterable, DPI
 
-# Import from PIL
-from PIL import Image
-
-
-DPI = 72
 
 
 def odf_create_frame(name=None, draw_id=None, style=None, position=None,
@@ -469,20 +461,13 @@ class odf_frame(odf_element):
                     filename = element.get_attribute('xlink:href')
 
                     # Compute width and height
-                    data = context['document'].get_part(filename)
-                    try:
-                        img = Image.open(StringIO(data))
-                        dpi = img.info.get('dpi')
-                    except (IOError, OverflowError):
-                        dpi = None
-                    dpi = dpi if dpi is not None else (DPI, DPI)
                     width, height = self.get_size()
                     if width is not None:
                         width = Unit(width)
-                        width = width.convert('px', dpi[0])
+                        width = width.convert('px', DPI)
                     if height is not None:
                         height = Unit(height)
-                        height = height.convert('px', dpi[1])
+                        height = height.convert('px', DPI)
 
                     # Insert or not ?
                     if context['no_img_level']:

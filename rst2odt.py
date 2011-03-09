@@ -50,9 +50,9 @@ from style import odf_create_style
 from table import odf_create_cell, odf_create_table, odf_create_row
 from table import odf_create_column, odf_create_header_rows
 from toc import odf_create_toc
+from utils import DPI
 
 
-DPI = 72
 
 
 def push_convert_pop(node, element, context):
@@ -436,7 +436,6 @@ def _add_image(image, caption, context, width=None, height=None):
         printwarn('unable to insert the image "%s": %s' % (image, e))
         return
     size = image_object.size
-    dpi = image_object.info.get('dpi', (DPI, DPI))
 
     # Convert pixels to inches
     if width:
@@ -451,16 +450,18 @@ def _add_image(image, caption, context, width=None, height=None):
                 raise NotImplementedError, 'only pixel units supported'
         else:
             height = int(width / (float(size[0]) / float(size[1])))
-        size = (width, height)
     elif height:
         try:
             height = int(height.replace('px', ''))
         except ValueError:
             raise NotImplementedError, 'only pixel units supported'
         width = int(height * (float(size[0]) / float(size[1])))
-        size = (width, height)
-    size = ( "%sin" % (float(size[0]) / dpi[0]),
-             "%sin" % (float(size[1]) / dpi[1]) )
+    else:
+        # If the information is not present, we assume a width of 640 px
+        width = 640
+        height = int(width / (float(size[0]) / float(size[1])))
+    size = ( "%sin" % (width / DPI),
+             "%sin" % (height / DPI) )
 
     # Add the image
     local_uri = context['doc'].add_file(image)
