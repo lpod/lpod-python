@@ -56,7 +56,7 @@ def show_styles(document, target, automatic=True, common=True,
 def delete_styles(document, target, pretty=True):
     n = document.delete_styles()
     document.save(target=target, pretty=pretty)
-    printinfo(n, "styles removed (0 error, 0 warning).")
+    printinfo(str(n), "styles removed (0 error, 0 warning).")
 
 
 
