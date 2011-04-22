@@ -329,7 +329,7 @@ def _set_value_and_type(element, value=None, value_type=None, text=None,
         if text is None:
             text = u'true' if value else u'false'
         value = Boolean.encode(value)
-    elif isinstance(value, (int, float, dec)):
+    elif isinstance(value, (int, float, long, dec)):
         if value_type is None:
             value_type = 'float'
         if text is None:
