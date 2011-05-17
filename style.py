@@ -50,6 +50,9 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         width=None, break_before=None, break_after=None,
         # For family 'graphic'
         min_height=None,
+        # For family 'font-face'
+        font_name=None, font_family=None, font_family_generic=None,
+        font_pitch=u"variable",
         # Every other property
         **kw):
     """Create a style of the given family. The name is not mandatory at this
@@ -134,11 +137,15 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
         if master_page:
             element.set_master_page(master_page)
     # Master Page
-    if family == 'master-page':
+    elif family == 'master-page':
         if page_layout:
             element.set_page_layout(page_layout)
         if next_style:
             element.set_next_style(next_style)
+    # Font face
+    elif family == 'font-face':
+        element.set_font(font_name, family=font_family,
+                family_generic=font_family_generic, pitch=font_pitch)
     # Properties
     if area is None:
         area = family
@@ -186,6 +193,7 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
     elif area == 'graphic':
         if min_height:
             kw['fo:min-height'] = min_height
+    # Every other properties
     if kw:
         element.set_properties(kw, area=area)
     return element
@@ -665,6 +673,17 @@ class odf_font_style(odf_style):
 
     def get_family(self):
         return 'font-face'
+
+
+    def set_font(self, name, family=None, family_generic=None,
+            pitch=u"variable"):
+        self.set_attribute('style:name', name)
+        if family is None:
+            family = name
+        self.set_attribute('svg:font-family', "'{0}'".format(family))
+        if family_generic is not None:
+            self.set_attribute('style:font-family-generic', family_generic)
+        self.set_attribute('style:font-pitch', pitch)
 
 
 
