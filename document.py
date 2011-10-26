@@ -350,6 +350,10 @@ class odf_document(object):
         """
         name = None
         close_after = False
+        # Folder for added files (FIXME hard-coded and copied)
+        manifest = self.get_part(ODF_MANIFEST)
+        medias = manifest.get_paths()
+
         if type(path_or_file) is unicode or type(path_or_file) is str:
             path_or_file = path_or_file.encode('utf_8')
             file = open(path_or_file, 'rb')
@@ -357,22 +361,31 @@ class odf_document(object):
             close_after = True
         else:
             file = path_or_file
-            name = getattr(file, 'name')
+            name = getattr(_file, 'name')
+        name = name.count('./') and name.split('./')[-1] or name
         # Generate a safe portable name
         uuid = str(uuid4())
         if name is None:
             name = uuid
             media_type = ''
         else:
-            _, extension = splitext(name)
-            name = uuid + extension.lower()
+            basename, extension = splitext(name)
+            name = basename + extension.lower()
             media_type, encoding = guess_type(name)
-        # Folder for added files (FIXME hard-coded and copied)
-        manifest = self.get_part(ODF_MANIFEST)
+            # Check this name is already used in the document
+            fullpath = 'Pictures/%s' % name
+            if fullpath in medias:
+                _, extension = splitext(name)
+                basename = '%s_%s' % (basename, uuid)
+                name = basename + extension.lower()
+                media_type, encoding = guess_type(name)
+
         if manifest.get_media_type('Pictures/') is None:
             manifest.add_full_path('Pictures/')
+
         full_path = 'Pictures/%s' % (name)
         self.container.set_part(full_path, file.read())
+
         # Update manifest
         manifest.add_full_path(full_path, media_type)
         # Close file
