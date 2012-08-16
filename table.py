@@ -1592,10 +1592,13 @@ class odf_table(odf_element):
 
             values -- list of lists
         """
-        values = iter(values)
-        for y, row in enumerate(self.traverse()):
-            row.set_values(values.next())
-            self.set_row(y, row)
+        while self.get_height()>0:
+            self.delete_row(0)
+        row_list = []
+        for row_values in values:
+            row = odf_create_row()
+            row.set_values(row_values)
+            self.append_row(row)
 
     set_table_values = obsolete('set_table_values', set_values)
 
@@ -1840,6 +1843,14 @@ class odf_table(odf_element):
     def extend_rows(self, rows=[]):
         self.extend(rows)
         compute_table_cache(self)
+        # Update width if necessary
+        width = self.get_width()
+        for row in self.traverse():
+            if row.get_width() > width:
+                width = row.get_width()
+        diff = width - self.get_width()
+        if diff > 0:
+            self.append_column(odf_create_column(repeated=diff))
 
 
     def append_row(self, row=None, _repeated=None):
@@ -1894,6 +1905,7 @@ class odf_table(odf_element):
             return
         # Inside the defined table
         _delete_item_in_vault(y, self, xp_row_idx, '_tmap')
+
 
     def get_row_values(self, y):
         """Shortcut to get the list of Python values for the cells of the row
