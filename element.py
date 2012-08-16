@@ -32,6 +32,7 @@ from re import search, compile
 # Import from lxml
 from lxml.etree import fromstring, tostring, Element, _Element
 from lxml.etree import _ElementStringResult, _ElementUnicodeResult
+from lxml.etree import XPath
 
 # Import from lpod
 from datatype import DateTime, Boolean
@@ -128,7 +129,7 @@ def _get_prefixed_name(tag):
 
 __class_registry = {}
 
-def register_element_class(qname, cls, family=None):
+def register_element_class(qname, cls, family=None, caching=False):
     """Associate a qualified element name to a Python class that handles this
     type of element.
 
@@ -152,11 +153,11 @@ def register_element_class(qname, cls, family=None):
     tag = '{%s}%s' % _decode_qname(qname)
     if (tag, family) in __class_registry:
         raise ValueError,  'element "%s" already registered' % qname
-    __class_registry[(tag, family)] = cls
+    __class_registry[(tag, family)] = (cls, caching)
 
 
 
-def _make_odf_element(native_element):
+def _make_odf_element(native_element, cache=None):
     """Turn an lxml Element into an odf_element (or the registered subclass).
 
     Arguments:
@@ -167,12 +168,15 @@ def _make_odf_element(native_element):
     """
     tag = native_element.tag
     family = native_element.get("{%s}family" % ODF_NAMESPACES['style'])
-    cls = __class_registry.get((tag, family))
+    cls, caching = __class_registry.get((tag, family), (None, None))
     if cls is None and family is not None:
-        cls = __class_registry.get((tag, None))
+        cls, caching = __class_registry.get((tag, None), (None, None))
     if cls is None:
         cls = odf_element
-    return cls(native_element)
+    if caching:
+        return cls(native_element, cache)
+    else:
+        return cls(native_element)
 
 
 
@@ -180,7 +184,9 @@ def _make_odf_element(native_element):
 # Public API
 #
 
-def odf_create_element(element_data):
+
+
+def odf_create_element(element_data, cache=None):
     if type(element_data) is str:
         pass
     elif type(element_data) is unicode:
@@ -199,7 +205,12 @@ def odf_create_element(element_data):
     data = ns_document_data % element_data
     root = fromstring(data)
     element = root[0]
-    return _make_odf_element(element)
+    return _make_odf_element(element, cache)
+
+
+
+def xpath_compile(path):
+    return XPath(path, namespaces=ODF_NAMESPACES, regexp=False)
 
 
 
@@ -244,11 +255,16 @@ class odf_element(object):
     behind.
     """
 
-    def __init__(self, native_element):
+    def __init__(self, native_element, cache=None):
         if not isinstance(native_element, _Element):
             raise TypeError, ('"%s" is not an element node' %
                               type(native_element))
         self.__element = native_element
+        if cache is not None:
+            if len(cache) == 3:
+                self._tmap, self._cmap, self._rmap = cache
+            else:
+                self._tmap, self._cmap = cache
 
 
     def __str__(self):
@@ -475,21 +491,66 @@ class odf_element(object):
         element.tag = '{%s}%s' % _decode_qname(qname)
         return _make_odf_element(element)
 
+    def elements_repeated_sequence(self, xpath_instance, name):
+        uri, name = _decode_qname(name)
+        if uri is not None:
+            name = '{%s}%s' % (uri, name)
+        element = self.__element
+        sub_elements = xpath_instance(element)
+        result = []
+        idx = -1
+        for sub_element in sub_elements:
+            idx += 1
+            value = sub_element.get(name)
+            if value is None:
+                result.append((idx, 1))
+                continue
+            try:
+                value = int(value)
+            except:
+                value = 1
+            result.append((idx, max(value, 1)))
+        return result
 
     def get_elements(self, xpath_query):
         element = self.__element
-        result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
-        return [_make_odf_element(e) for e in result]
+        if isinstance(xpath_query, XPath):
+            result = xpath_query(element)
+        else:
+            result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
+        if hasattr(self, '_tmap'):
+            if hasattr(self, '_rmap'):
+                cache = (self._tmap, self._cmap, self._rmap)
+            else:
+                cache = (self._tmap, self._cmap)
+        else:
+            cache = None
+        return [_make_odf_element(e, cache) for e in result]
 
     get_element_list = obsolete('get_element_list', get_elements)
 
+    # fixme : need original get_element as wrapper of get_elements
 
     def get_element(self, xpath_query):
-        result = self.get_elements(xpath_query)
+        element = self.__element
+        result = element.xpath("(%s)[1]" % xpath_query, namespaces=ODF_NAMESPACES)
         if result:
-            return result[0]
+            return _make_odf_element(result[0])
         return None
 
+    def get_element_idx(self, xpath_query, idx):
+        element = self.__element
+        result = element.xpath("(%s)[%s]" % (xpath_query, idx+1), namespaces=ODF_NAMESPACES)
+        if result:
+            return _make_odf_element(result[0])
+        return None
+
+    def get_element_idx2(self, xpath_instance, idx):
+        element = self.__element
+        result = xpath_instance(element, idx=idx+1)
+        if result:
+            return _make_odf_element(result[0])
+        return None
 
     def get_attributes(self):
         attributes = {}
@@ -694,7 +755,7 @@ class odf_element(object):
 
     def get_children(self):
         element = self.__element
-        return [_make_odf_element(e) for e in element]
+        return [_make_odf_element(e) for e in element.getchildren()]
 
 
     def index(self, child):
@@ -776,6 +837,15 @@ class odf_element(object):
             raise ValueError, "(xml)position must be defined"
 
 
+    def extend(self, odf_elements):
+        """Fast append elements at the end of ourself using extend.
+        """
+        if odf_elements:
+            current = self.__element
+            elements = [ odf_element.__element for odf_element in odf_elements]
+            current.extend(elements)
+
+
     def append(self, unicode_or_element):
         """Insert element or text in the last position.
         """
@@ -848,6 +918,12 @@ class odf_element(object):
         """Remove text, children and attributes from the element.
         """
         self.__element.clear()
+        if hasattr(self, '_tmap'):
+            self._tmap = []
+        if hasattr(self, '_cmap'):
+            self._tmap = []
+        if hasattr(self, '_rmap'):
+            self._rmap = []
 
 
     def clone(self):
@@ -857,6 +933,11 @@ class odf_element(object):
         # Re-attach it to a root with all namespaces
         root = Element('ROOT', nsmap=ODF_NAMESPACES)
         root.append(clone)
+        if hasattr(self, '_tmap'):
+            if hasattr(self, '_rmap'):
+                return self.__class__(clone, (self._tmap[:], self._cmap[:], self._rmap[:]))
+            else:
+                return self.__class__(clone, (self._tmap[:], self._cmap[:]))
         return self.__class__(clone)
 
 
@@ -896,7 +977,7 @@ class odf_element(object):
         Return: list
         """
         # FIXME incomplete (and possibly inaccurate)
-        return (_get_elements(self, 'descendant::*', text_style=name)
+        return (  _get_elements(self, 'descendant::*', text_style=name)
                 + _get_elements(self, 'descendant::*', draw_style=name)
                 + _get_elements(self, 'descendant::*', draw_text_style=name)
                 + _get_elements(self, 'descendant::*', table_style=name)
@@ -1288,8 +1369,12 @@ class odf_element(object):
 
         Return: odf_table or None if not found
         """
-        return _get_element(self, 'descendant::table:table', position,
+        if name is None and content is None:
+            result = self.get_element_idx('descendant::table:table', position)
+        else :
+            result = _get_element(self, 'descendant::table:table', position,
                 table_name=name, content=content)
+        return result
 
 
     #

@@ -118,24 +118,24 @@ class GetDocumentTestCase(TestCase):
         path = 'samples/example.xml'
         self.assert_(odf_get_document(path))
 
-
-    def test_http(self):
-        file = urlopen('http://ftp.lpod-project.org/example.odt')
-        document = odf_get_document(file)
-        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
-
-
-    def test_ftp(self):
-        ftp = FTP('ftp.lpod-project.org')
-        ftp.login()
-        file = StringIO()
-        ftp.retrbinary('RETR example.odt', file.write)
-        ftp.quit()
-        file.seek(0)
-        document = odf_get_document(file)
-        self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
-
-
+#fixme : reactivitate ftp
+    #def test_http(self):
+    #    file = urlopen('http://ftp.lpod-project.org/example.odt')
+    #    document = odf_get_document(file)
+    #    self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
+    #
+    #
+    #def test_ftp(self):
+    #    ftp = FTP('ftp.lpod-project.org')
+    #    ftp.login()
+    #    file = StringIO()
+    #    ftp.retrbinary('RETR example.odt', file.write)
+    #    ftp.quit()
+    #    file.seek(0)
+    #    document = odf_get_document(file)
+    #    self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
+    #
+    #
 
 class DocumentTestCase(TestCase):
 

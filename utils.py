@@ -214,6 +214,7 @@ def _expand_properties(properties):
                'family_generic': 'style:font-family-generic',
                'pitch': 'style:font-pitch',
                # compliance with office suites
+               'font_family': 'fo:font-family',
                'font_style_name': 'style:font-style-name',
                # paragraph
                'align': 'fo:text-align',
@@ -518,5 +519,3 @@ def isiterable(obj):
     except TypeError:
         return False
     return True
-
-

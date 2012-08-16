@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2012 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: David Versmisse <david.versmisse@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
 #          Romain Gauthier <romain@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.org).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -30,11 +31,23 @@
 from cStringIO import StringIO
 from csv import reader, Sniffer
 from textwrap import wrap
+from bisect import bisect_left, insort
 
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
+from element import xpath_compile
 from utils import get_value, _set_value_and_type, obsolete, isiterable
+
+
+
+xp_row = xpath_compile('table:table-row')
+xp_row_idx = xpath_compile('(table:table-row)[$idx]')
+xp_column = xpath_compile('table:table-column')
+xp_column_idx = xpath_compile('(table:table-column)[$idx]')
+xp_cell = xpath_compile('(table:table-cell|table:covered-table-cell)')
+xp_cell_idx = xpath_compile('(table:table-cell|table:covered-table-cell)[$idx]')
+
 
 
 def _alpha_to_digit(alpha):
@@ -141,97 +154,135 @@ def _get_python_value(data, encoding):
 
 
 
-def _set_element(position, new_element, real_elements, get_repeated,
-        set_repeated):
-    pos = 0
-    for real_element in real_elements:
-        repeated = get_repeated(real_element) or 1
-        for current_repetition in xrange(repeated):
-            if pos == position:
-                # Repetitions start counting at 1
-                current_repetition += 1
-                break
-            pos += 1
-        else:
-            # Not found on this(these) element(s)
-            continue
-        parent = real_element.get_parent()
-        index = parent.index(real_element)
-        # Split, update repetitions and insert the new one
-        repeated_after = repeated - current_repetition
-        repeated_before = current_repetition - 1
-        if repeated_before:
-            # Update repetition
-            set_repeated(real_element, repeated_before)
-        else:
-            # Replacing the first occurence
-            parent.delete(real_element)
-            index -= 1
-        # Insert new element
-        parent.insert(new_element.clone(), position=index + 1, )
-        # Insert the remaining repetitions
-        if repeated_after:
-            element_after = real_element.clone()
-            set_repeated(element_after, repeated_after)
-            parent.insert(element_after, position=index + 2)
-        return
+def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name):
+    """Set the item (cell, row) in its vault (row, table), updating the
+       cache map.
+    """
+    try:
+        vault_map = getattr(vault, vault_map_name)
+    except:
+        raise ValueError
+    odf_idx = find_odf_idx(vault_map, position)
+    repeated = item.get_repeated() or 1
+    current_cache = vault_map[odf_idx]
+    cache = vault._indexes[vault_map_name]
+    if odf_idx in cache:
+        current_item = cache[odf_idx]
+    else:
+        current_item = vault.get_element_idx2(vault_scheme, odf_idx)
+    vault._indexes[vault_map_name] = {}
+    target_idx = vault.index(current_item)
+    if odf_idx > 0:
+        before_cache = vault_map[odf_idx - 1]
+    else:
+        before_cache = -1
+    current_pos = before_cache + 1
+    current_repeated = current_cache - before_cache
+    repeated_before = position - current_pos
+    repeated_after = current_repeated - repeated_before - 1
+    if repeated_before >= 1:
+        #Update repetition
+        current_item._set_repeated(repeated_before)
+        target_idx += 1
+    else:
+        # Replacing the first occurence
+        vault.delete(current_item)
+    # Insert new element
+    new_item = item.clone()
+    vault.insert(new_item, position = target_idx)
+    # Insert the remaining repetitions
+    if repeated_after >= 1:
+        after_item = current_item.clone()
+        after_item._set_repeated(repeated_after)
+        vault.insert(after_item, position = target_idx + 1)
+    # update cache
+    # remove existing
+    idx = odf_idx
+    map = erase_map_once(vault_map, idx)
+    # add before if any:
+    if repeated_before >= 1:
+        map = insert_map_once(map, idx, repeated_before)
+        idx += 1
+    # add our slot
+    map = insert_map_once(map, idx, repeated)
+    # add after if any::
+    if repeated_after >= 1:
+        idx += 1
+        map = insert_map_once(map, idx, repeated_after)
+    setattr(vault, vault_map_name, map)
 
 
 
-def _insert_element(position, new_element, real_elements, get_repeated,
-        set_repeated):
-    pos = 0
-    for real_element in real_elements:
-        repeated = get_repeated(real_element) or 1
-        for current_repetition in xrange(repeated):
-            if pos == position:
-                # Repetitions start counting at 1
-                current_repetition += 1
-                break
-            pos += 1
-        else:
-            # Not found on this(these) element(s)
-            continue
-        parent = real_element.get_parent()
-        index = parent.index(real_element)
-        if repeated == 1 or current_repetition == 1:
-            # Just insert before
-            parent.insert(new_element.clone(), position=index)
-        else:
-            repeated_after = repeated - current_repetition + 1
-            repeated_before = current_repetition - 1
-            # Update repetition
-            set_repeated(real_element, repeated_before)
-            # Insert new element
-            parent.insert(new_element.clone(), position=index + 1)
-            # Insert the remaining repetitions
-            if repeated_after:
-                element_after = real_element.clone()
-                set_repeated(element_after, repeated_after)
-                parent.insert(element_after, position=index + 2)
-        return
+def _insert_item_in_vault(position, item, vault, vault_scheme, vault_map_name):
+    try:
+        vault_map = getattr(vault, vault_map_name)
+    except:
+        raise ValueError
+    odf_idx = find_odf_idx(vault_map, position)
+    repeated = item.get_repeated() or 1
+    current_cache = vault_map[odf_idx]
+    cache = vault._indexes[vault_map_name]
+    if odf_idx in cache:
+        current_item = cache[odf_idx]
+    else:
+        current_item = vault.get_element_idx2(vault_scheme, odf_idx)
+    vault._indexes[vault_map_name] = {}
+    target_idx = vault.index(current_item)
+    if odf_idx > 0:
+        before_cache = vault_map[odf_idx - 1]
+    else:
+        before_cache = -1
+    current_pos = before_cache + 1
+    current_repeated = current_cache - before_cache
+    repeated_before = position - current_pos
+    repeated_after = current_repeated - repeated_before
+    if repeated_before >= 1:
+        current_item._set_repeated(repeated_before)
+        vault.insert(item.clone(), position = target_idx + 1)
+        after_item = current_item.clone()
+        after_item._set_repeated(repeated_after)
+        vault.insert(after_item, position = target_idx + 2)
+    else:
+        # only insert new cell
+        vault.insert(item.clone(), position = target_idx)
+    # update cache
+    if repeated_before >= 1:
+        map = erase_map_once(vault_map, odf_idx)
+        map = insert_map_once(map, odf_idx, repeated_before)
+        map = insert_map_once(map, odf_idx + 1, repeated)
+        setattr(vault, vault_map_name, insert_map_once(map, odf_idx + 2, repeated_after))
+    else:
+        setattr(vault, vault_map_name, insert_map_once(vault_map, odf_idx, repeated))
 
 
 
-def _delete_element(position, real_elements, get_repeated, set_repeated):
-    pos = 0
-    for real_element in real_elements:
-        repeated = get_repeated(real_element) or 1
-        for current_repetition in xrange(repeated):
-            if pos == position:
-                break
-            pos += 1
-        else:
-            # Not found on this(these) element(s)
-            continue
-        # Lost 1 credit
-        repeated -= 1
-        if repeated:
-            set_repeated(real_element, repeated)
-        else:
-            # Game over
-            real_element.delete()
-        return
+def _delete_item_in_vault(position, vault, vault_scheme, vault_map_name):
+    try:
+        vault_map = getattr(vault, vault_map_name)
+    except:
+        raise ValueError
+    odf_idx = find_odf_idx(vault_map, position)
+    current_cache = vault_map[odf_idx]
+    cache = vault._indexes[vault_map_name]
+    if odf_idx in cache:
+        current_item = cache[odf_idx]
+    else:
+        current_item = vault.get_element_idx2(vault_scheme, odf_idx)
+    vault._indexes[vault_map_name] = {}
+    if odf_idx > 0:
+        before_cache = vault_map[odf_idx - 1]
+    else:
+        before_cache = -1
+    current_pos = before_cache + 1
+    current_repeated = current_cache - before_cache
+    new_repeated = current_repeated - 1
+    if new_repeated >= 1:
+        current_item._set_repeated(new_repeated)
+        setattr(vault, vault_map_name, vault_map[:odf_idx] + [(x - 1) for x in vault_map[odf_idx:]] )
+    else:
+        # actual erase
+        vault.delete(current_item)
+        setattr(vault, vault_map_name, vault_map[:odf_idx] + [(x - 1) for x in vault_map[odf_idx + 1:]] )
 
 
 
@@ -261,7 +312,6 @@ def odf_create_cell(value=None, text=None, cell_type=None, currency=None,
 
     Return: odf_cell
     """
-
     element = odf_create_element('table:table-cell')
     element.set_value(value, text=text, cell_type=cell_type,
             currency=currency, formula=formula)
@@ -273,7 +323,7 @@ def odf_create_cell(value=None, text=None, cell_type=None, currency=None,
 
 
 
-def odf_create_row(width=None, repeated=None, style=None):
+def odf_create_row(width=None, repeated=None, style=None, cache=None):
     """Create a row element, optionally filled with "width" number of cells.
 
     Rows contain cells, their number determine the number of columns.
@@ -290,7 +340,7 @@ def odf_create_row(width=None, repeated=None, style=None):
 
     Return: odf_row
     """
-    element = odf_create_element('table:table-row')
+    element = odf_create_element('table:table-row', cache)
     if width is not None:
         for i in xrange(width):
             element.append(odf_create_cell())
@@ -298,6 +348,7 @@ def odf_create_row(width=None, repeated=None, style=None):
         element.set_repeated(repeated)
     if style is not None:
         element.set_style(style)
+    compute_row_cache(element)
     return element
 
 
@@ -317,7 +368,7 @@ def odf_create_row_group(height=None, width=None):
     element = odf_create_row_group('<table:table-row-group')
     if height is not None:
         for i in xrange(height):
-            row = odf_create_row(width)
+            row = odf_create_row(width=width)
             element.append(row)
     return element
 
@@ -405,7 +456,7 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
     Return: odf_table
     """
-    element = odf_create_element('table:table')
+    element = odf_create_element('table:table', ([], []))
     element.set_name(name)
     if protected:
         if protection_key is None:
@@ -431,9 +482,81 @@ def odf_create_table(name, width=None, height=None, protected=False,
         for i in xrange(height):
             row = odf_create_row(width)
             element.append(row)
+    compute_table_cache(element)
     return element
 
 
+def compute_table_cache(table):
+    idx_repeated_seq = table.elements_repeated_sequence(xp_row, 'table:number-rows-repeated')
+    table._tmap = make_cache_map(idx_repeated_seq)
+    idx_repeated_seq = table.elements_repeated_sequence(xp_column, 'table:number-columns-repeated')
+    table._cmap = make_cache_map(idx_repeated_seq)
+
+def compute_row_cache(row):
+    idx_repeated_seq = row.elements_repeated_sequence(xp_cell, 'table:number-columns-repeated')
+    row._rmap = make_cache_map(idx_repeated_seq)
+
+
+def insert_map_once(map, odf_idx, repeated):
+    """ Add an item (cell or row) to the map
+
+            map  --  cache map
+
+            odf_idx  --  index in ODF XML
+
+            repeated  --  repeated value of item, 1 or more
+
+        odf_idx is NOT position (col or row), neither raw XML position, but ODF index
+    """
+    repeated = repeated or 1
+    if odf_idx > len(map):
+        raise IndexError
+    if odf_idx > 0 :
+        before = map[odf_idx - 1]
+    else:
+        before = -1
+    juska = before + repeated # aka max position value for item
+    if odf_idx == len(map):
+        insort(map, juska)
+        return map
+    new_map = map[:odf_idx]
+    new_map.append(juska)
+    new_map.extend([(x + repeated) for x in map[odf_idx:]])
+    return new_map
+
+def erase_map_once(map, odf_idx):
+    """ Remove an item (cell or row) from the map
+
+            map  --  cache map
+
+            odf_idx  --  index in ODF XML
+    """
+    if odf_idx >= len(map):
+        raise IndexError
+    if odf_idx > 0 :
+        before = map[odf_idx - 1]
+    else:
+        before = -1
+    current = map[odf_idx]
+    repeated = current - before
+    map = map[:odf_idx] + [(x - repeated) for x in map[odf_idx + 1:]]
+    return map
+
+def make_cache_map(idx_repeated_seq):
+    """ Build the initial cache map of the table
+    """
+    map = []
+    for odf_idx, repeated in idx_repeated_seq:
+        map = insert_map_once(map, odf_idx, repeated)
+    return map
+
+def find_odf_idx(map, position):
+    """ Find odf_idx in the map from the position (col or row)
+    """
+    odf_idx = bisect_left(map, position)
+    if odf_idx < len(map):
+        return odf_idx
+    return None
 
 class odf_cell(odf_element):
     """Class for the table cell element.
@@ -526,7 +649,7 @@ class odf_cell(odf_element):
         return int(repeated)
 
 
-    def set_repeated(self, repeated):
+    def _set_repeated(self, repeated):
         """Set the numnber of times the cell is repeated, or None to delete
         it.
 
@@ -541,6 +664,33 @@ class odf_cell(odf_element):
                 pass
             return
         self.set_attribute('table:number-columns-repeated', str(repeated))
+
+    def set_repeated(self, repeated):
+        """Set the numnber of times the cell is repeated, or None to delete
+        it.
+
+        Arguments:
+
+            repeated -- int or None
+        """
+        self._set_repeated(repeated)
+        # update cache
+        child = self
+        while True:
+            # look for odf_row, parent may be group of rows
+            upper = child.get_parent()
+            if not upper:
+                # lonely cell
+                return
+            # parent may be group of rows, not table
+            if isinstance(upper, odf_row):
+                break
+            child = upper
+        # fixme : need to optimize this
+        if hasattr(self, '_rmap'):
+            compute_row_cache(upper)
+            del self._rmap[:]
+            self._rmap.extend(upper._rmap)
 
 
     def get_style(self):
@@ -601,10 +751,24 @@ class odf_cell(odf_element):
 class odf_row(odf_element):
 
     # Private API
+    def __init__(self, native_element, cache=None):
+        odf_element.__init__(self, native_element, cache)
+        self.y = None
+        # parse the whole table for repeated cells, if cache not already provided
+        if not hasattr(self, '_rmap'):
+            compute_row_cache(self)
+            if not hasattr(self, '_tmap'):
+                self._tmap = []
+                self._cmap = []
+        if not hasattr(self, '_indexes'):
+            self._indexes={}
+            self._indexes['_rmap'] = {}
+
+
+    _append = odf_element.append
 
     def _get_cells(self):
-        return self.get_elements(
-                '(table:table-cell|table:covered-table-cell)')
+        return self.get_elements(xp_cell)
 
 
     def _translate_x(self, x):
@@ -629,13 +793,13 @@ class odf_row(odf_element):
         return int(repeated)
 
 
-    def set_repeated(self, repeated):
+    def _set_repeated(self, repeated):
         """Set the numnber of times the row is repeated, or None to delete
-        it.
+        it. Without changing cache.
 
         Arguments:
 
-            repeated -- int or None
+            repeated -- int
         """
         if repeated is None or repeated < 2:
             try:
@@ -644,6 +808,33 @@ class odf_row(odf_element):
                 pass
             return
         self.set_attribute('table:number-rows-repeated', str(repeated))
+
+    def set_repeated(self, repeated):
+        """Set the numnber of times the row is repeated, or None to delete
+        it and update cache map.
+
+        Arguments:
+
+            repeated -- int or None
+        """
+        self._set_repeated(repeated)
+        # update cache
+        current = self
+        while True:
+            # look for odf_table, parent may be group of rows
+            upper = current.get_parent()
+            if not upper:
+                # lonely row
+                return
+            # parent may be group of rows, not table
+            if isinstance(upper, odf_table):
+                break
+            current = upper
+        # fixme : need to optimize this
+        if hasattr(self, '_tmap'):
+            compute_table_cache(upper)
+            del self._tmap[:]
+            self._tmap.extend(upper._tmap)
 
 
     def get_style(self):
@@ -672,12 +863,11 @@ class odf_row(odf_element):
 
         Return: int
         """
-        cells = self._get_cells()
-        repeated = self.xpath(
-                '(table:table-cell|table:covered-table-cell)/'
-                '@table:number-columns-repeated')
-        unrepeated = len(cells) - len(repeated)
-        return sum(int(r) for r in repeated) + unrepeated
+        try:
+            w = self._rmap[-1] + 1
+        except:
+            w = 0
+        return w
 
 
     def traverse(self):
@@ -687,12 +877,22 @@ class odf_row(odf_element):
 
         Copies are returned, use ``set_cell`` to push them back.
         """
-        for cell in self._get_cells():
-            repeated = cell.get_repeated() or 1
-            for i in xrange(repeated):
+        idx = -1
+        before = -1
+        for juska in self._rmap:
+            idx += 1
+            if idx in self._indexes['_rmap']:
+                cell = self._indexes['_rmap'][idx]
+            else:
+                cell = self.get_element_idx2(xp_cell_idx, idx)
+                self._indexes['_rmap'][idx] = cell
+            repeated = juska - before
+            before = juska
+            for i in xrange(repeated or 1):
                 # Return a copy without the now obsolete repetition
                 cell = cell.clone()
-                cell.set_repeated(None)
+                if repeated > 1:
+                    cell.set_repeated(None)
                 yield cell
 
 
@@ -708,6 +908,7 @@ class odf_row(odf_element):
 
         Return: list of tuples
         """
+        # fixme : not clones ?
         cells = []
         for x, cell in enumerate(self.traverse()):
             # Filter the cells with the regex
@@ -723,6 +924,43 @@ class odf_row(odf_element):
     get_cell_list = obsolete('get_cell_list', get_cells)
 
 
+    def _get_cell2(self, x):
+        if x >= self.get_width():
+            return odf_create_cell()
+        return self._get_cell2_no_create(x)
+
+    def _get_cell2_no_create(self, x):
+        idx = find_odf_idx(self._rmap, x)
+        if idx is not None:
+            if idx in self._indexes['_rmap']:
+                cell = self._indexes['_rmap'][idx]
+            else:
+                cell = self.get_element_idx2(xp_cell_idx, idx)
+                self._indexes['_rmap'][idx] = cell
+            # fixme : no clone here => change doc and unit tests
+            return cell.clone()
+            #return row
+        return None
+
+    def _get_cell2_no_create_no_clone(self, x):
+        idx = find_odf_idx(self._rmap, x)
+        if idx is not None:
+            if idx in self._indexes['_rmap']:
+                cell = self._indexes['_rmap'][idx]
+            else:
+                cell = self.get_element_idx2(xp_cell_idx, idx)
+                self._indexes['_rmap'][idx] = cell
+            return cell
+        return None
+
+    def get_cell_no_clone(self, x):
+        x = self._translate_x(x)
+        if x < 0:
+            return None
+        if x >= self.get_width():
+            return odf_create_cell()
+        return self._get_cell2_no_create_no_clone(x)
+
     def get_cell(self, x):
         """Get the cell at position "x" starting from 0. Alphabetical
         positions like "D" are accepted.
@@ -736,20 +974,9 @@ class odf_row(odf_element):
         Return: odf_cell
         """
         x = self._translate_x(x)
-        # Outside the defined row
-        if x >= self.get_width():
-            return odf_create_cell()
-        # Inside the defined row
-        cell_number = 0
-        for cell in self._get_cells():
-            repeated = cell.get_repeated() or 1
-            for i in xrange(repeated):
-                if cell_number == x:
-                    # Return a copy without the now obsolete repetition
-                    cell = cell.clone()
-                    cell.set_repeated(None)
-                    return cell
-                cell_number += 1
+        if x < 0:
+            return None
+        return self._get_cell2(x)
 
 
     def get_value(self, x):
@@ -770,17 +997,20 @@ class odf_row(odf_element):
         """
         if cell is None:
             cell = odf_create_cell()
+            repeated = 1
+        else:
+            repeated = cell.get_repeated() or 1
         x = self._translate_x(x)
         # Outside the defined row
         diff = x - self.get_width()
-        if diff >= 0:
-            if diff > 0:
-                self.append_cell(odf_create_cell(repeated=diff))
-            self.append_cell(cell.clone())
-            return
-        # Inside the defined row
-        _set_element(x, cell, self._get_cells(), odf_cell.get_repeated,
-                odf_cell.set_repeated)
+        if diff == 0:
+            self.append_cell(cell, _repeated = repeated)
+        elif diff > 0:
+            self.append_cell(odf_create_cell(repeated=diff), _repeated = diff)
+            self.append_cell(cell, _repeated = repeated)
+        else:
+            # Inside the defined row
+            _set_item_in_vault(x, cell, self, xp_cell_idx, '_rmap')
 
 
     def set_value(self, x, value, style=None):
@@ -810,19 +1040,22 @@ class odf_row(odf_element):
         x = self._translate_x(x)
         # Outside the defined row
         diff = x - self.get_width()
-        if diff >= 0:
-            if diff > 0:
-                self.append_cell(odf_create_cell(repeated=diff))
-            self.append_cell(cell.clone())
-            return
-        # Inside the defined row
-        # Inserting a repeated cell accepted
-        _insert_element(x, cell, self._get_cells(),
-                odf_cell.get_repeated, odf_cell.set_repeated)
+        if diff < 0:
+            _insert_item_in_vault(x, cell, self, xp_cell_idx, '_rmap')
+        elif diff == 0:
+            self.append_cell(cell)
+        else:
+            self.append_cell(odf_create_cell(repeated=diff), _repeated = diff)
+            self.append_cell(cell)
         return cell
 
+    def extend_cells(self, cells=[]):
+        self.extend(cells)
+        compute_row_cache(self)
 
-    def append_cell(self, cell=None):
+
+
+    def append_cell(self, cell=None, _repeated=None):
         """Append the given cell at the end of the row. Repeated cells are
         accepted. If no cell is given, an empty one is created.
 
@@ -831,12 +1064,21 @@ class odf_row(odf_element):
         Arguments:
 
             cell -- odf_cell
+
+            _repeated -- (optional), repeated value of the row
         """
         if cell is None:
             cell = odf_create_cell()
-        self.append(cell)
+        else:
+            cell = cell.clone()
+        self._append(cell)
+        if _repeated is None:
+            _repeated = cell.get_repeated() or 1
+        self._rmap = insert_map_once(self._rmap, len(self._rmap), _repeated)
         return cell
 
+    # fix for unit test and dummies
+    append = append_cell
 
     def delete_cell(self, x):
         """Delete the cell at the given position "x" starting from 0.
@@ -850,13 +1092,9 @@ class odf_row(odf_element):
             x -- int or str
         """
         x = self._translate_x(x)
-        # Outside the defined row
         if x >= self.get_width():
             return
-        # Inside the defined row
-        _delete_element(x, self._get_cells(), odf_cell.get_repeated,
-                odf_cell.set_repeated)
-
+        _delete_item_in_vault(x, self, xp_cell_idx, '_rmap')
 
     def get_values(self):
         """Shortcut to get the list of all cell values in this row.
@@ -877,8 +1115,10 @@ class odf_row(odf_element):
         width = self.get_width()
         for x, value in enumerate(values[:width]):
             self.set_value(x, value, style=style)
-        for value in values[width:]:
-            self.append_cell(odf_create_cell(value, style=style))
+        cells = [ odf_create_cell(value, style=style) for value in values[width:] ]
+        if cells:
+            self.extend(cells)
+        compute_row_cache(self)
 
 
     def rstrip(self, aggressive=False):
@@ -892,8 +1132,9 @@ class odf_row(odf_element):
         """
         for cell in reversed(self._get_cells()):
             if not cell.is_empty(aggressive=aggressive):
-                return
+                break
             self.delete(cell)
+        compute_row_cache(self)
 
 
     def is_empty(self, aggressive=False):
@@ -946,9 +1187,9 @@ class odf_column(odf_element):
         return int(repeated)
 
 
-    def set_repeated(self, repeated):
+    def _set_repeated(self, repeated):
         """Set the numnber of times the column is repeated, or None to delete
-        it.
+        it. Without changing cache.
 
         Arguments:
 
@@ -961,6 +1202,33 @@ class odf_column(odf_element):
                 pass
             return
         self.set_attribute('table:number-columns-repeated', str(repeated))
+
+    def set_repeated(self, repeated):
+        """Set the numnber of times the column is repeated, or None to delete
+        it and update cache map.
+
+        Arguments:
+
+            repeated -- int or None
+        """
+        self._set_repeated(repeated)
+        # update cache
+        current = self
+        while True:
+            # look for odf_table, parent may be group of rows
+            upper = current.get_parent()
+            if not upper:
+                # lonely row
+                return
+            # parent may be group of rows, not table
+            if isinstance(upper, odf_table):
+                break
+            current = upper
+        # fixme : need to optimize this
+        if hasattr(self, '_cmap'):
+            compute_table_cache(upper)
+            del self._cmap[:]
+            self._cmap.extend(upper._tmap)
 
 
     def get_style(self):
@@ -976,6 +1244,15 @@ class odf_table(odf_element):
     #
     # Private API
     #
+    def __init__(self, native_element, cache=None):
+        odf_element.__init__(self, native_element, cache)
+        # parse the whole table for repeated rows, if cache not already provided
+        if cache is None:
+            compute_table_cache(self)
+        self._indexes={}
+        self._indexes['_cmap'] = {}
+        self._indexes['_tmap'] = {}
+
 
     def _translate_x(self, x):
         x = _alpha_to_digit(x)
@@ -1168,28 +1445,40 @@ class odf_table(odf_element):
 
         Return: int
         """
-        rows = self._get_rows()
-        repeated = self.xpath('table:table-row/@table:number-rows-repeated')
-        unrepeated = len(rows) - len(repeated)
-        return sum(int(r) for r in repeated) + unrepeated
+        try:
+            h = self._tmap[-1] + 1
+        except:
+            h = 0
+        return h
+
 
     get_table_height = obsolete('get_table_height', get_height)
 
 
     def get_width(self):
-        """Get the current width of the table. We return the max width of the
-        rows.
+        """Get the current width of the table, measured on columns.
 
         Rows may have different widths, use the odf_table API to ensure width
         consistency.
 
         Return: int
         """
-        rows = self._get_rows()
-        if rows:
-            return max ([row.get_width() for row in rows])
-        else:
-            return 0
+        # Columns are our reference for user expected width
+
+        try:
+            w = self._cmap[-1] + 1
+        except:
+            w = 0
+
+        #columns = self._get_columns()
+        #repeated = self.xpath(
+        #        'table:table-column/@table:number-columns-repeated')
+        #unrepeated = len(columns) - len(repeated)
+        #ws = sum(int(r) for r in repeated) + unrepeated
+        #if w != ws:
+        #    print "WARNING   ws", ws, "w", w
+
+        return w
 
     get_table_width = obsolete('get_table_width', get_width)
 
@@ -1335,7 +1624,7 @@ class odf_table(odf_element):
             # keep count of the biggest row
             max_width = max(max_width, row.get_width())
         # Step 3: trim columns to match max_width
-        diff = self.get_columns_width() - max_width
+        diff = self.get_width() - max_width
         if diff > 0:
             for column in reversed(self._get_columns()):
                 repeated = column.get_repeated() or 1
@@ -1348,7 +1637,7 @@ class odf_table(odf_element):
                     diff = -repeated
                     if diff == 0:
                         break
-
+        compute_table_cache(self)
     rstrip_table = obsolete('rstrip_table', rstrip)
 
 
@@ -1373,7 +1662,7 @@ class odf_table(odf_element):
     #
 
     def _get_rows(self):
-        return self.get_elements('table:table-row')
+        return self.get_elements(xp_row)
 
 
     def traverse(self):
@@ -1383,12 +1672,22 @@ class odf_table(odf_element):
 
         Copies are returned, use ``set_row`` to push them back.
         """
-        for row in self._get_rows():
-            repeated = row.get_repeated() or 1
-            for i in xrange(repeated):
+        idx = -1
+        before = -1
+        for juska in self._tmap:
+            idx += 1
+            if idx in self._indexes['_tmap']:
+                row = self._indexes['_tmap'][idx]
+            else:
+                row = self.get_element_idx2(xp_row_idx, idx)
+                self._indexes['_tmap'][idx] = row
+            repeated = juska - before
+            before = juska
+            for i in xrange(repeated or 1):
                 # Return a copy without the now obsolete repetition
                 row = row.clone()
-                row.set_repeated(None)
+                if repeated > 1:
+                    row.set_repeated(None)
                 yield row
 
 
@@ -1407,6 +1706,7 @@ class odf_table(odf_element):
 
         Return: list of tuples
         """
+        # fixme : not clones ?
         rows = []
         for y, row in enumerate(self.traverse()):
             if content and not row.match(content):
@@ -1418,6 +1718,42 @@ class odf_table(odf_element):
 
     get_row_list = obsolete('get_row_list', get_rows)
 
+    def _get_row2(self, y):
+        if y >= self.get_height():
+            return odf_create_row()
+        return self._get_row2_no_create(y)
+
+    def _get_row2_no_create(self, y):
+        idx = find_odf_idx(self._tmap, y)
+        if idx is not None:
+            if idx in self._indexes['_tmap']:
+                row = self._indexes['_tmap'][idx]
+            else:
+                row = self.get_element_idx2(xp_row_idx, idx)
+                self._indexes['_tmap'][idx] = row
+            # fixme : no clone here => change doc and unit tests
+            return row.clone()
+            #return row
+        return None
+
+    def _get_row2_no_create_no_clone(self, y):
+        idx = find_odf_idx(self._tmap, y)
+        if idx is not None:
+            if idx in self._indexes['_tmap']:
+                row = self._indexes['_tmap'][idx]
+            else:
+                row = self.get_element_idx2(xp_row_idx, idx)
+                self._indexes['_tmap'][idx] = row
+            return row
+        return None
+
+    def get_row_no_clone(self, y):
+        y = self._translate_y(y)
+        if y < 0:
+            return None
+        if y >= self.get_height():
+            return odf_create_row()
+        return self._get_row2_no_create_no_clone(y)
 
     def get_row(self, y):
         """Get the row at the given "y" position.
@@ -1432,17 +1768,14 @@ class odf_table(odf_element):
 
         Return: odf_row
         """
+        # fixme : keep repeat ? maybe an option to functions : "raw=False"
         y = self._translate_y(y)
-        # Outside the defined table
-        if y >= self.get_height():
-            return odf_create_row()
-        # Inside the defined table
-        for h, row in enumerate(self.traverse()):
-            if h == y:
-                return row
+        if y < 0:
+            return None
+        return self._get_row2(y)
 
 
-    def set_row(self, y, row=None):
+    def set_row(self, y, row = None):
         """Replace the row at the given position with the new one. It must
         have the same number of cells. Repetion of the old row will be
         adjusted.
@@ -1457,18 +1790,23 @@ class odf_table(odf_element):
         """
         if row is None:
             row = odf_create_row()
+            repeated = 1
+        else:
+            repeated = row.get_repeated() or 1
         y = self._translate_y(y)
         # Outside the defined table
         diff = y - self.get_height()
-        if diff >= 0:
-            if diff > 0:
-                self.append_row(odf_create_row(repeated=diff))
-            self.append_row(row.clone())
-            return
-        # Inside the defined table
-        # Setting a repeated row accepted
-        _set_element(y, row, self._get_rows(), odf_row.get_repeated,
-                odf_row.set_repeated)
+        if diff == 0:
+            self.append_row(row, _repeated = repeated)
+        elif diff > 0:
+            self.append_row(odf_create_row(repeated = diff), _repeated = diff)
+            self.append_row(row, _repeated = repeated)
+        else:
+            # Inside the defined table
+            _set_item_in_vault(y, row, self, xp_row_idx, '_tmap')
+        #print self.serialize(True)
+        # Update width if necessary
+        self.__update_width(row)
 
 
     def insert_row(self, y, row=None):
@@ -1486,23 +1824,25 @@ class odf_table(odf_element):
         if row is None:
             row = odf_create_row()
         y = self._translate_y(y)
-        # Outside the defined table
         diff = y - self.get_height()
-        if diff >= 0:
-            if diff > 0:
-                self.append_row(odf_create_row(repeated=diff))
+        if diff < 0:
+            _insert_item_in_vault(y, row, self, xp_row_idx, '_tmap')
+        elif diff == 0:
             self.append_row(row.clone())
-            return row
-        # Inside the defined table
-        # Inserting a repeated row accepted
-        _insert_element(y, row, self._get_rows(), odf_row.get_repeated,
-                odf_row.set_repeated)
+        else:
+            self.append_row(odf_create_row(repeated=diff), _repeated = diff)
+            self.append_row(row.clone())
         # Update width if necessary
         self.__update_width(row)
         return row
 
 
-    def append_row(self, row=None):
+    def extend_rows(self, rows=[]):
+        self.extend(rows)
+        compute_table_cache(self)
+
+
+    def append_row(self, row=None, _repeated=None):
         """Append the row at the end of the table. If no row is given, an
         empty one is created.
 
@@ -1514,17 +1854,28 @@ class odf_table(odf_element):
         Arguments:
 
             row -- odf_row
+
+            _repeated -- (optional), repeated value of the row
         """
         if row is None:
-            row = odf_create_row(self.get_width() or 1)
+            _repeated = self.get_width() or 1
+            row = odf_create_row(_repeated)
+        else:
+            row = row.clone()
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
         self.append(row)
+        if _repeated is None:
+            _repeated = row.get_repeated() or 1
+        self._tmap = insert_map_once(self._tmap, len(self._tmap), _repeated)
         # Initialize columns
         if not self._get_columns():
             repeated = row.get_width()
             self.insert(odf_create_column(repeated=repeated),
                     position=0)
+            compute_table_cache(self)
+        # Update width if necessary
+        self.__update_width(row)
         return row
 
 
@@ -1542,9 +1893,7 @@ class odf_table(odf_element):
         if y >= self.get_height():
             return
         # Inside the defined table
-        _delete_element(y, self._get_rows(), odf_row.get_repeated,
-                odf_row.set_repeated)
-
+        _delete_item_in_vault(y, self, xp_row_idx, '_tmap')
 
     def get_row_values(self, y):
         """Shortcut to get the list of Python values for the cells of the row
@@ -1556,7 +1905,7 @@ class odf_table(odf_element):
 
             y -- int
         """
-        values = self.get_row(y).get_values()
+        values = self.get_row_no_clone(y).get_values()
         values.extend([None] * (self.get_width() - len(values)))
         return values
 
@@ -1573,9 +1922,11 @@ class odf_table(odf_element):
 
             values -- list of Python types
         """
-        row = self.get_row(y)
+        #row = self.get_row_no_clone(y) # would set all repeated rows
+        # row = self.get_row(y) # no needed if clones rows
+        row = odf_create_row() # needed if clones rows
         row.set_values(values)
-        self.set_row(y, row)
+        self.set_row(y, row) # needed if clones rows
 
 
     def is_row_empty(self, y, aggressive=False):
@@ -1592,7 +1943,7 @@ class odf_table(odf_element):
 
             aggressive -- bool
         """
-        return self.get_row(y).is_empty(aggressive=aggressive)
+        return self.get_row_no_clone(y).is_empty(aggressive=aggressive)
 
 
     #
@@ -1640,9 +1991,7 @@ class odf_table(odf_element):
         if y >= self.get_height():
             return odf_create_cell()
         # Inside the defined table
-        for h, row in enumerate(self.traverse()):
-            if h == y:
-                return row.get_cell(x)
+        return self._get_row2_no_create_no_clone(y).get_cell(x)
 
 
     def get_value(self, coordinates):
@@ -1672,24 +2021,17 @@ class odf_table(odf_element):
 
             cell -- odf_cell
         """
+        #self._cache.raz()
         if cell is None:
             cell = odf_create_cell()
+
+
         x, y = self._translate_coordinates(coordinates)
-        # Outside the defined table
-        diff = y - self.get_height()
-        if diff >= 0:
-            if diff > 0:
-                self.append_row(odf_create_row(repeated=diff))
-            row = odf_create_row()
-            row.set_cell(x, cell.clone())
-            self.append_row(row)
-            return
-        # Inside the defined table
-        for h, row in enumerate(self.traverse()):
-            if h == y:
-                row.set_cell(x, cell)
-                self.set_row(h, row)
-                return
+        row = self._get_row2(y)
+        row.set_repeated(None)
+        row.set_cell(x, cell)
+        self.set_row(y, row)
+        return
 
 
     def set_value(self, coordinates, value):
@@ -1782,32 +2124,13 @@ class odf_table(odf_element):
         """
         if cell is None:
             cell = odf_create_cell()
+        else:
+            cell = cell.clone()
         x, y = self._translate_coordinates(coordinates)
-        # Outside the defined table
-        diff = y - self.get_height()
-        if diff >= 0:
-            if diff > 0:
-                self.append_row(odf_create_row(repeated=diff))
-            row = odf_create_row()
-            row.set_cell(x, cell.clone())
-            self.append_row(row)
-            return cell
-        # Inside the defined table
-        # Repeated cells are accepted
-        repeated = cell.get_repeated() or 1
-        # Insert the cell
-        for h, row in enumerate(self.traverse()):
-            if h == y:
-                row_width = row.get_width()
-                if row_width <= x:
-                    diff = row_width - x
-                    if diff > 0:
-                        row.append_cell(odf_create_cell(repeated=diff))
-                    row.append_cell(cell)
-                else:
-                    row.insert_cell(x, cell)
-                self.set_row(h, row)
-                break
+        row = self._get_row2(y)
+        row.set_repeated(None)
+        row.insert_cell(x, cell)
+        self.set_row(y, row)
         # Update width if necessary
         # Don't insert: we are shifting a single row, not the
         # whole column; just append to match the width
@@ -1831,25 +2154,12 @@ class odf_table(odf_element):
         """
         if cell is None:
             cell = odf_create_cell()
+        else:
+            cell = cell.clone()
         y = self._translate_y(y)
-        # Outside the defined table
-        diff = y - self.get_height()
-        if diff >= 0:
-            if diff > 0:
-                self.append_row(odf_create_row(repeated=diff))
-            row = odf_create_row()
-            row.append_cell(cell.clone())
-            self.append_row(row)
-            return cell
-        # Inside the defined table
-        # Repeated cells are accepted
-        repeated = cell.get_repeated() or 1
-        # Append the cell
-        for h, row in enumerate(self.traverse()):
-            if h == y:
-                row.append_cell(cell)
-                self.set_row(h, row)
-                break
+        row = self._get_row2(y)
+        row.append_cell(cell)
+        self.set_row(y, row)
         # Update width if necessary
         self.__update_width(row)
         return cell
@@ -1873,7 +2183,7 @@ class odf_table(odf_element):
         if y >= self.get_height():
             return
         # Inside the defined table
-        row = self.get_row(y)
+        row = self._get_row2(y)
         row.delete_cell(x)
         self.set_row(y, row)
 
@@ -1883,15 +2193,11 @@ class odf_table(odf_element):
     #
 
     def _get_columns(self):
-        return self.get_elements('table:table-column')
+        return self.get_elements(xp_column)
 
 
     def get_columns_width(self):
-        columns = self._get_columns()
-        repeated = self.xpath(
-                'table:table-column/@table:number-columns-repeated')
-        unrepeated = len(columns) - len(repeated)
-        return sum(int(r) for r in repeated) + unrepeated
+        return self.get_width()
 
 
     def traverse_columns(self):
@@ -1901,21 +2207,28 @@ class odf_table(odf_element):
 
         Copies are returned, use ``set_column`` to push them back.
         """
-        for column in self._get_columns():
-            repeated = column.get_repeated() or 1
-            for i in xrange(repeated):
+        idx = -1
+        before = -1
+        for juska in self._cmap:
+            idx += 1
+            if idx in self._indexes['_cmap']:
+                column = self._indexes['_cmap'][idx]
+            else:
+                column = self.get_element_idx2(xp_column_idx, idx)
+                self._indexes['_cmap'][idx] = column
+            repeated = juska - before
+            before = juska
+            for i in xrange(repeated or 1):
                 # Return a copy without the now obsolete repetition
                 column = column.clone()
-                column.set_repeated(None)
+                if repeated > 1:
+                    column.set_repeated(None)
                 yield column
 
 
     def get_columns(self, style=None):
         """Get the list of columns matching the criteria. Each result is a
         tuple of (x, column).
-
-        The original column elements are returned, with their repetition
-        attribute.
 
         Arguments:
 
@@ -1932,6 +2245,21 @@ class odf_table(odf_element):
 
     get_column_list = obsolete('get_column_list', get_columns)
 
+    def _get_column2(self, x):
+        # Outside the defined table
+        if x >= self.get_width():
+            return odf_create_column()
+        # Inside the defined table
+        return self._get_column2_no_create(x)
+
+    def _get_column2_no_create(self, x):
+        odf_idx = find_odf_idx(self._cmap, x)
+        if odf_idx is not None:
+            column = self.get_element_idx2(xp_column_idx, odf_idx)
+            # fixme : no clone here => change doc and unit tests
+            return column.clone()
+            #return row
+        return None
 
     def get_column(self, x):
         """Get the column at the given "x" position.
@@ -1950,13 +2278,7 @@ class odf_table(odf_element):
         Return: odf_column
         """
         x = self._translate_x(x)
-        # Outside the defined table
-        if x >= self.get_columns_width():
-            return odf_create_column()
-        # Inside the defined table
-        for w, column in enumerate(self.traverse_columns()):
-            if w == x:
-                return column
+        return self._get_column2(x)
 
 
     def set_column(self, x, column=None):
@@ -1976,18 +2298,19 @@ class odf_table(odf_element):
         x = self._translate_x(x)
         if column is None:
             column = odf_create_column()
+            repeated = 1
+        else:
+            repeated = column.get_repeated() or 1
         # Outside the defined table
-        diff = x - self.get_columns_width()
-        if diff >= 0:
-            if diff > 0:
-                self.append_column(odf_create_column(repeated=diff))
-            self.append_column(column.clone())
-            return
-        # Inside the defined table
-        _set_element(x, column, self._get_columns(),
-                odf_column.get_repeated,
-                odf_column.set_repeated)
-
+        diff = x - self.get_width()
+        if diff == 0:
+            self.append_column(column, _repeated = repeated)
+        elif diff > 0:
+            self.append_column(odf_create_column(repeated = diff), _repeated = diff)
+            self.append_column(column, _repeated = repeated)
+        else:
+            # Inside the defined table
+            _set_item_in_vault(x, column, self, xp_column_idx, '_cmap')
 
 
     def insert_column(self, x, column=None):
@@ -2008,17 +2331,14 @@ class odf_table(odf_element):
         if column is None:
             column = odf_create_column()
         x = self._translate_x(x)
-        # Outside the defined table
-        diff = x - self.get_columns_width()
-        if diff >= 0:
-            if diff > 0:
-                self.append_column(odf_create_column(repeated=diff))
+        diff = x - self.get_width()
+        if diff < 0:
+            _insert_item_in_vault(x, column, self, xp_column_idx, '_cmap')
+        elif diff == 0:
             self.append_column(column.clone())
-            return column
-        # Inside the defined table
-        _insert_element(x, column, self._get_columns(),
-                odf_column.get_repeated,
-                odf_column.set_repeated)
+        else:
+            self.append_column(odf_create_column(repeated=diff), _repeated = diff)
+            self.append_column(column.clone())
         # Repetitions are accepted
         repeated = column.get_repeated() or 1
         # Update width on every row
@@ -2030,7 +2350,7 @@ class odf_table(odf_element):
         return column
 
 
-    def append_column(self, column=None):
+    def append_column(self, column=None, _repeated=None):
         """Append the column at the end of the table. If no column is given,
         an empty one is created.
 
@@ -2045,10 +2365,19 @@ class odf_table(odf_element):
         """
         if column is None:
             column = odf_create_column()
-        last_column = self._get_columns()[-1]
-        self.insert(column, position=self.index(last_column) + 1)
+        else:
+            column = column.clone()
+        if len(self._cmap) == 0:
+            position = 0
+        else:
+            odf_idx = len(self._cmap) - 1
+            last_column = self.get_element_idx2(xp_column_idx, odf_idx)
+            position = self.index(last_column) + 1
+        self.insert(column, position = position)
         # Repetitions are accepted
-        repeated = column.get_repeated() or 1
+        if _repeated is None:
+            _repeated = column.get_repeated() or 1
+        self._cmap = insert_map_once(self._cmap, len(self._cmap), _repeated)
         # No need to update row widths
         return column
 
@@ -2066,14 +2395,12 @@ class odf_table(odf_element):
         """
         x = self._translate_x(x)
         # Outside the defined table
-        if x >= self.get_columns_width():
+        if x >= self.get_width():
             return
         # Inside the defined table
-        _delete_element(x, self._get_columns(),
-                odf_column.get_repeated,
-                odf_column.set_repeated)
+        _delete_item_in_vault(x, self, xp_column_idx, '_cmap')
         # Update width
-        width = self.get_columns_width()
+        width = self.get_width()
         for y, row in enumerate(self._get_rows()):
             if row.get_width() >= width:
                 row.delete_cell(x)
@@ -2093,11 +2420,9 @@ class odf_table(odf_element):
         """
         x = self._translate_x(x)
         result = []
-        for row in self._get_rows():
+        for row in self.traverse():
             cell = row.get_cell(x)
-            repeated = row.get_repeated() or 1
-            for i in xrange(repeated):
-                result.append(cell.clone())
+            result.append(cell)
         return result
 
 
@@ -2218,7 +2543,7 @@ class odf_table(odf_element):
                 # Also testing lxml.etree._ElementUnicodeResult
                 if type(value) is unicode:
                     value = value.encode(encoding)
-                elif type(value) is str:
+                if type(value) is str:
                     value = value.strip()
                 value = '' if value is None else str(value)
                 value = value.replace(quotechar, quoted)
@@ -2294,8 +2619,8 @@ def import_from_csv(path_or_file, name, style=None, delimiter=None,
 
 
 # Register
-register_element_class('table:table-cell', odf_cell)
+register_element_class('table:table-cell', odf_cell, caching=True)
 register_element_class('table:covered-table-cell', odf_cell)
-register_element_class('table:table-row', odf_row)
+register_element_class('table:table-row', odf_row, caching=True)
 register_element_class('table:table-column', odf_column)
-register_element_class('table:table', odf_table)
+register_element_class('table:table', odf_table, caching=True)

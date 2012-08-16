@@ -27,7 +27,7 @@
 #
 
 # Import from the Standard Library
-from re import compile, escape
+from re import compile, escape, UNICODE
 
 # Import from lpod
 from bookmark import odf_create_bookmark, odf_create_bookmark_start
@@ -298,7 +298,7 @@ class odf_paragraph(odf_element):
                 regex = text[offset:]
             regex = escape(regex)
         if regex:
-            pattern = compile(unicode(regex))
+            pattern = compile(unicode(regex), UNICODE)
             for text in self.xpath('descendant::text()'):
                 # Static information about the text node
                 container = text.get_parent()

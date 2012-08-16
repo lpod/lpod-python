@@ -387,10 +387,12 @@ class TestList(TestCase):
                    'rst_mode': False}
         expected = (u'- In this picture, there are 47 people;\n'
                     u'  none of them can be seen.\n'
+                    u'  \n'
                     u'  - In this film, we hope to show you the\n'
                     u'    value of not being seen.\n'
                     u'  - Here is Mr. Bagthorpe of London, SE14.\n'
                     u'  - He cannot be seen.\n'
+                    u'    \n'
                     u'    - Now I am going to ask him to stand up.\n'
                     u'    - Mr. Bagthorpe, will you stand up please?\n')
         self.assertEqual(how_not_to_be_seen1.get_formatted_text(context),

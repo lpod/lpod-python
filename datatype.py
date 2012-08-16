@@ -179,6 +179,8 @@ class Unit(object):
             value = ''.join(digits)
             if nondigits:
                 unit = ''.join(nondigits)
+        elif isinstance(value, float):
+            value = str(value)
         self.value = Decimal(value)
         self.unit = unit
 

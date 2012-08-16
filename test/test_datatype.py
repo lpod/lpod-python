@@ -103,7 +103,9 @@ class UnitTestCase(TestCase):
 
 
     def test_float(self):
-        self.assertRaises(TypeError, Unit, 3.14)
+        unit = Unit(3.14)
+        self.assertEqual(unit.value, Decimal('3.14'))
+        self.assertEqual(unit.unit, 'cm')
 
 
     def test_encode(self):
