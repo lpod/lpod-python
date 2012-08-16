@@ -69,7 +69,7 @@ def get_release():
         if line.startswith('*'):
             branch = line[2:]
             break
-    output = _run_command(['git', 'describe',  '--tags']).strip()
+    output = _run_command(['git', 'describe',  '--tags', '--always']).strip()
     if not '-' in output:
         return output
     version, delta, sha = output.split('-')
@@ -90,5 +90,3 @@ if __name__ == '__main__':
         print get_release()
     except:
         printerr('%s: unable to read info' % basename(argv[0]))
-
-
