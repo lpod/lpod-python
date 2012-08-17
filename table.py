@@ -1031,7 +1031,7 @@ class odf_row(odf_element):
         self.set_cell(x, odf_create_cell(value, style=style), clone=False)
 
 
-    def insert_cell(self, x, cell=None):
+    def insert_cell(self, x, cell=None, clone=True):
         """Insert the given cell at position "x" starting from 0. If no cell
         is given, an empty one is created.
 
@@ -1053,10 +1053,10 @@ class odf_row(odf_element):
         if diff < 0:
             _insert_item_in_vault(x, cell, self, _xpath_cell_idx, '_rmap')
         elif diff == 0:
-            self.append_cell(cell)
+            self.append_cell(cell, clone=clone)
         else:
             self.append_cell(odf_create_cell(repeated=diff), _repeated=diff, clone=False)
-            self.append_cell(cell)
+            self.append_cell(cell, clone=clone)
         return cell
 
 
@@ -1751,25 +1751,18 @@ class odf_table(odf_element):
 
     get_row_list = obsolete('get_row_list', get_rows)
 
-    def _get_row2(self, y):
+    def _get_row2(self, y, clone = True, create = True):
         if y >= self.get_height():
-            return odf_create_row()
-        return self._get_row2_no_create(y)
-
-    def _get_row2_no_create(self, y):
-        idx = find_odf_idx(self._tmap, y)
-        if idx is not None:
-            if idx in self._indexes['_tmap']:
-                row = self._indexes['_tmap'][idx]
+            if create:
+                return odf_create_row()
             else:
-                row = self.get_element_idx2(_xpath_row_idx, idx)
-                self._indexes['_tmap'][idx] = row
-            # fixme : no clone here => change doc and unit tests
-            return row.clone()
-            #return row
-        return None
+                return None
+        if clone:
+            return self._get_row2_base(y).clone()
+        else:
+            return self._get_row2_base(y)
 
-    def _get_row2_no_create_no_clone(self, y):
+    def _get_row2_base(self, y):
         idx = find_odf_idx(self._tmap, y)
         if idx is not None:
             if idx in self._indexes['_tmap']:
@@ -1780,15 +1773,7 @@ class odf_table(odf_element):
             return row
         return None
 
-    def get_row_no_clone(self, y):
-        y = self._translate_y(y)
-        if y < 0:
-            return None
-        if y >= self.get_height():
-            return odf_create_row()
-        return self._get_row2_no_create_no_clone(y)
-
-    def get_row(self, y):
+    def get_row(self, y, clone = True, create = True):
         """Get the row at the given "y" position.
 
         Position start at 0. So cell A4 is on row 3.
@@ -1805,7 +1790,7 @@ class odf_table(odf_element):
         y = self._translate_y(y)
         if y < 0:
             return None
-        return self._get_row2(y)
+        return self._get_row2(y, clone = clone, create = create)
 
 
     def set_row(self, y, row = None, clone = True):
@@ -1951,7 +1936,7 @@ class odf_table(odf_element):
 
             y -- int
         """
-        values = self.get_row_no_clone(y).get_values()
+        values = self.get_row(y, clone=False).get_values()
         values.extend([None] * (self.get_width() - len(values)))
         return values
 
@@ -1968,8 +1953,6 @@ class odf_table(odf_element):
 
             values -- list of Python types
         """
-        #row = self.get_row_no_clone(y) # would set all repeated rows
-        # row = self.get_row(y) # no needed if clones rows
         row = odf_create_row() # needed if clones rows
         row.set_values(values)
         self.set_row(y, row) # needed if clones rows
@@ -1989,7 +1972,7 @@ class odf_table(odf_element):
 
             aggressive -- bool
         """
-        return self.get_row_no_clone(y).is_empty(aggressive=aggressive)
+        return self.get_row(y, clone=False).is_empty(aggressive=aggressive)
 
 
     #
@@ -2037,7 +2020,7 @@ class odf_table(odf_element):
         if y >= self.get_height():
             return odf_create_cell()
         # Inside the defined table
-        return self._get_row2_no_create_no_clone(y).get_cell(x)
+        return self._get_row2_base(y).get_cell(x)
 
 
     def get_value(self, coordinates):
@@ -2077,7 +2060,7 @@ class odf_table(odf_element):
             row.set_cell(x, cell, clone=clone)
             self.set_row(y, row, clone=False)
         else:
-            row = self._get_row2_no_create_no_clone(y)
+            row = self._get_row2_base(y)
             repeated = row.get_repeated() or 1
             if repeated > 1:
                 row = row.clone()
@@ -2161,7 +2144,7 @@ class odf_table(odf_element):
         self.set_cell(coordinates, cell)
 
 
-    def insert_cell(self, coordinates, cell=None):
+    def insert_cell(self, coordinates, cell=None, clone=True):
         """Insert the given cell at the given coordinates. If no cell is
         given, an empty one is created.
 
@@ -2178,7 +2161,8 @@ class odf_table(odf_element):
         """
         if cell is None:
             cell = odf_create_cell()
-        else:
+            clone = False
+        if clone:
             cell = cell.clone()
         x, y = self._translate_coordinates(coordinates)
         row = self._get_row2(y)
@@ -2186,8 +2170,6 @@ class odf_table(odf_element):
         row.insert_cell(x, cell)
         self.set_row(y, row)
         # Update width if necessary
-        # Don't insert: we are shifting a single row, not the
-        # whole column; just append to match the width
         self.__update_width(row)
         return cell
 
@@ -2213,7 +2195,7 @@ class odf_table(odf_element):
             cell = cell.clone()
         y = self._translate_y(y)
         row = self._get_row2(y)
-        row.append_cell(cell, clone=clone)
+        row.append_cell(cell, clone=False)
         self.set_row(y, row)
         # Update width if necessary
         self.__update_width(row)
@@ -2238,9 +2220,9 @@ class odf_table(odf_element):
         if y >= self.get_height():
             return
         # Inside the defined table
-        row = self._get_row2(y)
+        row = self._get_row2_base(y)
         row.delete_cell(x)
-        self.set_row(y, row)
+        #self.set_row(y, row)
 
 
     #
@@ -2456,7 +2438,7 @@ class odf_table(odf_element):
         _delete_item_in_vault(x, self, _xpath_column_idx, '_cmap')
         # Update width
         width = self.get_width()
-        for y, row in enumerate(self._get_rows()):
+        for row in self._get_rows():
             if row.get_width() >= width:
                 row.delete_cell(x)
 
