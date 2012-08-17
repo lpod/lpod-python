@@ -154,7 +154,7 @@ def _get_python_value(data, encoding):
 
 
 
-def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name):
+def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clone=True):
     """Set the item (cell, row) in its vault (row, table), updating the
        cache map.
     """
@@ -188,7 +188,10 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name):
         # Replacing the first occurence
         vault.delete(current_item)
     # Insert new element
-    new_item = item.clone()
+    if clone:
+        new_item = item.clone()
+    else:
+        new_item = item
     vault.insert(new_item, position = target_idx)
     # Insert the remaining repetitions
     if repeated_after >= 1:
@@ -1598,7 +1601,7 @@ class odf_table(odf_element):
         for row_values in values:
             row = odf_create_row()
             row.set_values(row_values)
-            self.append_row(row)
+            self.append_row(row, clone=False)
 
     set_table_values = obsolete('set_table_values', set_values)
 
@@ -1642,6 +1645,15 @@ class odf_table(odf_element):
                         break
         compute_table_cache(self)
     rstrip_table = obsolete('rstrip_table', rstrip)
+
+
+    def transpose(self):
+        self.rstrip(aggressive=True)    # fixme : We don^t trnaspose styles...
+        data = []
+        for row in self.traverse():
+            data.append(row.get_values())
+        transposed_data = map(None, *data)
+        self.set_values(transposed_data)
 
 
     def is_empty(self, aggressive=False):
@@ -1778,7 +1790,7 @@ class odf_table(odf_element):
         return self._get_row2(y)
 
 
-    def set_row(self, y, row = None):
+    def set_row(self, y, row = None, clone=True):
         """Replace the row at the given position with the new one. It must
         have the same number of cells. Repetion of the old row will be
         adjusted.
@@ -1794,25 +1806,26 @@ class odf_table(odf_element):
         if row is None:
             row = odf_create_row()
             repeated = 1
+            clone = False
         else:
             repeated = row.get_repeated() or 1
         y = self._translate_y(y)
         # Outside the defined table
         diff = y - self.get_height()
         if diff == 0:
-            self.append_row(row, _repeated = repeated)
+            self.append_row(row, _repeated = repeated, clone=clone)
         elif diff > 0:
-            self.append_row(odf_create_row(repeated = diff), _repeated = diff)
-            self.append_row(row, _repeated = repeated)
+            self.append_row(odf_create_row(repeated = diff), _repeated=diff, clone=clone)
+            self.append_row(row, _repeated=repeated, clone=clone)
         else:
             # Inside the defined table
-            _set_item_in_vault(y, row, self, xp_row_idx, '_tmap')
+            _set_item_in_vault(y, row, self, xp_row_idx, '_tmap', clone=clone)
         #print self.serialize(True)
         # Update width if necessary
         self.__update_width(row)
 
 
-    def insert_row(self, y, row=None):
+    def insert_row(self, y, row=None, clone=True):
         """Insert the row before the given "y" position. It must have the
         same number of cells. If no row is given, an empty one is created.
 
@@ -1826,15 +1839,16 @@ class odf_table(odf_element):
         """
         if row is None:
             row = odf_create_row()
+            clone = False
         y = self._translate_y(y)
         diff = y - self.get_height()
         if diff < 0:
             _insert_item_in_vault(y, row, self, xp_row_idx, '_tmap')
         elif diff == 0:
-            self.append_row(row.clone())
+            self.append_row(row, clone=clone)
         else:
-            self.append_row(odf_create_row(repeated=diff), _repeated = diff)
-            self.append_row(row.clone())
+            self.append_row(odf_create_row(repeated=diff), _repeated=diff, clone=False)
+            self.append_row(row, clone=clone)
         # Update width if necessary
         self.__update_width(row)
         return row
@@ -1853,7 +1867,7 @@ class odf_table(odf_element):
             self.append_column(odf_create_column(repeated=diff))
 
 
-    def append_row(self, row=None, _repeated=None):
+    def append_row(self, row=None, clone=True, _repeated=None):
         """Append the row at the end of the table. If no row is given, an
         empty one is created.
 
@@ -1871,7 +1885,7 @@ class odf_table(odf_element):
         if row is None:
             _repeated = self.get_width() or 1
             row = odf_create_row(_repeated)
-        else:
+        elif clone:
             row = row.clone()
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
@@ -2625,7 +2639,7 @@ def import_from_csv(path_or_file, name, style=None, delimiter=None,
         for value in line:
             cell = odf_create_cell(_get_python_value(value, encoding))
             row.append_cell(cell)
-        table.append_row(row)
+        table.append_row(row, clone = False)
     return table
 
 

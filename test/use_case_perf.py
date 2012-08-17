@@ -104,6 +104,21 @@ def test_swap(D, table_ini):
         print table.to_csv()
     print "-" * 50
 
+def test_swap_transpose(D, table_ini):
+    print "Test swap rows/cols with transpose ", D.lines, "rows", D.cols, "cols"
+    if not hasattr(table_ini, 'transpose'):
+        print "method not available"
+        print "-" * 50
+        return
+    table = table_ini.clone()
+    C = chrono()
+    table.transpose()
+    C.delta()
+    print "Size of swapped table :", table.get_size()
+    if DEBUG:
+        print table.to_csv()
+    print "-" * 50
+
 def test_random_set_value(D):
     print "Test random set_value", D.lines, "rows", D.cols, "cols"
     table = odf_create_table(u"Table")
@@ -164,6 +179,7 @@ if __name__=="__main__":
         test_append_rows(D)
         t = test_set_rows(D)
         test_swap(D, t)
+        test_swap_transpose(D, t)
         ##cProfile.run('t = test_random_set_value(D)')
         t = test_random_set_value(D)
         test_random_get_value(D, t)
