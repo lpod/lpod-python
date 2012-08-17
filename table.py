@@ -481,19 +481,15 @@ def odf_create_table(name, width=None, height=None, protected=False,
         height = height or 1
         # Column groups for style information
         columns = odf_create_column(repeated=width)
-        element.append(columns)
+        element._append(columns)
         for i in xrange(height):
             row = odf_create_row(width)
-            element.append(row)
-    compute_table_cache(element)
+            element._append(row)
+    element.__compute_table_cache()
     return element
 
 
-def compute_table_cache(table):
-    idx_repeated_seq = table.elements_repeated_sequence(_xpath_row, 'table:number-rows-repeated')
-    table._tmap = make_cache_map(idx_repeated_seq)
-    idx_repeated_seq = table.elements_repeated_sequence(_xpath_column, 'table:number-columns-repeated')
-    table._cmap = make_cache_map(idx_repeated_seq)
+
 
 def compute_row_cache(row):
     idx_repeated_seq = row.elements_repeated_sequence(_xpath_cell, 'table:number-columns-repeated')
@@ -770,6 +766,7 @@ class odf_row(odf_element):
 
     _append = odf_element.append
 
+
     def _get_cells(self):
         return self.get_elements(_xpath_cell)
 
@@ -835,7 +832,7 @@ class odf_row(odf_element):
             current = upper
         # fixme : need to optimize this
         if hasattr(self, '_tmap'):
-            compute_table_cache(upper)
+            upper.__compute_table_cache()
             del self._tmap[:]
             self._tmap.extend(upper._tmap)
 
@@ -1238,7 +1235,7 @@ class odf_column(odf_element):
             current = upper
         # fixme : need to optimize this
         if hasattr(self, '_cmap'):
-            compute_table_cache(upper)
+            upper.__compute_table_cache()
             del self._cmap[:]
             self._cmap.extend(upper._tmap)
 
@@ -1260,10 +1257,13 @@ class odf_table(odf_element):
         odf_element.__init__(self, native_element, cache)
         # parse the whole table for repeated rows, if cache not already provided
         if cache is None:
-            compute_table_cache(self)
+            self.__compute_table_cache()
         self._indexes={}
         self._indexes['_cmap'] = {}
         self._indexes['_tmap'] = {}
+
+
+    _append = odf_element.append
 
 
     def _translate_x(self, x):
@@ -1289,6 +1289,11 @@ class odf_table(odf_element):
         y = self._translate_y(y)
         return (x, y)
 
+    def __compute_table_cache(self):
+        idx_repeated_seq = self.elements_repeated_sequence(_xpath_row, 'table:number-rows-repeated')
+        self._tmap = make_cache_map(idx_repeated_seq)
+        idx_repeated_seq = self.elements_repeated_sequence(_xpath_column, 'table:number-columns-repeated')
+        self._cmap = make_cache_map(idx_repeated_seq)
 
     def __update_width(self, row):
         """Synchronize the number of columns if the row is bigger.
@@ -1652,7 +1657,7 @@ class odf_table(odf_element):
                     diff = -repeated
                     if diff == 0:
                         break
-        compute_table_cache(self)
+        self.__compute_table_cache
     rstrip_table = obsolete('rstrip_table', rstrip)
 
 
@@ -1865,7 +1870,7 @@ class odf_table(odf_element):
 
     def extend_rows(self, rows=[]):
         self.extend(rows)
-        compute_table_cache(self)
+        self.__compute_table_cache()
         # Update width if necessary
         width = self.get_width()
         for row in self.traverse():
@@ -1898,7 +1903,7 @@ class odf_table(odf_element):
             row = row.clone()
         # Appending a repeated row accepted
         # Do not insert next to the last row because it could be in a group
-        self.append(row)
+        self._append(row)
         if _repeated is None:
             _repeated = row.get_repeated() or 1
         self._tmap = insert_map_once(self._tmap, len(self._tmap), _repeated)
@@ -1907,10 +1912,12 @@ class odf_table(odf_element):
             repeated = row.get_width()
             self.insert(odf_create_column(repeated=repeated),
                     position=0)
-            compute_table_cache(self)
+            self.__compute_table_cache()
         # Update width if necessary
         self.__update_width(row)
         return row
+
+    append = append_row
 
 
     def delete_row(self, y):
