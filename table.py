@@ -351,7 +351,7 @@ def odf_create_row(width=None, repeated=None, style=None, cache=None):
         element.set_repeated(repeated)
     if style is not None:
         element.set_style(style)
-    compute_row_cache(element)
+    element._compute_row_cache()
     return element
 
 
@@ -485,15 +485,9 @@ def odf_create_table(name, width=None, height=None, protected=False,
         for i in xrange(height):
             row = odf_create_row(width)
             element._append(row)
-    element.__compute_table_cache()
+    element._compute_table_cache()
     return element
 
-
-
-
-def compute_row_cache(row):
-    idx_repeated_seq = row.elements_repeated_sequence(_xpath_cell, 'table:number-columns-repeated')
-    row._rmap = make_cache_map(idx_repeated_seq)
 
 
 def insert_map_once(map, odf_idx, repeated):
@@ -523,6 +517,7 @@ def insert_map_once(map, odf_idx, repeated):
     new_map.extend([(x + repeated) for x in map[odf_idx:]])
     return new_map
 
+
 def erase_map_once(map, odf_idx):
     """ Remove an item (cell or row) from the map
 
@@ -541,6 +536,7 @@ def erase_map_once(map, odf_idx):
     map = map[:odf_idx] + [(x - repeated) for x in map[odf_idx + 1:]]
     return map
 
+
 def make_cache_map(idx_repeated_seq):
     """ Build the initial cache map of the table
     """
@@ -549,6 +545,7 @@ def make_cache_map(idx_repeated_seq):
         map = insert_map_once(map, odf_idx, repeated)
     return map
 
+
 def find_odf_idx(map, position):
     """ Find odf_idx in the map from the position (col or row)
     """
@@ -556,6 +553,8 @@ def find_odf_idx(map, position):
     if odf_idx < len(map):
         return odf_idx
     return None
+
+
 
 class odf_cell(odf_element):
     """Class for the table cell element.
@@ -687,7 +686,7 @@ class odf_cell(odf_element):
             child = upper
         # fixme : need to optimize this
         if hasattr(self, '_rmap'):
-            compute_row_cache(upper)
+            upper._compute_row_cache()
             del self._rmap[:]
             self._rmap.extend(upper._rmap)
 
@@ -755,7 +754,7 @@ class odf_row(odf_element):
         self.y = None
         # parse the whole table for repeated cells, if cache not already provided
         if not hasattr(self, '_rmap'):
-            compute_row_cache(self)
+            self._compute_row_cache()
             if not hasattr(self, '_tmap'):
                 self._tmap = []
                 self._cmap = []
@@ -776,6 +775,11 @@ class odf_row(odf_element):
         if x < 0:
             x = self.get_width() + x
         return x
+
+
+    def _compute_row_cache(self):
+        idx_repeated_seq = self.elements_repeated_sequence(_xpath_cell, 'table:number-columns-repeated')
+        self._rmap = make_cache_map(idx_repeated_seq)
 
 
     # Public API
@@ -832,7 +836,7 @@ class odf_row(odf_element):
             current = upper
         # fixme : need to optimize this
         if hasattr(self, '_tmap'):
-            upper.__compute_table_cache()
+            upper._compute_table_cache()
             del self._tmap[:]
             self._tmap.extend(upper._tmap)
 
@@ -1058,7 +1062,7 @@ class odf_row(odf_element):
 
     def extend_cells(self, cells=[]):
         self.extend(cells)
-        compute_row_cache(self)
+        self._compute_row_cache()
 
 
     def append_cell(self, cell=None, clone=True, _repeated=None):
@@ -1127,7 +1131,7 @@ class odf_row(odf_element):
         cells = [ odf_create_cell(value, style=style) for value in values[width:] ]
         if cells:
             self.extend(cells)
-        compute_row_cache(self)
+        self._compute_row_cache()
 
 
     def rstrip(self, aggressive=False):
@@ -1143,7 +1147,7 @@ class odf_row(odf_element):
             if not cell.is_empty(aggressive=aggressive):
                 break
             self.delete(cell)
-        compute_row_cache(self)
+        self._compute_row_cache()
 
 
     def is_empty(self, aggressive=False):
@@ -1235,7 +1239,7 @@ class odf_column(odf_element):
             current = upper
         # fixme : need to optimize this
         if hasattr(self, '_cmap'):
-            upper.__compute_table_cache()
+            upper._compute_table_cache()
             del self._cmap[:]
             self._cmap.extend(upper._tmap)
 
@@ -1257,7 +1261,7 @@ class odf_table(odf_element):
         odf_element.__init__(self, native_element, cache)
         # parse the whole table for repeated rows, if cache not already provided
         if cache is None:
-            self.__compute_table_cache()
+            self._compute_table_cache()
         self._indexes={}
         self._indexes['_cmap'] = {}
         self._indexes['_tmap'] = {}
@@ -1289,7 +1293,7 @@ class odf_table(odf_element):
         y = self._translate_y(y)
         return (x, y)
 
-    def __compute_table_cache(self):
+    def _compute_table_cache(self):
         idx_repeated_seq = self.elements_repeated_sequence(_xpath_row, 'table:number-rows-repeated')
         self._tmap = make_cache_map(idx_repeated_seq)
         idx_repeated_seq = self.elements_repeated_sequence(_xpath_column, 'table:number-columns-repeated')
@@ -1657,7 +1661,7 @@ class odf_table(odf_element):
                     diff = -repeated
                     if diff == 0:
                         break
-        self.__compute_table_cache
+        self._compute_table_cache()
     rstrip_table = obsolete('rstrip_table', rstrip)
 
 
@@ -1870,7 +1874,7 @@ class odf_table(odf_element):
 
     def extend_rows(self, rows=[]):
         self.extend(rows)
-        self.__compute_table_cache()
+        self._compute_table_cache()
         # Update width if necessary
         width = self.get_width()
         for row in self.traverse():
@@ -1912,7 +1916,7 @@ class odf_table(odf_element):
             repeated = row.get_width()
             self.insert(odf_create_column(repeated=repeated),
                     position=0)
-            self.__compute_table_cache()
+            self._compute_table_cache()
         # Update width if necessary
         self.__update_width(row)
         return row
