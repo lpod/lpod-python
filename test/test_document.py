@@ -213,39 +213,39 @@ class TestStyle(TestCase):
         self.document = odf_get_document('../templates/lpod_styles.odt')
 
 
-    def test_get_style_list(self):
+    def test_get_styles(self):
         document = self.document
-        styles = document.get_style_list()
+        styles = document.get_styles()
         self.assertEqual(len(styles), 73)
 
 
-    def test_get_style_list_family_paragraph(self):
+    def test_get_styles_family_paragraph(self):
         document = self.document
-        styles = document.get_style_list(family='paragraph')
+        styles = document.get_styles(family='paragraph')
         self.assertEqual(len(styles), 33)
 
 
-    def test_get_style_list_family_text(self):
+    def test_get_styles_family_text(self):
         document = self.document
-        styles = document.get_style_list(family='text')
+        styles = document.get_styles(family='text')
         self.assertEqual(len(styles), 4)
 
 
-    def test_get_style_list_family_graphic(self):
+    def test_get_styles_family_graphic(self):
         document = self.document
-        styles = document.get_style_list(family='graphic')
+        styles = document.get_styles(family='graphic')
         self.assertEqual(len(styles), 1)
 
 
-    def test_get_style_list_family_page_layout(self):
+    def test_get_styles_family_page_layout(self):
         document = self.document
-        styles = document.get_style_list(family='page-layout')
+        styles = document.get_styles(family='page-layout')
         self.assertEqual(len(styles), 2)
 
 
-    def test_get_style_list_family_master_page(self):
+    def test_get_styles_family_master_page(self):
         document = self.document
-        styles = document.get_style_list(family='master-page')
+        styles = document.get_styles(family='master-page')
         self.assertEqual(len(styles), 2)
 
 

@@ -132,17 +132,17 @@ class TestStyle(TestCase):
         self.assertEqual(style.serialize(), expected)
 
 
-    def test_get_style_list(self):
+    def test_get_styles(self):
         style_list = self.styles.get_styles()
         self.assertEqual(len(style_list), 22)
 
 
-    def test_get_style_list_paragraph(self):
+    def test_get_styles_paragraph(self):
         style_list = self.styles.get_styles(family='paragraph')
         self.assertEqual(len(style_list), 10)
 
 
-    def test_get_style_list_master_page(self):
+    def test_get_styles_master_page(self):
         style_list = self.styles.get_styles(family='master-page')
         self.assertEqual(len(style_list), 1)
 
