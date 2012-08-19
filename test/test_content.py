@@ -51,12 +51,12 @@ class ContentTestCase(TestCase):
         self.assertEqual(body.get_tag(), 'office:text')
 
 
-    def test_get_style_list(self):
+    def test_get_styles(self):
         result = self.content.get_styles()
         self.assertEqual(len(result), 4)
 
 
-    def test_get_style_list_family(self):
+    def test_get_styles_family(self):
         result = self.content.get_styles('font-face')
         self.assertEqual(len(result), 3)
 

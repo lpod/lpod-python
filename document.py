@@ -445,13 +445,13 @@ class odf_document(object):
     # Styles over several parts
     #
 
-    # TODO rename to get_styles in next version
-    def get_style_list(self, family=None, automatic=False):
+    def get_styles(self, family=None, automatic=False):
         content = self.get_part(ODF_CONTENT)
         styles = self.get_part(ODF_STYLES)
         return (content.get_styles(family=family)
                 + styles.get_styles(family=family, automatic=automatic))
 
+    get_style_list = obsolete('get_style_list', get_styles)
 
     def get_style(self, family, name_or_element=None, display_name=None):
         """Return the style uniquely identified by the name/family pair. If
@@ -553,7 +553,7 @@ class odf_document(object):
                     # TODO: Use prefixes of Ooo: Mpm1, ...
                     prefix = 'lpod_auto_'
 
-                    styles = self.get_style_list(family=family, automatic=True)
+                    styles = self.get_styles(family=family, automatic=True)
                     names = [ s.get_name () for s in styles ]
                     numbers = [ int(name[len(prefix):]) for name in names
                                 if name and name.startswith(prefix) ]
@@ -613,7 +613,7 @@ class odf_document(object):
 
     def show_styles(self, automatic=True, common=True, properties=False):
         infos = []
-        for style in self.get_style_list():
+        for style in self.get_styles():
             name = style.get_name()
             is_auto = (style.get_parent().get_tag()
                     == 'office:automatic-styles')
@@ -668,7 +668,7 @@ class odf_document(object):
                     continue
         # Then remove supposedly orphaned styles
         i = 0
-        for style in self.get_style_list():
+        for style in self.get_styles():
             if style.get_name() is None:
                 # Don't delete default styles
                 continue
@@ -690,7 +690,7 @@ class odf_document(object):
         content = self.get_part(ODF_CONTENT)
         manifest = self.get_part(ODF_MANIFEST)
         document_manifest = document.get_part(ODF_MANIFEST)
-        for style in document.get_style_list():
+        for style in document.get_styles():
             tagname = style.get_tag()
             family = style.get_family()
             stylename = style.get_name()

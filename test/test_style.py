@@ -149,13 +149,13 @@ class TestStyle(TestCase):
         self.content = document.get_part(ODF_CONTENT)
 
 
-    def test_get_style_list(self):
+    def test_get_styles(self):
         content = self.content
         styles = content.get_styles()
         self.assertEqual(len(styles), 6)
 
 
-    def test_get_style_list_family(self):
+    def test_get_styles_family(self):
         content = self.content
         styles = content.get_styles(family='paragraph')
         self.assertEqual(len(styles), 1)
