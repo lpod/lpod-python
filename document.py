@@ -30,7 +30,7 @@
 from copy import deepcopy
 from mimetypes import guess_type
 from operator import itemgetter
-from os.path import splitext
+from os.path import splitext, join
 from uuid import uuid4
 
 # Import from lpod
@@ -383,7 +383,7 @@ class odf_document(object):
         if manifest.get_media_type('Pictures/') is None:
             manifest.add_full_path('Pictures/')
 
-        full_path = 'Pictures/%s' % (name)
+        full_path = join('Pictures',name)
         self.container.set_part(full_path, file.read())
 
         # Update manifest
