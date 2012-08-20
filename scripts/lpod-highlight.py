@@ -33,8 +33,7 @@ from sys import exit, stdin
 from lpod import __version__
 from lpod.document import odf_get_document
 from lpod.scriptutils import add_option_output, printinfo
-from lpod.style import odf_create_style
-from lpod.styles import rgb2hex
+from lpod.style import odf_create_style, rgb2hex
 
 
 def highlight(odf_file_url, pattern, color=None, background_color=None,

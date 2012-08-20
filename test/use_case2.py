@@ -40,7 +40,7 @@ from lpod.paragraph import odf_create_paragraph
 from lpod.heading import odf_create_heading
 from lpod.frame import odf_create_frame
 from lpod.image import odf_create_image
-from lpod.style import odf_create_style
+from lpod.style import odf_create_style, rgb2hex
 from lpod.variable import odf_create_variable_decl
 from lpod.variable import odf_create_variable_set, odf_create_variable_get
 from lpod.variable import odf_create_user_field_decl
@@ -51,7 +51,6 @@ from lpod.variable import odf_create_date_variable, odf_create_time_variable
 from lpod.variable import odf_create_chapter_variable
 from lpod.variable import odf_create_filename_variable
 from lpod.table import odf_create_table
-from lpod.styles import rgb2hex
 from lpod import __version__, __installation_path__
 
 
@@ -308,5 +307,3 @@ paragraph._insert_between(odf_create_filename_variable(), u"The", u"is: ")
 if not exists('test_output'):
     mkdir('test_output')
 document.save('test_output/use_case2.odt', pretty=True)
-
-
