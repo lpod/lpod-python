@@ -238,6 +238,68 @@ def rgb2hex(color):
 
 
 
+def make_table_cell_border_string(thick=None, line=None, color=None):
+    """Returns a string for style:table-cell-properties fo:border,
+    with default : "0.06pt solid #000000"
+
+        thick -- str or float
+        line -- str
+        color -- str or rgb 3-tuple, str is 'black', 'grey', ... or '#012345'
+
+    Returns : str
+    """
+    thick_default = "0.06pt"
+    line_default = "solid"
+    color_default = "#000000"
+    if thick is None:
+        thick_string = thick_default
+    elif isinstance(thick, (str, unicode)):
+        if isinstance(thick, unicode):
+            thick = thick.encode("utf-8")
+        thick = thick.strip()
+        if thick:
+            thick_string = thick
+        else:
+            thick_string = thick_default
+    elif isinstance(thick, float):
+        thick_string = "%.2fpt" % thick
+    elif isinstance(thick, int):
+        thick_string = "%.2fpt" % (thick / 100.0)
+    else:
+        raise ValueError, "Thickness must be None for default or float value (pt)"
+    if line is None:
+        line_string = line_default
+    elif isinstance(line, (str, unicode)):
+        if isinstance(line, unicode):
+            line = line.encode("utf-8")
+        line = line.strip()
+        if line:
+            line_string = line
+        else:
+            line_string = line_default
+    else:
+        raise ValueError, "Line style must be None for default or string"
+    if color is None:
+        color_string = color_default
+    elif isinstance(color, (str, unicode)):
+        if isinstance(color, unicode):
+            color = color.encode("utf-8")
+        color = color.strip()
+        if not color:
+            color = color_default
+        elif color.startswith("#"):
+            color_string = color
+        else:
+            color_string = rgb2hex(color)
+    elif isinstance(color, tuple):
+        color_string = rgb2hex(color)
+    else:
+        raise ValueError, "Color must be None for default or color string, or RGB tuple"
+    border = " ".join((thick_string, line_string, color_string))
+    return border
+
+
+
 def odf_create_style(family, name=None, display_name=None, parent=None,
         # Where properties apply
         area=None,

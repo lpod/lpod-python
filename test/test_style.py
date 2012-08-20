@@ -34,6 +34,7 @@ from lpod.document import odf_get_document
 from lpod.style import odf_create_style, odf_style
 from lpod.style import odf_list_level_style_number
 from lpod.style import hex2rgb, rgb2hex
+from lpod.style import make_table_cell_border_string
 from lpod.xmlpart import odf_xmlpart
 
 
@@ -112,6 +113,47 @@ class Rgb2HexTestCase(TestCase):
     def test_color_bad_value(self):
         color = {}
         self.assertRaises(TypeError, rgb2hex, color)
+
+
+
+class Test_make_table_cell_border_string(TestCase):
+
+    def test_default_border(self):
+        expected = '0.06pt solid #000000'
+        self.assertEqual(make_table_cell_border_string(), expected)
+
+    def test_border_bold(self):
+        expected = '0.30pt solid #000000'
+        self.assertEqual(make_table_cell_border_string(thick=0.3), expected)
+
+    def test_border_bold2(self):
+        expected = '0.30pt solid #000000'
+        self.assertEqual(make_table_cell_border_string(thick=u"0.30pt"), expected)
+
+    def test_border_int(self):
+        expected = '0.06pt solid #000000'
+        self.assertEqual(make_table_cell_border_string(thick=6), expected)
+
+    def test_border_custom(self):
+        expected = '0.1cm dotted #FF0000'
+        self.assertEqual(make_table_cell_border_string(thick='0.1cm ',
+                                                       line=' dotted',
+                                                       color = '#FF0000 '),
+                                                    expected)
+
+    def test_border_color_raise(self):
+        arg=(None, None, 'bug')
+        self.assertRaises(ValueError, make_table_cell_border_string, arg)
+
+    def test_border_color_name(self):
+        expected = '0.06pt solid #D3D3D3'
+        self.assertEqual(make_table_cell_border_string(color='lightgrey'),
+                         expected)
+
+    def test_border_color_tuple(self):
+        expected = '0.06pt solid #808080'
+        self.assertEqual(make_table_cell_border_string(color=(128,128,128)),
+                         expected)
 
 
 
