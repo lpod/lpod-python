@@ -921,9 +921,13 @@ class odf_element(object):
         if hasattr(self, '_tmap'):
             self._tmap = []
         if hasattr(self, '_cmap'):
-            self._tmap = []
+            self._cmap = []
         if hasattr(self, '_rmap'):
             self._rmap = []
+        if hasattr(self, '_indexes'):
+            self._indexes={}
+            self._indexes['_cmap'] = {}
+            self._indexes['_tmap'] = {}
 
 
     def clone(self):
