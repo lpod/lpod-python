@@ -35,6 +35,7 @@ from lpod.style import odf_create_style, odf_style
 from lpod.style import odf_list_level_style_number
 from lpod.style import hex2rgb, rgb2hex
 from lpod.style import make_table_cell_border_string
+from lpod.style import odf_create_table_cell_style
 from lpod.xmlpart import odf_xmlpart
 
 
@@ -571,6 +572,63 @@ class TableStyleTestCase(TestCase):
             'style:family="table-column"><style:table-column-properties '
             'style:column-width="5cm"/></style:style>'))
 
+
+
+class Table_cell_style_test(TestCase):
+
+    def test_odf_create_table_cell_style(self):
+        border = make_table_cell_border_string()
+        style = odf_create_table_cell_style(border=border)
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="0.06pt solid #000000"/></style:style>'))
+
+
+    def test_odf_create_table_cell_style_top(self):
+        border = make_table_cell_border_string()
+        style = odf_create_table_cell_style(border_top=border)
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border-top="0.06pt solid #000000" fo:border-left="none" '
+            'fo:border-right="none" fo:border-bottom="none"/></style:style>'))
+
+
+    def test_odf_create_table_cell_style_bg(self):
+        border = make_table_cell_border_string(color='blue')
+        style = odf_create_table_cell_style(
+                                border=border,
+                                background_color='green')
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="0.06pt solid #0000FF" fo:background-color="#008000"/>'
+            '</style:style>'))
+
+
+    def test_odf_create_table_cell_style_color(self):
+        border = make_table_cell_border_string(color='blue')
+        style = odf_create_table_cell_style(
+                                border=border,
+                                color='yellow')
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="0.06pt solid #0000FF"/><style:text-properties '
+            'fo:color="#FFFF00"/></style:style>'))
+
+
+    def test_odf_create_table_cell_style_all(self):
+        border_left = make_table_cell_border_string(color='blue')
+        border_right = make_table_cell_border_string(thick=60)
+        style = odf_create_table_cell_style(
+                                background_color='yellow',
+                                color=(128,64,32),
+                                border_left=border_left,
+                                border_right=border_right)
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border-top="none" fo:border-left="0.06pt solid #0000FF" '
+            'fo:background-color="#FFFF00" '
+            'fo:border-right="0.60pt solid #000000" fo:border-bottom="none"/>'
+            '<style:text-properties fo:color="#804020"/></style:style>'))
 
 
 if __name__ == '__main__':

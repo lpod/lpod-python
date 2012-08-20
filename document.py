@@ -515,6 +515,8 @@ class odf_document(object):
             automatic -- bool
 
             default -- bool
+
+        Returns : style name -- str
         """
 
         # Get family and name
@@ -592,6 +594,7 @@ class odf_document(object):
         if existing is not None:
             container.delete(existing)
         container.append(style)
+        return style.get_name()
 
 
     def get_styled_elements(self, name=True):

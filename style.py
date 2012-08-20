@@ -238,6 +238,28 @@ def rgb2hex(color):
 
 
 
+def __make_color_string(color=None):
+    color_default = "#000000"
+    if color is None:
+        color_string = color_default
+    elif isinstance(color, (str, unicode)):
+        if isinstance(color, unicode):
+            color = color.encode("utf-8")
+        color = color.strip()
+        if not color:
+            color = color_default
+        elif color.startswith("#"):
+            color_string = color
+        else:
+            color_string = rgb2hex(color)
+    elif isinstance(color, tuple):
+        color_string = rgb2hex(color)
+    else:
+        raise ValueError, "Color must be None for default or color string, or RGB tuple"
+    return color_string
+
+
+
 def make_table_cell_border_string(thick=None, line=None, color=None):
     """Returns a string for style:table-cell-properties fo:border,
     with default : "0.06pt solid #000000"
@@ -250,7 +272,6 @@ def make_table_cell_border_string(thick=None, line=None, color=None):
     """
     thick_default = "0.06pt"
     line_default = "solid"
-    color_default = "#000000"
     if thick is None:
         thick_string = thick_default
     elif isinstance(thick, (str, unicode)):
@@ -279,24 +300,39 @@ def make_table_cell_border_string(thick=None, line=None, color=None):
             line_string = line_default
     else:
         raise ValueError, "Line style must be None for default or string"
-    if color is None:
-        color_string = color_default
-    elif isinstance(color, (str, unicode)):
-        if isinstance(color, unicode):
-            color = color.encode("utf-8")
-        color = color.strip()
-        if not color:
-            color = color_default
-        elif color.startswith("#"):
-            color_string = color
-        else:
-            color_string = rgb2hex(color)
-    elif isinstance(color, tuple):
-        color_string = rgb2hex(color)
-    else:
-        raise ValueError, "Color must be None for default or color string, or RGB tuple"
+    color_string = __make_color_string(color)
     border = " ".join((thick_string, line_string, color_string))
     return border
+
+
+
+def odf_create_table_cell_style(border=None, border_top=None,
+                                border_bottom=None,
+                                border_left=None, border_right=None,
+                                background_color=None, shadow=None,
+                                color=None):
+                                #parent='Standard'):
+    if border is not None:
+        border_bottom = border_top = border_left = border_right = None
+    if (border is None and border_bottom is None and border_top is None
+        and border_left is None and border_right is None):
+        border = make_table_cell_border_string()    # default border
+    if color:
+        color_string = __make_color_string(color)
+    if background_color:
+        bgcolor_string = __make_color_string(background_color)
+    else:
+        bgcolor_string = None
+    cell_style = odf_create_style('table-cell', area='table-cell',
+                                  border=border, border_top=border_top,
+                                  border_bottom=border_bottom,
+                                  border_left=border_left,
+                                  border_right=border_right,
+                                  background_color=bgcolor_string,
+                                  shadow=shadow)
+    if color:
+        cell_style.set_properties(area='text', color=color_string)
+    return cell_style
 
 
 
@@ -442,6 +478,8 @@ def odf_create_style(family, name=None, display_name=None, parent=None,
             kw['fo:border-left'] = border_left or 'none'
         if shadow:
             kw['style:shadow'] = shadow
+        if background_color:
+            kw['fo:background-color'] = background_color
     # Table row
     elif area == 'table-row':
         if height:
