@@ -704,10 +704,8 @@ class odf_cell(odf_element):
                 break
             child = upper
         # fixme : need to optimize this
-        if hasattr(self, '_rmap'):
+        if isinstance(upper, odf_row):
             upper._compute_row_cache()
-            del self._rmap[:]
-            self._rmap.extend(upper._rmap)
 
 
     def get_style(self):
@@ -756,7 +754,7 @@ class odf_cell(odf_element):
         return self.set_text_content(text)
 
 
-    def is_empty(self, aggressive):
+    def is_empty(self, aggressive=False):
         if self.get_value() is not None or self.get_children():
             return False
         if not aggressive and self.get_style() is not None:
@@ -860,10 +858,13 @@ class odf_row(odf_element):
                 break
             current = upper
         # fixme : need to optimize this
-        if hasattr(self, '_tmap'):
+        if isinstance(upper, odf_table):
             upper._compute_table_cache()
-            del self._tmap[:]
-            self._tmap.extend(upper._tmap)
+            if hasattr(self, '_tmap'):
+                del self._tmap[:]
+                self._tmap.extend(upper._tmap)
+            else:
+                self._tmap = upper._tmap
 
 
     def get_style(self):
@@ -1172,6 +1173,7 @@ class odf_row(odf_element):
                 break
             self.delete(cell)
         self._compute_row_cache()
+        self._indexes['_rmap'] = {}
 
 
     def is_empty(self, aggressive=False):
@@ -1202,7 +1204,6 @@ class odf_row_group(odf_element):
 
 
 class odf_column(odf_element):
-
 
     def __init__(self, native_element, cache=None):
         odf_element.__init__(self, native_element, cache)
@@ -1274,10 +1275,13 @@ class odf_column(odf_element):
                 break
             current = upper
         # fixme : need to optimize this
-        if hasattr(self, '_cmap'):
+        if isinstance(upper, odf_table):
             upper._compute_table_cache()
-            del self._cmap[:]
-            self._cmap.extend(upper._tmap)
+            if hasattr(self, '_cmap'):
+                del self._cmap[:]
+                self._cmap.extend(upper._cmap)
+            else:
+                self._cmap = upper._cmap
 
 
     def get_style(self):
@@ -1703,10 +1707,17 @@ class odf_table(odf_element):
             row.rstrip(aggressive=aggressive)
             # keep count of the biggest row
             max_width = max(max_width, row.get_width())
+        # raz cache of rows
+        self._indexes['_tmap'] = {}
         # Step 3: trim columns to match max_width
-        diff = self.get_width() - max_width
+        columns = self._get_columns()
+        repeated_cols = self.xpath(
+                    'table:table-column/@table:number-columns-repeated')
+        unrepeated = len(columns) - len(repeated_cols)
+        column_width = sum(int(r) for r in repeated_cols) + unrepeated
+        diff = column_width - max_width
         if diff > 0:
-            for column in reversed(self._get_columns()):
+            for column in reversed(columns):
                 repeated = column.get_repeated() or 1
                 repeated = repeated - diff
                 if repeated > 0:
@@ -1717,7 +1728,10 @@ class odf_table(odf_element):
                     diff = -repeated
                     if diff == 0:
                         break
+        # raz cache of columns
+        self._indexes['_cmap'] = {}
         self._compute_table_cache()
+
     rstrip_table = obsolete('rstrip_table', rstrip)
 
 
@@ -1952,8 +1966,8 @@ class odf_table(odf_element):
             _repeated -- (optional), repeated value of the row
         """
         if row is None:
-            _repeated = self.get_width() or 1
-            row = odf_create_row(_repeated)
+            row = odf_create_row()
+            _repeated = 1
         elif clone:
             row = row.clone()
         # Appending a repeated row accepted
