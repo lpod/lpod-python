@@ -465,6 +465,7 @@ def get_extension(filename):
 
 
 if  __name__ == '__main__':
+    target_file_checked = False
     # Options initialisation
     usage = ("%prog [options] <input.ods> <output.odt>\n"
       "       %prog [options] <input.ods> <output.csv>\n"
@@ -501,6 +502,8 @@ if  __name__ == '__main__':
     outfile = args[1]
     extension = get_extension(outfile)
     if extension in ('csv', 'html', 'rst', 'txt'):
+        check_target_file(outfile)
+        target_file_checked = True
         outdoc = open(outfile, 'wb')
         outtype = extension
     else:
@@ -524,10 +527,14 @@ if  __name__ == '__main__':
     if converter is None:
         raise NotImplementedError, "unsupported combination"
     # Remove output file
-    check_target_file(outfile)
+    if not target_file_checked:
+        check_target_file(outfile)
     # Convert!
     converter(indoc, outdoc)
     if isinstance(outdoc, odf_document):
         outdoc.save(outfile)
     else:
-        outdoc.close()
+        try:
+            outdoc.close()
+        except AttributeError:
+            pass

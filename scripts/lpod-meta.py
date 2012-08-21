@@ -102,5 +102,4 @@ if  __name__ == '__main__':
         set_metadata(doc, options.set_list)
     else:
         # Dump
-        print doc.get_formated_meta()
-
+        print doc.get_formated_meta().encode('utf-8')

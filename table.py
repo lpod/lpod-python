@@ -1508,6 +1508,14 @@ class odf_table(odf_element):
     # Public API
     #
 
+    def append(self, something):
+        if type(something) == odf_row:
+            return self.append_row(something)
+        elif type(something) == odf_column:
+            return self.append_column(something)
+        else:
+            # probably still an error
+            return self._append(something)
 
     def get_height(self):
         """Get the current height of the table.
@@ -1964,8 +1972,6 @@ class odf_table(odf_element):
         # Update width if necessary
         self.__update_width(row)
         return row
-
-    append = append_row
 
 
     def delete_row(self, y):

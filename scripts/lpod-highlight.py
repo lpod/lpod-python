@@ -75,7 +75,7 @@ def highlight(odf_file_url, pattern, color=None, background_color=None,
             continue
         paragraph.set_span(name, regex=pattern)
     document.save(target=target, pretty=pretty)
-    printinfo((i + 1), "paragraphs changed (0 error, 0 warning).")
+    printinfo(str((i + 1)), "paragraphs changed (0 error, 0 warning).")
 
 
 
