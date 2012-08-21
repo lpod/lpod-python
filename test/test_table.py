@@ -1013,6 +1013,7 @@ class TestTableRow(TestCase):
     def test_get_row(self):
         row = self.table.get_row(3)
         self.assertEqual(row.get_values(), [1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(row.y, 3)
 
 
     def test_get_row_repeat(self):
@@ -1021,13 +1022,14 @@ class TestTableRow(TestCase):
         table.get_elements('table:table-row')[1].set_repeated(2)
         row = table.get_row(4)
         self.assertEqual(row.get_values(), [1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(row.y, 4)
 
 
     def test_set_row(self):
         table = self.table.clone()
         row = table.get_row(3)
         row.set_value(3, u"Changed")
-        table.set_row(1, row)
+        row_back = table.set_row(1, row)
         self.assertEqual(table.get_values(),
                 [[1, 1, 1,          2, 3, 3, 3],
                  [1, 2, 3, u"Changed", 5, 6, 7],
@@ -1035,6 +1037,7 @@ class TestTableRow(TestCase):
                  [1, 2, 3,          4, 5, 6, 7]])
         # test columns are synchronized
         self.assertEqual(table.get_width(), 7)
+        self.assertEqual(row_back.y, 1)
 
 
     def test_set_row_repeat(self):
@@ -1071,12 +1074,13 @@ class TestTableRow(TestCase):
         table = self.table.clone()
         row = table.insert_row(2)
         self.assert_(type(row) is odf_row)
+        self.assertEqual(row.y, 2)
 
 
     def test_insert_row(self):
         table = self.table.clone()
         row = table.get_row(3)
-        table.insert_row(2, row)
+        row_back = table.insert_row(2, row)
         self.assertEqual(table.get_values(),
                 [[1, 1, 1, 2, 3, 3, 3],
                  [1, 1, 1, 2, 3, 3, 3],
@@ -1085,6 +1089,7 @@ class TestTableRow(TestCase):
                  [1, 2, 3, 4, 5, 6, 7]])
         # test columns are synchronized
         self.assertEqual(table.get_width(), 7)
+        self.assertEqual(row_back.y, 2)
 
 
     def test_insert_row_repeated(self):
@@ -1128,7 +1133,7 @@ class TestTableRow(TestCase):
     def test_append_row(self):
         table = self.table.clone()
         row = table.get_row(0)
-        table.append_row(row)
+        row_back = table.append_row(row)
         self.assertEqual(table.get_values(),
                 [[1, 1, 1, 2, 3, 3, 3],
                  [1, 1, 1, 2, 3, 3, 3],
@@ -1137,6 +1142,7 @@ class TestTableRow(TestCase):
                  [1, 1, 1, 2, 3, 3, 3]])
         # test columns are synchronized
         self.assertEqual(table.get_width(), 7)
+        self.assertEqual(row_back.y, table.get_height() - 1)
 
 
     def test_append_row_smaller(self):
@@ -1273,7 +1279,6 @@ class TestTableCell(TestCase):
         self.assertEqual(cell.y, 2)
 
 
-
     def test_append(self):
         table = self.table.clone()
         cell = table.append_cell(1)
@@ -1333,15 +1338,19 @@ class TestTableColumn(TestCase):
         table = self.table
         column = table.get_column(3)
         self.assertEqual(column.get_style(), u"co2")
+        self.assertEqual(column.x, 3)
         column = table.get_column(4)
         self.assertEqual(column.get_style(), u"co1")
+        self.assertEqual(column.x, 4)
 
 
     def test_set_column(self):
         table = self.table.clone()
         column = table.get_column(3)
-        table.set_column(4, column)
+        column_back = table.set_column(4, column)
+        self.assertEqual(column_back.x, 4)
         column = table.get_column(4)
+        self.assertEqual(column.x, 4)
         self.assertEqual(column.get_style(), u"co2")
 
 
@@ -1349,26 +1358,30 @@ class TestTableColumn(TestCase):
         table = self.table.clone()
         column = table.insert_column(3)
         self.assert_(type(column) is odf_column)
+        self.assertEqual(column.x, 3)
 
 
     def test_insert_column(self):
         table = self.table.clone()
-        table.insert_column(3, odf_create_column())
+        column = table.insert_column(3, odf_create_column())
         self.assertEqual(table.get_width(), 8)
         self.assertEqual(table.get_row(0).get_width(), 8)
+        self.assertEqual(column.x, 3)
 
 
     def test_append(self):
         table = self.table.clone()
         column = table.append_column()
         self.assert_(type(column) is odf_column)
+        self.assertEqual(column.x, table.get_width() - 1)
 
 
     def test_append_column(self):
         table = self.table.clone()
-        table.append_column(odf_create_column())
+        column = table.append_column(odf_create_column())
         self.assertEqual(table.get_columns_width(), 8)
         self.assertEqual(table.get_row(0).get_width(),  7)
+        self.assertEqual(column.x, table.get_width() - 1)
         # The column must be inserted between the columns and the rows
         self.assert_(type(table.get_children()[-1]) is not odf_column)
 
