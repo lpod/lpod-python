@@ -34,6 +34,7 @@ from textwrap import wrap
 from bisect import bisect_left, insort
 
 # Import from lpod
+from _flags import legacy, experimental, future
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
 from element import xpath_compile
@@ -953,6 +954,8 @@ class odf_row(odf_element):
             if style and style != cell.get_style():
                 continue
             cells.append((x, cell))
+        if experimental or future:
+            return [ xc[1] for xc in cells ]
         # Return the coordinate and element
         return cells
 
@@ -1821,6 +1824,8 @@ class odf_table(odf_element):
             if style and style != row.get_style():
                 continue
             rows.append((y, row))
+        if experimental:
+            return [ xr[1] for xr in rows ]
         return rows
 
     get_row_list = obsolete('get_row_list', get_rows)
@@ -2071,11 +2076,17 @@ class odf_table(odf_element):
         Return: list of tuples
         """
         cells = []
-        for y, row in enumerate(self.traverse()):
-            for x, cell in row.get_cells(style=style, content=content):
-                cells.append((x, y, cell))
-        # Return the coordinates and element
-        return cells
+        if experimental or future:
+            for row in self.traverse():
+                for cell in row.get_cells(style=style, content=content):
+                    cells.append(cell)
+            return cells
+        else:
+            for y, row in enumerate(self.traverse()):
+                for x, cell in row.get_cells(style=style, content=content):
+                    cells.append((x, y, cell))
+            # Return the coordinates and element
+            return cells
 
     get_cell_list = obsolete('get_cell_list', get_cells)
 
@@ -2368,6 +2379,8 @@ class odf_table(odf_element):
             if style and style != column.get_style():
                 continue
             columns.append((x, column))
+        if experimental or future:
+            return [ xc[1] for xc in columns ]
         return columns
 
     get_column_list = obsolete('get_column_list', get_columns)
