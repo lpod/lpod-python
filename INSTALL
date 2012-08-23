@@ -3,4 +3,4 @@ Install Dependencies:
   - lxml >= 2.0: http://codespeak.net/lxml/
 
 Installation:
-  $ python setup.py install
+  $ sudo python setup.py install
