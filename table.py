@@ -606,8 +606,9 @@ class odf_cell(odf_element):
 
             text -- unicode
 
-            cell_type -- 'boolean', 'float', 'date', 'string' or 'time'
-                            'currency' 'percentage'
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                        'currency' or 'percentage'
+
             currency -- unicode
         """
         text = _set_value_and_type(self, value=value, text=text,
