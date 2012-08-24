@@ -643,7 +643,6 @@ class TestRowCell(TestCase):
         cell_5 = row.get_cell(5)
         self.assertEqual(cell_5.get_value(), 3)
         self.assertEqual(cell_5.get_text_content(), u"3")
-        self.assertEqual(cell_5.get_text(), u"3")
         self.assertEqual(cell_5.get_type(), 'float')
         self.assertEqual(cell_5.get_style(), u"ce1")
 
@@ -1252,7 +1251,6 @@ class TestTableCell(TestCase):
         cell = table.get_cell('D3')
         self.assertEqual(cell.get_value(), 2)
         self.assertEqual(cell.get_text_content(), u"2")
-        self.assertEqual(cell.get_text(), u"2")
         self.assertEqual(cell.get_type(), 'float')
         self.assertEqual(cell.get_style(), u"ce1")
         self.assertEqual(cell.x, 3)

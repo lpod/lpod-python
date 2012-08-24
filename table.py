@@ -753,13 +753,6 @@ class odf_cell(odf_element):
         self.set_attribute('table:formula', formula)
 
 
-    _get_text = odf_element.get_text
-
-    def get_text(self, recursive = False):
-        unused = recursive
-        return self.get_text_content()
-
-
     def set_text(self, text):
         return self.set_text_content(text)
 
