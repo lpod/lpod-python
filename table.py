@@ -580,15 +580,16 @@ class odf_cell(odf_element):
         return clone
 
 
-    def get_value(self):
+    def get_value(self, get_type=False):
         """Get the Python value that represent the cell.
 
         Possible return types are unicode, int, Decimal, datetime,
         timedelta.
+        If get_type is True, returns a tuple (value, ODF type of value)
 
-        Return: Python type
+        Return: Python type or tuple (python type, string)
         """
-        return get_value(self)
+        return get_value(self, get_type=get_type)
 
 
     def set_value(self, value, text=None, cell_type=None, currency=None,

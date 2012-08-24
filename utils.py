@@ -391,41 +391,61 @@ def _set_value_and_type(element, value=None, value_type=None, text=None,
 ######################################################################
 # Public API
 ######################################################################
-def get_value(element, value_type=None, try_get_text=True):
+def get_value(element, value_type=None, try_get_text=True, get_type=False):
     """Only for "with office:value-type" elements
     """
     if value_type is None:
         value_type = element.get_attribute('office:value-type')
     if value_type == 'boolean':
         value = element.get_attribute('office:boolean-value')
+        if get_type:
+            return (Boolean.decode(value), value_type)
         return Boolean.decode(value)
     elif value_type in  ('float', 'percentage', 'currency'):
         value = dec(element.get_attribute('office:value'))
         # Return 3 instead of 3.0 if possible
         if int(value) == value:
+            if get_type:
+                return (int(value), value_type)
             return int(value)
+        if get_type:
+                return (value, value_type)
         return value
     elif value_type == 'date':
         value = element.get_attribute('office:date-value')
         if 'T' in value:
+            if get_type:
+                return (DateTime.decode(value), value_type)
             return DateTime.decode(value)
         else:
+            if get_type:
+                return (Date.decode(value), value_type)
             return Date.decode(value)
     elif value_type == 'string':
         value = element.get_attribute('office:string-value')
         if value is not None:
+            if get_type:
+                return (unicode(value), value_type)
             return unicode(value)
         if try_get_text:
             value = []
             for para in element.get_elements('text:p'):
                 value.append(para.get_text(recursive=True))
             if value:
+                if get_type:
+                    return (u"\n".join(value), value_type)
                 return u"\n".join(value)
+        if get_type:
+            return (None, value_type)
         return None
     elif value_type == 'time':
-        value = element.get_attribute('office:time-value')
-        return Duration.decode(value)
+        value = Duration.decode(element.get_attribute('office:time-value'))
+        if get_type:
+            return (value, value_type)
+        return value
     elif value_type is None:
+        if get_type:
+            return (None, None)
         return None
 
     raise ValueError, 'unexpected value type "%s"' % value_type

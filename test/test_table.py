@@ -448,6 +448,7 @@ class TestCell(TestCase):
 
     def test_get_cell_value(self):
         self.assertEqual(self.cell.get_value(), 1)
+        self.assertEqual(self.cell.get_value(get_type=True), (1, 'float') )
 
 
     def test_set_cell_value(self):
@@ -455,6 +456,7 @@ class TestCell(TestCase):
         cell.set_value(u"€")
         self.assertEqual(cell.get_value(), u"€")
         self.assertEqual(cell.get_type(), 'string')
+        self.assertEqual(cell.get_value(get_type=True), (u"€", 'string') )
 
 
     def test_get_cell_type(self):
@@ -463,12 +465,16 @@ class TestCell(TestCase):
         cell.set_value(u"€")
         self.assertEqual(cell.get_type(), 'string')
 
+
     def test_get_cell_type_percentage(self):
         cell = odf_create_cell(90, cell_type='percentage')
         self.assertEqual(cell.get_type(), 'percentage')
+        self.assertEqual(cell.get_value(get_type=True), (90, 'percentage') )
         cell = self.cell.clone()
         cell.set_type('percentage')
         self.assertEqual(cell.get_type(), 'percentage')
+        self.assertEqual(cell.get_value(get_type=True), (1, 'percentage') )
+
 
     def test_set_cell_type(self):
         cell = self.cell.clone()
@@ -476,10 +482,18 @@ class TestCell(TestCase):
         self.assertEqual(cell.get_type(), 'time')
 
 
+    def test_set_cell_type_date(self):
+        cell = self.cell.clone()
+        cell.set_type('date')
+        self.assertEqual(cell.get_type(), 'date')
+
+
     def test_get_cell_currency(self):
         cell = odf_create_cell(123, cell_type='currency', currency='EUR')
         self.assertEqual(cell.get_currency(), 'EUR')
         self.assertEqual(cell.get_type(), 'currency')
+        self.assertEqual(cell.get_value(get_type=True), (123, 'currency') )
+
 
     def test_set_cell_currency(self):
         cell = odf_create_cell(123, cell_type='currency', currency='EUR')
