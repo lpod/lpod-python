@@ -248,16 +248,16 @@ class TestCreateCell(TestCase):
         cell = odf_create_cell(90, cell_type='percentage')
         expected = ('<table:table-cell office:value-type="percentage" '
                       'office:value="90">'
-                      '<text:p>90</text:p>'
+                      '<text:p>9000 %</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
 
 
     def test_percentage_repr(self):
-        cell = odf_create_cell(90, text=u"90 %", cell_type='percentage')
+        cell = odf_create_cell(90, text=u"9000 %", cell_type='percentage')
         expected = ('<table:table-cell office:value-type="percentage" '
                       'office:value="90">'
-                      '<text:p>90 %</text:p>'
+                      '<text:p>9000 %</text:p>'
                     '</table:table-cell>')
         self.assertEqual(cell.serialize(), expected)
 

@@ -331,6 +331,8 @@ def _set_value_and_type(element, value=None, value_type=None, text=None,
             text = u'true' if value else u'false'
         value = Boolean.encode(value)
     elif isinstance(value, (int, float, long, dec)):
+        if value_type is 'percentage':
+            text = "%d %%" % int(value * 100)
         if value_type is None:
             value_type = 'float'
         if text is None:
