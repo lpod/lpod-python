@@ -567,8 +567,8 @@ class odf_cell(odf_element):
     """Class for the table cell element.
     """
 
-    def __init__(self, native_element, cache=None):
-        odf_element.__init__(self, native_element, cache)
+    def __init__(self, native_element):
+        odf_element.__init__(self, native_element)
         self.y = None
         self.x = None
 
@@ -2765,7 +2765,7 @@ def import_from_csv(path_or_file, name, style=None, delimiter=None,
 
 
 # Register
-register_element_class('table:table-cell', odf_cell, caching=True)
+register_element_class('table:table-cell', odf_cell)
 register_element_class('table:covered-table-cell', odf_cell)
 register_element_class('table:table-row', odf_row, caching=True)
 register_element_class('table:table-column', odf_column)
