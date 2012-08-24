@@ -37,17 +37,17 @@ from bisect import bisect_left, insort
 from _flags import legacy, experimental, future
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
-from element import xpath_compile
+from element import _xpath_compile
 from utils import get_value, _set_value_and_type, obsolete, isiterable
 
 
 
-_xpath_row = xpath_compile('table:table-row')
-_xpath_row_idx = xpath_compile('(table:table-row)[$idx]')
-_xpath_column = xpath_compile('table:table-column')
-_xpath_column_idx = xpath_compile('(table:table-column)[$idx]')
-_xpath_cell = xpath_compile('(table:table-cell|table:covered-table-cell)')
-_xpath_cell_idx = xpath_compile('(table:table-cell|table:covered-table-cell)[$idx]')
+_xpath_row = _xpath_compile('table:table-row')
+_xpath_row_idx = _xpath_compile('(table:table-row)[$idx]')
+_xpath_column = _xpath_compile('table:table-column')
+_xpath_column_idx = _xpath_compile('(table:table-column)[$idx]')
+_xpath_cell = _xpath_compile('(table:table-cell|table:covered-table-cell)')
+_xpath_cell_idx = _xpath_compile('(table:table-cell|table:covered-table-cell)[$idx]')
 
 
 

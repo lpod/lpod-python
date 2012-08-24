@@ -80,6 +80,7 @@ FIRST_CHILD, LAST_CHILD, NEXT_SIBLING, PREV_SIBLING, STOPMARKER = range(5)
 
 ns_stripper = compile(' xmlns:\w*="[\w:\-\/\.#]*"')
 
+__xpath_query_cache = {}
 
 # An empty XML document with all namespaces declared
 ns_document_path = _get_abspath('templates/namespaces.xml')
@@ -122,6 +123,21 @@ def _get_prefixed_name(tag):
 
 
 
+def _xpath_compile(path):
+    return XPath(path, namespaces=ODF_NAMESPACES, regexp=False)
+
+
+
+def _find_query_in_cache(query):
+    xpath = __xpath_query_cache.get(query, None)
+    if xpath is None:
+        xpath = _xpath_compile(query)
+        __xpath_query_cache[query] = xpath
+    return xpath
+
+
+_xpath_text = _find_query_in_cache("//text()")
+_xpath_text_descendant = _find_query_in_cache("descendant::text()")
 #
 # Semi-Public API
 # (not in the lpOD specification but foundation of the Python implementation)
@@ -206,11 +222,6 @@ def odf_create_element(element_data, cache=None):
     root = fromstring(data)
     element = root[0]
     return _make_odf_element(element, cache)
-
-
-
-def xpath_compile(path):
-    return XPath(path, namespaces=ODF_NAMESPACES, regexp=False)
 
 
 
@@ -303,7 +314,7 @@ class odf_element(object):
             if position < 0:
                 # Found the last text that matches the regex
                 text = None
-                for a_text in current.xpath("//text()"):
+                for a_text in _xpath_text(current):
                     if regex.search(a_text) is not None:
                         text = a_text
                 if text is None:
@@ -312,7 +323,7 @@ class odf_element(object):
             # position >= 0
             else:
                 count = 0
-                for text in current.xpath("//text()"):
+                for text in _xpath_text(current):
                     found_nb = len(regex.findall(text))
                     if found_nb + count >= position + 1:
                         break
@@ -332,7 +343,7 @@ class odf_element(object):
 
             # Found the text
             count = 0
-            for text in current.xpath("//text()"):
+            for text in _xpath_text(current):
                 found_nb = len(text)
                 if found_nb + count >= position:
                     break
@@ -401,7 +412,7 @@ class odf_element(object):
         """
         current = self.__element
         wrapper = element.__element
-        for text in current.xpath('descendant::text()'):
+        for text in 'descendant::text()':
             if not from_ in text:
                 continue
             from_index = text.index(from_)
@@ -446,7 +457,7 @@ class odf_element(object):
         parent = from_container.getparent()
         index = parent.index(from_container)
         parent.insert(index + 1, wrapper)
-        for text in wrapper.xpath('descendant::text()'):
+        for text in _xpath_text_descendant(wrapper):
             if not to in text:
                 continue
             to_end = text.index(to) + len(to)
@@ -517,7 +528,8 @@ class odf_element(object):
         if isinstance(xpath_query, XPath):
             result = xpath_query(element)
         else:
-            result = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
+            new_xpath_query = _find_query_in_cache(xpath_query)
+            result = new_xpath_query(element)
         if hasattr(self, '_tmap'):
             if hasattr(self, '_rmap'):
                 cache = (self._tmap, self._cmap, self._rmap)
@@ -901,7 +913,8 @@ class odf_element(object):
         odf_element or odf_text instances translated from the nodes found.
         """
         element = self.__element
-        elements = element.xpath(xpath_query, namespaces=ODF_NAMESPACES)
+        xpath_instance = _find_query_in_cache(xpath_query)
+        elements = xpath_instance(element)
         result = []
         for obj in elements:
             if (type(obj) is _ElementStringResult or
