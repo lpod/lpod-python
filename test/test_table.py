@@ -38,6 +38,7 @@ from lpod.table import _alpha_to_digit, _digit_to_alpha
 from lpod.table import _get_cell_coordinates, odf_cell, odf_row
 from lpod.table import odf_create_cell, odf_create_row, odf_create_column
 from lpod.table import odf_create_table, import_from_csv, odf_column
+from lpod._flags import future
 
 
 csv_data = '"A float","3.14"\n"A date","1975-05-07"\n'
@@ -615,13 +616,20 @@ class TestRowCell(TestCase):
 
 
     def test_get_cell_list_regex(self):
-        coordinates = [x for x, cell in self.row.get_cells(content=ur'3')]
+        if future:
+            coordinates = [cell.x for cell in self.row.get_cells(content=ur'3')]
+        else:
+            coordinates = [x for x, cell in self.row.get_cells(content=ur'3')]
         expected = [4, 5, 6]
         self.assertEqual(coordinates, expected)
 
 
     def test_get_cell_list_style(self):
-        coordinates = [x
+        if future:
+            coordinates = [cell.x
+                for cell in self.row.get_cells(style=ur"ce1")]
+        else:
+            coordinates = [x
                 for x, cell in self.row.get_cells(style=ur"ce1")]
         expected = [1, 5]
         self.assertEqual(coordinates, expected)
@@ -1002,8 +1010,12 @@ class TestTableCache(TestCase):
             table.append_row()
         self.assertEqual(len(table.get_rows()), 5)
         vals = []
-        for idx, row in table.get_rows():
-            vals.append(len(row.get_cells()))
+        if future:
+            for row in table.get_rows():
+                vals.append(len(row.get_cells()))
+        else:
+            for idx, row in table.get_rows():
+                vals.append(len(row.get_cells()))
         self.assertEqual(vals, [20, 20, 20, 0, 0])
         last_row = table.get_row(-1)
         for r in range(3):
@@ -1039,7 +1051,10 @@ class TestTableRow(TestCase):
 
 
     def test_get_row_list_regex(self):
-        coordinates = [y for y, row in self.table.get_rows(content=ur'4')]
+        if future:
+            coordinates = [row.y for row in self.table.get_rows(content=ur'4')]
+        else:
+            coordinates = [y for y, row in self.table.get_rows(content=ur'4')]
         self.assertEqual(coordinates, [3])
 
 
@@ -1048,7 +1063,10 @@ class TestTableRow(TestCase):
         # Set a different style manually
         row = table.get_elements('table:table-row')[2]
         row.set_style(u"A Style")
-        coordinates = [y for y, row in table.get_rows(style=ur'A Style')]
+        if future:
+            coordinates = [row.y for row in table.get_rows(style=ur'A Style')]
+        else:
+            coordinates = [y for y, row in table.get_rows(style=ur'A Style')]
         self.assertEqual(coordinates, [2])
 
 
@@ -1284,7 +1302,11 @@ class TestTableCell(TestCase):
 
     def test_get_cell_list_regex(self):
         table = self.table
-        coordinates = [(x, y)
+        if future:
+            coordinates = [(cell.x, cell.y)
+                for cell in table.get_cells(content=ur'3')]
+        else:
+            coordinates = [(x, y)
                 for x, y, cell in table.get_cells(content=ur'3')]
         expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
                 (5, 2), (6, 2), (2, 3)]
@@ -1293,7 +1315,11 @@ class TestTableCell(TestCase):
 
     def test_get_cell_list_style(self):
         table = self.table
-        coordinates = [(x, y)
+        if future:
+            coordinates = [(cell.x, cell.y)
+                for cell in table.get_cells(style=ur"ce1")]
+        else:
+            coordinates = [(x, y)
                 for x, y, cell in table.get_cells(style=ur"ce1")]
         expected = [(1, 1), (5, 1), (3, 2)]
         self.assertEqual(coordinates, expected)
@@ -1372,7 +1398,10 @@ class TestTableColumn(TestCase):
 
     def test_get_column_list_style(self):
         table = self.table
-        coordinates = [x for x, col in table.get_columns(style=ur"co2")]
+        if future:
+            coordinates = [col.x for col in table.get_columns(style=ur"co2")]
+        else:
+            coordinates = [x for x, col in table.get_columns(style=ur"co2")]
         self.assertEqual(coordinates, [2, 3])
 
 

@@ -28,6 +28,9 @@
 # Import from the Standard Library
 from unittest import TestLoader, TestSuite, TextTestRunner
 
+# test future : import lpod.future
+import lpod.future
+
 # Import tests
 import test_bookmark
 import test_container

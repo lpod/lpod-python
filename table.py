@@ -912,6 +912,7 @@ class odf_row(odf_element):
         """
         idx = -1
         before = -1
+        x = 0
         for juska in self._rmap:
             idx += 1
             if idx in self._indexes['_rmap']:
@@ -930,11 +931,12 @@ class odf_row(odf_element):
                 if repeated > 1:
                     cell.set_repeated(None)
                 cell.y = self.y
-                cell.x = idx + i
+                cell.x = x
+                x += 1
                 yield cell
 
 
-    def get_cells(self, style=None, content=None):
+    def _old_get_cells(self, style=None, content=None):
         """Get the list of cells matching the criteria. Each result is a
         tuple of (x, cell).
 
@@ -956,8 +958,48 @@ class odf_row(odf_element):
             if style and style != cell.get_style():
                 continue
             cells.append((x, cell))
-        if experimental or future:
-            return [ xc[1] for xc in cells ]
+        # Return the coordinate and element
+        return cells
+
+
+    def get_cells(self, style=None, content=None, cell_type=None):
+        """Get the list of cells matching the criteria.
+
+        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        type, aka non empty cells.
+
+        Arguments:
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
+
+            content -- regex, unicode
+
+            style -- unicode
+
+        Return: list of tuples
+
+        (cell_type : lpod.future)
+        """
+        if not future:
+            return self._old_get_cells(style=style, content=content)
+        # fixme : not clones ?
+        if cell_type:
+            cell_type = cell_type.lower().strip()
+        cells = []
+        for cell in self.traverse():
+            # Filter the cells by cell_type
+            if cell_type:
+                ctype = cell.get_type()
+                if not ctype or not (ctype == cell_type or cell_type == 'all'):
+                    continue
+            # Filter the cells with the regex
+            if content and not cell.match(content):
+                continue
+            # Filter the cells with the style
+            if style and style != cell.get_style():
+                continue
+            cells.append(cell)
         # Return the coordinate and element
         return cells
 
@@ -1004,20 +1046,31 @@ class odf_row(odf_element):
         return cell
 
 
-    def get_value(self, x):
+    def get_value(self, x, get_type=False):
         """Shortcut to get the value of the cell at position "x".
 
         See ``get_cell`` and ``odf_cell.get_value``.
         """
-        x = self._translate_x(x)
-        if x < 0:
-            return None
-        if x >= self.get_width():
-            return None
-        cell = self._get_cell2_base(x)
-        if cell is None:
-            return None
-        return cell.get_value()
+        if get_type:
+            x = self._translate_x(x)
+            if x < 0:
+                return (None, None)
+            if x >= self.get_width():
+                return (None, None)
+            cell = self._get_cell2_base(x)
+            if cell is None:
+                return (None, None)
+            return cell.get_value(get_type=get_type)
+        else:
+            x = self._translate_x(x)
+            if x < 0:
+                return None
+            if x >= self.get_width():
+                return None
+            cell = self._get_cell2_base(x)
+            if cell is None:
+                return None
+            return cell.get_value()
 
 
     def set_cell(self, x, cell=None, clone=True):
@@ -1046,15 +1099,29 @@ class odf_row(odf_element):
             # Inside the defined row
             _set_item_in_vault(x, cell, self, _xpath_cell_idx, '_rmap', clone=clone)
             cell.x = x
-            cell.y = self.get_width() - 1
+            cell.y = self.y
 
 
-    def set_value(self, x, value, style=None):
+    def set_value(self, x, value, style=None, cell_type=None, currency=None):
         """Shortcut to set the value of the cell at position "x".
+
+        Arguments:
+
+            x -- int or str
+
+            value -- Python type
+
+            cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
+                     'string' or 'time'
+
+            currency -- three-letter str
+
+            style -- unicode
 
         See ``get_cell`` and ``odf_cell.get_value``.
         """
-        self.set_cell(x, odf_create_cell(value, style=style), clone=False)
+        self.set_cell(x, odf_create_cell(value, style=style,
+                        cell_type=cell_type, currency=currency), clone=False)
 
 
     def insert_cell(self, x, cell=None, clone=True):
@@ -1121,6 +1188,7 @@ class odf_row(odf_element):
     # fix for unit test and typos
     append = append_cell
 
+
     def delete_cell(self, x):
         """Delete the cell at the given position "x" starting from 0.
         Alphabetical positions like "D" are accepted.
@@ -1138,15 +1206,46 @@ class odf_row(odf_element):
         _delete_item_in_vault(x, self, _xpath_cell_idx, '_rmap')
 
 
-    def get_values(self):
+    def get_values(self, cell_type=None, complement=False, get_type=False):
         """Shortcut to get the list of all cell values in this row.
+
+        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        type, aka non empty cells.
+        If cell_type and complement is True, replace missing values by None.
+
+        If get_type is True, returns a tuple (value, ODF type of value)
+
+        Arguments:
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
+
+            complement -- boolean
+
+            get_type -- boolean
 
         Return: list of Python types
         """
-        return [cell.get_value() for cell in self.traverse()]
+        if not future:
+            return [cell.get_value() for cell in self.traverse()]
+        if cell_type:
+            values = []
+            for cell in self.traverse():
+                # Filter the cells by cell_type
+                ctype = cell.get_type()
+                if not ctype or not (ctype == cell_type or cell_type == 'all'):
+                    if complement:
+                        if get_type:
+                            values.append((None, None))
+                        else:
+                            values.append(None)
+                    continue
+                values.append(cell.get_value(get_type=get_type))
+            return values
+        return [cell.get_value(get_type=get_type) for cell in self.traverse()]
 
 
-    def set_values(self, values, style=None):
+    def _old_set_values(self, values, style=None):
         """Shortcut to set the list of all cell values in this row.
 
         Arguments:
@@ -1162,6 +1261,41 @@ class odf_row(odf_element):
         if cells:
             self.extend(cells)
         self._compute_row_cache()
+
+
+    def set_values(self, values, style=None, cell_type=None, currency=None):
+        """Shortcut to set the list of all cell values in this row.
+
+        Arguments:
+
+            values -- list of Python types
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency' or 'percentage'
+
+            currency -- three-letter str
+
+            style -- cell style
+        """
+        if not future:
+            return self._old_set_values(values, style=style)
+        # fixme : if values n, n+ are same, use repeat
+        width = self.get_width()
+        for x, value in enumerate(values[:width]):
+            self.set_cell(x, odf_create_cell(value, style=style,
+                        cell_type=cell_type, currency=currency), clone=False)
+        cells = [ odf_create_cell(value, style=style,
+                        cell_type=cell_type, currency=currency)
+                                                for value in values[width:] ]
+        if cells:
+            self.extend_cells(cells)
+        else:
+            self._compute_row_cache()
+
+
+    def set_cells(self, cells=[]):
+        self.clear()
+        self.extend_cells(cells)
 
 
     def rstrip(self, aggressive=False):
@@ -1526,6 +1660,7 @@ class odf_table(odf_element):
             # probably still an error
             return self._append(something)
 
+
     def get_height(self):
         """Get the current height of the table.
 
@@ -1640,35 +1775,64 @@ class odf_table(odf_element):
             return self.__get_formatted_text_normal(context)
 
 
-    def get_values(self):
+    def get_values(self, cell_type=None, complement=True, get_type=False):
         """Get a matrix of all Python values of the table.
 
-        Return: list of lists
+        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        type, aka non empty cells.
+        If cell_type and complement is True, replace missing values by None.
+
+        If get_type is True, returns tuples (value, ODF type of value)
+
+        Arguments:
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
+
+            complement -- boolean
+
+            get_type -- boolean
+
+        Return: list of lists of Python types
         """
         data = []
         width = self.get_width()
         for row in self.traverse():
-            values = row.get_values()
+            values = row.get_values(cell_type=cell_type, complement=complement,
+                                                get_type=get_type)
             # Complement row to match column width
-            values.extend([None] * (width - len(values)))
+            if complement:
+                if get_type:
+                    values.extend([(None, None)] * (width - len(values)))
+                else:
+                    values.extend([None] * (width - len(values)))
             data.append(values)
         return data
 
 
-    def iter_values(self):
+    def iter_values(self, get_type=False):
         """Iterate through lines of Python values of the table.
+
+        If get_type is True, returns tuples (value, ODF type of value)
+
+        Arguments:
+
+            get_type -- boolean
 
         Return: iterator of lists
         """
         width = self.get_width()
         for row in self.traverse():
-            values = row.get_values()
+            values = row.get_values(get_type=get_type)
             # Complement row to match column width
-            values.extend([None] * (width - len(values)))
+            if get_type:
+                values.extend([(None, None)] * (width - len(values)))
+            else:
+                values.extend([None] * (width - len(values)))
             yield values
 
 
-    def set_values(self, values):
+    def set_values(self, values, style=None, cell_type=None, currency=None):
         """Set all Python values for the whole table.
 
         A list of lists is expected, with as many lists as rows, and as many
@@ -1676,14 +1840,22 @@ class odf_table(odf_element):
 
         Arguments:
 
-            values -- list of lists
+            values -- list of lists of python types
+
+            cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
+                         'string' or 'time'
+
+            currency -- three-letter str
+
+            style -- unicode
         """
-        while self.get_height()>0:
+        while self.get_height() > 0:
             self.delete_row(0)
         row_list = []
         for row_values in values:
             row = odf_create_row()
-            row.set_values(row_values)
+            row.set_values(row_values, cell_type=cell_type, currency=currency,
+                           style=style)
             self.append_row(row, clone=False)
 
     set_table_values = obsolete('set_table_values', set_values)
@@ -1745,10 +1917,14 @@ class odf_table(odf_element):
         """
         data = []
         for row in self.traverse():
-            data.append(row.get_values())
+            data.append([cell for cell in row.traverse()])
         transposed_data = map(None, *data)
         self.clear()
-        self.set_values(transposed_data)
+        new_rows = []
+        for row_cells in transposed_data:
+            row = odf_create_row()
+            row.extend_cells(row_cells)
+            self.append_row(row, clone=False)
         self._compute_table_cache()
 
 
@@ -1785,6 +1961,7 @@ class odf_table(odf_element):
         """
         idx = -1
         before = -1
+        y = 0
         for juska in self._tmap:
             idx += 1
             if idx in self._indexes['_tmap']:
@@ -1797,13 +1974,14 @@ class odf_table(odf_element):
             for i in xrange(repeated or 1):
                 # Return a copy without the now obsolete repetition
                 row = row.clone()
-                row.y = idx + i
+                row.y = y
+                y += 1
                 if repeated > 1:
                     row.set_repeated(None)
                 yield row
 
 
-    def get_rows(self, style=None, content=None):
+    def _old_get_rows(self, style=None, content=None):
         """Get the list of rows matching the criteria. Each result is a
         tuple of (y, row).
 
@@ -1826,8 +2004,35 @@ class odf_table(odf_element):
             if style and style != row.get_style():
                 continue
             rows.append((y, row))
-        if experimental:
-            return [ xr[1] for xr in rows ]
+        return rows
+
+
+    def get_rows(self, style=None, content=None):
+        """Get the list of rows matching the criteria.
+
+        The original row elements are returned, with their repetition
+        attribute.
+
+        Arguments:
+
+            content -- regex, unicode
+
+            style -- unicode
+
+        Return: list of rows
+        """
+        if not future:
+            return self._old_get_rows(style=style, content=content)
+        # fixme : not clones ?
+        if not content and not style:
+            return [row for row in self.traverse()]
+        rows = []
+        for row in self.traverse():
+            if content and not row.match(content):
+                continue
+            if style and style != row.get_style():
+                continue
+            rows.append(row)
         return rows
 
     get_row_list = obsolete('get_row_list', get_rows)
@@ -2012,22 +2217,45 @@ class odf_table(odf_element):
         _delete_item_in_vault(y, self, _xpath_row_idx, '_tmap')
 
 
-    def get_row_values(self, y):
+    def get_row_values(self, y, cell_type=None, complement=True,
+                       get_type=False):
         """Shortcut to get the list of Python values for the cells of the row
         at the given "y" position.
 
         Position start at 0. So cell A4 is on row 3.
 
+        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        type, aka non empty cells.
+        If cell_type and complement is True, replace missing values by None.
+
+        If get_type is True, returns a tuple (value, ODF type of value)
+
         Arguments:
 
-            y -- int
+            y -- int, str
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
+
+            complement -- boolean
+
+            get_type -- boolean
+
+        Return: list of lists of Python types
         """
-        values = self.get_row(y, clone=False).get_values()
-        values.extend([None] * (self.get_width() - len(values)))
+        values = self.get_row(y, clone=False).get_values(cell_type=cell_type,
+                                    complement=complement, get_type=get_type)
+        # Complement row to match column width
+        if complement:
+            if get_type:
+                values.extend([(None, None)] * (self.get_width() - len(values)))
+            else:
+                values.extend([None] * (self.get_width() - len(values)))
         return values
 
 
-    def set_row_values(self, y, values):
+    def set_row_values(self, y, values, cell_type=None, currency=None,
+                       style=None):
         """Shortcut to set the values of all cells of the row at the given
         "y" position.
 
@@ -2038,9 +2266,36 @@ class odf_table(odf_element):
             y -- int
 
             values -- list of Python types
+
+            cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
+                         'string' or 'time'
+
+            currency -- three-letter str
+
+            style -- unicode
         """
         row = odf_create_row() # needed if clones rows
-        row.set_values(values)
+        row.set_values(values, style=style, cell_type=cell_type,
+                       currency=currency)
+        self.set_row(y, row) # needed if clones rows
+
+
+    def set_row_cells(self, y, cells=[]):
+        """Shortcut to set the cells of the row at the given
+        "y" position.
+
+        Position start at 0. So cell A4 is on row 3.
+
+        Arguments:
+
+            y -- int
+
+            cells -- list of Python types
+
+            style -- unicode
+        """
+        row = odf_create_row() # needed if clones rows
+        row.extend_cells(cells)
         self.set_row(y, row) # needed if clones rows
 
 
@@ -2065,22 +2320,32 @@ class odf_table(odf_element):
     # Cells
     #
 
-    def get_cells(self, style=None, content=None):
+    def get_cells(self, cell_type=None, style=None, content=None):
         """Get the list of cells matching the criteria. Each result is a
         tuple of (x, y, cell).
 
+        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        type, aka non empty cells.
+        empty cells.
+
         Arguments:
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
 
             regex -- unicode
 
             style -- unicode
 
         Return: list of tuples
+
+        (cell_type : lpod.future)
         """
         cells = []
-        if experimental or future:
+        if future:
             for row in self.traverse():
-                for cell in row.get_cells(style=style, content=content):
+                for cell in row.get_cells(cell_type=cell_type, style=style,
+                                          content=content):
                     cells.append(cell)
             return cells
         else:
@@ -2171,7 +2436,8 @@ class odf_table(odf_element):
                 self.__update_width(row)
 
 
-    def set_value(self, coordinates, value):
+    def set_value(self, coordinates, value, cell_type=None, currency=None,
+                  style=None):
         """Set the Python value of the cell at the given coordinates.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
@@ -2182,8 +2448,17 @@ class odf_table(odf_element):
             coordinates -- (int, int) or str
 
             value -- Python type
+
+            cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
+                     'string' or 'time'
+
+            currency -- three-letter str
+
+            style -- unicode
+
         """
-        self.set_cell(coordinates, odf_create_cell(value), clone=False)
+        self.set_cell(coordinates, odf_create_cell(value, cell_type=cell_type,
+                                currency=currency, style=style), clone=False)
 
 
     def set_cell_image(self, coordinates, image_frame, type=None):
@@ -2348,6 +2623,7 @@ class odf_table(odf_element):
         """
         idx = -1
         before = -1
+        x = 0
         for juska in self._cmap:
             idx += 1
             if idx in self._indexes['_cmap']:
@@ -2360,13 +2636,14 @@ class odf_table(odf_element):
             for i in xrange(repeated or 1):
                 # Return a copy without the now obsolete repetition
                 column = column.clone()
-                column.x = idx + i
+                column.x = x
+                x += 1
                 if repeated > 1:
                     column.set_repeated(None)
                 yield column
 
 
-    def get_columns(self, style=None):
+    def _old_get_columns(self, style=None):
         """Get the list of columns matching the criteria. Each result is a
         tuple of (x, column).
 
@@ -2381,8 +2658,30 @@ class odf_table(odf_element):
             if style and style != column.get_style():
                 continue
             columns.append((x, column))
-        if experimental or future:
-            return [ xc[1] for xc in columns ]
+        return columns
+
+
+    def get_columns(self, style=None):
+        """Get the list of columns matching the criteria. Each result is a
+        tuple of (x, column).
+
+        Arguments:
+
+            style -- unicode
+
+            content -- regex, unicode
+
+        Return: list of columns
+        """
+        if not future:
+            return self._old_get_columns(style=style)
+        if not style:
+            return [column for column in self.traverse_columns()]
+        columns = []
+        for column in self.traverse_columns():
+            if style != column.get_style():
+                continue
+            columns.append(column)
         return columns
 
     get_column_list = obsolete('get_column_list', get_columns)
@@ -2552,7 +2851,7 @@ class odf_table(odf_element):
                 row.delete_cell(x)
 
 
-    def get_column_cells(self, x):
+    def _old_get_column_cells(self, x):
         """Get the list of cells at the given position.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
@@ -2572,20 +2871,117 @@ class odf_table(odf_element):
         return result
 
 
-    def get_column_values(self, x):
+    def get_column_cells(self, x, style=None, content=None, cell_type=None,
+                         complement=False):
+        """Get the list of cells at the given position.
+
+        Position start at 0. So cell C4 is on column 2. Alphabetical position
+        like "C" is accepted.
+
+        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        type, aka non empty cells.
+
+        If complement is True, replace missing values by None.
+
+        Arguments:
+
+            x -- int or str.isalpha()
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
+
+            content -- regex, unicode
+
+            style -- unicode
+
+            complement -- boolean
+
+        Return: list of odf_cell
+        """
+        if not future:
+            return self._old_get_column_cells(x)
+        x = self._translate_x(x)
+        if cell_type:
+            cell_type = cell_type.lower().strip()
+        cells = []
+        if not style and not content and not cell_type:
+            for row in self.traverse():
+                cells.append(row.get_cell(x, clone=True))
+            return cells
+        for row in self.traverse():
+            cell = row.get_cell(x, clone=True)
+        # Filter the cells by cell_type
+            if cell_type:
+                ctype = cell.get_type()
+                if not ctype or not (ctype == cell_type or cell_type == 'all'):
+                    if complement:
+                        cells.append(None)
+                    continue
+            # Filter the cells with the regex
+            if content and not cell.match(content):
+                if complement:
+                    cells.append(None)
+                continue
+            # Filter the cells with the style
+            if style and style != cell.get_style():
+                if complement:
+                    cells.append(None)
+                continue
+            cells.append(cell)
+        return cells
+
+
+    def get_column_values(self, x, cell_type=None, complement=True,
+                          get_type=False):
         """Shortcut to get the list of Python values for the cells at the
         given position.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
         like "C" is accepted.
 
+        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        type, aka non empty cells.
+        If cell_type and complement is True, replace missing values by None.
+
+        If get_type is True, returns a tuple (value, ODF type of value)
+
         Arguments:
 
             x -- int or str.isalpha()
 
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
+
+            complement -- boolean
+
+            get_type -- boolean
+
         Return: list of Python types
         """
-        return [cell.get_value() for cell in self.get_column_cells(x)]
+        if not future:
+            return [cell.get_value() for cell in self._old_get_column_cells(x)]
+        cells = self.get_column_cells(x, style=None, content=None,
+                                    cell_type=cell_type, complement=complement)
+        values = []
+        for cell in cells:
+            if cell is None:
+                if complement:
+                    if get_type:
+                        values.append((None, None))
+                    else:
+                        values.append(None)
+                continue
+            if cell_type:
+                ctype = cell.get_type()
+                if not ctype or not (ctype == cell_type or cell_type == 'all'):
+                    if complement:
+                        if get_type:
+                            values.append((None, None))
+                        else:
+                            values.append(None)
+                    continue
+            values.append(cell.get_value(get_type=get_type))
+        return values
 
 
     def set_column_cells(self, x, cells):
@@ -2611,7 +3007,8 @@ class odf_table(odf_element):
             self.set_row(y, row)
 
 
-    def set_column_values(self, x, values):
+    def set_column_values(self, x, values, cell_type=None, currency=None,
+                       style=None):
         """Shortcut to set the list of Python values of cells at the given
         position.
 
@@ -2625,8 +3022,16 @@ class odf_table(odf_element):
             x -- int or str.isalpha()
 
             values -- list of Python types
+
+            cell_type -- 'boolean', 'currency', 'date', 'float', 'percentage',
+                         'string' or 'time'
+
+            currency -- three-letter str
+
+            style -- unicode
         """
-        cells = [odf_create_cell(value) for value in values]
+        cells = [odf_create_cell(value, cell_type=cell_type, currency=currency,
+                                 style=style) for value in values]
         self.set_column_cells(x, cells)
 
 
