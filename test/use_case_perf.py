@@ -3,7 +3,7 @@
 
 import time
 import random
-import cProfile
+#import cProfile
 # Import from lpod
 from lpod.table import odf_create_table, odf_create_row, odf_create_cell
 from lpod import __version__ as version
