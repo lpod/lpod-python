@@ -34,7 +34,6 @@ from textwrap import wrap
 from bisect import bisect_left, insort
 
 # Import from lpod
-from _flags import legacy, experimental, future
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
 from element import _xpath_compile
@@ -80,8 +79,9 @@ def _digit_to_alpha(digit):
 
 
 
-def _get_cell_coordinates(obj):
+def _convert_coordinates(obj):
     """Translates "D3" to (3, 2) or return (1, 2) untouched.
+    Translates "A1:B3" to (0,0,1,2)
     """
     # By (1, 2) ?
     if isiterable(obj):
@@ -89,26 +89,30 @@ def _get_cell_coordinates(obj):
     # Or by 'B3' notation ?
     if not isinstance(obj, basestring):
         raise ValueError, 'bad coordinates type: "%s"' % type(obj)
-    # First "B"
-    alpha = ''
-    for c in obj:
-        if c.isalpha():
-            alpha += c
-        else:
-            break
-    try:
-        column = _alpha_to_digit(alpha)
-    except ValueError:
-        raise ValueError, 'cell name "%s" is malformed' % obj
-    # Then "3"
-    try:
-        line = int(obj[len(alpha):])
-    except ValueError:
-        raise ValueError, 'cell name "%s" is malformed' % obj
-    if line <= 0:
-        raise ValueError, 'cell name "%s" is malformed' % obj
-    # Indexes start at 0
-    return column, line - 1
+    coordinates = []
+    for coord in [x.strip() for x in obj.split(':', 1)]:
+        # First "A"
+        alpha = ''
+        for c in coord:
+            if c.isalpha():
+                alpha += c
+            else:
+                break
+        try:
+            column = _alpha_to_digit(alpha)
+        except ValueError:
+            raise ValueError, 'coordinates "%s" malformed' % obj
+        coordinates.append(column)
+        # Then "1"
+        try:
+            line = int(coord[len(alpha):])
+        except ValueError:
+            raise ValueError, 'coordinates "%s" malformed' % obj
+        if line <= 0:
+            raise ValueError, 'coordinates "%s" malformed' % obj
+        # Indexes start at 0
+        coordinates.append(line - 1)
+    return tuple(coordinates)
 
 
 
@@ -180,7 +184,7 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
     current_pos = before_cache + 1
     current_repeated = current_cache - before_cache
     repeated_before = position - current_pos
-    repeated_after = current_repeated - repeated_before - 1
+    repeated_after = current_repeated - repeated_before - repeated
     if repeated_before >= 1:
         #Update repetition
         current_item._set_repeated(repeated_before)
@@ -199,6 +203,21 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
         after_item = current_item.clone()
         after_item._set_repeated(repeated_after)
         vault.insert(after_item, position = target_idx + 1)
+    # setting a repeated item !
+    if repeated_after < 0:
+        # deleting some overlapped items
+        deleting = repeated_after
+        while deleting < 0:
+            delete_item = vault.get_element_idx2(vault_scheme, target_idx + 1)
+            if delete_item is None:
+                break
+            is_repeated = delete_item.get_repeated() or 1
+            is_repeated += deleting
+            if is_repeated > 1:
+                delete_item._set_repeated(is_repeated)
+            else:
+                vault.delete(delete_item)
+            deleting = is_repeated
     # update cache
     # remove existing
     idx = odf_idx
@@ -213,6 +232,12 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
     if repeated_after >= 1:
         idx += 1
         map = _insert_map_once(map, idx, repeated_after)
+    if repeated_after < 0:
+        idx += 1
+        while repeated_after < 0:
+            if idx < len(map):
+                map = _erase_map_once(map, idx)
+            repeated_after += 1
     setattr(vault, vault_map_name, map)
     return new_item
 
@@ -792,9 +817,31 @@ class odf_row(odf_element):
 
     def _translate_x(self, x):
         x = _alpha_to_digit(x)
-        if x < 0:
-            x = self.get_width() + x
+        while x < 0:
+            if self.get_width() == 0:
+                x = 0
+            else:
+                x += self.get_width()
         return x
+
+
+    def _translate_row_coordinates(self, coordinates):
+        xyzt = _convert_coordinates(coordinates)
+        if len(xyzt) == 2:
+            x, z = xyzt
+        else:
+            x, _, z, __ = xyzt
+        while x < 0:
+            if self.get_width() == 0:
+                x = 0
+            else:
+                x += self.get_width()
+        while z < 0:
+            if self.get_width() == 0:
+                z = 0
+            else:
+                z += self.get_width()
+        return x, z
 
 
     def _compute_row_cache(self):
@@ -903,72 +950,97 @@ class odf_row(odf_element):
         return w
 
 
-    def traverse(self):
+    def traverse(self, start=None, end=None):
         """Yield as many cell elements as expected cells in the row, i.e.
         expand repetitions by returning the same cell as many times as
         necessary.
+
+            Arguments:
+
+                start -- int
+
+                end -- int
 
         Copies are returned, use ``set_cell`` to push them back.
         """
         idx = -1
         before = -1
         x = 0
-        for juska in self._rmap:
-            idx += 1
-            if idx in self._indexes['_rmap']:
-                cell = self._indexes['_rmap'][idx]
-            else:
-                cell = self.get_element_idx2(_xpath_cell_idx, idx)
-                self._indexes['_rmap'][idx] = cell
-            repeated = juska - before
-            before = juska
-            for i in xrange(repeated or 1):
-                # Return a copy without the now obsolete repetition
-                if cell is None:
-                    cell = odf_create_cell()
+        if start is None and end is None:
+            for juska in self._rmap:
+                idx += 1
+                if idx in self._indexes['_rmap']:
+                    cell = self._indexes['_rmap'][idx]
                 else:
-                    cell = cell.clone()
-                if repeated > 1:
-                    cell.set_repeated(None)
-                cell.y = self.y
-                cell.x = x
-                x += 1
-                yield cell
+                    cell = self.get_element_idx2(_xpath_cell_idx, idx)
+                    self._indexes['_rmap'][idx] = cell
+                repeated = juska - before
+                before = juska
+                for i in xrange(repeated or 1):
+                    # Return a copy without the now obsolete repetition
+                    if cell is None:
+                        cell = odf_create_cell()
+                    else:
+                        cell = cell.clone()
+                        if repeated > 1:
+                            cell.set_repeated(None)
+                    cell.y = self.y
+                    cell.x = x
+                    x += 1
+                    yield cell
+        else:
+            if start is None:
+                start = 0
+            start = max(0, start)
+            if end is None:
+                try:
+                    end = self._rmap[-1]
+                except:
+                    end = -1
+            start_map = _find_odf_idx(self._rmap, start)
+            if start_map is None:
+                return
+            if start_map > 0:
+                before = self._rmap[start_map - 1]
+            idx = start_map - 1
+            before = start - 1
+            x = start
+            for juska in self._rmap[start_map:]:
+                idx += 1
+                if idx in self._indexes['_rmap']:
+                    cell = self._indexes['_rmap'][idx]
+                else:
+                    cell = self.get_element_idx2(_xpath_cell_idx, idx)
+                    self._indexes['_rmap'][idx] = cell
+                repeated = juska - before
+                before = juska
+                for i in xrange(repeated or 1):
+                    if x <= end:
+                        if cell is None:
+                            cell = odf_create_cell()
+                        else:
+                            cell = cell.clone()
+                            if repeated > 1 or (x == start and start > 0):
+                                cell.set_repeated(None)
+                        cell.y = self.y
+                        cell.x = x
+                        x += 1
+                        yield cell
 
 
-    def _old_get_cells(self, style=None, content=None):
-        """Get the list of cells matching the criteria. Each result is a
-        tuple of (x, cell).
-
-        Arguments:
-
-            regex -- unicode
-
-            style -- unicode
-
-        Return: list of tuples
-        """
-        # fixme : not clones ?
-        cells = []
-        for x, cell in enumerate(self.traverse()):
-            # Filter the cells with the regex
-            if content and not cell.match(content):
-                continue
-            # Filter the cells with the style
-            if style and style != cell.get_style():
-                continue
-            cells.append((x, cell))
-        # Return the coordinate and element
-        return cells
-
-
-    def get_cells(self, style=None, content=None, cell_type=None):
+    def get_cells(self, coordinates=None, style=None, content=None,
+                  cell_type=None):
         """Get the list of cells matching the criteria.
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
 
+        Filter by coordinates will retrieve the amount of cells defined by
+        coordinates, minus the other filters.
+
         Arguments:
+
+            coordinates -- str or tuple of int
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
@@ -978,16 +1050,17 @@ class odf_row(odf_element):
             style -- unicode
 
         Return: list of tuples
-
-        (cell_type : lpod.future)
         """
-        if not future:
-            return self._old_get_cells(style=style, content=content)
         # fixme : not clones ?
+        if coordinates:
+            x, z = self._translate_row_coordinates(coordinates)
+        else:
+            x = None
+            z = None
         if cell_type:
             cell_type = cell_type.lower().strip()
         cells = []
-        for cell in self.traverse():
+        for cell in self.traverse(start = x, end = z):
             # Filter the cells by cell_type
             if cell_type:
                 ctype = cell.get_type()
@@ -1038,8 +1111,6 @@ class odf_row(odf_element):
         Return: odf_cell
         """
         x = self._translate_x(x)
-        if x < 0:
-            return None
         cell = self._get_cell2(x, clone=clone)
         cell.y = self.y
         cell.x = x
@@ -1048,25 +1119,20 @@ class odf_row(odf_element):
 
     def get_value(self, x, get_type=False):
         """Shortcut to get the value of the cell at position "x".
+        If egt_type is True, returns the tuples (value, ODF type).
+
+        If the cell is empty, returns None or (None, None)
 
         See ``get_cell`` and ``odf_cell.get_value``.
         """
         if get_type:
             x = self._translate_x(x)
-            if x < 0:
-                return (None, None)
-            if x >= self.get_width():
-                return (None, None)
             cell = self._get_cell2_base(x)
             if cell is None:
                 return (None, None)
             return cell.get_value(get_type=get_type)
         else:
             x = self._translate_x(x)
-            if x < 0:
-                return None
-            if x >= self.get_width():
-                return None
             cell = self._get_cell2_base(x)
             if cell is None:
                 return None
@@ -1100,6 +1166,7 @@ class odf_row(odf_element):
             _set_item_in_vault(x, cell, self, _xpath_cell_idx, '_rmap', clone=clone)
             cell.x = x
             cell.y = self.y
+        return repeated
 
 
     def set_value(self, x, value, style=None, cell_type=None, currency=None):
@@ -1206,16 +1273,29 @@ class odf_row(odf_element):
         _delete_item_in_vault(x, self, _xpath_cell_idx, '_rmap')
 
 
-    def get_values(self, cell_type=None, complement=False, get_type=False):
+    def get_values(self, coordinates=None, cell_type=None,
+                   complement=False, get_type=False):
         """Shortcut to get the list of all cell values in this row.
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
-        If cell_type and complement is True, replace missing values by None.
+        If cell_type is used and complement is True, missing values are
+        replaced by None.
+        If cell_type is None, complement is always True : with no cell type
+        queried, get_values() returns None for each empty cell, the length
+        of the list is equal to the length of the row (depending on
+        coordinates use).
 
-        If get_type is True, returns a tuple (value, ODF type of value)
+        If get_type is True, returns a tuple (value, ODF type of cell), or
+        (None, None) for empty cells if complement is True.
+
+        Filter by coordinates will retrieve the amount of cells defined by
+        coordinates with None for empty cells, except when using cell_type.
+
 
         Arguments:
+
+            coordinates -- str or tuple of int
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
@@ -1224,13 +1304,17 @@ class odf_row(odf_element):
 
             get_type -- boolean
 
-        Return: list of Python types
+        Return: list of Python types, or list of tuples.
         """
-        if not future:
-            return [cell.get_value() for cell in self.traverse()]
+        if coordinates:
+            x, z = self._translate_row_coordinates(coordinates)
+        else:
+            x = None
+            z = None
         if cell_type:
+            cell_type = cell_type.lower().strip()
             values = []
-            for cell in self.traverse():
+            for cell in self.traverse(start = x, end = z):
                 # Filter the cells by cell_type
                 ctype = cell.get_type()
                 if not ctype or not (ctype == cell_type or cell_type == 'all'):
@@ -1240,35 +1324,49 @@ class odf_row(odf_element):
                         else:
                             values.append(None)
                     continue
-                values.append(cell.get_value(get_type=get_type))
+                values.append(cell.get_value(get_type = get_type))
             return values
-        return [cell.get_value(get_type=get_type) for cell in self.traverse()]
+        else:
+            return [ cell.get_value(get_type = get_type)
+                                for cell in self.traverse(start = x, end = z) ]
 
 
-    def _old_set_values(self, values, style=None):
-        """Shortcut to set the list of all cell values in this row.
+    def set_cells(self, cells=[], start=0, clone=True):
+        """Set the cells in the row, from the 'start' column.
+        This method does not clear the row, use row.clear() before to start
+        with an empty row.
 
         Arguments:
 
             values -- list of Python types
-            style -- cell style
+
+            start -- int or str
+
+            cells -- list of cells
         """
-        width = self.get_width()
-        for x, value in enumerate(values[:width]):
-            odf_create_cell(value, style=style)
-            self.set_value(x, value, style=style)
-        cells = [ odf_create_cell(value, style=style) for value in values[width:] ]
-        if cells:
-            self.extend(cells)
-        self._compute_row_cache()
+        start = self._translate_x(start)
+        if start == 0 and clone == False and (len(cells) >= self.get_width()):
+            self.clear()
+            self.extend_cells(cells)
+        else:
+            x = start
+            for cell in cells:
+                repeat = self.set_cell(x, cell, clone=clone)
+                x += repeat
 
 
-    def set_values(self, values, style=None, cell_type=None, currency=None):
-        """Shortcut to set the list of all cell values in this row.
+    def set_values(self, values, start=0, style=None, cell_type=None,
+                   currency=None):
+        """Shortcut to set the value of cells in the row, from the 'start'
+        column vith values.
+        This method does not clear the row, use row.clear() before to start
+        with an empty row.
 
         Arguments:
 
             values -- list of Python types
+
+            start -- int or str
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency' or 'percentage'
@@ -1277,25 +1375,20 @@ class odf_row(odf_element):
 
             style -- cell style
         """
-        if not future:
-            return self._old_set_values(values, style=style)
         # fixme : if values n, n+ are same, use repeat
-        width = self.get_width()
-        for x, value in enumerate(values[:width]):
-            self.set_cell(x, odf_create_cell(value, style=style,
-                        cell_type=cell_type, currency=currency), clone=False)
-        cells = [ odf_create_cell(value, style=style,
-                        cell_type=cell_type, currency=currency)
-                                                for value in values[width:] ]
-        if cells:
+        start = self._translate_x(start)
+        if start == 0 and (len(values) >= self.get_width()):
+            self.clear()
+            cells = ([odf_create_cell(value, style=style,
+                    cell_type=cell_type, currency=currency)
+                    for value in values])
             self.extend_cells(cells)
         else:
-            self._compute_row_cache()
-
-
-    def set_cells(self, cells=[]):
-        self.clear()
-        self.extend_cells(cells)
+            x = start
+            for value in values:
+                self.set_cell(x, odf_create_cell(value, style=style,
+                        cell_type=cell_type, currency=currency), clone=False)
+                x += 1
 
 
     def rstrip(self, aggressive=False):
@@ -1461,8 +1554,8 @@ class odf_table(odf_element):
 
     def _translate_x(self, x):
         x = _alpha_to_digit(x)
-        if x < 0:
-            x = self.get_width() + x
+        while x < 0:
+            x += self.get_width()
         return x
 
 
@@ -1470,17 +1563,30 @@ class odf_table(odf_element):
         # "3" (couting from 1) -> 2 (couting from 0)
         if isinstance(y, str):
             y = int(y) - 1
-        if y < 0:
-            y = self.get_height() + y
+        while y < 0:
+            y += self.get_height()
         return y
 
 
     def _translate_coordinates(self, coordinates):
-        x, y = _get_cell_coordinates(coordinates)
-        if x < 0:
-            x = self.get_width() + x
-        y = self._translate_y(y)
-        return (x, y)
+        coord = _convert_coordinates(coordinates)
+        if len(coord) == 2:
+            x, y = coord
+            while x < 0:
+                x += self.get_width()
+            while y < 0:
+                y += self.get_height()
+            return (x, y)
+        x, y, z, t = coord
+        while x < 0:
+            x += self.get_width()
+        while z < 0:
+            z += self.get_width()
+        while y < 0:
+            y += self.get_height()
+        while t < 0:
+            t += self.get_height()
+        return (x, y, z, t)
 
 
     def _compute_table_cache(self):
@@ -1952,59 +2058,74 @@ class odf_table(odf_element):
         return self.get_elements(_xpath_row)
 
 
-    def traverse(self):
+    def traverse(self, start=None, end=None):
         """Yield as many row elements as expected rows in the table, i.e.
         expand repetitions by returning the same row as many times as
         necessary.
+
+            Arguments:
+
+                start -- int
+
+                end -- int
 
         Copies are returned, use ``set_row`` to push them back.
         """
         idx = -1
         before = -1
         y = 0
-        for juska in self._tmap:
-            idx += 1
-            if idx in self._indexes['_tmap']:
-                row = self._indexes['_tmap'][idx]
-            else:
-                row = self.get_element_idx2(_xpath_row_idx, idx)
-                self._indexes['_tmap'][idx] = row
-            repeated = juska - before
-            before = juska
-            for i in xrange(repeated or 1):
-                # Return a copy without the now obsolete repetition
-                row = row.clone()
-                row.y = y
-                y += 1
-                if repeated > 1:
-                    row.set_repeated(None)
-                yield row
-
-
-    def _old_get_rows(self, style=None, content=None):
-        """Get the list of rows matching the criteria. Each result is a
-        tuple of (y, row).
-
-        The original row elements are returned, with their repetition
-        attribute.
-
-        Arguments:
-
-            regex -- unicode
-
-            style -- unicode
-
-        Return: list of tuples
-        """
-        # fixme : not clones ?
-        rows = []
-        for y, row in enumerate(self.traverse()):
-            if content and not row.match(content):
-                continue
-            if style and style != row.get_style():
-                continue
-            rows.append((y, row))
-        return rows
+        if start is None and end is None:
+            for juska in self._tmap:
+                idx += 1
+                if idx in self._indexes['_tmap']:
+                    row = self._indexes['_tmap'][idx]
+                else:
+                    row = self.get_element_idx2(_xpath_row_idx, idx)
+                    self._indexes['_tmap'][idx] = row
+                repeated = juska - before
+                before = juska
+                for i in xrange(repeated or 1):
+                    # Return a copy without the now obsolete repetition
+                    row = row.clone()
+                    row.y = y
+                    y += 1
+                    if repeated > 1:
+                        row.set_repeated(None)
+                    yield row
+        else:
+            if start is None:
+                start = 0
+            start = max(0, start)
+            if end is None:
+                try:
+                    end = self._tmap[-1]
+                except:
+                    end = -1
+            start_map = _find_odf_idx(self._tmap, start)
+            if start_map is None:
+                return
+            if start_map > 0:
+                before = self._tmap[start_map - 1]
+            idx = start_map - 1
+            before = start - 1
+            y = start
+            for juska in self._tmap[start_map:]:
+                idx += 1
+                if idx in self._indexes['_tmap']:
+                    row = self._indexes['_tmap'][idx]
+                else:
+                    row = self.get_element_idx2(_xpath_row_idx, idx)
+                    self._indexes['_tmap'][idx] = row
+                repeated = juska - before
+                before = juska
+                for i in xrange(repeated or 1):
+                    if y <= end:
+                        row = row.clone()
+                        row.y = y
+                        y += 1
+                        if repeated > 1 or (y == start and start > 0):
+                            row.set_repeated(None)
+                        yield row
 
 
     def get_rows(self, style=None, content=None):
@@ -2021,8 +2142,6 @@ class odf_table(odf_element):
 
         Return: list of rows
         """
-        if not future:
-            return self._old_get_rows(style=style, content=content)
         # fixme : not clones ?
         if not content and not style:
             return [row for row in self.traverse()]
@@ -2320,15 +2439,20 @@ class odf_table(odf_element):
     # Cells
     #
 
-    def get_cells(self, cell_type=None, style=None, content=None):
-        """Get the list of cells matching the criteria. Each result is a
-        tuple of (x, y, cell).
+    def get_cells(self, coordinates=None, cell_type=None, style=None,
+                  content=None, complement=True):
+        """Get the cells matching the criteria. If coordinates is None,
+        parse the whole table, else parse the defined area.
+        If the result is 2D (several rows and colums), return a list of lists,
+        else a single list of cells.
+        If complement is True (default), empty cells are retrieved too.
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
-        empty cells.
 
         Arguments:
+
+            coordinates -- str or tuple of int
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
@@ -2337,23 +2461,29 @@ class odf_table(odf_element):
 
             style -- unicode
 
-        Return: list of tuples
+            complement -- boolean
 
-        (cell_type : lpod.future)
+        Return: list of tuples
         """
         cells = []
-        if future:
+        if not coordinates:
             for row in self.traverse():
                 for cell in row.get_cells(cell_type=cell_type, style=style,
                                           content=content):
                     cells.append(cell)
-            return cells
         else:
-            for y, row in enumerate(self.traverse()):
-                for x, cell in row.get_cells(style=style, content=content):
-                    cells.append((x, y, cell))
-            # Return the coordinates and element
-            return cells
+            xyzt = _translate_coordinates(coordinates)
+            if len(xyzt) == 2:
+                x, y = z, t = xyzt
+            else:
+                x, y, z, t = xyzt
+            for row in self.traverse(start = y, end = t):
+                for cell in row.get_cells(coordinates = (x, z),
+                                            cell_type=cell_type,
+                                            style=style,
+                                            content=content):
+                    cells.append(cell)
+        return cells
 
     get_cell_list = obsolete('get_cell_list', get_cells)
 
@@ -2673,8 +2803,6 @@ class odf_table(odf_element):
 
         Return: list of columns
         """
-        if not future:
-            return self._old_get_columns(style=style)
         if not style:
             return [column for column in self.traverse_columns()]
         columns = []
@@ -2898,8 +3026,6 @@ class odf_table(odf_element):
 
         Return: list of odf_cell
         """
-        if not future:
-            return self._old_get_column_cells(x)
         x = self._translate_x(x)
         if cell_type:
             cell_type = cell_type.lower().strip()
@@ -2958,8 +3084,6 @@ class odf_table(odf_element):
 
         Return: list of Python types
         """
-        if not future:
-            return [cell.get_value() for cell in self._old_get_column_cells(x)]
         cells = self.get_column_cells(x, style=None, content=None,
                                     cell_type=cell_type, complement=complement)
         values = []

@@ -35,10 +35,9 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.document import odf_get_document
 from lpod.table import _alpha_to_digit, _digit_to_alpha
-from lpod.table import _get_cell_coordinates, odf_cell, odf_row
+from lpod.table import _convert_coordinates, odf_cell, odf_row
 from lpod.table import odf_create_cell, odf_create_row, odf_create_column
 from lpod.table import odf_create_table, import_from_csv, odf_column
-from lpod._flags import future
 
 
 csv_data = '"A float","3.14"\n"A date","1975-05-07"\n'
@@ -68,15 +67,41 @@ class TestCoordinates(TestCase):
         self.assertRaises(ValueError, _digit_to_alpha, '730')
 
 
-    def test_get_cell_coordinates_tuple(self):
+    def test_convert_coordinates_tuple(self):
         x1, y1 = (12, 34)
-        x2, y2 = _get_cell_coordinates((x1, y1))
+        x2, y2 = _convert_coordinates((x1, y1))
         self.assertEqual((x1, y1), (x2, y2))
 
 
-    def test_get_cell_coordinates_alphanum(self):
-        x, y = _get_cell_coordinates('ABC123')
+    def test_convert_coordinates_tuple4(self):
+        coord = (12, 34, 15, 60)
+        converted = _convert_coordinates(coord)
+        self.assertEqual(converted, coord)
+
+
+    def test_convert_coordinates_alphanum(self):
+        x, y = _convert_coordinates('ABC123')
         self.assertEqual((x, y), (730, 122))
+
+
+    def test_convert_coordinates_alphanum4(self):
+        converted = _convert_coordinates('F7:ABC123')
+        self.assertEqual(converted, (5, 6, 730, 122))
+
+
+    def test_convert_coordinates_alphanum4(self):
+        converted = _convert_coordinates('f7:ABc123')
+        self.assertEqual(converted, (5, 6, 730, 122))
+
+
+    def test_convert_coordinates_alphanum4(self):
+        converted = _convert_coordinates('f7 : ABc 123 ')
+        self.assertEqual(converted, (5, 6, 730, 122))
+
+
+    def test_convert_coordinates_alphanum4(self):
+        converted = _convert_coordinates('ABC 123: F7 ')
+        self.assertEqual(converted, (730, 122, 5, 6))
 
 
 
@@ -599,6 +624,12 @@ class TestRow(TestCase):
 
 class TestRowCell(TestCase):
 
+#    simpletable :
+#      1	1	1	2	3	3	3
+#      1	1	1	2	3	3	3       self.row
+#      1	1	1	2	3	3	3
+#      1    2	3	4	5	6	7
+
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
         body = document.get_body()
@@ -611,28 +642,129 @@ class TestRowCell(TestCase):
         self.assertEqual(len(list(self.row.traverse())), 7)
 
 
-    def test_get_cell_list(self):
+    def test_traverse_coord(self):
+        self.assertEqual(len(list(self.row.traverse(2, None))), 5)
+        self.assertEqual(len(list(self.row.traverse(2, 4))), 3)
+        self.assertEqual(len(list(self.row.traverse(0, 3))), 4)
+        self.assertEqual(len(list(self.row.traverse(0, 55))), 7)
+        self.assertEqual(len(list(self.row.traverse(100, 55))), 0)
+        self.assertEqual(len(list(self.row.traverse(100, None))), 0)
+        self.assertEqual(len(list(self.row.traverse(None, 1))), 2)
+        self.assertEqual(len(list(self.row.traverse(-5, 1))), 2)
+        self.assertEqual(len(list(self.row.traverse(2, -1))), 0)
+        self.assertEqual(len(list(self.row.traverse(-5, -1))), 0)
+
+
+    def test_get_cells(self):
         self.assertEqual(len(list(self.row.get_cells())), 7)
 
 
-    def test_get_cell_list_regex(self):
-        if future:
-            coordinates = [cell.x for cell in self.row.get_cells(content=ur'3')]
-        else:
-            coordinates = [x for x, cell in self.row.get_cells(content=ur'3')]
+    def test_get_cells_on_emty_row(self):
+        row = odf_create_row()
+        self.assertEqual(len(row.get_cells()), 0)
+        self.assertEqual(len(row.get_cells((1, 2))), 0)
+        self.assertEqual(len(row.get_cells((-2, -3))), 0)
+        self.assertEqual(len(row.get_cells((0, 10))), 0)
+
+
+    def test_get_cells_coord(self):
+        coord = (0,8)
+        self.assertEqual(len(self.row.get_cells(coord)), 7)
+        coord = 'a1:c2'
+        self.assertEqual(len(self.row.get_cells(coord)), 3)
+        coord = 'a1:a2'
+        self.assertEqual(len(self.row.get_cells(coord)), 1)
+        coord = 'a1:EE2'
+        self.assertEqual(len(self.row.get_cells(coord)), 7)
+        coord = 'D1'
+        self.assertEqual(len(self.row.get_cells(coord)), 0)
+        coord = 'c5:a1'
+        self.assertEqual(len(self.row.get_cells(coord)), 0)
+        coord = (5,6)
+        self.assertEqual(len(self.row.get_cells(coord)), 2)
+        coord = (-5, 6)
+        self.assertEqual(len(self.row.get_cells(coord)), 5)
+        coord = (0, -1)
+        self.assertEqual(len(self.row.get_cells(coord)), 7)
+        coord = (0, -2)
+        self.assertEqual(len(self.row.get_cells(coord)), 6)
+        coord = (-1,-1)
+        self.assertEqual(len(self.row.get_cells(coord)), 1)
+        coord = (1,0)
+        self.assertEqual(len(self.row.get_cells(coord)), 0)
+
+
+    def test_get_cells_regex(self):
+        coordinates = [cell.x for cell in self.row.get_cells(content=ur'3')]
         expected = [4, 5, 6]
         self.assertEqual(coordinates, expected)
 
 
-    def test_get_cell_list_style(self):
-        if future:
-            coordinates = [cell.x
-                for cell in self.row.get_cells(style=ur"ce1")]
-        else:
-            coordinates = [x
-                for x, cell in self.row.get_cells(style=ur"ce1")]
+    def test_get_cells_style(self):
+        coordinates = [cell.x
+            for cell in self.row.get_cells(style=ur"ce1")]
         expected = [1, 5]
         self.assertEqual(coordinates, expected)
+
+
+    def test_get_cells_cell_type(self):
+        row = self.row.clone()
+        cells = row.get_cells(cell_type='all')
+        self.assertEqual(len(cells), 7)
+        cells = row.get_cells(cell_type='float')
+        self.assertEqual(len(cells), 7)
+        cells = row.get_cells(cell_type='percentage')
+        self.assertEqual(len(cells), 0)
+        cells = row.get_cells(cell_type='string')
+        self.assertEqual(len(cells), 0)
+
+
+    def test_get_cells_cell_type2(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False)
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        cells = row.get_cells(cell_type='all')
+        self.assertEqual(len(cells), 7 + 3 )
+        cells = row.get_cells(cell_type='float')
+        self.assertEqual(len(cells), 7)
+        cells = row.get_cells(cell_type='percentage')
+        self.assertEqual(len(cells), 1)
+        cells = row.get_cells(cell_type='string')
+        self.assertEqual(len(cells), 2)
+
+
+    def test_get_cells_cell_type_and_coord(self):
+        row = self.row.clone()
+        cells = row.get_cells(coordinates=(0, 5), cell_type='all')
+        self.assertEqual(len(cells), 6)
+        cells = row.get_cells(coordinates=(0, 5), cell_type='float')
+        self.assertEqual(len(cells), 6)
+        cells = row.get_cells(coordinates=(0, 5), cell_type='percentage')
+        self.assertEqual(len(cells), 0)
+        cells = row.get_cells(coordinates=(2, 5), cell_type='string')
+        self.assertEqual(len(cells), 0)
+
+
+    def test_get_cells_cell_type_and_coord2(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False)
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        cells = row.get_cells(coordinates=(2, 9), cell_type='all')
+        self.assertEqual(len(cells), 8)
+        cells = row.get_cells(coordinates=(3, 9), cell_type='float')
+        self.assertEqual(len(cells), 4)
+        cells = row.get_cells(coordinates=(0, 5), cell_type='percentage')
+        self.assertEqual(len(cells), 0)
+        cells = row.get_cells(coordinates=(0, 5), cell_type='string')
+        self.assertEqual(len(cells), 0)
+        cells = row.get_cells(coordinates=(5, 9), cell_type='percentage')
+        self.assertEqual(len(cells), 1)
+        cells = row.get_cells(coordinates=(5, 9), cell_type='string')
+        self.assertEqual(len(cells), 2)
+        cells = row.get_cells(coordinates=(8, 9), cell_type='string')
+        self.assertEqual(len(cells), 1)
 
 
     def test_get_cell_alpha(self):
@@ -655,6 +787,72 @@ class TestRowCell(TestCase):
         self.assertEqual(cell_5.get_style(), u"ce1")
 
 
+    def test_get_cell_coord(self):
+        row = self.row.clone()
+        cell = row.get_cell(-1)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-3)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-4)
+        self.assertEqual(cell.get_value(), 2)
+        cell = row.get_cell(-5)
+        self.assertEqual(cell.get_value(), 1)
+        cell = row.get_cell(-1 - 7)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-3 - 56)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-4 - 560)
+        self.assertEqual(cell.get_value(), 2)
+        cell = row.get_cell(-5 - 7000)
+        self.assertEqual(cell.get_value(), 1)
+        cell = row.get_cell(8)
+        self.assertEqual(cell.get_value(), None)
+        cell = row.get_cell(1000)
+        self.assertEqual(cell.get_value(), None)
+
+
+    def test_get_value_coord(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell("Appended"))
+        value = row.get_value(-1)
+        self.assertEqual(value, u'Appended')
+        value = row.get_value(-3)
+        self.assertEqual(value, 3)
+        value = row.get_value(-4)
+        self.assertEqual(value, 3)
+        value = row.get_value(-5)
+        self.assertEqual(value, 2)
+        value = row.get_value(-1 - 8)
+        self.assertEqual(value, u'Appended')
+        value = row.get_value(7)
+        self.assertEqual(value, u'Appended')
+        value = row.get_value(8)
+        self.assertEqual(value, None)
+        value = row.get_value(1000)
+        self.assertEqual(value, None)
+
+
+    def test_get_value_coord_with_get_type(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell("Appended"))
+        value = row.get_value(-1, get_type=True)
+        self.assertEqual(value, (u'Appended', u'string'))
+        value = row.get_value(-3, get_type=True)
+        self.assertEqual(value, (3, u'float'))
+        value = row.get_value(-4, get_type=True)
+        self.assertEqual(value, (3, u'float'))
+        value = row.get_value(-5, get_type=True)
+        self.assertEqual(value, (2, u'float'))
+        value = row.get_value(-1 - 8, get_type=True)
+        self.assertEqual(value, (u'Appended', u'string'))
+        value = row.get_value(7, get_type=True)
+        self.assertEqual(value, (u'Appended', u'string'))
+        value = row.get_value(8, get_type=True)
+        self.assertEqual(value, (None, None))
+        value = row.get_value(1000, get_type=True)
+        self.assertEqual(value, (None, None))
+
+
     def test_set_cell(self):
         row = self.row.clone()
         row.set_value(1, 3.14)
@@ -664,11 +862,30 @@ class TestRowCell(TestCase):
         self.assertEqual(row.get_width(), 7)
 
 
+    def test_set_cell_far_away(self):
+        row = self.row.clone()
+        row.set_value(7 + 3, 3.14)
+        self.assertEqual(row.get_values(),
+                [1, 1, 1, 2, 3, 3, 3, None, None, None, dec('3.14')])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 11)
+
+
     def test_set_cell_repeat(self):
         row = self.row_repeats.clone()
         row.set_value(1, 3.14)
         self.assertEqual(row.get_values(),
                 [1, dec('3.14'), 1, 2, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cell_repeat_repeat(self):
+        row = self.row_repeats.clone()
+        cell = odf_create_cell(value=20, repeated=2)
+        row.set_cell(1, cell)
+        self.assertEqual(row.get_values(),
+                [1, 20, 20, 2, 3, 3, 3])
         # Test repetitions are synchronized
         self.assertEqual(row.get_width(), 7)
 
@@ -715,7 +932,18 @@ class TestRowCell(TestCase):
         self.assertEqual(cell.y, 0)
 
 
-    def test_append(self):
+    def test_insert_cell_repeat_repeat_bis(self):
+        row = self.row_repeats.clone()
+        cell = row.insert_cell(1, odf_create_cell(u"Inserted", repeated=2))
+        self.assertEqual(row.get_values(),
+                [1, u"Inserted", u"Inserted", 1, 1, 2, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 9)
+        self.assertEqual(cell.x, 1)
+        self.assertEqual(cell.y, 0)
+
+
+    def test_append_cell(self):
         row = self.row.clone()
         cell = row.append_cell()
         self.assert_(type(cell) is odf_cell)
@@ -723,7 +951,7 @@ class TestRowCell(TestCase):
         self.assertEqual(cell.y, 1)
 
 
-    def test_append_cell(self):
+    def test_append_cell2(self):
         row = self.row.clone()
         cell = row.append_cell(odf_create_cell(u"Appended"))
         self.assertEqual(row.get_values(),
@@ -749,6 +977,662 @@ class TestRowCell(TestCase):
         # Test repetitions are synchronized
         self.assertEqual(row.get_width(), 6)
 
+
+    def test_set_cells_1(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10)]
+        row.set_cells(cells)
+        self.assertEqual(row.get_values(),
+                [10, 1, 1, 2, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_2(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10),
+                    odf_create_cell(value=20)]
+        row.set_cells(cells)
+        self.assertEqual(row.get_values(),
+                [10, 20, 1, 2, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_many(self):
+        row = self.row.clone()
+        cells = []
+        for i in range(10):
+            cells.append(odf_create_cell(value=10*i))
+        row.set_cells(cells)
+        self.assertEqual(row.get_values(),
+                [0, 10, 20,  30, 40, 50, 60, 70, 80, 90])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 10)
+
+
+    def test_set_cells_1_start_1(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10)]
+        row.set_cells(cells, 1)
+        self.assertEqual(row.get_values(),
+                [1, 10, 1, 2, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_1_start_m_2(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10)]
+        row.set_cells(cells, -2)
+        self.assertEqual(row.get_values(),
+                [1, 1, 1, 2, 3, 10, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_1_start_m_6(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10)]
+        row.set_cells(cells, 6)
+        self.assertEqual(row.get_values(),
+                [1, 1, 1, 2, 3, 3, 10])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_1_start_m_9(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10)]
+        row.set_cells(cells, 9)
+        self.assertEqual(row.get_values(),
+                [1, 1, 1, 2, 3, 3, 3, None, None, 10])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 10)
+
+
+    def test_set_cells_2_start_1(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10),
+                    odf_create_cell(value=20)]
+        row.set_cells(cells, 1)
+        self.assertEqual(row.get_values(),
+                [1, 10, 20, 2, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_many_start_5(self):
+        row = self.row.clone()
+        cells = []
+        for i in range(5):
+            cells.append(odf_create_cell(value=10*i))
+        row.set_cells(cells, 5)
+        self.assertEqual(row.get_values(),
+                [1, 1, 1, 2, 3, 0, 10, 20, 30, 40])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 10)
+
+
+    def test_set_cells_many_start_far(self):
+        row = self.row.clone()
+        cells = []
+        for i in range(5):
+            cells.append(odf_create_cell(value=10*i))
+        row.set_cells(cells, 9)
+        self.assertEqual(row.get_values(),
+                [1, 1, 1, 2, 3, 3, 3, None, None, 0, 10, 20, 30, 40])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 14)
+
+
+    def test_set_cells_3_start_1_repeats(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10, repeated = 2)]
+        row.set_cells(cells, 1)
+        self.assertEqual(row.get_values(),
+                [1, 10, 10, 2, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_3_start_1_repeats_2(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10, repeated = 2),
+                    odf_create_cell(value=20)]
+        row.set_cells(cells, 1)
+        self.assertEqual(row.get_values(),
+                [1, 10, 10, 20, 3, 3, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_3_start_1_repeats_3(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10, repeated = 2),
+                    odf_create_cell(value=20),
+                    odf_create_cell(value=30, repeated = 2)]
+        row.set_cells(cells, 1)
+        self.assertEqual(row.get_values(),
+                [1, 10, 10, 20, 30, 30, 3])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 7)
+
+
+    def test_set_cells_3_start_1_repeats_4(self):
+        row = self.row.clone()
+        cells = [odf_create_cell(value=10, repeated = 2),
+                    odf_create_cell(value=20),
+                    odf_create_cell(value=30, repeated = 4)]
+        row.set_cells(cells, 1)
+        self.assertEqual(row.get_values(),
+                [1, 10, 10, 20, 30, 30, 30, 30])
+        # Test repetitions are synchronized
+        self.assertEqual(row.get_width(), 8)
+
+
+    def test_set_values_empty(self):
+        row = odf_create_row()
+        row.set_values([1, 2, 3, 4])
+        self.assertEqual(row.get_width(), 4)
+        self.assertEqual(row.get_values(), [1, 2, 3, 4])
+
+
+    def test_set_values_on_row(self):
+        row = self.row.clone()
+        row.set_values([10, 20, 30, u'4'])
+        self.assertEqual(row.get_width(), 7)
+        self.assertEqual(row.get_values(), [10, 20, 30, u'4', 3, 3, 3])
+
+
+    def test_set_values_on_row2(self):
+        row = self.row.clone()
+        row.set_values([10, 20, 30, u'4'], start = 2)
+        self.assertEqual(row.get_width(), 7)
+        self.assertEqual(row.get_values(), [1, 1, 10, 20, 30, u'4', 3])
+
+
+    def test_set_values_on_row3(self):
+        row = self.row.clone()
+        row.set_values([10, 20, 30, u'4'], start = 2)
+        self.assertEqual(row.get_width(), 7)
+        self.assertEqual(row.get_values(), [1, 1, 10, 20, 30, u'4', 3])
+
+
+    def test_set_values_on_row4(self):
+        row = self.row.clone()
+        row.set_values([10, 20, 30, u'4'], start = -2)
+        self.assertEqual(row.get_width(), 9)
+        self.assertEqual(row.get_values(), [1, 1, 1, 2, 3, 10, 20, 30, u'4'])
+
+
+    def test_set_values_on_row5(self):
+        row = self.row.clone()
+        row.set_values([10, 20, 30, u'4'], start = 8)
+        self.assertEqual(row.get_width(), 7 + 1 + 4)
+        self.assertEqual(row.get_values(), [1, 1, 1, 2, 3, 3, 3, None,
+                                            10, 20, 30, u'4'])
+
+    def test_set_values_on_row6(self):
+        row = self.row.clone()
+        row.set_values([10, 20, 30, 40, 50, 60, 70, 80], start = 0)
+        self.assertEqual(row.get_width(), 8)
+        self.assertEqual(row.get_values(), [10, 20, 30, 40, 50, 60, 70, 80])
+
+
+    def test_set_values_on_row_percentage(self):
+        row = self.row.clone()
+        row.set_values([10, 20], start=4, cell_type='percentage')
+        self.assertEqual(row.get_width(), 7)
+        self.assertEqual(row.get_values(), [1, 1, 1, 2, 10, 20, 3])
+        self.assertEqual(row.get_values(get_type=True, cell_type='percentage'),
+                         [(10, u'percentage'), (20, u'percentage')])
+
+
+    def test_set_values_on_row_style(self):
+        row = self.row.clone()
+        row.set_values([10, 20], start=3, style='bold')
+        self.assertEqual(row.get_width(), 7)
+        self.assertEqual(row.get_values(), [1, 1, 1, 10, 20, 3, 3])
+        self.assertEqual(row.get_cell(4).get_style(), u'bold')
+
+
+    def test_set_values_on_row_curency(self):
+        row = self.row.clone()
+        row.set_values([10, 20], start=3,
+                cell_type=u'currency', currency=u'EUR')
+        self.assertEqual(row.get_width(), 7)
+        self.assertEqual(row.get_values(), [1, 1, 1, 10, 20, 3, 3])
+        self.assertEqual(row.get_cell(4).get_value(get_type=True), (20, u'currency'))
+        self.assertEqual(row.get_cell(4).get_currency(), 'EUR')
+
+
+
+class TestRowCellGetValues(TestCase):
+
+#    simpletable :
+#      1	1	1	2	3	3	3
+#      1	1	1	2	3	3	3       self.row
+#      1	1	1	2	3	3	3
+#      1    2	3	4	5	6	7
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        body = document.get_body()
+        table = body.get_table(name=u"Example1").clone()
+        self.row_repeats = table.get_row(0)
+        self.row = table.get_row(1)
+
+
+    def test_on_empty_row(self):
+        row = odf_create_row()
+        self.assertEqual(row.get_values(), [])
+        self.assertEqual(row.get_values(complement=True), [])
+        self.assertEqual(row.get_values(complement=True, get_type=True), [])
+        self.assertEqual(row.get_values((0,10)), [])
+        self.assertEqual(row.get_values(cell_type='all'), [])
+        self.assertEqual(row.get_values(cell_type='All'), [])
+        self.assertEqual(row.get_values((2,3), complement=True), [])
+
+
+    def test_get_values_count(self):
+        self.assertEqual(len(self.row.get_values()), 7)
+
+
+    def test_get_values_coord(self):
+        coord = (0,8)
+        self.assertEqual(len(self.row.get_values(coord)), 7)
+        coord = 'a1:c2'
+        self.assertEqual(len(self.row.get_values(coord)), 3)
+        coord = 'a1:a2'
+        self.assertEqual(len(self.row.get_values(coord)), 1)
+        coord = 'a1:EE2'
+        self.assertEqual(len(self.row.get_values(coord)), 7)
+        coord = 'D1'
+        self.assertEqual(len(self.row.get_values(coord)), 0)
+        coord = 'c5:a1'
+        self.assertEqual(len(self.row.get_values(coord)), 0)
+        coord = (5,6)
+        self.assertEqual(len(self.row.get_values(coord)), 2)
+        coord = (-5, 6)
+        self.assertEqual(len(self.row.get_values(coord)), 5)
+        coord = (0, -1)
+        self.assertEqual(len(self.row.get_values(coord)), 7)
+        coord = (0, -2)
+        self.assertEqual(len(self.row.get_values(coord)), 6)
+        coord = (-1,-1)
+        self.assertEqual(len(self.row.get_values(coord)), 1)
+        coord = (1,0)
+        self.assertEqual(len(self.row.get_values(coord)), 0)
+
+
+    def test_get_values_cell_type(self):
+        row = self.row.clone()
+        values = row.get_values(cell_type='all')
+        self.assertEqual(len(values), 7)
+        values = row.get_values(cell_type='float')
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
+        values = row.get_values(cell_type='percentage')
+        self.assertEqual(len(values), 0)
+        values = row.get_values(cell_type='string')
+        self.assertEqual(len(values), 0)
+
+
+    def test_get_values_cell_type2(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False)
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        values = row.get_values(cell_type='all')
+        self.assertEqual(len(values), 7 + 3 )
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2"])
+        values = row.get_values(cell_type='float')
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
+        values = row.get_values(cell_type='percentage')
+        self.assertEqual(len(values), 1)
+        self.assertEqual(values, [14])
+        values = row.get_values(cell_type='string')
+        self.assertEqual(len(values), 2)
+        self.assertEqual(values, [u"bob", u"bob2"])
+
+
+    def test_get_values_cell_type2_with_hole(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False)
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        row.set_cell(12, odf_create_cell(value="far"), clone=False)
+        values = row.get_values(cell_type='all') # aka all non empty
+        self.assertEqual(len(values), 11 )
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
+                                  u"far"])
+        values = row.get_values() # difference when requestion everything
+        self.assertEqual(len(values), 13 )
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
+                                  None, None, u"far"])
+        values = row.get_values(cell_type='float')
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
+        values = row.get_values(cell_type='percentage')
+        self.assertEqual(len(values), 1)
+        self.assertEqual(values, [14])
+        values = row.get_values(cell_type='string')
+        self.assertEqual(len(values), 3)
+        self.assertEqual(values, [u"bob", u"bob2", u"far"])
+
+
+    def test_get_values_cell_type2_with_hole_and_get_type(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False)
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        row.set_cell(12, odf_create_cell(value="far"), clone=False)
+        values = row.get_values(cell_type='all',  # aka all non empty
+                                get_type=True)
+        self.assertEqual(len(values), 11 )
+        self.assertEqual(values, [(1, u"float"), (1, u"float"), (1, u"float"),
+                                (2, u"float"), (3, u"float"),
+                                (3, u"float"), (3, u"float"),
+                                (u"bob", u"string"), (14, u"percentage"),
+                                (u"bob2", u"string"),
+                                (u"far", u"string")])
+        values = row.get_values(get_type=True) # difference when  everything
+        self.assertEqual(len(values), 13 )
+        self.assertEqual(values, [(1, u"float"), (1, u"float"), (1, u"float"),
+                                (2, u"float"), (3, u"float"),
+                                (3, u"float"), (3, u"float"),
+                                (u"bob", u"string"), (14, u"percentage"),
+                                (u"bob2", u"string"),
+                                (None, None), (None,None),
+                                (u"far", u"string")])
+        values = row.get_values(cell_type='float' ,get_type=True)
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [(1, u"float"), (1, u"float"), (1, u"float"),
+                                (2, u"float"), (3, u"float"),
+                                (3, u"float"), (3, u"float")])
+        values = row.get_values(cell_type='percentage', get_type=True)
+        self.assertEqual(len(values), 1)
+        self.assertEqual(values, [(14, u"percentage")])
+        values = row.get_values(cell_type='string', get_type=True)
+        self.assertEqual(len(values), 3)
+        self.assertEqual(values, [(u"bob", u"string"),
+                                (u"bob2", u"string"),
+                                (u"far", u"string")])
+
+
+    def test_get_values_cell_type2_complement(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False)
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        row.set_cell(12, odf_create_cell(value="far"), clone=False)
+        values = row.get_values(cell_type='ALL', complement=True)
+        self.assertEqual(len(values), 13 )
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
+                                  None, None, u"far"])
+        values = row.get_values(cell_type='FLOAT', complement=True)
+        self.assertEqual(len(values), 13)
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, None, None, None,
+                                  None, None, None])
+        values = row.get_values(cell_type='percentage', complement=True)
+        self.assertEqual(len(values), 13)
+        self.assertEqual(values, [None, None, None, None, None, None, None,
+                                  None, 14, None, None, None, None])
+        values = row.get_values(cell_type='string', complement=True)
+        self.assertEqual(len(values), 13)
+        self.assertEqual(values, [None, None, None, None, None, None, None,
+                                  u"bob", None, u"bob2", None, None, u"far"])
+
+
+    def test_get_values_cell_type_and_coord(self):
+        row = self.row.clone()
+        values = row.get_values(coordinates=(0, 5), cell_type='all')
+        self.assertEqual(len(values), 6)
+        values = row.get_values(coordinates=(0, 5), cell_type='float')
+        self.assertEqual(len(values), 6)
+        values = row.get_values(coordinates=(0, 5), cell_type='percentage')
+        self.assertEqual(len(values), 0)
+        values = row.get_values(coordinates=(2, 5), cell_type='string')
+        self.assertEqual(len(values), 0)
+
+
+    def test_get_values_cell_type_and_coord_and_get_type(self):
+        row = self.row.clone()
+        values = row.get_values(coordinates=(0, 5), cell_type='all',
+                                get_type=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [(1, u"float"), (1, u"float"),
+                                (1, u"float"), (2, u"float"),
+                                (3, u"float"), (3, u"float")])
+        values = row.get_values(coordinates=(0, 5), cell_type='float',
+                                get_type=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [(1, u"float"), (1, u"float"),
+                                (1, u"float"), (2, u"float"),
+                                (3, u"float"), (3, u"float")])
+        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
+                                get_type=True)
+        self.assertEqual(len(values), 0)
+        values = row.get_values(coordinates=(2, 5), cell_type='string',
+                                get_type=True)
+        self.assertEqual(len(values), 0)
+
+
+    def test_get_values_cell_type_and_coord_and_complement(self):
+        row = self.row.clone()
+        values = row.get_values(coordinates=(0, 5), cell_type='all',
+                                complement=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3])
+        values = row.get_values(coordinates=(0, 5), cell_type='float',
+                                complement=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [1, 1, 1, 2, 3, 3])
+        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
+                                complement=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [None, None, None, None, None, None])
+        values = row.get_values(coordinates=(2, 5), cell_type='string',
+                                complement=True)
+        self.assertEqual(len(values), 4)
+        self.assertEqual(values, [None, None, None, None])
+
+
+    def test_get_values_cell_type_and_coord2_and_complement(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False )
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        row.set_cell(12, odf_create_cell(value="far"), clone=False)
+        values = row.get_values(coordinates=(2, 20), cell_type='all',
+                                complement=True)
+        self.assertEqual(len(values), 11)
+        self.assertEqual(values, [1, 2, 3, 3, 3, u"bob", 14, u"bob2",
+                                  None, None, u"far"])
+        values = row.get_values(coordinates=(2, 11), cell_type='all',
+                                complement=True)
+        self.assertEqual(len(values), 10)
+        self.assertEqual(values, [1, 2, 3, 3, 3, u"bob", 14, u"bob2",
+                                  None, None])
+        values = row.get_values(coordinates=(3, 12), cell_type='float',
+                                complement=True)
+        self.assertEqual(len(values), 10)
+        self.assertEqual(values, [2, 3, 3, 3, None, None, None,
+                                  None, None, None])
+        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
+                                complement=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [None, None, None, None, None, None])
+        values = row.get_values(coordinates=(0, 5), cell_type='string',
+                                complement=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [None, None, None, None, None, None])
+        values = row.get_values(coordinates=(5, 11), cell_type='percentage',
+                                complement=True)
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [None, None, None, 14, None, None, None])
+        values = row.get_values(coordinates=(6, 12), cell_type='string',
+                                complement=True)
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [None, u"bob", None, u"bob2",
+                                  None, None, u"far"])
+        values = row.get_values(coordinates=(8, 20), cell_type='string',
+                                complement=True)
+        self.assertEqual(len(values), 5)
+        self.assertEqual(values, [None, u"bob2",
+                                  None, None, u"far"])
+
+
+    def test_get_values_cell_type_and_coord2_and_complement_and_get_type(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell(value="bob"), clone=False )
+        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
+        row.append_cell(odf_create_cell(value="bob2"), clone=False)
+        row.set_cell(12, odf_create_cell(value="far"), clone=False)
+        values = row.get_values(coordinates=(2, 20), cell_type='all',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 11)
+        self.assertEqual(values, [(1, u"float"), (2, u"float"), (3, u"float"),
+                                (3, u"float"), (3, u"float"),
+                                (u"bob", u"string"), (14, u"percentage"),
+                                (u"bob2", u"string"),
+                                (None, None), (None,None),
+                                (u"far", u"string")])
+        values = row.get_values(coordinates=(2, 11), cell_type='all',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 10)
+        self.assertEqual(values, [(1, u"float"), (2, u"float"), (3, u"float"),
+                                (3, u"float"), (3, u"float"),
+                                (u"bob", u"string"), (14, u"percentage"),
+                                (u"bob2", u"string"),
+                                (None, None), (None,None)])
+        values = row.get_values(coordinates=(3, 12), cell_type='float',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 10)
+        self.assertEqual(values, [(2, u"float"), (3, u"float"),
+                                (3, u"float"), (3, u"float"),
+                                (None, None), (None,None),
+                                (None, None), (None,None),
+                                (None, None), (None,None)])
+        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [(None, None), (None,None),
+                                (None, None), (None,None),
+                                (None, None), (None,None)])
+        values = row.get_values(coordinates=(0, 5), cell_type='string',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 6)
+        self.assertEqual(values, [(None, None), (None,None),
+                                (None, None), (None,None),
+                                (None, None), (None,None)])
+        values = row.get_values(coordinates=(5, 11), cell_type='percentage',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [(None, None), (None,None),
+                                (None, None), (14, u"percentage"), (None,None),
+                                (None, None), (None,None)])
+        values = row.get_values(coordinates=(6, 12), cell_type='string',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 7)
+        self.assertEqual(values, [(None, None), (u"bob", u"string"),
+                                (None, None), (u"bob2", u"string"),
+                                (None, None), (None, None),
+                                (u"far", u"string")])
+        values = row.get_values(coordinates=(8, 20), cell_type='string',
+                                complement=True, get_type=True)
+        self.assertEqual(len(values), 5)
+        self.assertEqual(values, [(None, None), (u"bob2", u"string"),
+                                  (None, None), (None, None),
+                                  (u"far", u"string")])
+
+
+    def test_get_cell_alpha(self):
+        row = self.row
+        cell_5 = row.get_cell('F')
+        self.assertEqual(cell_5.get_value(), 3)
+        self.assertEqual(cell_5.get_text_content(), u"3")
+        self.assertEqual(cell_5.get_type(), 'float')
+        self.assertEqual(cell_5.get_style(), u"ce1")
+        self.assertEqual(cell_5.x, 5)
+        self.assertEqual(cell_5.y, 1)
+
+
+    def test_get_cell_int(self):
+        row = self.row
+        cell_5 = row.get_cell(5)
+        self.assertEqual(cell_5.get_value(), 3)
+        self.assertEqual(cell_5.get_text_content(), u"3")
+        self.assertEqual(cell_5.get_type(), 'float')
+        self.assertEqual(cell_5.get_style(), u"ce1")
+
+
+    def test_get_cell_coord(self):
+        row = self.row.clone()
+        cell = row.get_cell(-1)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-3)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-4)
+        self.assertEqual(cell.get_value(), 2)
+        cell = row.get_cell(-5)
+        self.assertEqual(cell.get_value(), 1)
+        cell = row.get_cell(-1 - 7)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-3 - 56)
+        self.assertEqual(cell.get_value(), 3)
+        cell = row.get_cell(-4 - 560)
+        self.assertEqual(cell.get_value(), 2)
+        cell = row.get_cell(-5 - 7000)
+        self.assertEqual(cell.get_value(), 1)
+        cell = row.get_cell(8)
+        self.assertEqual(cell.get_value(), None)
+        cell = row.get_cell(1000)
+        self.assertEqual(cell.get_value(), None)
+
+
+    def test_get_value_coord(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell("Appended"))
+        value = row.get_value(-1)
+        self.assertEqual(value, u'Appended')
+        value = row.get_value(-3)
+        self.assertEqual(value, 3)
+        value = row.get_value(-4)
+        self.assertEqual(value, 3)
+        value = row.get_value(-5)
+        self.assertEqual(value, 2)
+        value = row.get_value(-1 - 8)
+        self.assertEqual(value, u'Appended')
+        value = row.get_value(7)
+        self.assertEqual(value, u'Appended')
+        value = row.get_value(8)
+        self.assertEqual(value, None)
+        value = row.get_value(1000)
+        self.assertEqual(value, None)
+
+
+    def test_get_value_coord_with_get_type(self):
+        row = self.row.clone()
+        row.append_cell(odf_create_cell("Appended"))
+        value = row.get_value(-1, get_type=True)
+        self.assertEqual(value, (u'Appended', u'string'))
+        value = row.get_value(-3, get_type=True)
+        self.assertEqual(value, (3, u'float'))
+        value = row.get_value(-4, get_type=True)
+        self.assertEqual(value, (3, u'float'))
+        value = row.get_value(-5, get_type=True)
+        self.assertEqual(value, (2, u'float'))
+        value = row.get_value(-1 - 8, get_type=True)
+        self.assertEqual(value, (u'Appended', u'string'))
+        value = row.get_value(7, get_type=True)
+        self.assertEqual(value, (u'Appended', u'string'))
+        value = row.get_value(8, get_type=True)
+        self.assertEqual(value, (None, None))
+        value = row.get_value(1000, get_type=True)
+        self.assertEqual(value, (None, None))
 
 
 class TestColumn(TestCase):
@@ -800,6 +1684,11 @@ class TestColumn(TestCase):
 
 
 class TestTable(TestCase):
+    # simpletable :
+    #   1	1	1	2	3	3	3
+    #   1	1	1	2	3	3	3
+    #   1	1	1	2	3	3	3
+    #   1   2	3	4	5	6	7
 
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
@@ -938,7 +1827,7 @@ class TestTableCache(TestCase):
 
 
     def test_row_repeat_twice(self):
-        row = odf_create_row(repeated=5)
+        row = odf_create_row(repeated=6)
         table = self.table.clone()
         table.insert_row(2, row)
         cell = odf_create_cell(value=333, repeated=2)
@@ -951,8 +1840,8 @@ class TestTableCache(TestCase):
         row.set_repeated(3)
         table.set_row(4, row)
         self.assertEqual(table.get_height(), 4      # initial height
-                                            + 5     # *insert* row with repeated 5
-                                            + 3 -1) # *set* row with repeated 3
+                                            + 6     # *insert* row with repeated 5
+                                            + 3 -3) # *set* row with repeated 3
         self.assertEqual(table.get_values(),
                 [[1, 1, 1, 2, 3, 3, 3],
                  [1, 1, 1, 2, 3, 3, 3],
@@ -961,7 +1850,6 @@ class TestTableCache(TestCase):
                  [None, None, None, None, 333, 333, None],
                  [None, None, None, None, 333, 333, None],
                  [None, None, None, None, 333, 333, None],
-                 [None, None, None, None, None, None, None],
                  [None, None, None, None, None, None, None],
                  [1, 1, 1, 2, 3, 3, 3],
                  [1, 2, 3, 4, 5, 6, 7]])
@@ -1010,12 +1898,8 @@ class TestTableCache(TestCase):
             table.append_row()
         self.assertEqual(len(table.get_rows()), 5)
         vals = []
-        if future:
-            for row in table.get_rows():
-                vals.append(len(row.get_cells()))
-        else:
-            for idx, row in table.get_rows():
-                vals.append(len(row.get_cells()))
+        for row in table.get_rows():
+            vals.append(len(row.get_cells()))
         self.assertEqual(vals, [20, 20, 20, 0, 0])
         last_row = table.get_row(-1)
         for r in range(3):
@@ -1051,10 +1935,7 @@ class TestTableRow(TestCase):
 
 
     def test_get_row_list_regex(self):
-        if future:
-            coordinates = [row.y for row in self.table.get_rows(content=ur'4')]
-        else:
-            coordinates = [y for y, row in self.table.get_rows(content=ur'4')]
+        coordinates = [row.y for row in self.table.get_rows(content=ur'4')]
         self.assertEqual(coordinates, [3])
 
 
@@ -1063,10 +1944,7 @@ class TestTableRow(TestCase):
         # Set a different style manually
         row = table.get_elements('table:table-row')[2]
         row.set_style(u"A Style")
-        if future:
-            coordinates = [row.y for row in table.get_rows(style=ur'A Style')]
-        else:
-            coordinates = [y for y, row in table.get_rows(style=ur'A Style')]
+        coordinates = [row.y for row in table.get_rows(style=ur'A Style')]
         self.assertEqual(coordinates, [2])
 
 
@@ -1302,12 +2180,8 @@ class TestTableCell(TestCase):
 
     def test_get_cell_list_regex(self):
         table = self.table
-        if future:
-            coordinates = [(cell.x, cell.y)
-                for cell in table.get_cells(content=ur'3')]
-        else:
-            coordinates = [(x, y)
-                for x, y, cell in table.get_cells(content=ur'3')]
+        coordinates = [(cell.x, cell.y)
+            for cell in table.get_cells(content=ur'3')]
         expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
                 (5, 2), (6, 2), (2, 3)]
         self.assertEqual(coordinates, expected)
@@ -1315,12 +2189,8 @@ class TestTableCell(TestCase):
 
     def test_get_cell_list_style(self):
         table = self.table
-        if future:
-            coordinates = [(cell.x, cell.y)
-                for cell in table.get_cells(style=ur"ce1")]
-        else:
-            coordinates = [(x, y)
-                for x, y, cell in table.get_cells(style=ur"ce1")]
+        coordinates = [(cell.x, cell.y)
+            for cell in table.get_cells(style=ur"ce1")]
         expected = [(1, 1), (5, 1), (3, 2)]
         self.assertEqual(coordinates, expected)
 
@@ -1398,10 +2268,7 @@ class TestTableColumn(TestCase):
 
     def test_get_column_list_style(self):
         table = self.table
-        if future:
-            coordinates = [col.x for col in table.get_columns(style=ur"co2")]
-        else:
-            coordinates = [x for x, col in table.get_columns(style=ur"co2")]
+        coordinates = [col.x for col in table.get_columns(style=ur"co2")]
         self.assertEqual(coordinates, [2, 3])
 
 
