@@ -27,6 +27,9 @@ pip-log.txt
 .coverage
 .tox
 
+# OS X
+.DS_Store
+
 #Translations
 *.mo
 
