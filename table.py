@@ -1040,7 +1040,7 @@ class odf_row(odf_element):
         type, aka non empty cells.
 
         Filter by coordinates will retrieve the amount of cells defined by
-        coordinates, minus the other filters.
+        'coord', minus the other filters.
 
         Arguments:
 
@@ -1077,7 +1077,6 @@ class odf_row(odf_element):
             if style and style != cell.get_style():
                 continue
             cells.append(cell)
-        # Return the coordinate and element
         return cells
 
     get_cell_list = obsolete('get_cell_list', get_cells)
@@ -1123,7 +1122,7 @@ class odf_row(odf_element):
 
     def get_value(self, x, get_type=False):
         """Shortcut to get the value of the cell at position "x".
-        If egt_type is True, returns the tuples (value, ODF type).
+        If get_type is True, returns the tuples (value, ODF type).
 
         If the cell is empty, returns None or (None, None)
 
@@ -1949,12 +1948,12 @@ class odf_table(odf_element):
 
         Filter by coordinates will parse the area defined by the coordinates.
 
-        If cell_type is used and complete is True (default), missing values
+        If 'cell_type' is used and 'complete' is True (default), missing values
         are replaced by None.
-        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        Filter by ' cell_type = "all" ' will retrieve cells of any
         type, aka non empty cells.
 
-        If cell_type is None, complete is always True : with no cell type
+        If 'cell_type' is None, complete is always True : with no cell type
         queried, get_values() returns None for each empty cell, the length
         each lists is equal to the width of the table.
 
@@ -1962,6 +1961,7 @@ class odf_table(odf_element):
         (None, None) for empty cells with complete True.
 
         If flat is True, the methods return a single list of all the values.
+        By default, flat is False.
 
         Arguments:
 
@@ -2093,7 +2093,7 @@ class odf_table(odf_element):
                 continue
             row = self.get_row(y, clone=True)
             repeated =  row.get_repeated or 1
-            if repeated:
+            if repeated >= 2:
                 row.set_repeated(None)
             row.set_values(row_values, start=x, cell_type=cell_type,
                            currency=currency, style=style)
@@ -2154,20 +2154,61 @@ class odf_table(odf_element):
     rstrip_table = obsolete('rstrip_table', rstrip)
 
 
-    def transpose(self):
+    def transpose(self, coord=None):
         """Swap *in-place* rows and columns of the table.
+
+        If 'coord' is not None, apply transpose only to the area defined by the
+        coordinates. Beware, if area is not square, some cells mays be over
+        written during the process.
+
+        Arguments:
+
+            coord -- str or tuple of int : coordinates of area
+
+            start -- int or str
         """
         data = []
-        for row in self.traverse():
-            data.append([cell for cell in row.traverse()])
-        transposed_data = map(None, *data)
-        self.clear()
-        new_rows = []
-        for row_cells in transposed_data:
-            row = odf_create_row()
-            row.extend_cells(row_cells)
-            self.append_row(row, clone=False)
-        self._compute_table_cache()
+        if coord is None:
+            for row in self.traverse():
+                data.append([cell for cell in row.traverse()])
+            transposed_data = map(None, *data)
+            self.clear()
+            new_rows = []
+            for row_cells in transposed_data:
+                row = odf_create_row()
+                row.extend_cells(row_cells)
+                self.append_row(row, clone=False)
+            self._compute_table_cache()
+        else:
+            x, y, z, t = self._translate_table_coordinates(coord)
+            if x is None:
+                x = 0
+            else:
+                x = min(x, self.get_width())
+            if z is None:
+                z = self.get_width()
+            else:
+                z = min(z, self.get_width())
+            if y is None:
+                y = 0
+            else:
+                y = min(y, self.get_height())
+            if t is None:
+                t = self.get_height()
+            else:
+                t = min(t, self.get_height())
+            for row in self.traverse(start=y, end=t):
+                data.append([cell for cell in row.traverse(start=x, end=z)])
+            transposed_data = map(None, *data)
+            # clear locally
+            w = z - x + 1
+            h = t -y + 1
+            if w != h:
+                nones = [[none] * w for i in range(h)]
+                self.set_values(nones, coord=(x,y,z,t))
+            # put transposed
+            self.set_cells(data, (x, y, x + h - 1, y + w -1))
+            self._compute_table_cache(row)
 
 
     def is_empty(self, aggressive=False):
@@ -2579,15 +2620,18 @@ class odf_table(odf_element):
     #
 
     def get_cells(self, coord=None, cell_type=None, style=None,
-                  content=None, complete=True):
-        """Get the cells matching the criteria. If coordinates is None,
-        parse the whole table, else parse the defined area.
-        If the result is 2D (several rows and colums), return a list of lists,
-        else a single list of cells.
-        If complete is True (default), empty cells are retrieved too.
+                  content=None, flat=True):
+        """Get the cells matching the criteria. If 'coord' is None,
+        parse the whole table, else parse the area defined by 'coord'.
 
-        Filter by cell_type, with cell_type 'all' will retrieve cells of any
+        Filter by  cell_type = "all"  will retrieve cells of any
         type, aka non empty cells.
+
+        If flat is True (default), the method return a single list of all
+        the values, else a list of lists of cells.
+
+        if cell_type, style and content are None, get_cells() will return
+        the exact number of cells of the area, including empty cells.
 
         Arguments:
 
@@ -2596,48 +2640,46 @@ class odf_table(odf_element):
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
 
-            regex -- unicode
+            content -- regex, unicode
 
             style -- unicode
 
-            complete -- boolean
+            flat -- boolean
 
         Return: list of tuples
         """
-        cells = []
-        if not coord:
-            for row in self.traverse():
-                for cell in row.get_cells(cell_type=cell_type, style=style,
-                                          content=content):
-                    cells.append(cell)
-        else:
+        if coord:
             x, y, z, t = self._translate_table_coordinates(coord)
-            for row in self.traverse(start = y, end = t):
-                for cell in row.get_cells(coordinates = (x, z),
-                                            cell_type=cell_type,
-                                            style=style,
-                                            content=content):
-                    cells.append(cell)
+        else:
+            x = y = z = t = None
+        cells = []
+        for row in self.traverse(start = y, end = t):
+            row_cells = row.get_cells(coord = (x, z), cell_type=cell_type,
+                                            style=style, content=content)
+            if flat:
+                cells.extend(row_cells)
+            else:
+                cells.append(row_cells)
         return cells
 
     get_cell_list = obsolete('get_cell_list', get_cells)
 
 
-    def get_cell(self, coordinates, clone=True):
+    def get_cell(self, coord, clone=True):
         """Get the cell at the given coordinates.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
         human-readable position like "C4".
 
-        A  copy is returned, use ``set_cell`` to push it back.
+        A copy is returned, use ``set_cell`` to push it back.
 
         Arguments:
 
-            coordinates -- (int, int) or str
+            coord -- (int, int) or str
 
         Return: odf_cell
         """
-        x, y = self._translate_cell_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coord)
         # Outside the defined table
         if y >= self.get_height():
             cell = odf_create_cell()
@@ -2649,22 +2691,41 @@ class odf_table(odf_element):
         return cell
 
 
-    def get_value(self, coordinates):
+    def get_value(self, coord, get_type=False):
         """Shortcut to get the Python value of the cell at the given
         coordinates.
 
-        They are either a 2-uplet of (x, y) starting from 0, or a
-        human-readable position like "C4".
+        If get_type is True, returns the tuples (value, ODF type)
+
+        coord is either a 2-uplet of (x, y) starting from 0, or a
+        human-readable position like "C4". If an Area is given, the upper
+        left position is used as coord.
+
         Arguments:
 
-            coordinates -- (int, int) or str
+            coord -- (int, int) or str
 
         Return: Python type
         """
-        return self.get_cell(coordinates, clone=False).get_value()
+        x, y = self._translate_cell_coordinates(coord)
+        # Outside the defined table
+        if y >= self.get_height():
+            if get_type:
+                return (None, None)
+            else:
+                return None
+        else:
+            # Inside the defined table
+            cell = self._get_row2_base(y)._get_cell2_base(x)
+            if cell is None:
+                if get_type:
+                    return (None, None)
+                else:
+                    return None
+            return cell.get_value(get_type=get_type)
 
 
-    def set_cell(self, coordinates, cell=None, clone=True):
+    def set_cell(self, coord, cell=None, clone=True):
         """Replace a cell of the table at the given coordinates.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
@@ -2672,14 +2733,14 @@ class odf_table(odf_element):
 
         Arguments:
 
-            coordinates -- (int, int) or str
+            coord -- (int, int) or str
 
             cell -- odf_cell
         """
         if cell is None:
             cell = odf_create_cell()
             clone = False
-        x, y = self._translate_cell_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coord)
         cell.x = x
         cell.y = y
         if y >= self.get_height():
@@ -2726,7 +2787,7 @@ class odf_table(odf_element):
                                 currency=currency, style=style), clone=False)
 
 
-    def set_cell_image(self, coordinates, image_frame, type=None):
+    def set_cell_image(self, coord, image_frame, type=None):
         """Do all the magic to display an image in the cell at the given
         coordinates.
 
@@ -2741,7 +2802,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            coordinates -- (int, int) or str
+            coord -- (int, int) or str
 
             image_frame -- odf_frame including an image
 
@@ -2757,7 +2818,7 @@ class odf_table(odf_element):
             if type is None:
                 raise ValueError, "document type not supported for images"
         # We need the end address of the image
-        x, y = self._translate_cell_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coord)
         cell = self.get_cell((x, y))
         image_frame = image_frame.clone()
         # Remove any previous paragraph, frame, etc.
@@ -2781,10 +2842,10 @@ class odf_table(odf_element):
             cell.set_value(u"")
             paragraph = cell.get_element('text:p')
             paragraph.append(image_frame)
-        self.set_cell(coordinates, cell)
+        self.set_cell(coord, cell)
 
 
-    def insert_cell(self, coordinates, cell=None, clone=True):
+    def insert_cell(self, coord, cell=None, clone=True):
         """Insert the given cell at the given coordinates. If no cell is
         given, an empty one is created.
 
@@ -2795,7 +2856,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            coordinates -- (int, int) or str
+            coord -- (int, int) or str
 
             cell -- odf_cell
         """
@@ -2804,7 +2865,7 @@ class odf_table(odf_element):
             clone = False
         if clone:
             cell = cell.clone()
-        x, y = self._translate_cell_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coord)
         row = self._get_row2(y, clone=True)
         row.y = y
         row.set_repeated(None)
@@ -2844,7 +2905,7 @@ class odf_table(odf_element):
         return cell
 
 
-    def delete_cell(self, coordinates):
+    def delete_cell(self, coord):
         """Delete the cell at the given coordinates, so that next cells are
         shifted to the left.
 
@@ -2857,7 +2918,7 @@ class odf_table(odf_element):
 
             coordinates -- (int, int) or str
         """
-        x, y = self._translate_cell_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coord)
         # Outside the defined table
         if y >= self.get_height():
             return
