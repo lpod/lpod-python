@@ -1348,7 +1348,10 @@ class odf_row(odf_element):
 
             cells -- list of cells
         """
-        start = self._translate_x_from_any(start)
+        if start is None:
+            start = 0
+        else:
+            start = self._translate_x_from_any(start)
         if start == 0 and clone == False and (len(cells) >= self.get_width()):
             self.clear()
             self.extend_cells(cells)
@@ -1380,7 +1383,10 @@ class odf_row(odf_element):
             style -- cell style
         """
         # fixme : if values n, n+ are same, use repeat
-        start = self._translate_x_from_any(start)
+        if start is None:
+            start = 0
+        else:
+            start = self._translate_x_from_any(start)
         if start == 0 and (len(values) >= self.get_width()):
             self.clear()
             cells = ([odf_create_cell(value, style=style,
@@ -2074,21 +2080,25 @@ class odf_table(odf_element):
 
             style -- unicode
         """
-        if len(values) == 0:
-            return
         if coord:
-            x, y = self._translate_cell_coordinates(coordinates)
+            x, y = self._translate_cell_coordinates(coord)
         else:
-            x = y = None
-        idx = -1
-        for row in self.traverse(start = y):
-            idx += 1
-            try:
-                row_values = values[idx]
-            except IndexError:
-                break
+            x = y = 0
+        if y is None:
+            y = 0
+        y -= 1
+        for row_values in values:
+            y += 1
+            if not row_values:
+                continue
+            row = self.get_row(y, clone=True)
+            repeated =  row.get_repeated or 1
+            if repeated:
+                row.set_repeated(None)
             row.set_values(row_values, start=x, cell_type=cell_type,
                            currency=currency, style=style)
+            self.set_row(y, row, clone=False)
+            self.__update_width(row)
 
     set_table_values = obsolete('set_table_values', set_values)
 

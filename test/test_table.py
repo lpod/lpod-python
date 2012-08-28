@@ -1881,14 +1881,101 @@ class TestTable(TestCase):
                  [1, 2, 3, 4, 5, 6, 7]])
 
 
-    def test_set_table_values(self):
+    def test_set_table_values_with_clear(self):
         table = self.table.clone()
         values = [[u"a", u"b", u"c", u"d", u"e", u"f", u"g"],
                   [u"h", u"i", u"j", u"k", u"l", u"m", u"n"],
                   [u"o", u"p", u"q", u"r", u"s", u"t", u"u"],
                   [u"v", u"w", u"x", u"y", u"z", u"aa", u"ab"]]
+        table.clear()
         table.set_values(values)
         self.assertEqual(table.get_values(), values)
+
+
+    def test_set_table_values_big(self):
+        table = self.table.clone()
+        values = [[u"a", u"b", u"c", u"d", u"e", u"f", u"g"],
+                  [u"h", u"i", u"j", u"k", u"l", u"m", u"n"],
+                  [u"o", u"p", u"q", u"r", u"s", u"t", u"u"],
+                  [u"o", u"p", u"q", u"r", u"s", u"t", u"u"],
+                  [u"o", u"p", u"q", u"r", u"s", u"t", u"u"],
+                  [u"o", u"p", u"q", u"r", u"s", u"t", u"u"],
+                  [u"v", u"w", u"x", u"y", u"z", u"aa", u"ab"],
+                  [u"v", u"w", u"x", u"y", u"z", u"aa", u"ab"]]
+        table.set_values(values)
+        self.assertEqual(table.get_values(), values)
+        self.assertEqual(table.get_size(), (7, 8))
+
+
+    def test_set_table_values_small(self):
+        table = self.table.clone()
+        values = [[u"a", u"b", u"c"],
+                  [u"h", u"i", u"j", u"k", u"l", u"m", u"n"],
+                  [u"o", u"p", None, None, u"s", u"t", u"u"]]
+        table.set_values(values)
+        self.assertEqual(table.get_size(), (7, 4))
+        self.assertEqual(table.get_values(),
+                    [[u'a', u'b', u'c', 2, 3, 3, 3],
+                    [u'h', u'i', u'j', u'k', u'l', u'm', u'n'],
+                    [u'o', u'p', None, None, u's', u't', u'u'],
+                    [1, 2, 3, 4, 5, 6, 7]])
+
+
+    def test_set_table_values_small_coord(self):
+        table = self.table.clone()
+        values = [[u"a", u"b", u"c"],
+                  [u"h", u"i", u"j", u"k", u"l", u"m", u"n"],
+                  [u"o", u"p", None, None, u"s", u"t", u"u"]]
+        table.set_values(values, coord=("c2"))
+        self.assertEqual(table.get_size(), (9, 4))
+        self.assertEqual(table.get_values(),
+                    [[1, 1, 1, 2, 3, 3, 3, None, None],
+                    [1, 1, u'a', u'b', u'c', 3, 3, None, None],
+                    [1, 1, u'h', u'i', u'j', u'k', u'l', u'm', u'n'],
+                    [1, 2, u'o', u'p', None, None, u's', u't', u'u']])
+
+
+    def test_set_table_values_small_coord_far(self):
+        table = self.table.clone()
+        values = [[u"a", u"b", u"c"],
+                  [u"h", None ],
+                  [u"o" ]]
+        table.set_values(values, coord=("J6"))
+        self.assertEqual(table.get_size(), (12, 8))
+        self.assertEqual(table.get_values(),
+                    [[1, 1, 1, 2, 3, 3, 3, None, None, None, None, None],
+                    [1, 1, 1, 2, 3, 3, 3, None, None, None, None, None],
+                    [1, 1, 1, 2, 3, 3, 3, None, None, None, None, None],
+                    [1, 2, 3, 4, 5, 6, 7, None, None, None, None, None],
+                    [None, None, None, None, None, None, None, None, None,
+                     None, None, None],
+                    [None, None, None, None, None, None, None, None, None,
+                     u'a', u'b', u'c'],
+                    [None, None, None, None, None, None, None, None, None,
+                     u'h', None, None],
+                    [None, None, None, None, None, None, None, None, None,
+                     u'o', None, None]])
+
+
+    def test_set_table_values_small_type(self):
+        table = self.table.clone()
+        values = [[10, None, 30],
+                  [None, 40 ]]
+        table.set_values(values, coord=("C4"), cell_type = 'percentage')
+        self.assertEqual(table.get_size(), (7, 5))
+        self.assertEqual(table.get_values(),
+                    [[1, 1, 1, 2, 3, 3, 3],
+                    [1, 1, 1, 2, 3, 3, 3],
+                    [1, 1, 1, 2, 3, 3, 3],
+                    [1, 2, 10, None, 30, 6, 7],
+                    [None, None, None, 40, None, None, None]])
+        self.assertEqual(table.get_values(coordinates='4:', get_type=True),
+                    [[(1, u'float'), (2, u'float'),
+                    (10, u'percentage'), (None, None), (30, u'percentage'),
+                        (6, u'float'), (7, u'float')],
+                    [(None, None), (None, None), (None, None),
+                        (40, u'percentage'), (None, None), (None, None),
+                        (None, None)]])
 
 
     def test_rstrip_table(self):
