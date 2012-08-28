@@ -2044,11 +2044,20 @@ class odf_table(odf_element):
             yield values
 
 
-    def set_values(self, values, style=None, cell_type=None, currency=None):
-        """Set all Python values for the whole table.
+    def set_values(self, values, coord=None, style=None, cell_type=None,
+                   currency=None):
+        """set the value of cells in the row, from the 'coord' position
+        with values.
+
+        'coord' is the coordinate of the upper left cell to be modified by
+        values. If 'coord' is None, default to the position (0,0) ("A1").
+
+        The table is *not* cleared before the operation, to reset the table
+        before setting values, use table.clear()
 
         A list of lists is expected, with as many lists as rows, and as many
-        items in each sublist as cells.
+        items in each sublist as cells to be setted. None values in the list
+        will create empty cells with no cell type (but eventually a style).
 
         Arguments:
 

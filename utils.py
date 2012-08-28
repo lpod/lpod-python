@@ -321,9 +321,16 @@ def _set_value_and_type(element, value=None, value_type=None, text=None,
             'office:value', 'office:date-value', 'office:string-value',
             'office:time-value', 'table:formula'):
         try:
+            element.del_attribute('office:currency')
+        except KeyError:
+            pass
+    if value is None:
+        try:
             element.del_attribute(name)
         except KeyError:
             pass
+        element._erase_text_content()
+        return text
     if type(value) is bool:
         if value_type is None:
             value_type = 'boolean'

@@ -788,6 +788,17 @@ class odf_element(object):
         return u"\n".join(text)
 
 
+    def _erase_text_content(self):
+        paragraphs = self.get_elements('text:p')
+        if not paragraphs:
+            # E.g., text:p in draw:text-box in draw:frame
+            paragraphs = self.get_elements('*/text:p')
+        if paragraphs:
+            paragraph = paragraphs.pop(0)
+            for obsolete in paragraphs:
+                obsolete.delete()
+
+
     def set_text_content(self, text):
         """Like "set_text" but set the text of the embedded paragraph:
         annotations, cells...
