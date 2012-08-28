@@ -2046,20 +2046,24 @@ class odf_table(odf_element):
 
     def set_values(self, values, coord=None, style=None, cell_type=None,
                    currency=None):
-        """set the value of cells in the row, from the 'coord' position
+        """set the value of cells in the table, from the 'coord' position
         with values.
 
         'coord' is the coordinate of the upper left cell to be modified by
         values. If 'coord' is None, default to the position (0,0) ("A1").
+        If 'coord' is an area (e.g. "A2:B5"), the upper left position of this
+        area is used as coordinate.
 
         The table is *not* cleared before the operation, to reset the table
-        before setting values, use table.clear()
+        before setting values, use table.clear().
 
         A list of lists is expected, with as many lists as rows, and as many
         items in each sublist as cells to be setted. None values in the list
         will create empty cells with no cell type (but eventually a style).
 
         Arguments:
+
+            coord -- tuple or str
 
             values -- list of lists of python types
 
@@ -2070,14 +2074,21 @@ class odf_table(odf_element):
 
             style -- unicode
         """
-        while self.get_height() > 0:
-            self.delete_row(0)
-        row_list = []
-        for row_values in values:
-            row = odf_create_row()
-            row.set_values(row_values, cell_type=cell_type, currency=currency,
-                           style=style)
-            self.append_row(row, clone=False)
+        if len(values) == 0:
+            return
+        if coord:
+            x, y = self._translate_cell_coordinates(coordinates)
+        else:
+            x = y = None
+        idx = -1
+        for row in self.traverse(start = y):
+            idx += 1
+            try:
+                row_values = values[idx]
+            except IndexError:
+                break
+            row.set_values(row_values, start=x, cell_type=cell_type,
+                           currency=currency, style=style)
 
     set_table_values = obsolete('set_table_values', set_values)
 
