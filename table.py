@@ -1570,7 +1570,7 @@ class odf_table(odf_element):
         return y
 
 
-    def _translate_coordinates(self, coordinates):
+    def _translate_table_coordinates(self, coordinates):
         coord = _convert_coordinates(coordinates)
         if len(coord) == 2:
             x, y = coord
@@ -2475,7 +2475,7 @@ class odf_table(odf_element):
                                           content=content):
                     cells.append(cell)
         else:
-            xyzt = _translate_coordinates(coordinates)
+            xyzt = self._translate_table_coordinates(coordinates)
             if len(xyzt) == 2:
                 x, y = z, t = xyzt
             else:
@@ -2505,7 +2505,7 @@ class odf_table(odf_element):
 
         Return: odf_cell
         """
-        x, y = self._translate_coordinates(coordinates)
+        x, y = self._translate_table_coordinates(coordinates)
         # Outside the defined table
         if y >= self.get_height():
             cell = odf_create_cell()
@@ -2547,7 +2547,7 @@ class odf_table(odf_element):
         if cell is None:
             cell = odf_create_cell()
             clone = False
-        x, y = self._translate_coordinates(coordinates)
+        x, y = self._translate_table_coordinates(coordinates)
         cell.x = x
         cell.y = y
         if y >= self.get_height():
@@ -2625,7 +2625,7 @@ class odf_table(odf_element):
             if type is None:
                 raise ValueError, "document type not supported for images"
         # We need the end address of the image
-        x, y = self._translate_coordinates(coordinates)
+        x, y = self._translate_table_coordinates(coordinates)
         cell = self.get_cell((x, y))
         image_frame = image_frame.clone()
         # Remove any previous paragraph, frame, etc.
@@ -2672,7 +2672,7 @@ class odf_table(odf_element):
             clone = False
         if clone:
             cell = cell.clone()
-        x, y = self._translate_coordinates(coordinates)
+        x, y = self._translate_table_coordinates(coordinates)
         row = self._get_row2(y, clone=True)
         row.y = y
         row.set_repeated(None)
@@ -2725,7 +2725,7 @@ class odf_table(odf_element):
 
             coordinates -- (int, int) or str
         """
-        x, y = self._translate_coordinates(coordinates)
+        x, y = self._translate_table_coordinates(coordinates)
         # Outside the defined table
         if y >= self.get_height():
             return
