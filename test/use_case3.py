@@ -76,15 +76,15 @@ for y in xrange(0, 256, 8):
 
     row_style = odf_create_style('table-row', height='1.80cm')
     name_style_row = document.insert_style(style=row_style, automatic=True)
-    for idx,row in table.get_rows():
+    for row in table.get_rows():
         row.set_style(name_style_row)
         table.set_row(row.y, row)
 
     col_style = odf_create_style('table-column', width='3.6cm')
     name = document.insert_style(style=col_style, automatic=True)
-    for idx, column in table.get_columns():
+    for column in table.get_columns():
         column.set_style(col_style)
-        table.set_column(idx, column)
+        table.set_column(column.x, column)
 
 body.append(table)
 

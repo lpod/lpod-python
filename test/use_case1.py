@@ -92,8 +92,8 @@ for numero, filename in enumerate(listdir('samples')):
             row = odf_create_row()
             for value in line:
                 cell = odf_create_cell(value)
-                row.append(cell)
-            table.append(row)
+                row.append_cell(cell)
+            table.append_row(row)
         for i in xrange(size):
             column = odf_create_column(style=u"Standard")
             table.insert(column, FIRST_CHILD)

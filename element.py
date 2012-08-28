@@ -412,7 +412,7 @@ class odf_element(object):
         """
         current = self.__element
         wrapper = element.__element
-        for text in 'descendant::text()':
+        for text in _xpath_text_descendant(current):
             if not from_ in text:
                 continue
             from_index = text.index(from_)
@@ -441,7 +441,7 @@ class odf_element(object):
                 # Exit to the second part where we search for the end text
                 break
         else:
-            raise "start text not found"
+            raise ValueError, "start text not found"
         # The container is split in two
         container2 = deepcopy(from_container)
         if text.is_text:

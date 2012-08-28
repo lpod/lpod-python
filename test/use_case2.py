@@ -65,7 +65,7 @@ print 'Generating test_output/use_case2.odt ...'
 document = odf_new_document('text')
 body = document.get_body()
 
-# 1- The image
+# 0- The image
 # ------------
 image = Image.open('samples/image.png')
 width, height = image.size
@@ -85,7 +85,7 @@ container = document.container
 container.set_part(internal_name, open('samples/image.png').read())
 
 
-# 2- Congratulations (=> style on paragraph)
+# 1- Congratulations (=> style on paragraph)
 # ------------------------------------------
 heading = odf_create_heading(1, text=u'Congratulations !')
 body.append(heading)
@@ -101,7 +101,7 @@ paragraph = odf_create_paragraph(text, style=u"style1")
 body.append(paragraph)
 
 
-# 3- Your environment (=> a table)
+# 2- Your environment (=> a table)
 # --------------------------------
 heading = odf_create_heading(1, text=u'Your environment')
 body.append(heading)
@@ -120,7 +120,7 @@ table.set_values(data)
 body.append(table)
 
 
-# 4- Description (=> footnote & => highlight)
+# 3- Description (=> footnote & => highlight)
 # -------------------------------------------
 
 heading = odf_create_heading(1, text=u'Description')
@@ -148,7 +148,7 @@ paragraph.set_span(u"style2", regex=u"ISO standard")
 body.append(paragraph)
 
 
-# 6- A variable
+# 4- A variable
 # -------------
 
 # A variable "spam" with the value 42
@@ -176,7 +176,7 @@ body.append(paragraph)
 paragraph.insert_variable(variable_get, u"is: ")
 
 
-# 7- An user field
+# 5- An user field
 # ----------------
 
 # An user field "pi5" with the value 3.14159
@@ -197,7 +197,7 @@ body.append(paragraph)
 paragraph._insert_between(user_field_get, u"The", u"is: ")
 
 
-# 8- Page number
+# 6- Page number
 # --------------
 
 heading = odf_create_heading(1, text=u'Page number')
@@ -227,7 +227,7 @@ body.append(paragraph)
 paragraph.insert_variable(odf_create_page_count_variable(), u"is: ")
 
 
-# 9- Date
+# 7- Date
 # -------
 
 heading = odf_create_heading(1, text=u'Date insertion')
@@ -247,7 +247,7 @@ paragraph.insert_variable(odf_create_date_variable(date(2009, 7, 20)),
     u"Today: ")
 
 
-# 10- Time
+# 8- Time
 # --------
 
 heading = odf_create_heading(1, text=u'Time insertion')
@@ -272,7 +272,7 @@ paragraph.insert_variable(odf_create_time_variable(time(19, 30),
     time_adjust=timedelta(hours=1)), u"hour: ")
 
 
-# 11- Chapter
+# 9- Chapter
 # -----------
 
 heading = odf_create_heading(1, text=u'Chapter')
@@ -286,7 +286,7 @@ paragraph.insert_variable(odf_create_chapter_variable(display='number-and-name')
         u"is: ")
 
 
-# 11- Filename
+# 10- Filename
 # ------------
 
 heading = odf_create_heading(1, text=u'Filename')

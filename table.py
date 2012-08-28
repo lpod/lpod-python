@@ -835,8 +835,8 @@ class odf_row(odf_element):
         return x
 
 
-    def _translate_row_coordinates(self, coordinates):
-        xyzt = _convert_coordinates(coordinates)
+    def _translate_row_coordinates(self, coord):
+        xyzt = _convert_coordinates(coord)
         if len(xyzt) == 2:
             x, z = xyzt
         else:
@@ -1578,28 +1578,28 @@ class odf_table(odf_element):
         return y
 
 
-    def _translate_table_coordinates(self, coordinates):
+    def _translate_table_coordinates(self, coord):
         height = self.get_height()
         width = self.get_width()
-        if isiterable(coordinates):
+        if isiterable(coord):
             # assuming we got int values
-            if len(coordinates) == 1:
+            if len(coord) == 1:
                 # It is a row
-                y = coordinates[0]
+                y = coord[0]
                 if y and y < 0:
                     y = _increment(y, height)
                 return (None, y, None, y)
-            if len(coordinates) == 2:
+            if len(coord) == 2:
                 # It is a row range, not a cell, because context is table
-                y = coordinates[0]
+                y = coord[0]
                 if y and y < 0:
                     y = _increment(y, height)
-                t = coordinates[1]
+                t = coord[1]
                 if t and t < 0:
                     t = _increment(t, height)
                 return (None, y, None, t)
             # should be 4 int
-            x, y, z, t = coordinates
+            x, y, z, t = coord
             if x and x < 0:
                 x = _increment(x, width)
             if y and y < 0:
@@ -1610,7 +1610,7 @@ class odf_table(odf_element):
                 t = _increment(t, height)
             return (x, y, z, t)
 
-        coord = _convert_coordinates(coordinates)
+        coord = _convert_coordinates(coord)
         if len(coord) == 2:
             x, y = coord
             if x and x < 0:
@@ -1631,9 +1631,62 @@ class odf_table(odf_element):
         return (x, y, z, t)
 
 
-    def _translate_cell_coordinates(self, coordinates):
+    def _translate_column_coordinates(self, coord):
+        height = self.get_height()
+        width = self.get_width()
+        if isiterable(coord):
+            # assuming we got int values
+            if len(coord) == 1:
+                # It is a column
+                x = coord[0]
+                if x and x < 0:
+                    x = _increment(x, width)
+                return (x, None, x, None)
+            if len(coord) == 2:
+                # It is a column range, not a cell, because context is table
+                x = coord[0]
+                if x and x < 0:
+                    x = _increment(y, width)
+                t = coord[1]
+                if z and z < 0:
+                    z = _increment(t, width)
+                return (x, None, z, None)
+            # should be 4 int
+            x, y, z, t = coord
+            if x and x < 0:
+                x = _increment(x, width)
+            if y and y < 0:
+                y = _increment(y, height)
+            if z and z < 0:
+                z = _increment(z, width)
+            if t and t < 0:
+                t = _increment(t, height)
+            return (x, y, z, t)
+
+        coord = _convert_coordinates(coord)
+        if len(coord) == 2:
+            x, y = coord
+            if x and x < 0:
+                x = _increment(x, width)
+            if y and y < 0:
+                y = _increment(y, height)
+            # extent to an area :
+            return (x, y, x, y)
+        x, y, z, t = coord
+        if x and x < 0:
+            x = _increment(x, width)
+        if y and y < 0:
+            y = _increment(y, height)
+        if z and z < 0:
+            z = _increment(z, width)
+        if t and t < 0:
+            t = _increment(t, height)
+        return (x, y, z, t)
+
+
+    def _translate_cell_coordinates(self, coord):
         # we want an x,y result
-        coord = _convert_coordinates(coordinates)
+        coord = _convert_coordinates(coord)
         if len(coord) == 2:
             x, y = coord
         # If we got an area, take the first cell
@@ -2762,7 +2815,7 @@ class odf_table(odf_element):
                 self.__update_width(row)
 
 
-    def set_value(self, coordinates, value, cell_type=None, currency=None,
+    def set_value(self, coord, value, cell_type=None, currency=None,
                   style=None):
         """Set the Python value of the cell at the given coordinates.
 
@@ -2771,7 +2824,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            coordinates -- (int, int) or str
+            coord -- (int, int) or str
 
             value -- Python type
 
@@ -2783,7 +2836,7 @@ class odf_table(odf_element):
             style -- unicode
 
         """
-        self.set_cell(coordinates, odf_create_cell(value, cell_type=cell_type,
+        self.set_cell(coord, odf_create_cell(value, cell_type=cell_type,
                                 currency=currency, style=style), clone=False)
 
 
@@ -2916,7 +2969,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            coordinates -- (int, int) or str
+            coord -- (int, int) or str
         """
         x, y = self._translate_cell_coordinates(coord)
         # Outside the defined table
@@ -2940,69 +2993,96 @@ class odf_table(odf_element):
         return self.get_width()
 
 
-    def traverse_columns(self):
+    def traverse_columns(self, start=None, end=None):
         """Yield as many column elements as expected columns in the table,
         i.e. expand repetitions by returning the same column as many times as
         necessary.
+
+            Arguments:
+
+                start -- int
+
+                end -- int
 
         Copies are returned, use ``set_column`` to push them back.
         """
         idx = -1
         before = -1
         x = 0
-        for juska in self._cmap:
-            idx += 1
-            if idx in self._indexes['_cmap']:
-                column = self._indexes['_cmap'][idx]
-            else:
-                column = self.get_element_idx2(_xpath_column_idx, idx)
-                self._indexes['_cmap'][idx] = column
-            repeated = juska - before
-            before = juska
-            for i in xrange(repeated or 1):
-                # Return a copy without the now obsolete repetition
-                column = column.clone()
-                column.x = x
-                x += 1
-                if repeated > 1:
-                    column.set_repeated(None)
-                yield column
+        if start is None and end is None:
+            for juska in self._cmap:
+                idx += 1
+                if idx in self._indexes['_cmap']:
+                    column = self._indexes['_cmap'][idx]
+                else:
+                    column = self.get_element_idx2(_xpath_column_idx, idx)
+                    self._indexes['_cmap'][idx] = column
+                repeated = juska - before
+                before = juska
+                for i in xrange(repeated or 1):
+                    # Return a copy without the now obsolete repetition
+                    column = column.clone()
+                    column.x = x
+                    x += 1
+                    if repeated > 1:
+                        column.set_repeated(None)
+                    yield column
+        else:
+            if start is None:
+                start = 0
+            start = max(0, start)
+            if end is None:
+                try:
+                    end = self._cmap[-1]
+                except:
+                    end = -1
+            start_map = _find_odf_idx(self._cmap, start)
+            if start_map is None:
+                return
+            if start_map > 0:
+                before = self._cmap[start_map - 1]
+            idx = start_map - 1
+            before = start - 1
+            x = start
+            for juska in self._cmap[start_map:]:
+                idx += 1
+                if idx in self._indexes['_cmap']:
+                    column = self._indexes['_cmap'][idx]
+                else:
+                    column = self.get_element_idx2(_xpath_column_idx, idx)
+                    self._indexes['_cmap'][idx] = column
+                repeated = juska - before
+                before = juska
+                for i in xrange(repeated or 1):
+                    if x <= end:
+                        column = column.clone()
+                        column.x = x
+                        x += 1
+                        if repeated > 1 or (x == start and start > 0):
+                            column.set_repeated(None)
+                        yield column
 
 
-    def _old_get_columns(self, style=None):
+    def get_columns(self, coord=None, style=None):
         """Get the list of columns matching the criteria. Each result is a
         tuple of (x, column).
 
         Arguments:
 
-            style -- unicode
-
-        Return: list of tuples
-        """
-        columns = []
-        for x, column in enumerate(self.traverse_columns()):
-            if style and style != column.get_style():
-                continue
-            columns.append((x, column))
-        return columns
-
-
-    def get_columns(self, style=None):
-        """Get the list of columns matching the criteria. Each result is a
-        tuple of (x, column).
-
-        Arguments:
+            coord -- str or tuple of int : coordinates of columns
 
             style -- unicode
-
-            content -- regex, unicode
 
         Return: list of columns
         """
+        if coord:
+            x, y, z, t = self._translate_column_coordinates(coord)
+        else:
+            x = y = z = t = None
         if not style:
-            return [column for column in self.traverse_columns()]
+            return [column for column in self.traverse_columns(start=x, end=t)]
         columns = []
-        for column in self.traverse_columns():
+        for column in self.traverse_columns(start=x, end=t):
             if style != column.get_style():
                 continue
             columns.append(column)
@@ -3285,7 +3365,7 @@ class odf_table(odf_element):
 
 
     def set_column_cells(self, x, cells):
-        """Set the list of cells at the given position.
+        """Shortcut to set the list of cells at the given position.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
         like "C" is accepted.
