@@ -1279,7 +1279,7 @@ class odf_row(odf_element):
 
     def get_values(self, coordinates=None, cell_type=None,
                    complement=False, get_type=False):
-        """Shortcut to get the list of all cell values in this row.
+        """Shortcut to get the cell values in this row.
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
@@ -1968,8 +1968,6 @@ class odf_table(odf_element):
 
             get_type -- boolean
 
-            flat -- boolean
-
         Return: list of lists of Python types
         """
         if coordinates:
@@ -1984,7 +1982,8 @@ class odf_table(odf_element):
                 width = min(z + 1, self.get_width())
             if x is not None:
                 width -= x
-            values = row.get_values((x, z), cell_type=cell_type, complement=complement,
+            values = row.get_values((x, z), cell_type=cell_type,
+                                            complement=complement,
                                                 get_type=get_type)
             # Complement row to match request width
             if complement:
@@ -2004,11 +2003,18 @@ class odf_table(odf_element):
 
         Filter by coordinates will parse the area defined by the coordinates.
 
-        If get_type is True, returns tuples (value, ODF type of value)
+        cell_type, complement, grt_type : see get_values()
+
+
 
         Arguments:
 
             coordinates -- str or tuple of int
+
+            cell_type -- 'boolean', 'float', 'date', 'string', 'time',
+                         'currency', 'percentage' or 'all'
+
+            complement -- boolean
 
             get_type -- boolean
 
@@ -2018,14 +2024,22 @@ class odf_table(odf_element):
             x, y, z, t = self._translate_table_coordinates(coordinates)
         else:
             x = y = z = t = None
-        width = self.get_width()
         for row in self.traverse(start = y, end = t):
-            values = row.get_values((x, z), get_type=get_type)
-            # Complement row to match column width
-            if get_type:
-                values.extend([(None, None)] * (width - len(values)))
+            if z is None:
+                width = self.get_width()
             else:
-                values.extend([None] * (width - len(values)))
+                width = min(z + 1, self.get_width())
+            if x is not None:
+                width -= x
+            values = row.get_values((x, z), cell_type=cell_type,
+                                            complement=complement,
+                                                get_type=get_type)
+            # Complement row to match column width
+            if complement:
+                if get_type:
+                    values.extend([(None, None)] * (width - len(values)))
+                else:
+                    values.extend([None] * (width - len(values)))
             yield values
 
 
