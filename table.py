@@ -827,9 +827,10 @@ class odf_row(odf_element):
         return self.get_elements(_xpath_cell)
 
 
-    def _translate_x(self, x):
-        x = _alpha_to_digit(x)
-        if x < 0:
+    def _translate_x_from_any(self, x):
+        if isinstance(x, basestring):
+            x, _ = _convert_coordinates(x)
+        if x and x < 0:
             return _increment(x, self.get_width())
         return x
 
@@ -1113,7 +1114,7 @@ class odf_row(odf_element):
 
         Return: odf_cell
         """
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         cell = self._get_cell2(x, clone=clone)
         cell.y = self.y
         cell.x = x
@@ -1129,13 +1130,13 @@ class odf_row(odf_element):
         See ``get_cell`` and ``odf_cell.get_value``.
         """
         if get_type:
-            x = self._translate_x(x)
+            x = self._translate_x_from_any(x)
             cell = self._get_cell2_base(x)
             if cell is None:
                 return (None, None)
             return cell.get_value(get_type=get_type)
         else:
-            x = self._translate_x(x)
+            x = self._translate_x_from_any(x)
             cell = self._get_cell2_base(x)
             if cell is None:
                 return None
@@ -1156,7 +1157,7 @@ class odf_row(odf_element):
             clone = False
         else:
             repeated = cell.get_repeated() or 1
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         # Outside the defined row
         diff = x - self.get_width()
         if diff == 0:
@@ -1210,7 +1211,7 @@ class odf_row(odf_element):
         """
         if cell is None:
             cell = odf_create_cell()
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         # Outside the defined row
         diff = x - self.get_width()
         if diff < 0:
@@ -1270,7 +1271,7 @@ class odf_row(odf_element):
 
             x -- int or str
         """
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         if x >= self.get_width():
             return
         _delete_item_in_vault(x, self, _xpath_cell_idx, '_rmap')
@@ -1347,7 +1348,7 @@ class odf_row(odf_element):
 
             cells -- list of cells
         """
-        start = self._translate_x(start)
+        start = self._translate_x_from_any(start)
         if start == 0 and clone == False and (len(cells) >= self.get_width()):
             self.clear()
             self.extend_cells(cells)
@@ -1379,7 +1380,7 @@ class odf_row(odf_element):
             style -- cell style
         """
         # fixme : if values n, n+ are same, use repeat
-        start = self._translate_x(start)
+        start = self._translate_x_from_any(start)
         if start == 0 and (len(values) >= self.get_width()):
             self.clear()
             cells = ([odf_create_cell(value, style=style,
@@ -1555,72 +1556,92 @@ class odf_table(odf_element):
     _append = odf_element.append
 
 
-    def _translate_x(self, x):
-        x = _alpha_to_digit(x)
-        if x < 0:
+    def _translate_x_from_any(self, x):
+        if isinstance(x, basestring):
+            x, _ = _convert_coordinates(x)
+        if x and x < 0:
             return _increment(x, self.get_width())
         return x
 
-
-    def _translate_y(self, y):
-        # "3" (couting from 1) -> 2 (couting from 0)
-        if isinstance(y, basestring):
-            y = int(y) - 1
-        if y < 0:
-            return _increment(y, self.get_height())
-        return y
 
     def _translate_y_from_any(self, y):
         # "3" (couting from 1) -> 2 (couting from 0)
         if isinstance(y, basestring):
             _, y = _convert_coordinates(y)
-        if y < 0:
+        if y and y < 0:
             return _increment(y, self.get_height())
         return y
 
 
     def _translate_table_coordinates(self, coordinates):
+        height = self.get_height()
+        width = self.get_width()
+        if isiterable(coordinates):
+            # assuming we got int values
+            if len(coordinates) == 1:
+                # It is a row
+                y = coordinates[0]
+                if y and y < 0:
+                    y = _increment(y, height)
+                return (None, y, None, y)
+            if len(coordinates) == 2:
+                # It is a row range, not a cell, because context is table
+                y = coordinates[0]
+                if y and y < 0:
+                    y = _increment(y, height)
+                t = coordinates[1]
+                if t and t < 0:
+                    t = _increment(t, height)
+                return (None, y, None, t)
+            # should be 4 int
+            x, y, z, t = coord
+            if x and x < 0:
+                x = _increment(x, width)
+            if y and y < 0:
+                y = _increment(y, height)
+            if z and z < 0:
+                z = _increment(z, width)
+            if t and t < 0:
+                t = _increment(t, height)
+            return (x, y, z, t)
+
         coord = _convert_coordinates(coordinates)
         if len(coord) == 2:
             x, y = coord
-            if x < 0:
-                x = _increment(x, self.get_width())
-            if y < 0:
-                y = _increment(y, self.get_height())
-            return (x, y)
+            if x and x < 0:
+                x = _increment(x, width)
+            if y and y < 0:
+                y = _increment(y, height)
+            # extent to an area :
+            return (x, y, x, y)
         x, y, z, t = coord
-        if x < 0:
-            x = _increment(x, self.get_width())
-        if y < 0:
-            y = _increment(y, self.get_height())
-        if z < 0:
-            z = _increment(z, self.get_width())
-        if t < 0:
-            t = _increment(t, self.get_height())
-
+        if x and x < 0:
+            x = _increment(x, width)
+        if y and y < 0:
+            y = _increment(y, height)
+        if z and z < 0:
+            z = _increment(z, width)
+        if t and t < 0:
+            t = _increment(t, height)
         return (x, y, z, t)
 
 
-    def _translate_table_row_coordinates(self, coordinates):
+    def _translate_cell_coordinates(self, coordinates):
+        # we want an x,y result
         coord = _convert_coordinates(coordinates)
         if len(coord) == 2:
-            y, t = coord
-            if y < 0:
-                y = _increment(y, self.get_height())
-            if t < 0:
-                t = _increment(t, self.get_height())
-            return (x, y)
-        x, y, z, t = coord
-        if x < 0:
+            x, y = coord
+        # If we got an area, take the first cell
+        elif len(coord) == 4:
+            x, y, z, t = coord
+        else:
+            raise ValueError, "ValueError %s" % coord
+        if x and x < 0:
             x = _increment(x, self.get_width())
-        if y < 0:
+        if y and y < 0:
             y = _increment(y, self.get_height())
-        if z < 0:
-            z = _increment(z, self.get_width())
-        if t < 0:
-            t = _increment(t, self.get_height())
+        return (x, y)
 
-        return (x, y, z, t)
 
     def _compute_table_cache(self):
         idx_repeated_seq = self.elements_repeated_sequence(_xpath_row, 'table:number-rows-repeated')
@@ -2210,7 +2231,7 @@ class odf_table(odf_element):
         Return: list of rows
         """
         if coordinates:
-            x, y, z, t = self._translate_table_row_coordinates(coordinates)
+            x, y, z, t = self._translate_table_coordinates(coordinates)
         else:
             x = y = z = t = None
         # fixme : not clones ?
@@ -2541,13 +2562,7 @@ class odf_table(odf_element):
                                           content=content):
                     cells.append(cell)
         else:
-            xyzt = self._translate_table_row_coordinates(coordinates)
-            if len(xyzt) == 2:
-                z, t = xyzt
-                x = None
-                y = None
-            else:
-                x, y, z, t = xyzt
+            x, y, z, t = self._translate_table_coordinates(coordinates)
             for row in self.traverse(start = y, end = t):
                 for cell in row.get_cells(coordinates = (x, z),
                                             cell_type=cell_type,
@@ -2573,7 +2588,7 @@ class odf_table(odf_element):
 
         Return: odf_cell
         """
-        x, y = self._translate_table_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coordinates)
         # Outside the defined table
         if y >= self.get_height():
             cell = odf_create_cell()
@@ -2615,7 +2630,7 @@ class odf_table(odf_element):
         if cell is None:
             cell = odf_create_cell()
             clone = False
-        x, y = self._translate_table_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coordinates)
         cell.x = x
         cell.y = y
         if y >= self.get_height():
@@ -2693,7 +2708,7 @@ class odf_table(odf_element):
             if type is None:
                 raise ValueError, "document type not supported for images"
         # We need the end address of the image
-        x, y = self._translate_table_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coordinates)
         cell = self.get_cell((x, y))
         image_frame = image_frame.clone()
         # Remove any previous paragraph, frame, etc.
@@ -2740,7 +2755,7 @@ class odf_table(odf_element):
             clone = False
         if clone:
             cell = cell.clone()
-        x, y = self._translate_table_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coordinates)
         row = self._get_row2(y, clone=True)
         row.y = y
         row.set_repeated(None)
@@ -2770,7 +2785,7 @@ class odf_table(odf_element):
             clone = False
         if clone:
             cell = cell.clone()
-        y = self._translate_y(y)
+        y = self._translate_y_from_any(y)
         row = self._get_row2(y)
         row.y = y
         row.append_cell(cell, clone=False)
@@ -2793,7 +2808,7 @@ class odf_table(odf_element):
 
             coordinates -- (int, int) or str
         """
-        x, y = self._translate_table_coordinates(coordinates)
+        x, y = self._translate_cell_coordinates(coordinates)
         # Outside the defined table
         if y >= self.get_height():
             return
@@ -2915,7 +2930,7 @@ class odf_table(odf_element):
 
         Return: odf_column
         """
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         column = self._get_column2(x)
         column.x = x
         return column
@@ -2935,7 +2950,7 @@ class odf_table(odf_element):
 
             column -- odf_column
         """
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         if column is None:
             column = odf_create_column()
             repeated = 1
@@ -2972,7 +2987,7 @@ class odf_table(odf_element):
         """
         if column is None:
             column = odf_create_column()
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         diff = x - self.get_width()
         if diff < 0:
             column_back = _insert_item_in_vault(x, column, self, _xpath_column_idx, '_cmap')
@@ -3037,7 +3052,7 @@ class odf_table(odf_element):
 
             x -- int or str.isalpha()
         """
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         # Outside the defined table
         if x >= self.get_width():
             return
@@ -3048,26 +3063,6 @@ class odf_table(odf_element):
         for row in self._get_rows():
             if row.get_width() >= width:
                 row.delete_cell(x)
-
-
-    def _old_get_column_cells(self, x):
-        """Get the list of cells at the given position.
-
-        Position start at 0. So cell C4 is on column 2. Alphabetical position
-        like "C" is accepted.
-
-        Arguments:
-
-            x -- int or str.isalpha()
-
-        Return: list of odf_cell
-        """
-        x = self._translate_x(x)
-        result = []
-        for row in self.traverse():
-            cell = row.get_cell(x)
-            result.append(cell)
-        return result
 
 
     def get_column_cells(self, x, style=None, content=None, cell_type=None,
@@ -3097,7 +3092,7 @@ class odf_table(odf_element):
 
         Return: list of odf_cell
         """
-        x = self._translate_x(x)
+        x = self._translate_x_from_any(x)
         if cell_type:
             cell_type = cell_type.lower().strip()
         cells = []
