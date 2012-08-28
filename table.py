@@ -1032,7 +1032,7 @@ class odf_row(odf_element):
                         yield cell
 
 
-    def get_cells(self, coordinates=None, style=None, content=None,
+    def get_cells(self, coord=None, style=None, content=None,
                   cell_type=None):
         """Get the list of cells matching the criteria.
 
@@ -1044,7 +1044,7 @@ class odf_row(odf_element):
 
         Arguments:
 
-            coordinates -- str or tuple of int
+            coord -- str or tuple of int : coordinates
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
@@ -1056,8 +1056,8 @@ class odf_row(odf_element):
         Return: list of tuples
         """
         # fixme : not clones ?
-        if coordinates:
-            x, z = self._translate_row_coordinates(coordinates)
+        if coord:
+            x, z = self._translate_row_coordinates(coord)
         else:
             x = None
             z = None
@@ -1277,21 +1277,21 @@ class odf_row(odf_element):
         _delete_item_in_vault(x, self, _xpath_cell_idx, '_rmap')
 
 
-    def get_values(self, coordinates=None, cell_type=None,
-                   complement=False, get_type=False):
+    def get_values(self, coord=None, cell_type=None,
+                   complete=False, get_type=False):
         """Shortcut to get the cell values in this row.
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
-        If cell_type is used and complement is True, missing values are
+        If cell_type is used and complete is True, missing values are
         replaced by None.
-        If cell_type is None, complement is always True : with no cell type
+        If cell_type is None, complete is always True : with no cell type
         queried, get_values() returns None for each empty cell, the length
         of the list is equal to the length of the row (depending on
         coordinates use).
 
         If get_type is True, returns a tuple (value, ODF type of value), or
-        (None, None) for empty cells if complement is True.
+        (None, None) for empty cells if complete is True.
 
         Filter by coordinates will retrieve the amount of cells defined by
         coordinates with None for empty cells, except when using cell_type.
@@ -1299,19 +1299,19 @@ class odf_row(odf_element):
 
         Arguments:
 
-            coordinates -- str or tuple of int
+            coord -- str or tuple of int : coordinates in row
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
 
-            complement -- boolean
+            complete -- boolean
 
             get_type -- boolean
 
         Return: list of Python types, or list of tuples.
         """
-        if coordinates:
-            x, z = self._translate_row_coordinates(coordinates)
+        if coord:
+            x, z = self._translate_row_coordinates(coord)
         else:
             x = None
             z = None
@@ -1322,7 +1322,7 @@ class odf_row(odf_element):
                 # Filter the cells by cell_type
                 ctype = cell.get_type()
                 if not ctype or not (ctype == cell_type or cell_type == 'all'):
-                    if complement:
+                    if complete:
                         if get_type:
                             values.append((None, None))
                         else:
@@ -1943,41 +1943,41 @@ class odf_table(odf_element):
             return self.__get_formatted_text_normal(context)
 
 
-    def get_values(self, coordinates=None, cell_type=None, complement=True,
+    def get_values(self, coord=None, cell_type=None, complete=True,
                    get_type=False, flat=False):
         """Get a matrix of values of the table.
 
         Filter by coordinates will parse the area defined by the coordinates.
 
-        If cell_type is used and complement is True (default), missing values
+        If cell_type is used and complete is True (default), missing values
         are replaced by None.
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
 
-        If cell_type is None, complement is always True : with no cell type
+        If cell_type is None, complete is always True : with no cell type
         queried, get_values() returns None for each empty cell, the length
         each lists is equal to the width of the table.
 
         If get_type is True, returns tuples (value, ODF type of value), or
-        (None, None) for empty cells with complement True.
+        (None, None) for empty cells with complete True.
 
         If flat is True, the methods return a single list of all the values.
 
         Arguments:
 
-            coordinates -- str or tuple of int
+            coord -- str or tuple of int : coordinates of area
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
 
-            complement -- boolean
+            complete -- boolean
 
             get_type -- boolean
 
         Return: list of lists of Python types
         """
-        if coordinates:
-            x, y, z, t = self._translate_table_coordinates(coordinates)
+        if coord:
+            x, y, z, t = self._translate_table_coordinates(coord)
         else:
             x = y = z = t = None
         data = []
@@ -1989,10 +1989,10 @@ class odf_table(odf_element):
             if x is not None:
                 width -= x
             values = row.get_values((x, z), cell_type=cell_type,
-                                            complement=complement,
+                                            complete=complete,
                                                 get_type=get_type)
-            # Complement row to match request width
-            if complement:
+            # complete row to match request width
+            if complete:
                 if get_type:
                     values.extend([(None, None)] * (width - len(values)))
                 else:
@@ -2004,31 +2004,31 @@ class odf_table(odf_element):
         return data
 
 
-    def iter_values(self, coordinates=None, cell_type=None, complement=True,
+    def iter_values(self, coord=None, cell_type=None, complete=True,
                     get_type=False):
         """Iterate through lines of Python values of the table.
 
         Filter by coordinates will parse the area defined by the coordinates.
 
-        cell_type, complement, grt_type : see get_values()
+        cell_type, complete, grt_type : see get_values()
 
 
 
         Arguments:
 
-            coordinates -- str or tuple of int
+            coord -- str or tuple of int : coordinates of area
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
 
-            complement -- boolean
+            complete -- boolean
 
             get_type -- boolean
 
         Return: iterator of lists
         """
-        if coordinates:
-            x, y, z, t = self._translate_table_coordinates(coordinates)
+        if coord:
+            x, y, z, t = self._translate_table_coordinates(coord)
         else:
             x = y = z = t = None
         for row in self.traverse(start = y, end = t):
@@ -2039,10 +2039,10 @@ class odf_table(odf_element):
             if x is not None:
                 width -= x
             values = row.get_values((x, z), cell_type=cell_type,
-                                            complement=complement,
+                                            complete=complete,
                                                 get_type=get_type)
-            # Complement row to match column width
-            if complement:
+            # complete row to match column width
+            if complete:
                 if get_type:
                     values.extend([(None, None)] * (width - len(values)))
                 else:
@@ -2264,14 +2264,14 @@ class odf_table(odf_element):
                         yield row
 
 
-    def get_rows(self, coordinates=None, style=None, content=None):
+    def get_rows(self, coord=None, style=None, content=None):
         """Get the list of rows matching the criteria.
 
         Filter by coordinates will parse the area defined by the coordinates.
 
         Arguments:
 
-            coordinates -- str or tuple of int
+            coord -- str or tuple of int : coordinates of rows
 
             content -- regex, unicode
 
@@ -2279,8 +2279,8 @@ class odf_table(odf_element):
 
         Return: list of rows
         """
-        if coordinates:
-            x, y, z, t = self._translate_table_coordinates(coordinates)
+        if coord:
+            x, y, z, t = self._translate_table_coordinates(coord)
         else:
             x = y = z = t = None
         # fixme : not clones ?
@@ -2475,7 +2475,7 @@ class odf_table(odf_element):
         _delete_item_in_vault(y, self, _xpath_row_idx, '_tmap')
 
 
-    def get_row_values(self, y, cell_type=None, complement=True,
+    def get_row_values(self, y, cell_type=None, complete=True,
                        get_type=False):
         """Shortcut to get the list of Python values for the cells of the row
         at the given "y" position.
@@ -2484,7 +2484,7 @@ class odf_table(odf_element):
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
-        If cell_type and complement is True, replace missing values by None.
+        If cell_type and complete is True, replace missing values by None.
 
         If get_type is True, returns a tuple (value, ODF type of value)
 
@@ -2495,16 +2495,16 @@ class odf_table(odf_element):
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
 
-            complement -- boolean
+            complete -- boolean
 
             get_type -- boolean
 
         Return: list of lists of Python types
         """
         values = self.get_row(y, clone=False).get_values(cell_type=cell_type,
-                                    complement=complement, get_type=get_type)
-        # Complement row to match column width
-        if complement:
+                                    complete=complete, get_type=get_type)
+        # complete row to match column width
+        if complete:
             if get_type:
                 values.extend([(None, None)] * (self.get_width() - len(values)))
             else:
@@ -2578,20 +2578,20 @@ class odf_table(odf_element):
     # Cells
     #
 
-    def get_cells(self, coordinates=None, cell_type=None, style=None,
-                  content=None, complement=True):
+    def get_cells(self, coord=None, cell_type=None, style=None,
+                  content=None, complete=True):
         """Get the cells matching the criteria. If coordinates is None,
         parse the whole table, else parse the defined area.
         If the result is 2D (several rows and colums), return a list of lists,
         else a single list of cells.
-        If complement is True (default), empty cells are retrieved too.
+        If complete is True (default), empty cells are retrieved too.
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
 
         Arguments:
 
-            coordinates -- str or tuple of int
+            coordinates -- str or tuple of int : coordinates of area
 
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
@@ -2600,18 +2600,18 @@ class odf_table(odf_element):
 
             style -- unicode
 
-            complement -- boolean
+            complete -- boolean
 
         Return: list of tuples
         """
         cells = []
-        if not coordinates:
+        if not coord:
             for row in self.traverse():
                 for cell in row.get_cells(cell_type=cell_type, style=style,
                                           content=content):
                     cells.append(cell)
         else:
-            x, y, z, t = self._translate_table_coordinates(coordinates)
+            x, y, z, t = self._translate_table_coordinates(coord)
             for row in self.traverse(start = y, end = t):
                 for cell in row.get_cells(coordinates = (x, z),
                                             cell_type=cell_type,
@@ -3115,7 +3115,7 @@ class odf_table(odf_element):
 
 
     def get_column_cells(self, x, style=None, content=None, cell_type=None,
-                         complement=False):
+                         complete=False):
         """Get the list of cells at the given position.
 
         Position start at 0. So cell C4 is on column 2. Alphabetical position
@@ -3124,7 +3124,7 @@ class odf_table(odf_element):
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
 
-        If complement is True, replace missing values by None.
+        If complete is True, replace missing values by None.
 
         Arguments:
 
@@ -3137,7 +3137,7 @@ class odf_table(odf_element):
 
             style -- unicode
 
-            complement -- boolean
+            complete -- boolean
 
         Return: list of odf_cell
         """
@@ -3155,24 +3155,24 @@ class odf_table(odf_element):
             if cell_type:
                 ctype = cell.get_type()
                 if not ctype or not (ctype == cell_type or cell_type == 'all'):
-                    if complement:
+                    if complete:
                         cells.append(None)
                     continue
             # Filter the cells with the regex
             if content and not cell.match(content):
-                if complement:
+                if complete:
                     cells.append(None)
                 continue
             # Filter the cells with the style
             if style and style != cell.get_style():
-                if complement:
+                if complete:
                     cells.append(None)
                 continue
             cells.append(cell)
         return cells
 
 
-    def get_column_values(self, x, cell_type=None, complement=True,
+    def get_column_values(self, x, cell_type=None, complete=True,
                           get_type=False):
         """Shortcut to get the list of Python values for the cells at the
         given position.
@@ -3182,7 +3182,7 @@ class odf_table(odf_element):
 
         Filter by cell_type, with cell_type 'all' will retrieve cells of any
         type, aka non empty cells.
-        If cell_type and complement is True, replace missing values by None.
+        If cell_type and complete is True, replace missing values by None.
 
         If get_type is True, returns a tuple (value, ODF type of value)
 
@@ -3193,18 +3193,18 @@ class odf_table(odf_element):
             cell_type -- 'boolean', 'float', 'date', 'string', 'time',
                          'currency', 'percentage' or 'all'
 
-            complement -- boolean
+            complete -- boolean
 
             get_type -- boolean
 
         Return: list of Python types
         """
         cells = self.get_column_cells(x, style=None, content=None,
-                                    cell_type=cell_type, complement=complement)
+                                    cell_type=cell_type, complete=complete)
         values = []
         for cell in cells:
             if cell is None:
-                if complement:
+                if complete:
                     if get_type:
                         values.append((None, None))
                     else:
@@ -3213,7 +3213,7 @@ class odf_table(odf_element):
             if cell_type:
                 ctype = cell.get_type()
                 if not ctype or not (ctype == cell_type or cell_type == 'all'):
-                    if complement:
+                    if complete:
                         if get_type:
                             values.append((None, None))
                         else:
