@@ -79,6 +79,15 @@ def _digit_to_alpha(digit):
 
 
 
+def _increment(x, step):
+    while x < 0:
+        if step == 0:
+            return 0
+        x += step
+    return x
+
+
+
 def _convert_coordinates(obj):
     """Translates "D3" to (3, 2) or return (1, 2) untouched.
     Translates "A1:B3" to (0,0,1,2)
@@ -107,7 +116,9 @@ def _convert_coordinates(obj):
         try:
             line = int(coord[len(alpha):])
         except ValueError:
-            raise ValueError, 'coordinates "%s" malformed' % obj
+            #raise ValueError, 'coordinates "%s" malformed' % obj
+            # maybe 'A:C' row coordinates
+            line = 1
         if line <= 0:
             raise ValueError, 'coordinates "%s" malformed' % obj
         # Indexes start at 0
@@ -817,11 +828,8 @@ class odf_row(odf_element):
 
     def _translate_x(self, x):
         x = _alpha_to_digit(x)
-        while x < 0:
-            if self.get_width() == 0:
-                x = 0
-            else:
-                x += self.get_width()
+        if x < 0:
+            return _increment(x, self.get_width())
         return x
 
 
@@ -831,17 +839,11 @@ class odf_row(odf_element):
             x, z = xyzt
         else:
             x, _, z, __ = xyzt
-        while x < 0:
-            if self.get_width() == 0:
-                x = 0
-            else:
-                x += self.get_width()
-        while z < 0:
-            if self.get_width() == 0:
-                z = 0
-            else:
-                z += self.get_width()
-        return x, z
+        if x < 0:
+            x = _increment(x, self.get_width())
+        if z < 0:
+            z = _increment(z, self.get_width())
+        return (x, z)
 
 
     def _compute_row_cache(self):
@@ -1554,17 +1556,17 @@ class odf_table(odf_element):
 
     def _translate_x(self, x):
         x = _alpha_to_digit(x)
-        while x < 0:
-            x += self.get_width()
+        if x < 0:
+            return _increment(x, self.get_width())
         return x
 
 
     def _translate_y(self, y):
         # "3" (couting from 1) -> 2 (couting from 0)
-        if isinstance(y, str):
+        if isinstance(y, basestring):
             y = int(y) - 1
-        while y < 0:
-            y += self.get_height()
+        if y < 0:
+            return _increment(y, self.get_height())
         return y
 
 
@@ -1572,20 +1574,21 @@ class odf_table(odf_element):
         coord = _convert_coordinates(coordinates)
         if len(coord) == 2:
             x, y = coord
-            while x < 0:
-                x += self.get_width()
-            while y < 0:
-                y += self.get_height()
+            if x < 0:
+                x = _increment(x, self.get_width())
+            if y < 0:
+                y = _increment(x, self.get_height())
             return (x, y)
         x, y, z, t = coord
-        while x < 0:
-            x += self.get_width()
-        while z < 0:
-            z += self.get_width()
-        while y < 0:
-            y += self.get_height()
-        while t < 0:
-            t += self.get_height()
+        if x < 0:
+            x = _increment(x, self.get_width())
+        if y < 0:
+            y = _increment(y, self.get_height())
+        if z < 0:
+            z = _increment(z, self.get_width())
+        if t < 0:
+            t = _increment(t, self.get_height())
+
         return (x, y, z, t)
 
 
