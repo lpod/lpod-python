@@ -1922,9 +1922,9 @@ class TestTableGetValues(TestCase):
     def setUp(self):
         document = odf_get_document('samples/simple_table.ods')
         body = document.get_body()
-        table = body.get_table(name=u"Example1").clone()
-        self.row_repeats = table.get_row(0)
-        self.row = table.get_row(1)
+        self.table = body.get_table(name=u"Example1").clone()
+        self.row_repeats = self.table.get_row(0)
+        self.row = self.table.get_row(1)
 
 
     def test_on_empty_table(self):
@@ -1932,73 +1932,190 @@ class TestTableGetValues(TestCase):
         self.assertEqual(table.get_values(), [])
         self.assertEqual(table.get_values(complement=True), [])
         self.assertEqual(table.get_values(complement=True, get_type=True), [])
-        self.assertEqual(table.get_values((0,10)), [])
+        self.assertEqual(table.get_values((0, 10)), [])
         self.assertEqual(table.get_values(cell_type='all'), [])
         self.assertEqual(table.get_values(cell_type='All'), [])
-        self.assertEqual(table.get_values((2,3), complement=True), [])
+        self.assertEqual(table.get_values((2, 3), complement=True), [])
 
 
     def test_get_values_count(self):
-        self.assertEqual(len(self.row.get_values()), 7)
+        self.assertEqual(len(self.table.get_values()), 4) # 4 rows
+        self.assertEqual(len(self.table.get_values(
+                    cell_type = 'All', complement = False)), 4) # same
+        self.assertEqual(len(self.table.get_values(
+                    cell_type = 'All', complement = True)), 4) # 4 lines result
+        self.assertEqual(len(self.table.get_values(
+                    cell_type = 'All', flat = True)), 28) # flat
+        self.assertEqual(len(self.table.get_values(
+                                     flat = True)), 28) # flat
 
 
-    def test_get_values_coord(self):
-        coord = (0,8)
-        self.assertEqual(len(self.row.get_values(coord)), 7)
-        coord = 'a1:c2'
-        self.assertEqual(len(self.row.get_values(coord)), 3)
-        coord = 'a1:a2'
-        self.assertEqual(len(self.row.get_values(coord)), 1)
-        coord = 'a1:EE2'
-        self.assertEqual(len(self.row.get_values(coord)), 7)
-        coord = 'D1'
-        self.assertEqual(len(self.row.get_values(coord)), 0)
-        coord = 'c5:a1'
-        self.assertEqual(len(self.row.get_values(coord)), 0)
-        coord = (5,6)
-        self.assertEqual(len(self.row.get_values(coord)), 2)
-        coord = (-5, 6)
-        self.assertEqual(len(self.row.get_values(coord)), 5)
-        coord = (0, -1)
-        self.assertEqual(len(self.row.get_values(coord)), 7)
-        coord = (0, -2)
-        self.assertEqual(len(self.row.get_values(coord)), 6)
-        coord = (-1,-1)
-        self.assertEqual(len(self.row.get_values(coord)), 1)
-        coord = (1,0)
-        self.assertEqual(len(self.row.get_values(coord)), 0)
+    def test_get_values_coord_1(self):
+        table = self.table
+        result = [  [1, 1, 1, 2, 3, 3, 3],
+                    [1, 1, 1, 2, 3, 3, 3],
+                    [1, 1, 1, 2, 3, 3, 3],
+                    [1, 2, 3, 4, 5, 6, 7]]
+        self.assertEqual(table.get_values(), result)
+        self.assertEqual(table.get_values( (0, 0, 6, 3) ), result)
+        self.assertEqual(table.get_values( (0, 3) ), result)
+        self.assertEqual(table.get_values( (0, None, 6, None) ), result)
+        self.assertEqual(table.get_values( (None, None, 6, 20) ), result)
+        self.assertEqual(table.get_values( (0, 0, None, None) ), result)
+        self.assertEqual(table.get_values( (None, 0, 10, None) ), result)
+        self.assertEqual(table.get_values(""), result)
+        self.assertEqual(table.get_values(":"), result)
+        self.assertEqual(table.get_values("A1:G4"), result)
+        self.assertEqual(table.get_values("A1:"), result)
+        self.assertEqual(table.get_values("1:4"), result)
+        self.assertEqual(table.get_values("1:4"), result)
+        self.assertEqual(table.get_values("1:"), result)
+        self.assertEqual(table.get_values("1:10"), result)
+        self.assertEqual(table.get_values(":10"), result)
+        self.assertEqual(table.get_values("A:"), result)
+        self.assertEqual(table.get_values(":G"), result)
+        self.assertEqual(table.get_values("1:H"), result)
+
+
+    def test_get_values_coord_2(self):
+        table = self.table
+        result = [  [1, 1, 1, 2, 3, 3, 3],
+                    [1, 2, 3, 4, 5, 6, 7]]
+        self.assertEqual(table.get_values( (0, 2, 7, 3) ), result)
+        self.assertEqual(table.get_values( (2, 3) ), result)
+        self.assertEqual(table.get_values( (0, 2, 6, None) ), result)
+        self.assertEqual(table.get_values( (None, 2, None, 20) ), result)
+        self.assertEqual(table.get_values( (None, 2, None, None) ), result)
+        self.assertEqual(table.get_values( (None, 2, 10, None) ), result)
+        self.assertEqual(table.get_values("A3:G4"), result)
+        self.assertEqual(table.get_values("A3:"), result)
+        self.assertEqual(table.get_values("3:4"), result)
+        self.assertEqual(table.get_values("3:"), result)
+        self.assertEqual(table.get_values("3:10"), result)
+        self.assertEqual(table.get_values("A3:"), result)
+        self.assertEqual(table.get_values("3:G"), result)
+        self.assertEqual(table.get_values("3:H"), result)
+
+
+    def test_get_values_coord_3(self):
+        table = self.table
+        result = [  [1, 1 ],
+                    [1, 1 ]]
+        self.assertEqual(table.get_values( (0, 0, 1, 1) ), result)
+        self.assertEqual(table.get_values( (None, 0, 1, 1) ), result)
+        self.assertEqual(table.get_values( (None, None, 1, 1) ), result)
+        self.assertEqual(table.get_values("A1:B2"), result)
+        self.assertEqual(table.get_values(":B2"), result)
+
+
+    def test_get_values_coord_4(self):
+        table = self.table
+        result = [  [3, 3 ],
+                    [6, 7 ]]
+        self.assertEqual(table.get_values('F3:G4'), result)
+        self.assertEqual(table.get_values("F3:"), result)
+        self.assertEqual(table.get_values("F3:RR555"), result)
+
+
+    def test_get_values_coord_5(self):
+        table = self.table
+        result = [  [2, 3],
+                    [2, 3],
+                    [2, 3],
+                    [4, 5]]
+        self.assertEqual(table.get_values('D1:E4'), result)
+        self.assertEqual(table.get_values("D:E"), result)
+        self.assertEqual(table.get_values("D1:E555"), result)
+
+
+    def test_get_values_coord_5_flat(self):
+        table = self.table
+        result = [  2, 3,
+                    2, 3,
+                    2, 3,
+                    4, 5]
+        self.assertEqual(table.get_values('D1:E4', flat = True), result)
+
+
+    def test_get_values_coord_6(self):
+        table = self.table
+        result = [[5]]
+        self.assertEqual(table.get_values('E4'), result)
+        self.assertEqual(table.get_values("E4:E4"), result)
+
+
+    def test_get_values_coord_6_flat(self):
+        table = self.table
+        result = [5]
+        self.assertEqual(table.get_values('E4', flat=True), result)
+
+
+    def test_get_values_coord_7(self):
+        table = self.table
+        result = []
+        self.assertEqual(table.get_values('E5'), result)
+        self.assertEqual(table.get_values("B3:A1"), result)
 
 
     def test_get_values_cell_type(self):
-        row = self.row.clone()
-        values = row.get_values(cell_type='all')
-        self.assertEqual(len(values), 7)
-        values = row.get_values(cell_type='float')
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
-        values = row.get_values(cell_type='percentage')
-        self.assertEqual(len(values), 0)
-        values = row.get_values(cell_type='string')
-        self.assertEqual(len(values), 0)
+        table = self.table
+        result = [  [1, 1, 1, 2, 3, 3, 3],
+                    [1, 1, 1, 2, 3, 3, 3],
+                    [1, 1, 1, 2, 3, 3, 3],
+                    [1, 2, 3, 4, 5, 6, 7]]
+        values = table.get_values(cell_type='all')
+        self.assertEqual(values, result)
+        values = table.get_values(cell_type='float')
+        self.assertEqual(values, result)
 
 
-    def test_get_values_cell_type2(self):
-        row = self.row.clone()
-        row.append_cell(odf_create_cell(value="bob"), clone=False)
-        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
-        row.append_cell(odf_create_cell(value="bob2"), clone=False)
-        values = row.get_values(cell_type='all')
-        self.assertEqual(len(values), 7 + 3 )
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2"])
-        values = row.get_values(cell_type='float')
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
-        values = row.get_values(cell_type='percentage')
-        self.assertEqual(len(values), 1)
-        self.assertEqual(values, [14])
-        values = row.get_values(cell_type='string')
-        self.assertEqual(len(values), 2)
-        self.assertEqual(values, [u"bob", u"bob2"])
+    def test_get_values_cell_type_no_comp(self):
+        table = self.table
+        result = [  1, 1, 1, 2, 3, 3, 3,
+                    1, 1, 1, 2, 3, 3, 3,
+                    1, 1, 1, 2, 3, 3, 3,
+                    1, 2, 3, 4, 5, 6, 7]
+        values = table.get_values(cell_type='all', complement=True,
+                                  flat=True)
+        self.assertEqual(values, result)
+        values = table.get_values(cell_type='float', complement=False,
+                                  flat=True)
+        self.assertEqual(values, result)
+
+
+    def test_get_values_cell_type_1(self):
+        table = self.table
+        result = [  [None, None, None, None, None, None, None],
+                    [None, None, None, None, None, None, None],
+                    [None, None, None, None, None, None, None],
+                    [None, None, None, None, None, None, None]]
+        values = table.get_values(cell_type='percentage')
+        self.assertEqual(values, result)
+
+
+    def test_get_values_cell_type_1_flat(self):
+        table = self.table
+        result = [  None, None, None, None, None, None, None,
+                    None, None, None, None, None, None, None,
+                    None, None, None, None, None, None, None,
+                    None, None, None, None, None, None, None]
+        values = table.get_values(cell_type='percentage', flat = True)
+        self.assertEqual(values, result)
+
+
+    def test_get_values_cell_type_1_no_comp_flat(self):
+        table = self.table
+        result = [ ]
+        values = table.get_values(cell_type='percentage', complement = False,
+                                  flat=True)
+        self.assertEqual(values, result)
+
+
+    def test_get_values_cell_type_1_no_comp(self):
+        table = self.table
+        result = [[], [], [], []]
+        values = table.get_values(cell_type='percentage', complement = False)
+        self.assertEqual(values, result)
 
 
     def test_get_values_cell_type2_with_hole(self):
@@ -2007,404 +2124,128 @@ class TestTableGetValues(TestCase):
         row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
         row.append_cell(odf_create_cell(value="bob2"), clone=False)
         row.set_cell(12, odf_create_cell(value="far"), clone=False)
-        values = row.get_values(cell_type='all') # aka all non empty
-        self.assertEqual(len(values), 11 )
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  u"far"])
-        values = row.get_values() # difference when requestion everything
-        self.assertEqual(len(values), 13 )
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  None, None, u"far"])
-        values = row.get_values(cell_type='float')
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
-        values = row.get_values(cell_type='percentage')
-        self.assertEqual(len(values), 1)
-        self.assertEqual(values, [14])
-        values = row.get_values(cell_type='string')
-        self.assertEqual(len(values), 3)
-        self.assertEqual(values, [u"bob", u"bob2", u"far"])
-        values = row.get_values(":") # requesting everything
-        self.assertEqual(len(values), 13 )
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  None, None, u"far"])
-        values = row.get_values(cell_type='float')
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
-        values = row.get_values(cell_type='percentage')
-        self.assertEqual(len(values), 1)
-        self.assertEqual(values, [14])
-        values = row.get_values(cell_type='string')
-        self.assertEqual(len(values), 3)
-        self.assertEqual(values, [u"bob", u"bob2", u"far"])
-        values = row.get_values(":") # requesting everything
-        self.assertEqual(len(values), 13 )
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  None, None, u"far"])
-        values = row.get_values(cell_type='float')
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
-        values = row.get_values(cell_type='percentage')
-        self.assertEqual(len(values), 1)
-        self.assertEqual(values, [14])
-        values = row.get_values(cell_type='string')
-        self.assertEqual(len(values), 3)
-        self.assertEqual(values, [u"bob", u"bob2", u"far"])
-        values = row.get_values("") # requesting everything 2
-        self.assertEqual(len(values), 13 )
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  None, None, u"far"])
-        values = row.get_values(cell_type='float')
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3])
-        values = row.get_values(cell_type='percentage')
-        self.assertEqual(len(values), 1)
-        self.assertEqual(values, [14])
-        values = row.get_values(cell_type='string')
-        self.assertEqual(len(values), 3)
-        self.assertEqual(values, [u"bob", u"bob2", u"far"])
+        table = self.table.clone()
+        table.append_row(row)
+        result = [[1, 1, 1, 2, 3, 3, 3, None, None, None, None, None, None],
+                  [1, 1, 1, 2, 3, 3, 3, None, None, None, None, None, None],
+                  [1, 1, 1, 2, 3, 3, 3, None, None, None, None, None, None],
+                  [1, 2, 3, 4, 5, 6, 7, None, None, None, None, None, None],
+                [1, 1, 1, 2, 3, 3, 3, u'bob', 14, u'bob2', None, None, u'far']]
+        self.assertEqual(table.get_values(), result )
+        self.assertEqual(table.get_values('A4:z4'), [result[3]] )
+        self.assertEqual(table.get_values('5:5'), [result[4]] )
 
-    def test_get_values_cell_type2_with_hole_and_get_type(self):
+
+    def test_get_values_cell_type2_with_hole_no_comp(self):
         row = self.row.clone()
         row.append_cell(odf_create_cell(value="bob"), clone=False)
         row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
         row.append_cell(odf_create_cell(value="bob2"), clone=False)
         row.set_cell(12, odf_create_cell(value="far"), clone=False)
-        values = row.get_values(cell_type='all',  # aka all non empty
-                                get_type=True)
-        self.assertEqual(len(values), 11 )
-        self.assertEqual(values, [(1, u"float"), (1, u"float"), (1, u"float"),
-                                (2, u"float"), (3, u"float"),
-                                (3, u"float"), (3, u"float"),
-                                (u"bob", u"string"), (14, u"percentage"),
-                                (u"bob2", u"string"),
-                                (u"far", u"string")])
-        values = row.get_values(get_type=True) # difference when  everything
-        self.assertEqual(len(values), 13 )
-        self.assertEqual(values, [(1, u"float"), (1, u"float"), (1, u"float"),
-                                (2, u"float"), (3, u"float"),
-                                (3, u"float"), (3, u"float"),
-                                (u"bob", u"string"), (14, u"percentage"),
-                                (u"bob2", u"string"),
-                                (None, None), (None,None),
-                                (u"far", u"string")])
-        values = row.get_values(cell_type='float' ,get_type=True)
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [(1, u"float"), (1, u"float"), (1, u"float"),
-                                (2, u"float"), (3, u"float"),
-                                (3, u"float"), (3, u"float")])
-        values = row.get_values(cell_type='percentage', get_type=True)
-        self.assertEqual(len(values), 1)
-        self.assertEqual(values, [(14, u"percentage")])
-        values = row.get_values(cell_type='string', get_type=True)
-        self.assertEqual(len(values), 3)
-        self.assertEqual(values, [(u"bob", u"string"),
-                                (u"bob2", u"string"),
-                                (u"far", u"string")])
+        table = self.table.clone()
+        table.append_row(row)
+        result = [[1, 1, 1, 2, 3, 3, 3],
+                  [1, 1, 1, 2, 3, 3, 3],
+                  [1, 1, 1, 2, 3, 3, 3],
+                  [1, 2, 3, 4, 5, 6, 7],
+                [1, 1, 1, 2, 3, 3, 3, u'bob', 14, u'bob2', None, None, u'far']]
+        self.assertEqual(table.get_values(complement=False), result )
+        self.assertEqual(table.get_values('A4:z4',
+                                          complement=False), [result[3]] )
+        self.assertEqual(table.get_values('5:5',
+                                          complement=False), [result[4]] )
 
 
-    def test_get_values_cell_type2_complement(self):
+    def test_get_values_cell_type2_with_hole_no_comp_flat(self):
         row = self.row.clone()
         row.append_cell(odf_create_cell(value="bob"), clone=False)
         row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
         row.append_cell(odf_create_cell(value="bob2"), clone=False)
         row.set_cell(12, odf_create_cell(value="far"), clone=False)
-        values = row.get_values(cell_type='ALL', complement=True)
-        self.assertEqual(len(values), 13 )
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  None, None, u"far"])
-        values = row.get_values(cell_type='FLOAT', complement=True)
-        self.assertEqual(len(values), 13)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3, 3, None, None, None,
-                                  None, None, None])
-        values = row.get_values(cell_type='percentage', complement=True)
-        self.assertEqual(len(values), 13)
-        self.assertEqual(values, [None, None, None, None, None, None, None,
-                                  None, 14, None, None, None, None])
-        values = row.get_values(cell_type='string', complement=True)
-        self.assertEqual(len(values), 13)
-        self.assertEqual(values, [None, None, None, None, None, None, None,
-                                  u"bob", None, u"bob2", None, None, u"far"])
+        table = self.table.clone()
+        table.append_row(row)
+        result = [1, 1, 1, 2, 3, 3, 3,
+                  1, 1, 1, 2, 3, 3, 3,
+                  1, 1, 1, 2, 3, 3, 3,
+                  1, 2, 3, 4, 5, 6, 7,
+                1, 1, 1, 2, 3, 3, 3, u'bob', 14, u'bob2', None, None, u'far']
+        result2 = [1, 2, 3, 4, 5, 6, 7]
+        result3 = [ 1, 1, 1, 2, 3, 3, 3, u'bob', 14, u'bob2', None, None,
+                   u'far']
+        self.assertEqual(table.get_values(complement=False, flat=True,),result)
+        self.assertEqual(table.get_values('A4:z4', flat=True,
+                                          complement=False), result2 )
+        self.assertEqual(table.get_values('5:5',flat=True,
+                                          complement=False), result3 )
 
 
-    def test_get_values_cell_type_and_coord(self):
+    def test_get_values_cell_type2_with_hole_get_type(self):
         row = self.row.clone()
-        values = row.get_values(coordinates=(0, 5), cell_type='all')
-        self.assertEqual(len(values), 6)
-        values = row.get_values(coordinates=(0, 5), cell_type='float')
-        self.assertEqual(len(values), 6)
-        values = row.get_values(coordinates=(0, 5), cell_type='percentage')
-        self.assertEqual(len(values), 0)
-        values = row.get_values(coordinates=(2, 5), cell_type='string')
-        self.assertEqual(len(values), 0)
-
-
-
-    def test_get_values_cell_type_and_coord_strange(self):
-        row = self.row.clone()
-        values = row.get_values(coordinates='A:F', cell_type='all')
-        self.assertEqual(len(values), 6)
-        values = row.get_values(coordinates='C:', cell_type='all')
-        self.assertEqual(len(values), 5)
-        values = row.get_values(coordinates='A : f', cell_type='float')
-        self.assertEqual(len(values), 6)
-        values = row.get_values(coordinates='A:F', cell_type='percentage')
-        self.assertEqual(len(values), 0)
-        values = row.get_values(coordinates='C:F', cell_type='string')
-        self.assertEqual(len(values), 0)
-
-
-    def test_get_values_cell_type_and_coord_strange_long(self):
-        row = self.row.clone()
-        values = row.get_values(coordinates='A8:F2', cell_type='all')
-        self.assertEqual(len(values), 6)
-        values = row.get_values(coordinates='C5:', cell_type='all')
-        self.assertEqual(len(values), 5)
-        values = row.get_values(coordinates='C5:99', cell_type='all')
-        self.assertEqual(len(values), 5)
-        values = row.get_values(coordinates='A2 : f', cell_type='float')
-        self.assertEqual(len(values), 6)
-        values = row.get_values(coordinates='A:F5', cell_type='percentage')
-        self.assertEqual(len(values), 0)
-        values = row.get_values(coordinates='C:F4', cell_type='string')
-        self.assertEqual(len(values), 0)
-
-
-    def test_get_values_cell_type_and_coord_and_get_type(self):
-        row = self.row.clone()
-        values = row.get_values(coordinates=(0, 5), cell_type='all',
-                                get_type=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [(1, u"float"), (1, u"float"),
-                                (1, u"float"), (2, u"float"),
-                                (3, u"float"), (3, u"float")])
-        values = row.get_values(coordinates=(0, 5), cell_type='float',
-                                get_type=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [(1, u"float"), (1, u"float"),
-                                (1, u"float"), (2, u"float"),
-                                (3, u"float"), (3, u"float")])
-        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
-                                get_type=True)
-        self.assertEqual(len(values), 0)
-        values = row.get_values(coordinates=(2, 5), cell_type='string',
-                                get_type=True)
-        self.assertEqual(len(values), 0)
-
-
-    def test_get_values_cell_type_and_coord_and_complement(self):
-        row = self.row.clone()
-        values = row.get_values(coordinates=(0, 5), cell_type='all',
-                                complement=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3])
-        values = row.get_values(coordinates=(0, 5), cell_type='float',
-                                complement=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [1, 1, 1, 2, 3, 3])
-        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
-                                complement=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [None, None, None, None, None, None])
-        values = row.get_values(coordinates=(2, 5), cell_type='string',
-                                complement=True)
-        self.assertEqual(len(values), 4)
-        self.assertEqual(values, [None, None, None, None])
-
-
-    def test_get_values_cell_type_and_coord2_and_complement(self):
-        row = self.row.clone()
-        row.append_cell(odf_create_cell(value="bob"), clone=False )
+        row.append_cell(odf_create_cell(value="bob"), clone=False)
         row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
         row.append_cell(odf_create_cell(value="bob2"), clone=False)
         row.set_cell(12, odf_create_cell(value="far"), clone=False)
-        values = row.get_values(coordinates=(2, 20), cell_type='all',
-                                complement=True)
-        self.assertEqual(len(values), 11)
-        self.assertEqual(values, [1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  None, None, u"far"])
-        values = row.get_values(coordinates=(2, 11), cell_type='all',
-                                complement=True)
-        self.assertEqual(len(values), 10)
-        self.assertEqual(values, [1, 2, 3, 3, 3, u"bob", 14, u"bob2",
-                                  None, None])
-        values = row.get_values(coordinates=(3, 12), cell_type='float',
-                                complement=True)
-        self.assertEqual(len(values), 10)
-        self.assertEqual(values, [2, 3, 3, 3, None, None, None,
-                                  None, None, None])
-        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
-                                complement=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [None, None, None, None, None, None])
-        values = row.get_values(coordinates=(0, 5), cell_type='string',
-                                complement=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [None, None, None, None, None, None])
-        values = row.get_values(coordinates=(5, 11), cell_type='percentage',
-                                complement=True)
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [None, None, None, 14, None, None, None])
-        values = row.get_values(coordinates=(6, 12), cell_type='string',
-                                complement=True)
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [None, u"bob", None, u"bob2",
-                                  None, None, u"far"])
-        values = row.get_values(coordinates=(8, 20), cell_type='string',
-                                complement=True)
-        self.assertEqual(len(values), 5)
-        self.assertEqual(values, [None, u"bob2",
-                                  None, None, u"far"])
+        table = self.table.clone()
+        table.append_row(row)
+        result1 = [[1, 1, 1, 2, 3, 3, 3, None, None, None, None, None, None]]
+        result2 = [[None, None, None, None, None, None, None, u'bob', None,
+                    u'bob2', None, None, u'far']]
 
+        self.assertEqual(table.get_values('5:5', cell_type='string'),
+                         result2 )
 
-    def test_get_values_cell_type_and_coord2_and_complement_and_get_type(self):
-        row = self.row.clone()
-        row.append_cell(odf_create_cell(value="bob"), clone=False )
-        row.append_cell(odf_create_cell(value=14, cell_type = 'percentage'))
-        row.append_cell(odf_create_cell(value="bob2"), clone=False)
-        row.set_cell(12, odf_create_cell(value="far"), clone=False)
-        values = row.get_values(coordinates=(2, 20), cell_type='all',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 11)
-        self.assertEqual(values, [(1, u"float"), (2, u"float"), (3, u"float"),
-                                (3, u"float"), (3, u"float"),
-                                (u"bob", u"string"), (14, u"percentage"),
-                                (u"bob2", u"string"),
-                                (None, None), (None,None),
-                                (u"far", u"string")])
-        values = row.get_values(coordinates=(2, 11), cell_type='all',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 10)
-        self.assertEqual(values, [(1, u"float"), (2, u"float"), (3, u"float"),
-                                (3, u"float"), (3, u"float"),
-                                (u"bob", u"string"), (14, u"percentage"),
-                                (u"bob2", u"string"),
-                                (None, None), (None,None)])
-        values = row.get_values(coordinates=(3, 12), cell_type='float',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 10)
-        self.assertEqual(values, [(2, u"float"), (3, u"float"),
-                                (3, u"float"), (3, u"float"),
-                                (None, None), (None,None),
-                                (None, None), (None,None),
-                                (None, None), (None,None)])
-        values = row.get_values(coordinates=(0, 5), cell_type='percentage',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [(None, None), (None,None),
-                                (None, None), (None,None),
-                                (None, None), (None,None)])
-        values = row.get_values(coordinates=(0, 5), cell_type='string',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 6)
-        self.assertEqual(values, [(None, None), (None,None),
-                                (None, None), (None,None),
-                                (None, None), (None,None)])
-        values = row.get_values(coordinates=(5, 11), cell_type='percentage',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [(None, None), (None,None),
-                                (None, None), (14, u"percentage"), (None,None),
-                                (None, None), (None,None)])
-        values = row.get_values(coordinates=(6, 12), cell_type='string',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 7)
-        self.assertEqual(values, [(None, None), (u"bob", u"string"),
-                                (None, None), (u"bob2", u"string"),
-                                (None, None), (None, None),
-                                (u"far", u"string")])
-        values = row.get_values(coordinates=(8, 20), cell_type='string',
-                                complement=True, get_type=True)
-        self.assertEqual(len(values), 5)
-        self.assertEqual(values, [(None, None), (u"bob2", u"string"),
-                                  (None, None), (None, None),
-                                  (u"far", u"string")])
+        self.assertEqual(table.get_values('5:5', cell_type='string',
+                                          complement=False, flat=True),
+                          [u'bob',
+                           u'bob2',
+                           u'far'] )
 
+        self.assertEqual(table.get_values('5:5', cell_type='string',
+                                complement=False, flat=True, get_type=True),
+                          [(u'bob', 'string'),
+                            (u'bob2', 'string'),
+                            (u'far', 'string')] )
 
-    def test_get_cell_alpha(self):
-        row = self.row
-        cell_5 = row.get_cell('F')
-        self.assertEqual(cell_5.get_value(), 3)
-        self.assertEqual(cell_5.get_text_content(), u"3")
-        self.assertEqual(cell_5.get_type(), 'float')
-        self.assertEqual(cell_5.get_style(), u"ce1")
-        self.assertEqual(cell_5.x, 5)
-        self.assertEqual(cell_5.y, 1)
+        self.assertEqual(table.get_values(
+            coordinates='4:5', cell_type='All', get_type=True),
+        [[ (1, u'float'), (2, u'float'), (3, u'float'), (4, u'float'),
+            (5, u'float'),  (6, u'float'), (7, u'float'),(None, None),
+            (None, None), (None, None), (None, None), (None, None),
+            (None, None)],
+            [(1, u'float'), (1, u'float'), (1, u'float'), (2, u'float'),
+            (3, u'float'), (3, u'float'), (3, u'float'), (u'bob', u'string'),
+            (14, u'percentage'), (u'bob2', u'string'), (None, None), (None, None),
+            (u'far', u'string')]] )
 
+        self.assertEqual(table.get_values(
+            coordinates='4:5', cell_type='All', get_type=True, complement=False),
+        [[ (1, u'float'), (2, u'float'), (3, u'float'), (4, u'float'),
+            (5, u'float'),  (6, u'float'), (7, u'float') ],
+            [(1, u'float'), (1, u'float'), (1, u'float'), (2, u'float'),
+            (3, u'float'), (3, u'float'), (3, u'float'), (u'bob', u'string'),
+            (14, u'percentage'), (u'bob2', u'string'),
+            (u'far', u'string')]] )
 
-    def test_get_cell_int(self):
-        row = self.row
-        cell_5 = row.get_cell(5)
-        self.assertEqual(cell_5.get_value(), 3)
-        self.assertEqual(cell_5.get_text_content(), u"3")
-        self.assertEqual(cell_5.get_type(), 'float')
-        self.assertEqual(cell_5.get_style(), u"ce1")
+        self.assertEqual(table.get_values(
+            coordinates='4:5', cell_type='string', get_type=True),
+        [[ (None, None), (None, None), (None, None),(None, None),
+            (None, None),  (None, None), (None, None),(None, None),
+            (None, None), (None, None), (None, None), (None, None),
+            (None, None)],
+            [(None, None), (None, None), (None, None), (None, None),
+            (None, None), (None, None), (None, None),(u'bob', u'string'),
+             (None, None), (u'bob2', u'string'), (None, None), (None, None),
+            (u'far', u'string')]] )
 
+        self.assertEqual(table.get_values(
+            coordinates='4:5', cell_type='string', get_type=True,
+            complement=False),
+       [ [ ], [(u'bob', u'string'), (u'bob2', u'string'), (u'far', u'string')]] )
 
-    def test_get_cell_coord(self):
-        row = self.row.clone()
-        cell = row.get_cell(-1)
-        self.assertEqual(cell.get_value(), 3)
-        cell = row.get_cell(-3)
-        self.assertEqual(cell.get_value(), 3)
-        cell = row.get_cell(-4)
-        self.assertEqual(cell.get_value(), 2)
-        cell = row.get_cell(-5)
-        self.assertEqual(cell.get_value(), 1)
-        cell = row.get_cell(-1 - 7)
-        self.assertEqual(cell.get_value(), 3)
-        cell = row.get_cell(-3 - 56)
-        self.assertEqual(cell.get_value(), 3)
-        cell = row.get_cell(-4 - 560)
-        self.assertEqual(cell.get_value(), 2)
-        cell = row.get_cell(-5 - 7000)
-        self.assertEqual(cell.get_value(), 1)
-        cell = row.get_cell(8)
-        self.assertEqual(cell.get_value(), None)
-        cell = row.get_cell(1000)
-        self.assertEqual(cell.get_value(), None)
-
-
-    def test_get_value_coord(self):
-        row = self.row.clone()
-        row.append_cell(odf_create_cell("Appended"))
-        value = row.get_value(-1)
-        self.assertEqual(value, u'Appended')
-        value = row.get_value(-3)
-        self.assertEqual(value, 3)
-        value = row.get_value(-4)
-        self.assertEqual(value, 3)
-        value = row.get_value(-5)
-        self.assertEqual(value, 2)
-        value = row.get_value(-1 - 8)
-        self.assertEqual(value, u'Appended')
-        value = row.get_value(7)
-        self.assertEqual(value, u'Appended')
-        value = row.get_value(8)
-        self.assertEqual(value, None)
-        value = row.get_value(1000)
-        self.assertEqual(value, None)
-
-
-    def test_get_value_coord_with_get_type(self):
-        row = self.row.clone()
-        row.append_cell(odf_create_cell("Appended"))
-        value = row.get_value(-1, get_type=True)
-        self.assertEqual(value, (u'Appended', u'string'))
-        value = row.get_value(-3, get_type=True)
-        self.assertEqual(value, (3, u'float'))
-        value = row.get_value(-4, get_type=True)
-        self.assertEqual(value, (3, u'float'))
-        value = row.get_value(-5, get_type=True)
-        self.assertEqual(value, (2, u'float'))
-        value = row.get_value(-1 - 8, get_type=True)
-        self.assertEqual(value, (u'Appended', u'string'))
-        value = row.get_value(7, get_type=True)
-        self.assertEqual(value, (u'Appended', u'string'))
-        value = row.get_value(8, get_type=True)
-        self.assertEqual(value, (None, None))
-        value = row.get_value(1000, get_type=True)
-        self.assertEqual(value, (None, None))
+        self.assertEqual(table.get_values(
+            coordinates='4:J5', cell_type='string', get_type=True,
+            complement=False),
+       [ [ ], [(u'bob', u'string'), (u'bob2', u'string'), ]] )
 
 
 

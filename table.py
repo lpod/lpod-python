@@ -1594,7 +1594,7 @@ class odf_table(odf_element):
                     t = _increment(t, height)
                 return (None, y, None, t)
             # should be 4 int
-            x, y, z, t = coord
+            x, y, z, t = coordinates
             if x and x < 0:
                 x = _increment(x, width)
             if y and y < 0:
@@ -1938,7 +1938,7 @@ class odf_table(odf_element):
 
 
     def get_values(self, coordinates=None, cell_type=None, complement=True,
-                   get_type=False):
+                   get_type=False, flat=False):
         """Get a matrix of values of the table.
 
         Filter by coordinates will parse the area defined by the coordinates.
@@ -1955,8 +1955,7 @@ class odf_table(odf_element):
         If get_type is True, returns tuples (value, ODF type of value), or
         (None, None) for empty cells with complement True.
 
-        If cell_type is used and complement is False, the method return a
-        single list of values (or tuples if get_type is True).
+        If flat is True, the methods return a single list of all the values.
 
         Arguments:
 
@@ -1969,6 +1968,8 @@ class odf_table(odf_element):
 
             get_type -- boolean
 
+            flat -- boolean
+
         Return: list of lists of Python types
         """
         if coordinates:
@@ -1976,22 +1977,25 @@ class odf_table(odf_element):
         else:
             x = y = z = t = None
         data = []
-        width = self.get_width()
         for row in self.traverse(start = y, end = t):
+            if z is None:
+                width = self.get_width()
+            else:
+                width = min(z + 1, self.get_width())
+            if x is not None:
+                width -= x
             values = row.get_values((x, z), cell_type=cell_type, complement=complement,
                                                 get_type=get_type)
-            # Complement row to match column width
+            # Complement row to match request width
             if complement:
                 if get_type:
                     values.extend([(None, None)] * (width - len(values)))
                 else:
                     values.extend([None] * (width - len(values)))
-                data.append(values)
+            if flat:
+                data.extend(values)
             else:
-                if cell_type:
-                    data.extend(values)
-                else:
-                    data.append(values)
+                data.append(values)
         return data
 
 
