@@ -1998,7 +1998,8 @@ class odf_table(odf_element):
         return data
 
 
-    def iter_values(self, coordinates=None, get_type=False):
+    def iter_values(self, coordinates=None, cell_type=None, complement=True,
+                    get_type=False):
         """Iterate through lines of Python values of the table.
 
         Filter by coordinates will parse the area defined by the coordinates.
