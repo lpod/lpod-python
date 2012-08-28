@@ -841,9 +841,9 @@ class odf_row(odf_element):
             x, z = xyzt
         else:
             x, _, z, __ = xyzt
-        if x < 0:
+        if x and x < 0:
             x = _increment(x, self.get_width())
-        if z < 0:
+        if z and z < 0:
             z = _increment(z, self.get_width())
         return (x, z)
 
