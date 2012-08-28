@@ -1571,8 +1571,38 @@ class odf_table(odf_element):
             return _increment(y, self.get_height())
         return y
 
+    def _translate_y_from_any(self, y):
+        # "3" (couting from 1) -> 2 (couting from 0)
+        if isinstance(y, basestring):
+            _, y = _convert_coordinates(y)
+        if y < 0:
+            return _increment(y, self.get_height())
+        return y
+
 
     def _translate_table_coordinates(self, coordinates):
+        coord = _convert_coordinates(coordinates)
+        if len(coord) == 2:
+            x, y = coord
+            if x < 0:
+                x = _increment(x, self.get_width())
+            if y < 0:
+                y = _increment(y, self.get_height())
+            return (x, y)
+        x, y, z, t = coord
+        if x < 0:
+            x = _increment(x, self.get_width())
+        if y < 0:
+            y = _increment(y, self.get_height())
+        if z < 0:
+            z = _increment(z, self.get_width())
+        if t < 0:
+            t = _increment(t, self.get_height())
+
+        return (x, y, z, t)
+
+
+    def _translate_table_row_coordinates(self, coordinates):
         coord = _convert_coordinates(coordinates)
         if len(coord) == 2:
             y, t = coord
@@ -1592,7 +1622,6 @@ class odf_table(odf_element):
             t = _increment(t, self.get_height())
 
         return (x, y, z, t)
-
 
     def _compute_table_cache(self):
         idx_repeated_seq = self.elements_repeated_sequence(_xpath_row, 'table:number-rows-repeated')
@@ -2182,7 +2211,7 @@ class odf_table(odf_element):
         Return: list of rows
         """
         if coordinates:
-            x, y, z, t = self._translate_table_coordinates(coordinates)
+            x, y, z, t = self._translate_table_row_coordinates(coordinates)
         else:
             x = y = z = t = None
         # fixme : not clones ?
@@ -2231,14 +2260,12 @@ class odf_table(odf_element):
 
         Arguments:
 
-            y -- int
+            y -- int or str
 
         Return: odf_row
         """
         # fixme : keep repeat ? maybe an option to functions : "raw=False"
-        y = self._translate_y(y)
-        if y < 0:
-            return None
+        y = self._translate_y_from_any(y)
         row = self._get_row2(y, clone = clone, create = create)
         row.y = y
         return row
@@ -2263,7 +2290,7 @@ class odf_table(odf_element):
             clone = False
         else:
             repeated = row.get_repeated() or 1
-        y = self._translate_y(y)
+        y = self._translate_y_from_any(y)
         row.y = y
         # Outside the defined table ?
         diff = y - self.get_height()
@@ -2289,14 +2316,14 @@ class odf_table(odf_element):
 
         Arguments:
 
-            y -- int
+            y -- int or str
 
             row -- odf_row
         """
         if row is None:
             row = odf_create_row()
             clone = False
-        y = self._translate_y(y)
+        y = self._translate_y_from_any(y)
         diff = y - self.get_height()
         if diff < 0:
             row_back = _insert_item_in_vault(y, row, self, _xpath_row_idx, '_tmap')
@@ -2369,9 +2396,9 @@ class odf_table(odf_element):
 
         Arguments:
 
-            y -- int
+            y -- int or str
         """
-        y = self._translate_y(y)
+        y = self._translate_y_from_any(y)
         # Outside the defined table
         if y >= self.get_height():
             return
@@ -2425,7 +2452,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            y -- int
+            y -- int or str
 
             values -- list of Python types
 
@@ -2450,7 +2477,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            y -- int
+            y -- int or str
 
             cells -- list of Python types
 
@@ -2471,7 +2498,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            y -- int
+            y -- int or str
 
             aggressive -- bool
         """
@@ -2515,9 +2542,11 @@ class odf_table(odf_element):
                                           content=content):
                     cells.append(cell)
         else:
-            xyzt = self._translate_table_coordinates(coordinates)
+            xyzt = self._translate_table_row_coordinates(coordinates)
             if len(xyzt) == 2:
-                x, y = z, t = xyzt
+                z, t = xyzt
+                x = None
+                y = None
             else:
                 x, y, z, t = xyzt
             for row in self.traverse(start = y, end = t):
