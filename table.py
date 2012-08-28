@@ -112,19 +112,18 @@ def _convert_coordinates(obj):
         except ValueError:
             #raise ValueError, 'coordinates "%s" malformed' % obj
             # maybe '1:4' table row coordinates
-            column = 0
+            column = None
         coordinates.append(column)
         # Then "1"
         try:
-            line = int(coord[len(alpha):])
+            line = int(coord[len(alpha):]) - 1
         except ValueError:
             #raise ValueError, 'coordinates "%s" malformed' % obj
             # maybe 'A:C' row coordinates
-            line = 1
-        if line <= 0:
+            line = None
+        if line and line <= 0:
             raise ValueError, 'coordinates "%s" malformed' % obj
-        # Indexes start at 0
-        coordinates.append(line - 1)
+        coordinates.append(line)
     return tuple(coordinates)
 
 

@@ -89,21 +89,64 @@ class TestCoordinates(TestCase):
         self.assertEqual(converted, (5, 6, 730, 122))
 
 
-    def test_convert_coordinates_alphanum4(self):
+    def test_convert_coordinates_alphanum4_2(self):
         converted = _convert_coordinates('f7:ABc123')
         self.assertEqual(converted, (5, 6, 730, 122))
 
 
-    def test_convert_coordinates_alphanum4(self):
+    def test_convert_coordinates_alphanum4_3(self):
         converted = _convert_coordinates('f7 : ABc 123 ')
         self.assertEqual(converted, (5, 6, 730, 122))
 
 
-    def test_convert_coordinates_alphanum4(self):
+    def test_convert_coordinates_alphanum4_4(self):
         converted = _convert_coordinates('ABC 123: F7 ')
         self.assertEqual(converted, (730, 122, 5, 6))
 
+    def test_convert_coordinates_bad(self):
+        self.assertRaises(ValueError, _convert_coordinates, None)
+        self.assertEqual(_convert_coordinates( (None,) ), (None,) )
+        self.assertEqual(_convert_coordinates( (None, None) ), (None, None) )
+        self.assertEqual(_convert_coordinates( (1, 'bad' ) ), (1, 'bad') )
 
+    def test_convert_coordinates_bad_string(self):
+        self.assertEqual(_convert_coordinates( "2B" ),      (None, None) )
+        self.assertEqual(_convert_coordinates( "$$$" ),     (None, None) )
+        self.assertEqual(_convert_coordinates( "" ),        (None, None) )
+
+    def test_convert_coordinates_std(self):
+        self.assertEqual(_convert_coordinates( "A1" ), (0, 0) )
+        self.assertEqual(_convert_coordinates( " a 1 " ), (0, 0) )
+        self.assertEqual(_convert_coordinates( " aa 1 " ), (26, 0) )
+
+    def test_convert_coordinates_assert(self):
+        self.assertRaises(ValueError, _convert_coordinates, "A0" )
+        self.assertRaises(ValueError, _convert_coordinates, "A-5" )
+
+    def test_convert_coordinates_big(self):
+        self.assertEqual(_convert_coordinates( "AAA200001" ), (26*26+26, 200000) )
+
+    def test_convert_coordinates_partial(self):
+        self.assertEqual(_convert_coordinates( "B" ),       (1, None) )
+        self.assertEqual(_convert_coordinates( "2" ),       (None, 1) )
+
+    def test_convert_coordinates_partial_4(self):
+        self.assertEqual(_convert_coordinates( "B3:D5" ),   (1, 2, 3, 4) )
+        self.assertEqual(_convert_coordinates( "B3:" ),     (1, 2, None, None) )
+        self.assertEqual(_convert_coordinates( " B  3  :  " ), (1, 2, None, None) )
+        self.assertEqual(_convert_coordinates( ":D5" ),     (None, None, 3, 4) )
+        self.assertEqual(_convert_coordinates( "  :  D 5  " ), (None, None, 3, 4) )
+        self.assertEqual(_convert_coordinates( "C:D" ),     (2, None, 3, None) )
+        self.assertEqual(_convert_coordinates( " : D " ),   (None, None, 3, None) )
+        self.assertEqual(_convert_coordinates( " C :  " ),  (2, None, None, None) )
+        self.assertEqual(_convert_coordinates( "2 : 3 " ),  (None, 1, None, 2) )
+        self.assertEqual(_convert_coordinates( "2 :  " ),   (None, 1, None, None) )
+        self.assertEqual(_convert_coordinates( " :3  " ),   (None, None, None, 2) )
+        self.assertEqual(_convert_coordinates( " :  " ),    (None, None, None, None) )
+
+    def test_convert_coordinates_partial_bad_4(self):
+        self.assertEqual(_convert_coordinates( " : $$$ " ), (None, None, None, None) )
+        self.assertEqual(_convert_coordinates( " B 3: $$$ " ), (1, 2, None, None) )
 
 class TestCreateCell(TestCase):
 
@@ -1680,7 +1723,6 @@ class TestColumn(TestCase):
         self.assertEqual(column.get_style(), u"co2")
         column.set_style(None)
         self.assertEqual(column.get_style(), None)
-
 
 
 class TestTable(TestCase):
