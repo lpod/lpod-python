@@ -259,13 +259,22 @@ class odf_container(object):
         parts = self.__parts
         # Parts to save, except manifest at the end
         part_names = parts.keys()
-        part_names.remove(ODF_MANIFEST)
+        try:
+            part_names.remove(ODF_MANIFEST)
+        except KeyError:
+            print "Warning : missing '%s'" % ODF_MANIFEST
         # "Pretty-save" parts in some order
         # mimetype requires to be first and uncompressed
-        dump('mimetype', parts['mimetype'])
-        part_names.remove('mimetype')
+        try:
+            dump('mimetype', parts['mimetype'])
+            part_names.remove('mimetype')
+        except:
+            print "Warning : missing 'mimetype'"
         # XML parts
         for path in ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES:
+            if path not in parts:
+                print "Warning : missing '%s'" % path
+                continue
             dump(path, parts[path])
             part_names.remove(path)
         # Everything else
