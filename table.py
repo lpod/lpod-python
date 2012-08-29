@@ -2228,6 +2228,8 @@ class odf_table(odf_element):
             self.clear()
             new_rows = []
             for row_cells in transposed_data:
+                if not isiterable(row_cells):
+                    row_cells = (row_cells,)
                 row = odf_create_row()
                 row.extend_cells(row_cells)
                 self.append_row(row, clone=False)
@@ -2237,19 +2239,19 @@ class odf_table(odf_element):
             if x is None:
                 x = 0
             else:
-                x = min(x, self.get_width())
+                x = min(x, self.get_width() - 1)
             if z is None:
-                z = self.get_width()
+                z = self.get_width() - 1
             else:
-                z = min(z, self.get_width())
+                z = min(z, self.get_width() - 1)
             if y is None:
                 y = 0
             else:
-                y = min(y, self.get_height())
+                y = min(y, self.get_height() - 1)
             if t is None:
-                t = self.get_height()
+                t = self.get_height() - 1
             else:
-                t = min(t, self.get_height())
+                t = min(t, self.get_height() - 1)
             for row in self.traverse(start=y, end=t):
                 data.append([cell for cell in row.traverse(start=x, end=z)])
             transposed_data = map(None, *data)
@@ -2257,11 +2259,15 @@ class odf_table(odf_element):
             w = z - x + 1
             h = t -y + 1
             if w != h:
-                nones = [[none] * w for i in range(h)]
+                nones = [[None] * w for i in range(h)]
                 self.set_values(nones, coord=(x,y,z,t))
             # put transposed
-            self.set_cells(data, (x, y, x + h - 1, y + w -1))
-            self._compute_table_cache(row)
+            for idx, row_cells in enumerate(transposed_data):
+                if not isiterable(row_cells):
+                    row_cells = (row_cells,)
+                    transposed_data[idx] = row_cells
+            self.set_cells(transposed_data, (x, y, x + h - 1, y + w -1))
+            self._compute_table_cache()
 
 
     def is_empty(self, aggressive=False):
@@ -2813,6 +2819,49 @@ class odf_table(odf_element):
                 row.set_cell(x, cell, clone=clone)
                 # Update width if necessary, since we don't use set_row
                 self.__update_width(row)
+
+
+    def set_cells(self, cells, coord=None, clone=True):
+        """set the cells in the table, from the 'coord' position.
+
+        'coord' is the coordinate of the upper left cell to be modified by
+        values. If 'coord' is None, default to the position (0,0) ("A1").
+        If 'coord' is an area (e.g. "A2:B5"), the upper left position of this
+        area is used as coordinate.
+
+        The table is *not* cleared before the operation, to reset the table
+        before setting cells, use table.clear().
+
+        A list of lists is expected, with as many lists as rows to be set, and
+        as many cell in each sublist as cells to be setted in the row.
+
+        Arguments:
+
+            cells -- cell object
+
+            coord -- tuple or str
+
+            values -- list of lists of python types
+
+        """
+        if coord:
+            x, y = self._translate_cell_coordinates(coord)
+        else:
+            x = y = 0
+        if y is None:
+            y = 0
+        y -= 1
+        for row_cells in cells:
+            y += 1
+            if not row_cells:
+                continue
+            row = self.get_row(y, clone=True)
+            repeated =  row.get_repeated or 1
+            if repeated >= 2:
+                row.set_repeated(None)
+            row.set_cells(row_cells, start=x, clone=clone)
+            self.set_row(y, row, clone=False)
+            self.__update_width(row)
 
 
     def set_value(self, coord, value, cell_type=None, currency=None,

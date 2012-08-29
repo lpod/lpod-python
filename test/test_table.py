@@ -1984,6 +1984,11 @@ class TestTable(TestCase):
         table.rstrip()
         self.assertEqual(table.get_size(), (5, 9))
 
+# simpletable :
+    #   1	1	1	2	3	3	3
+    #   1	1	1	2	3	3	3
+    #   1	1	1	2	3	3	3
+    #   1   2	3	4	5	6	7
 
     def test_table_transpose(self):
         table = self.table.clone()
@@ -1996,6 +2001,40 @@ class TestTable(TestCase):
                  [3, 3, 3, 5],
                  [3, 3, 3, 6],
                  [3, 3, 3, 7]])
+
+
+    def test_table_transpose_2(self):
+        table = self.table.clone()
+        table.transpose("A1:G1")
+        self.assertEqual(table.get_values(),
+               [[1, None, None, None, None, None, None],
+                [1, 1, 1, 2, 3, 3, 3],
+                [1, 1, 1, 2, 3, 3, 3],
+                [2, 2, 3, 4, 5, 6, 7],
+                [3, None, None, None, None, None, None],
+                [3, None, None, None, None, None, None],
+                [3, None, None, None, None, None, None]])
+
+
+    def test_table_transpose_3(self):
+        table = self.table.clone()
+        table.delete_row(3)
+        table.delete_row(2)
+        table.delete_row(1)
+        table.transpose()
+        self.assertEqual(table.get_values(),
+               [[1], [1], [1], [2], [3], [3], [3]])
+
+
+    def test_table_transpose_4(self):
+        table = self.table.clone()
+        table.transpose("F2:F4")
+        print table.get_values()
+        self.assertEqual(table.get_values(),
+               [[1, 1, 1, 2, 3, 3,    3,   None],
+                [1, 1, 1, 2, 3, 3,    3,   6],
+                [1, 1, 1, 2, 3, None, 3,   None],
+                [1, 2, 3, 4, 5, None, 7,   None]])
 
 
 class TestTableGetValues(TestCase):
