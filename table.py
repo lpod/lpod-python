@@ -1142,13 +1142,15 @@ class odf_row(odf_element):
             return cell.get_value()
 
 
-    def set_cell(self, x, cell=None, clone=True):
+    def set_cell(self, x, cell=None, clone=True, _get_repeat=False):
         """Push the cell back in the row at position "x" starting from 0.
         Alphabetical positions like "D" are accepted.
 
         Arguments:
 
             x -- int or str
+
+        returns the cell with x and y updated
         """
         if cell is None:
             cell = odf_create_cell()
@@ -1160,16 +1162,20 @@ class odf_row(odf_element):
         # Outside the defined row
         diff = x - self.get_width()
         if diff == 0:
-            self.append_cell(cell, _repeated=repeated, clone=clone)
+            cell_back = self.append_cell(cell, _repeated=repeated, clone=clone)
         elif diff > 0:
             self.append_cell(odf_create_cell(repeated=diff), _repeated=diff, clone=False)
-            self.append_cell(cell, _repeated=repeated, clone=clone)
+            cell_back = self.append_cell(cell, _repeated=repeated, clone=clone)
         else:
             # Inside the defined row
             _set_item_in_vault(x, cell, self, _xpath_cell_idx, '_rmap', clone=clone)
             cell.x = x
             cell.y = self.y
-        return repeated
+            cell_back = cell
+        if _get_repeat:
+            return repeated
+        else:
+            return cell_back
 
 
     def set_value(self, x, value, style=None, cell_type=None, currency=None):
@@ -1207,6 +1213,8 @@ class odf_row(odf_element):
             x -- int or str
 
             cell -- odf_cell
+
+        returns the cell with x and y updated
         """
         if cell is None:
             cell = odf_create_cell()
@@ -1217,12 +1225,13 @@ class odf_row(odf_element):
             _insert_item_in_vault(x, cell, self, _xpath_cell_idx, '_rmap')
             cell.x = x
             cell.y = self.y
+            cell_back = cell
         elif diff == 0:
-            self.append_cell(cell, clone=clone)
+            cell_back = self.append_cell(cell, clone=clone)
         else:
             self.append_cell(odf_create_cell(repeated=diff), _repeated=diff, clone=False)
-            self.append_cell(cell, clone=clone)
-        return cell
+            cell_back = self.append_cell(cell, clone=clone)
+        return cell_back
 
 
     def extend_cells(self, cells=[]):
@@ -1241,6 +1250,8 @@ class odf_row(odf_element):
             cell -- odf_cell
 
             _repeated -- (optional), repeated value of the row
+
+        returns the cell with x and y updated
         """
         if cell is None:
             cell = odf_create_cell()
@@ -1357,7 +1368,7 @@ class odf_row(odf_element):
         else:
             x = start
             for cell in cells:
-                repeat = self.set_cell(x, cell, clone=clone)
+                repeat = self.set_cell(x, cell, clone=clone, _get_repeat=True)
                 x += repeat
 
 
@@ -2441,9 +2452,10 @@ class odf_table(odf_element):
 
 
     def set_row(self, y, row = None, clone = True):
-        """Replace the row at the given position with the new one. It must
-        have the same number of cells. Repetion of the old row will be
-        adjusted.
+        """Replace the row at the given position with the new one. Repetions of
+        the old row will be adjusted.
+
+        If row is None, a new empty row is created.
 
         Position start at 0. So cell A4 is on row 3.
 
@@ -2452,6 +2464,8 @@ class odf_table(odf_element):
             y -- int
 
             row -- odf_row
+
+        returns the row, with updated row.y
         """
         if row is None:
             row = odf_create_row()
@@ -2478,16 +2492,20 @@ class odf_table(odf_element):
 
 
     def insert_row(self, y, row=None, clone=True):
-        """Insert the row before the given "y" position. It must have the
-        same number of cells. If no row is given, an empty one is created.
+        """Insert the row before the given "y" position. If no row is given,
+        an empty one is created.
 
         Position start at 0. So cell A4 is on row 3.
+
+        If row is None, a new empty row is created.
 
         Arguments:
 
             y -- int or str
 
             row -- odf_row
+
+        returns the row, with updated row.y
         """
         if row is None:
             row = odf_create_row()
@@ -2508,6 +2526,13 @@ class odf_table(odf_element):
 
 
     def extend_rows(self, rows=[]):
+        """Append a list of rows at the end of the table.
+
+        Arguments:
+
+            rows -- list of odf_row
+
+        """
         self.extend(rows)
         self._compute_table_cache()
         # Update width if necessary
@@ -2534,6 +2559,8 @@ class odf_table(odf_element):
             row -- odf_row
 
             _repeated -- (optional), repeated value of the row
+
+        returns the row, with updated row.y
         """
         if row is None:
             row = odf_create_row()
@@ -2614,7 +2641,7 @@ class odf_table(odf_element):
 
     def set_row_values(self, y, values, cell_type=None, currency=None,
                        style=None):
-        """Shortcut to set the values of all cells of the row at the given
+        """Shortcut to set the values of *all* cells of the row at the given
         "y" position.
 
         Position start at 0. So cell A4 is on row 3.
@@ -2631,15 +2658,17 @@ class odf_table(odf_element):
             currency -- three-letter str
 
             style -- unicode
+
+        returns the row, with updated row.y
         """
         row = odf_create_row() # needed if clones rows
         row.set_values(values, style=style, cell_type=cell_type,
                        currency=currency)
-        self.set_row(y, row) # needed if clones rows
+        return self.set_row(y, row) # needed if clones rows
 
 
     def set_row_cells(self, y, cells=[]):
-        """Shortcut to set the cells of the row at the given
+        """Shortcut to set *all* the cells of the row at the given
         "y" position.
 
         Position start at 0. So cell A4 is on row 3.
@@ -2651,10 +2680,12 @@ class odf_table(odf_element):
             cells -- list of Python types
 
             style -- unicode
+
+        returns the row, with updated row.y
         """
         row = odf_create_row() # needed if clones rows
         row.extend_cells(cells)
-        self.set_row(y, row) # needed if clones rows
+        return self.set_row(y, row) # needed if clones rows
 
 
     def is_row_empty(self, y, aggressive=False):
@@ -2762,7 +2793,7 @@ class odf_table(odf_element):
 
         Arguments:
 
-            coord -- (int, int) or str
+            coord -- (int, int) or str : coordinate
 
         Return: Python type
         """
@@ -2792,9 +2823,11 @@ class odf_table(odf_element):
 
         Arguments:
 
-            coord -- (int, int) or str
+            coord -- (int, int) or str : coordinate
 
             cell -- odf_cell
+
+        return the cell, with x and y updated
         """
         if cell is None:
             cell = odf_create_cell()
@@ -2804,7 +2837,7 @@ class odf_table(odf_element):
         cell.y = y
         if y >= self.get_height():
             row = odf_create_row()
-            row.set_cell(x, cell, clone=clone)
+            cell_back = row.set_cell(x, cell, clone=clone)
             self.set_row(y, row, clone=False)
         else:
             row = self._get_row2_base(y)
@@ -2813,12 +2846,13 @@ class odf_table(odf_element):
             if repeated > 1:
                 row = row.clone()
                 row.set_repeated(None)
-                row.set_cell(x, cell, clone=clone)
+                cell_back = row.set_cell(x, cell, clone=clone)
                 self.set_row(y, row, clone=False)
             else:
-                row.set_cell(x, cell, clone=clone)
+                cell_back = row.set_cell(x, cell, clone=clone)
                 # Update width if necessary, since we don't use set_row
                 self.__update_width(row)
+        return cell_back
 
 
     def set_cells(self, cells, coord=None, clone=True):
@@ -2961,6 +2995,8 @@ class odf_table(odf_element):
             coord -- (int, int) or str
 
             cell -- odf_cell
+
+        returns the cell with x and y updated
         """
         if cell is None:
             cell = odf_create_cell()
@@ -2971,11 +3007,11 @@ class odf_table(odf_element):
         row = self._get_row2(y, clone=True)
         row.y = y
         row.set_repeated(None)
-        row.insert_cell(x, cell, clone=False)
+        cell_back = row.insert_cell(x, cell, clone=False)
         self.set_row(y, row, clone=False)
         # Update width if necessary
         self.__update_width(row)
-        return cell
+        return cell_back
 
 
     def append_cell(self, y, cell=None, clone=True):
@@ -2991,6 +3027,8 @@ class odf_table(odf_element):
             y -- int
 
             cell -- odf_cell
+
+        returns the cell with x and y updated
         """
         if cell is None:
             cell = odf_create_cell()
@@ -3000,11 +3038,11 @@ class odf_table(odf_element):
         y = self._translate_y_from_any(y)
         row = self._get_row2(y)
         row.y = y
-        row.append_cell(cell, clone=False)
+        cell_back = row.append_cell(cell, clone=False)
         self.set_row(y, row)
         # Update width if necessary
         self.__update_width(row)
-        return cell
+        return cell_back
 
 
     def delete_cell(self, coord):
