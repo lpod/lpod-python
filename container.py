@@ -37,6 +37,7 @@ from const import ODF_MIMETYPES, ODF_PARTS, ODF_TYPES, ODF_MANIFEST
 from const import ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES
 from manifest import odf_manifest
 from utils import _get_abspath, obsolete
+from scriptutils import printwarn
 
 
 class odf_container(object):
@@ -262,18 +263,18 @@ class odf_container(object):
         try:
             part_names.remove(ODF_MANIFEST)
         except KeyError:
-            print "Warning : missing '%s'" % ODF_MANIFEST
+            printwarn("missing '%s'" % ODF_MANIFEST)
         # "Pretty-save" parts in some order
         # mimetype requires to be first and uncompressed
         try:
             dump('mimetype', parts['mimetype'])
             part_names.remove('mimetype')
         except:
-            print "Warning : missing 'mimetype'"
+            printwarn("missing 'mimetype'")
         # XML parts
         for path in ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES:
             if path not in parts:
-                print "Warning : missing '%s'" % path
+                printwarn("missing '%s'" % path)
                 continue
             dump(path, parts[path])
             part_names.remove(path)
@@ -385,6 +386,12 @@ class odf_container(object):
             target = self.path
         if packaging in ('zip', 'flat'):
             if isinstance(target, basestring):
+                while target.endswith(os.sep):
+                    target = target[:-1]
+                while target.endswith('.backup'):
+                    target = target.split('.backup', 1)[0]
+                while target.endswith('.folder'):
+                    target = target.split('.folder', 1)[0]
                 file = open(target, 'wb')
                 close_after = True
             else:
@@ -401,17 +408,17 @@ class odf_container(object):
                         try:
                             shutil.rmtree(backup)
                         except Exception as e:
-                            print "Warning : %s" % e
+                            printwarn(e)
                     try:
                         shutil.move(target, backup)
                     except Exception as e:
-                        print "Warning : %s" % e
+                        printwarn(e)
             else:
                 if os.path.exists(target):
                     try:
                         shutil.rmtree(target)
                     except Exception as e:
-                        print "Warning : %s" % e
+                        printwarn(e)
             os.mkdir(target, 0755)
             file = target
             close_after = False
