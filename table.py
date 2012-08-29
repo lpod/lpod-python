@@ -2679,15 +2679,15 @@ class odf_table(odf_element):
     #
 
     def get_cells(self, coord=None, cell_type=None, style=None,
-                  content=None, flat=True):
+                  content=None, flat=False):
         """Get the cells matching the criteria. If 'coord' is None,
         parse the whole table, else parse the area defined by 'coord'.
 
         Filter by  cell_type = "all"  will retrieve cells of any
         type, aka non empty cells.
 
-        If flat is True (default), the method return a single list of all
-        the values, else a list of lists of cells.
+        If flat is True (default is False), the method return a single list
+        of all the values, else a list of lists of cells.
 
         if cell_type, style and content are None, get_cells() will return
         the exact number of cells of the area, including empty cells.
