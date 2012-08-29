@@ -2029,7 +2029,6 @@ class TestTable(TestCase):
     def test_table_transpose_4(self):
         table = self.table.clone()
         table.transpose("F2:F4")
-        print table.get_values()
         self.assertEqual(table.get_values(),
                [[1, 1, 1, 2, 3, 3,    3,   None],
                 [1, 1, 1, 2, 3, 3,    3,   6],
@@ -2509,6 +2508,7 @@ class TestTableRow(TestCase):
 
     def test_get_row_list(self):
         self.assertEqual(len(list(self.table.get_rows())), 4)
+        self.assertEqual(len(list(self.table.get_rows("2:3"))), 2)
 
 
     def test_get_row_list_regex(self):
