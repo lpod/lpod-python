@@ -27,6 +27,7 @@
 #
 
 # Import from the Standard Library
+import os
 from cStringIO import StringIO
 from ftplib import FTP
 from os import mkdir
@@ -207,7 +208,48 @@ class ContainerSaveTestCase(TestCase):
         """
         container = odf_get_container('samples/example.odt')
         container.save('trash/example.odt')
-        # TODO FINISH ME
+        new_container = odf_get_container('trash/example.odt')
+        mimetype = new_container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
+
+    def test_save_folder(self):
+        container = odf_get_container('samples/example.odt')
+        container.save('trash/example.odt', packaging='folder')
+        path = os.path.join('trash', 'example.odt' + '.folder', 'mimetype')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'content.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'meta.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'styles.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'settings.xml')
+        self.assertEqual(os.path.isfile(path), True)
+
+    def test_save_backfolder(self):
+        container = odf_get_container('samples/example.odt')
+        container.save('trash/example.odt', packaging='backfolder')
+        container.save('trash/example.odt', packaging='backfolder') # 2 times to have backup
+        path = os.path.join('trash', 'example.odt' + '.folder.backup', 'mimetype')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder.backup', 'content.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder.backup', 'meta.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder.backup', 'styles.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder.backup', 'settings.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'mimetype')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'content.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'meta.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'styles.xml')
+        self.assertEqual(os.path.isfile(path), True)
+        path = os.path.join('trash', 'example.odt' + '.folder', 'settings.xml')
+        self.assertEqual(os.path.isfile(path), True)
 
 
     # XXX We must implement the flat xml part

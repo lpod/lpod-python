@@ -45,7 +45,7 @@ class odf_container(object):
     # The archive file
     __zipfile = None
     # Using zip archive
-    __zip_packaging = None
+    __packaging = None  # None, 'zip', 'flat', 'folder', 'backfolder'
 
 
     def __init__(self, path_or_file):
@@ -65,7 +65,7 @@ class odf_container(object):
         # Most probably zipped document
         try:
             mimetype = self.__get_zip_part('mimetype')
-            self.__zip_packaging = True
+            self.__packaging = 'zip'
         except BadZipfile:
             if zip_expected:
                 raise ValueError, "corrupted or not an OpenDocument archive"
@@ -74,7 +74,7 @@ class odf_container(object):
                 mimetype = self.__get_xml_part('mimetype')
             except ValueError:
                 raise ValueError, "bad OpenDocument format"
-            self.__zip_packaging = False
+            self.__packaging = 'flat'
         if mimetype not in ODF_MIMETYPES:
             message = 'Document of unknown type "%s"' % mimetype
             raise ValueError, message
@@ -234,7 +234,7 @@ class odf_container(object):
     def get_parts(self):
         """Get the list of members.
         """
-        if self.__zip_packaging is True:
+        if self.__packaging == 'zip':
             return self.__get_zip_parts()
         return self.__get_xml_parts()
 
@@ -248,7 +248,7 @@ class odf_container(object):
             if part is None:
                 raise ValueError, 'part "%s" is deleted' % path
             return part
-        if self.__zip_packaging is True:
+        if self.__packaging == 'zip':
             part = self.__get_zip_part(path)
         else:
             part = self.__get_xml_part(path)
@@ -302,7 +302,10 @@ class odf_container(object):
         parts = self.__parts
         # Packaging
         if packaging is None:
-            packaging = 'zip' if self.__zip_packaging is True else 'flat'
+            if self.__packaging:
+                packaging = self.__packaging
+            else:
+                packaging = 'zip' # default
         packaging = packaging.strip().lower()
         if packaging not in ('zip', 'flat', 'folder', 'backfolder'):
             raise ValueError, 'packaging type "%s" not supported' % packaging
