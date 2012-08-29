@@ -26,9 +26,10 @@
 #
 
 # Import from the Standard Library
+import os
+import shutil
 from copy import deepcopy
 from cStringIO import StringIO
-from os.path import isdir
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 
 # Import from lpod
@@ -51,7 +52,7 @@ class odf_container(object):
         if type(path_or_file) is str:
             # Path
             self.path = path = path_or_file
-            if isdir(path):
+            if os.path.isdir(path):
                 message = "reading uncompressed OpenDocument not supported"
                 raise NotImplementedError, message
             file = open(path, 'rb')
@@ -190,6 +191,42 @@ class odf_container(object):
         filezip.close()
 
 
+    def __save_folder(self, folder):
+        """Save a folder ODF from the available parts.
+        """
+
+        def dump(path, content):
+            file_name = os.path.join(folder, path)
+            dir_name = os.path.dirname(file_name)
+            if not os.path.exists(dir_name):
+                os.makedirs(dir_name, mode=0755)
+            if not os.path.isdir(file_name):
+                open(file_name, 'wb', 0644).write(content)
+
+        # Parts were loaded by "save"
+        parts = self.__parts
+        # Parts to save, except manifest at the end
+        part_names = parts.keys()
+        part_names.remove(ODF_MANIFEST)
+        # "Pretty-save" parts in some order
+        # mimetype requires to be first and uncompressed
+        dump('mimetype', parts['mimetype'])
+        part_names.remove('mimetype')
+        # XML parts
+        for path in ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES:
+            dump(path, parts[path])
+            part_names.remove(path)
+        # Everything else
+        for path in part_names:
+            data = parts[path]
+            if data is None:
+                # Deleted
+                continue
+            dump(path, data)
+        # Manifest
+        dump(ODF_MANIFEST, parts[ODF_MANIFEST])
+
+
     #
     # Public API
     #
@@ -259,13 +296,15 @@ class odf_container(object):
 
             target -- str or file-like
 
-            packaging -- 'zip' or 'flat'
+            packaging -- 'zip' or 'flat', or for debugging purpose 'folder'
+                         or 'backfolder'
         """
         parts = self.__parts
         # Packaging
         if packaging is None:
             packaging = 'zip' if self.__zip_packaging is True else 'flat'
-        if packaging not in ('zip', 'flat'):
+        packaging = packaging.strip().lower()
+        if packaging not in ('zip', 'flat', 'folder', 'backfolder'):
             raise ValueError, 'packaging type "%s" not supported' % packaging
         # Load parts else they will be considered deleted
         for path in self.get_parts():
@@ -275,16 +314,45 @@ class odf_container(object):
         close_after = False
         if target is None:
             target = self.path
-        if type(target) is str:
-            file = open(target, 'wb')
-            close_after = True
-        else:
+        if packaging in ('zip', 'flat'):
+            if isinstance(target, basestring):
+                file = open(target, 'wb')
+                close_after = True
+            else:
+                file = target
+        if packaging in ('folder', 'backfolder'):
+            if not isinstance(target, basestring):
+                raise ValueError, "Saving in folder format requires a folder name, not %s." % target
+            if not target.endswith('.folder'):
+                target = target + '.folder'
+            if packaging == 'backfolder':
+                backup = target + '.backup'
+                if os.path.exists(target):
+                    if os.path.exists(backup):
+                        try:
+                            shutil.rmtree(backup)
+                        except Exception as e:
+                            print "Warning : %s" % e
+                    try:
+                        shutil.move(target, backup)
+                    except Exception as e:
+                        print "Warning : %s" % e
+            else:
+                if os.path.exists(target):
+                    try:
+                        shutil.rmtree(target)
+                    except Exception as e:
+                        print "Warning : %s" % e
+            os.mkdir(target, 0755)
             file = target
+            close_after = False
         # Serialize
         if packaging == 'zip':
             self.__save_zip(file)
-        else:
+        elif packaging == 'flat':
             self.__save_xml(file)
+        else: # folder
+            self.__save_folder(file)
         # Close files we opened ourselves
         if close_after:
             file.close()
