@@ -212,6 +212,7 @@ class ContainerSaveTestCase(TestCase):
         mimetype = new_container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
+
     def test_save_folder(self):
         container = odf_get_container('samples/example.odt')
         container.save('trash/example.odt', packaging='folder')
@@ -225,6 +226,19 @@ class ContainerSaveTestCase(TestCase):
         self.assertEqual(os.path.isfile(path), True)
         path = os.path.join('trash', 'example.odt' + '.folder', 'settings.xml')
         self.assertEqual(os.path.isfile(path), True)
+
+
+    def test_save_folder_to_zip(self):
+        container = odf_get_container('samples/example.odt')
+        container.save('trash/example.odt', packaging='folder')
+        path = os.path.join('trash', 'example.odt' + '.folder', 'mimetype')
+        self.assertEqual(os.path.isfile(path), True)
+        new_container = odf_get_container('trash/example.odt.folder')
+        new_container.save('trash/example_bis.odt', packaging='zip')
+        new_container_zip = odf_get_container('trash/example_bis.odt')
+        mimetype = new_container_zip.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
+
 
     def test_save_backfolder(self):
         container = odf_get_container('samples/example.odt')
@@ -250,6 +264,44 @@ class ContainerSaveTestCase(TestCase):
         self.assertEqual(os.path.isfile(path), True)
         path = os.path.join('trash', 'example.odt' + '.folder', 'settings.xml')
         self.assertEqual(os.path.isfile(path), True)
+
+
+    def test_load_folder(self):
+        container = odf_get_container('samples/example.odt')
+        container.save('trash/example_f.odt', packaging='folder')
+        new_container = odf_get_container('trash/example_f.odt.folder')
+        content = new_container.get_part(ODF_CONTENT)
+        self.assert_('<office:document-content' in content)
+        mimetype = new_container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
+        path = 'Pictures/a.jpg'
+        data = 'JFIFIThinkImAnImage'
+        new_container.set_part(path, data)
+        self.assertEqual(new_container.get_part(path), data)
+        # Not a realistic test
+        path = 'content'
+        new_container.del_part(path)
+        self.assertRaises(ValueError, new_container.get_part, path)
+
+
+    def test_load_backfolder(self):
+        container = odf_get_container('samples/example.odt')
+        container.save('trash/example_f.odt', packaging='backfolder')
+        container.save('trash/example_f.odt', packaging='backfolder')
+        new_container = odf_get_container('trash/example_f.odt.folder.backup')
+        content = new_container.get_part(ODF_CONTENT)
+        self.assert_('<office:document-content' in content)
+        mimetype = new_container.get_part('mimetype')
+        self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
+        path = 'Pictures/a.jpg'
+        data = 'JFIFIThinkImAnImage'
+        new_container.set_part(path, data)
+        self.assertEqual(new_container.get_part(path), data)
+        # Not a realistic test
+        path = 'content'
+        new_container.del_part(path)
+        self.assertRaises(ValueError, new_container.get_part, path)
+
 
 
     # XXX We must implement the flat xml part

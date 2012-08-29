@@ -49,37 +49,52 @@ class odf_container(object):
 
 
     def __init__(self, path_or_file):
-        if type(path_or_file) is str:
+        want_folder = False
+        if isinstance(path_or_file, basestring):
             # Path
             self.path = path = path_or_file
-            if os.path.isdir(path):
-                message = "reading uncompressed OpenDocument not supported"
-                raise NotImplementedError, message
-            file = open(path, 'rb')
+            if os.path.isdir(path): # opening a folder
+                want_folder = True
+            else:
+                file = open(path, 'rb')
         else:
             # File-like assumed
             self.path = None
             file = path_or_file
-        self.__data = data = file.read()
-        zip_expected = data[:4] == 'PK\x03\x04'
-        # Most probably zipped document
-        try:
-            mimetype = self.__get_zip_part('mimetype')
-            self.__packaging = 'zip'
-        except BadZipfile:
-            if zip_expected:
-                raise ValueError, "corrupted or not an OpenDocument archive"
-            # Maybe XML document
+        if want_folder:
+            self.__data = data = path
             try:
-                mimetype = self.__get_xml_part('mimetype')
-            except ValueError:
-                raise ValueError, "bad OpenDocument format"
-            self.__packaging = 'flat'
-        if mimetype not in ODF_MIMETYPES:
-            message = 'Document of unknown type "%s"' % mimetype
-            raise ValueError, message
-        self.__parts = {'mimetype': mimetype}
-
+                mimetype = self.__get_folder_part('mimetype')
+                if path.endswith('.backup') or os.path.isdir(path + '.backup'):
+                    self.__packaging = 'backfolder'
+                else:
+                    self.__packaging = 'folder'
+            except:
+                raise ValueError, "corrupted or not an OpenDocument folder (missing mimetype)"
+            if mimetype not in ODF_MIMETYPES:
+                message = 'Document of unknown type "%s"' % mimetype
+                raise ValueError, message
+            self.__parts = {'mimetype': mimetype}
+        else:
+            self.__data = data = file.read()
+            zip_expected = data[:4] == 'PK\x03\x04'
+            # Most probably zipped document
+            try:
+                mimetype = self.__get_zip_part('mimetype')
+                self.__packaging = 'zip'
+            except BadZipfile:
+                if zip_expected:
+                    raise ValueError, "corrupted or not an OpenDocument archive"
+                # Maybe XML document
+                try:
+                    mimetype = self.__get_xml_part('mimetype')
+                except ValueError:
+                    raise ValueError, "bad OpenDocument format"
+                self.__packaging = 'flat'
+            if mimetype not in ODF_MIMETYPES:
+                message = 'Document of unknown type "%s"' % mimetype
+                raise ValueError, message
+            self.__parts = {'mimetype': mimetype}
 
 
     #
@@ -151,6 +166,7 @@ class odf_container(object):
         """Get bytes of a part from the Zip ODF. No cache.
         """
         zipfile = self.__get_zipfile()
+
         return zipfile.read(path)
 
 
@@ -191,6 +207,39 @@ class odf_container(object):
         filezip.close()
 
 
+    def __get_folder_parts(self):
+        """Get the list of members in the ODF folder.
+        """
+        def parse_folder(folder):
+            parts = []
+            file_names = os.listdir(os.path.join(self.__data, folder))
+            for f in file_names:
+                if f.startswith('.'):   # no hidden files
+                    continue
+                if os.path.isfile(os.path.join(self.__data, folder, f)):
+                    part_name = os.path.join(folder, f)
+                    parts.append(part_name)
+                if os.path.isdir(os.path.join(self.__data, folder, f)):
+                    sub_folder = os.path.join(folder, f)
+                    sub_parts = parse_folder(sub_folder)
+                    if len(sub_parts) > 0:
+                        parts.extend(sub_parts)
+                    else:
+                        # store leaf directories
+                        parts.append(os.path.join(sub_folder)+'/')
+            return parts
+        return parse_folder('')
+
+
+    def __get_folder_part(self, path):
+        """Get bytes of a part from the ODF folder. No cache.
+        """
+        name = os.path.join(self.__data, path)
+        if os.path.isdir(name):
+            return ''
+        return open(name).read()
+
+
     def __save_folder(self, folder):
         """Save a folder ODF from the available parts.
         """
@@ -200,7 +249,10 @@ class odf_container(object):
             dir_name = os.path.dirname(file_name)
             if not os.path.exists(dir_name):
                 os.makedirs(dir_name, mode=0755)
-            if not os.path.isdir(file_name):
+            if path.endswith('/') : # folder
+                if not os.path.isdir(file_name):
+                    os.makedirs(file_name, mode=0755)
+            else:
                 open(file_name, 'wb', 0644).write(content)
 
         # Parts were loaded by "save"
@@ -236,7 +288,10 @@ class odf_container(object):
         """
         if self.__packaging == 'zip':
             return self.__get_zip_parts()
-        return self.__get_xml_parts()
+        elif self.__packaging in ('folder', 'backfolder'):
+            return self.__get_folder_parts()
+        else:
+            return self.__get_xml_parts()
 
 
     def get_part(self, path):
@@ -250,6 +305,8 @@ class odf_container(object):
             return part
         if self.__packaging == 'zip':
             part = self.__get_zip_part(path)
+        elif self.__packaging in ('folder', 'backfolder'):
+            part = self.__get_folder_part(path)
         else:
             part = self.__get_xml_part(path)
         loaded_parts[path] = part
