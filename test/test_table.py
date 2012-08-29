@@ -2752,13 +2752,13 @@ class TestTableCell(TestCase):
 
 
     def test_get_cell_list(self):
-        self.assertEqual(len(list(self.table.get_cells())), 28)
+        self.assertEqual(len(list(self.table.get_cells(flat=True))), 28)
 
 
     def test_get_cell_list_regex(self):
         table = self.table
         coordinates = [(cell.x, cell.y)
-            for cell in table.get_cells(content=ur'3')]
+            for cell in table.get_cells(content=ur'3', flat=True)]
         expected = [(4, 0), (5, 0), (6, 0), (4, 1), (5, 1), (6, 1), (4, 2),
                 (5, 2), (6, 2), (2, 3)]
         self.assertEqual(coordinates, expected)
@@ -2767,7 +2767,7 @@ class TestTableCell(TestCase):
     def test_get_cell_list_style(self):
         table = self.table
         coordinates = [(cell.x, cell.y)
-            for cell in table.get_cells(style=ur"ce1")]
+            for cell in table.get_cells(style=ur"ce1", flat=True)]
         expected = [(1, 1), (5, 1), (3, 2)]
         self.assertEqual(coordinates, expected)
 
