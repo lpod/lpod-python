@@ -55,7 +55,6 @@ if  __name__ == '__main__':
     elif os.path.isdir(args[0]):
         out_packaging = 'zip'
     else:
-        raise ValueError
+        raise ValueError, "no File or folder ?"
     doc = odf_get_document(args[0])
     doc.save(packaging = out_packaging, pretty=True)
-

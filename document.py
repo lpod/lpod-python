@@ -27,6 +27,7 @@
 #
 
 # Import from the Standard Library
+import sys
 from copy import deepcopy
 from mimetypes import guess_type
 from operator import itemgetter
@@ -415,7 +416,7 @@ class odf_document(object):
         return clone
 
 
-    def save(self, target=None, packaging=None, pretty=False):
+    def save(self, target=None, packaging=None, pretty=False, backup=False):
         """Save the document, at the same place it was opened or at the given
         target path. Target can also be a file-like object. It can be saved
         as a Zip file (default) or a flat XML file (unimplemented). XML parts
@@ -426,9 +427,10 @@ class odf_document(object):
             target -- str or file-like object
 
             packaging -- 'zip' or 'flat', or for debugging purpose 'folder'
-                         or 'backfolder'
 
             pretty -- bool
+
+            backup -- boolean
         """
         # Some advertising
         meta = self.get_part(ODF_META)
@@ -440,7 +442,7 @@ class odf_document(object):
             if part is not None:
                 container.set_part(path, part.serialize(pretty))
         # Save the container
-        container.save(target, packaging)
+        container.save(target, packaging=packaging, backup=backup)
 
 
     #

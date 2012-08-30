@@ -27,6 +27,7 @@
 
 # Import from the Standard Library
 import os
+import sys
 import shutil
 from copy import deepcopy
 from cStringIO import StringIO
@@ -35,6 +36,7 @@ from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, BadZipfile
 # Import from lpod
 from const import ODF_MIMETYPES, ODF_PARTS, ODF_TYPES, ODF_MANIFEST
 from const import ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES
+from const import ODF_EXTENSIONS
 from manifest import odf_manifest
 from utils import _get_abspath, obsolete
 from scriptutils import printwarn
@@ -46,7 +48,7 @@ class odf_container(object):
     # The archive file
     __zipfile = None
     # Using zip archive
-    __packaging = None  # None, 'zip', 'flat', 'folder', 'backfolder'
+    __packaging = None  # None, 'zip', 'flat', 'folder'
 
 
     def __init__(self, path_or_file):
@@ -64,18 +66,19 @@ class odf_container(object):
             file = path_or_file
         if want_folder:
             self.__data = data = path
+            self.__packaging = 'folder'
             try:
-                mimetype = self.__get_folder_part('mimetype')
-                if path.endswith('.backup') or os.path.isdir(path + '.backup'):
-                    self.__packaging = 'backfolder'
-                else:
-                    self.__packaging = 'folder'
+                mimetype, timestamp = self.__get_folder_part('mimetype')
             except:
-                raise ValueError, "corrupted or not an OpenDocument folder (missing mimetype)"
+                printwarn ("corrupted or not an OpenDocument folder (missing mimetype)")
+                mimetype = ''
+                timestamp = None
             if mimetype not in ODF_MIMETYPES:
-                message = 'Document of unknown type "%s"' % mimetype
-                raise ValueError, message
+                message = 'Document of unknown type "%s", trying with ODF_TEXT.' % mimetype
+                printwarn(message)
+                mimetype = ODF_EXTENSIONS['odt']
             self.__parts = {'mimetype': mimetype}
+            self.__parts_ts = {'mimetype': timestamp}
         else:
             self.__data = data = file.read()
             zip_expected = data[:4] == 'PK\x03\x04'
@@ -185,15 +188,24 @@ class odf_container(object):
             filezip = ZipFile(file, 'w', compression=compression)
         # Parts to save, except manifest at the end
         part_names = parts.keys()
-        part_names.remove(ODF_MANIFEST)
+        try:
+            part_names.remove(ODF_MANIFEST)
+        except KeyError:
+            printwarn("missing '%s'" % ODF_MANIFEST)
         # "Pretty-save" parts in some order
         # mimetype requires to be first and uncompressed
         filezip.compression = ZIP_STORED
-        filezip.writestr('mimetype', parts['mimetype'])
-        filezip.compression = compression
-        part_names.remove('mimetype')
+        try:
+            filezip.writestr('mimetype', parts['mimetype'])
+            filezip.compression = compression
+            part_names.remove('mimetype')
+        except:
+            printwarn("missing 'mimetype'")
         # XML parts
         for path in ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES:
+            if path not in parts:
+                printwarn("missing '%s'" % path)
+                continue
             filezip.writestr(path, parts[path])
             part_names.remove(path)
         # Everything else
@@ -233,29 +245,46 @@ class odf_container(object):
 
 
     def __get_folder_part(self, path):
-        """Get bytes of a part from the ODF folder. No cache.
+        """Get bytes of a part from the ODF folder, with timestamp.
         """
         name = os.path.join(self.__data, path)
         if os.path.isdir(name):
-            return ''
-        return open(name).read()
+            return ('', os.stat(name)[8])
+        timestamp = os.stat(name)[8]
+        return (open(name).read() , timestamp)
+
+
+    def __get_folder_part_timestamp(self, path):
+        name = os.path.join(self.__data, path)
+        try:
+            timestamp = os.stat(name)[8]
+        except:
+            timestamp = -1
+        return timestamp
 
 
     def __save_folder(self, folder):
         """Save a folder ODF from the available parts.
         """
+        encoding = sys.getfilesystemencoding()
 
         def dump(path, content):
+            try:
+                path = path.decode(encoding)
+            except:
+                pass
             file_name = os.path.join(folder, path)
             dir_name = os.path.dirname(file_name)
             if not os.path.exists(dir_name):
                 os.makedirs(dir_name, mode=0755)
-            if path.endswith('/') : # folder
+            if path.endswith(u'/') : # folder
                 if not os.path.isdir(file_name):
-                    os.makedirs(file_name, mode=0755)
+                    os.makedirs(file_name.encode(encoding), mode=0777)
             else:
-                open(file_name, 'wb', 0644).write(content)
+                open(file_name.encode(encoding), 'wb', 0666).write(content)
 
+        if isinstance(folder, basestring) and not isinstance(folder, unicode):
+            folder = folder.decode(encoding)
         # Parts were loaded by "save"
         parts = self.__parts
         # Parts to save, except manifest at the end
@@ -263,7 +292,7 @@ class odf_container(object):
         try:
             part_names.remove(ODF_MANIFEST)
         except KeyError:
-            printwarn("missing '%s'" % ODF_MANIFEST)
+            printwarn(u"missing '%s'" % ODF_MANIFEST)
         # "Pretty-save" parts in some order
         # mimetype requires to be first and uncompressed
         try:
@@ -298,7 +327,7 @@ class odf_container(object):
         """
         if self.__packaging == 'zip':
             return self.__get_zip_parts()
-        elif self.__packaging in ('folder', 'backfolder'):
+        elif self.__packaging == 'folder':
             return self.__get_folder_parts()
         else:
             return self.__get_xml_parts()
@@ -312,11 +341,19 @@ class odf_container(object):
             part = loaded_parts[path]
             if part is None:
                 raise ValueError, 'part "%s" is deleted' % path
+            if self.__packaging == 'folder':
+                cache_ts = self.__parts_ts.get(path, -1)
+                current_ts = self.__get_folder_part_timestamp(path)
+                if current_ts != cache_ts:
+                    part, timestamp = self.__get_folder_part(path)
+                    loaded_parts[path] = part
+                    self.__parts_ts[path] = timestamp
             return part
         if self.__packaging == 'zip':
             part = self.__get_zip_part(path)
-        elif self.__packaging in ('folder', 'backfolder'):
-            part = self.__get_folder_part(path)
+        elif self.__packaging == 'folder':
+            part, timestamp = self.__get_folder_part(path)
+            self.__parts_ts[path] = timestamp
         else:
             part = self.__get_xml_part(path)
         loaded_parts[path] = part
@@ -352,7 +389,25 @@ class odf_container(object):
         return clone
 
 
-    def save(self, target=None, packaging=None):
+    def _do_backup(self, target):
+        parts = target.split('.', 1)
+        if len(parts) == 1:
+            back_file = target + '.backup'
+        else:
+            back_file = parts[0] + '.backup.' + parts[1]
+        if os.path.exists(target):
+            if os.path.isdir(back_file):
+                try:
+                    shutil.rmtree(back_file)
+                except Exception as e:
+                    printwarn(str(e))
+            try:
+                shutil.move(target, back_file)
+            except Exception as e:
+                printwarn(str(e))
+
+
+    def save(self, target=None, packaging=None, backup=False):
         """Save the container to the given target, a path or a file-like
         object.
 
@@ -364,8 +419,12 @@ class odf_container(object):
             target -- str or file-like
 
             packaging -- 'zip' or 'flat', or for debugging purpose 'folder'
-                         or 'backfolder'
+
+            backup -- boolean
         """
+        if isinstance(target, basestring) and not isinstance(target, unicode):
+            encoding = sys.getfilesystemencoding()
+            target = target.decode(encoding)
         parts = self.__parts
         # Packaging
         if packaging is None:
@@ -374,7 +433,7 @@ class odf_container(object):
             else:
                 packaging = 'zip' # default
         packaging = packaging.strip().lower()
-        if packaging not in ('zip', 'flat', 'folder', 'backfolder'):
+        if packaging not in ('zip', 'flat', 'folder'):
             raise ValueError, 'packaging type "%s" not supported' % packaging
         # Load parts else they will be considered deleted
         for path in self.get_parts():
@@ -384,54 +443,45 @@ class odf_container(object):
         close_after = False
         if target is None:
             target = self.path
+        if isinstance(target, basestring):
+            while target.endswith(os.sep):
+                target = target[:-1]
+            while target.endswith('.folder'):
+                target = target.split('.folder', 1)[0]
         if packaging in ('zip', 'flat'):
             if isinstance(target, basestring):
-                while target.endswith(os.sep):
-                    target = target[:-1]
-                while target.endswith('.backup'):
-                    target = target.split('.backup', 1)[0]
-                while target.endswith('.folder'):
-                    target = target.split('.folder', 1)[0]
-                file = open(target, 'wb')
+                if backup:
+                    self._do_backup(target)
+                dest_file = open(target, 'wb')
                 close_after = True
             else:
-                file = target
-        if packaging in ('folder', 'backfolder'):
+                dest_file = target
+        if packaging == 'folder':
             if not isinstance(target, basestring):
                 raise ValueError, "Saving in folder format requires a folder name, not %s." % target
             if not target.endswith('.folder'):
                 target = target + '.folder'
-            if packaging == 'backfolder':
-                backup = target + '.backup'
-                if os.path.exists(target):
-                    if os.path.exists(backup):
-                        try:
-                            shutil.rmtree(backup)
-                        except Exception as e:
-                            printwarn(e)
-                    try:
-                        shutil.move(target, backup)
-                    except Exception as e:
-                        printwarn(e)
+            if backup:
+                self._do_backup(target)
             else:
                 if os.path.exists(target):
                     try:
                         shutil.rmtree(target)
                     except Exception as e:
-                        printwarn(e)
-            os.mkdir(target, 0755)
-            file = target
-            close_after = False
+                        printwarn(str(e))
+
+            os.mkdir(target, 0777)
+            dest_file = target
         # Serialize
         if packaging == 'zip':
-            self.__save_zip(file)
+            self.__save_zip(dest_file)
         elif packaging == 'flat':
-            self.__save_xml(file)
+            self.__save_xml(dest_file)
         else: # folder
-            self.__save_folder(file)
+            self.__save_folder(dest_file)
         # Close files we opened ourselves
         if close_after:
-            file.close()
+            dest_file.close()
 
 
 
