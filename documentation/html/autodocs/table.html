@@ -11,7 +11,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     'current-stable-60-g27fffd7',
+        VERSION:     'current-stable-64-g5a41b73',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -110,16 +110,6 @@ If get_type is True, returns a tuple (value, ODF type of value)</p>
 <dl class="method">
 <dt id="lpod.table.odf_cell.is_empty">
 <tt class="descname">is_empty</tt><big>(</big><em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.is_empty" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_cell.set_cell_style">
-<tt class="descname">set_cell_style</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_cell_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_cell.set_cell_value">
-<tt class="descname">set_cell_value</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_cell_value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -317,11 +307,6 @@ x &#8211; int or str</blockquote>
 </dd></dl>
 
 <dl class="method">
-<dt id="lpod.table.odf_row.get_cell_list">
-<tt class="descname">get_cell_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_cell_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="lpod.table.odf_row.get_cells">
 <tt class="descname">get_cells</tt><big>(</big><em>coord=None</em>, <em>style=None</em>, <em>content=None</em>, <em>cell_type=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the list of cells matching the criteria.</p>
@@ -475,11 +460,6 @@ it and update cache map.</p>
 <blockquote>
 repeated &#8211; int or None</blockquote>
 </dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_row.set_row_style">
-<tt class="descname">set_row_style</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_row_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="lpod.table.odf_row.set_style">
@@ -664,11 +644,6 @@ coord &#8211; (int, int) or str</blockquote>
 </dd></dl>
 
 <dl class="method">
-<dt id="lpod.table.odf_table.get_cell_list">
-<tt class="descname">get_cell_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_cell_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="lpod.table.odf_table.get_cells">
 <tt class="descname">get_cells</tt><big>(</big><em>coord=None</em>, <em>cell_type=None</em>, <em>style=None</em>, <em>content=None</em>, <em>flat=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the cells matching the criteria. If &#8216;coord&#8217; is None,
@@ -729,11 +704,6 @@ type, aka non empty cells.</p>
 </blockquote>
 <p>Return: list of odf_cell</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_table.get_column_list">
-<tt class="descname">get_column_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_column_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="lpod.table.odf_table.get_column_values">
@@ -827,11 +797,6 @@ y &#8211; int or str</blockquote>
 </dd></dl>
 
 <dl class="method">
-<dt id="lpod.table.odf_table.get_row_list">
-<tt class="descname">get_row_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_row_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="lpod.table.odf_table.get_row_values">
 <tt class="descname">get_row_values</tt><big>(</big><em>y</em>, <em>cell_type=None</em>, <em>complete=True</em>, <em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_row_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shortcut to get the list of Python values for the cells of the row
@@ -878,16 +843,6 @@ If cell_type and complete is True, replace missing values by None.</p>
 <dl class="method">
 <dt id="lpod.table.odf_table.get_style">
 <tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_table.get_table_height">
-<tt class="descname">get_table_height</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_table_height" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_table.get_table_width">
-<tt class="descname">get_table_width</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_table_width" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1055,11 +1010,6 @@ to False, and no style.</p>
 <blockquote>
 aggressive &#8211; bool</blockquote>
 </dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_table.rstrip_table">
-<tt class="descname">rstrip_table</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.rstrip_table" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="lpod.table.odf_table.set_cell">
@@ -1241,16 +1191,6 @@ the old row will be adjusted.</p>
 <dl class="method">
 <dt id="lpod.table.odf_table.set_style">
 <tt class="descname">set_style</tt><big>(</big><em>style</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_table.set_table_style">
-<tt class="descname">set_table_style</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_table_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.table.odf_table.set_table_values">
-<tt class="descname">set_table_values</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_table_values" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1548,7 +1488,7 @@ ensuiring model integrity.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2012, lpOD team.
-      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Last updated on Last release: lpOD current-stable-64-g5a41b73. Last modified: 2012-09-03 17:56..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
     </div>
   </body>
