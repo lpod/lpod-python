@@ -1,0 +1,171 @@
+@import url("default.css");
+
+@font-face {
+font-family: goodstyle;
+font-style: normal;
+font-weight: normal;
+src: url(LinLibertine_R.woff);
+}
+
+body {
+  background-color: white;
+  color: black;
+  margin-left: 28px;
+  font-family: goodstyle, Arial, Helvetica, sans-serif;
+  font-size: 13pt;
+  line-height: 100%;
+}
+
+ul {
+  margin: 0 0 0 0;
+}
+
+div.related {
+  background-color: #444;
+}
+
+a,
+div.sphinxsidebar h3 a,
+div.sphinxsidebar a,
+div.footer a {
+  color: #444;
+}
+
+div.sphinxsidebar h3,
+div.sphinxsidebar h4 {
+  font-family: goodstyle, Arial, Helvetica, sans-serif;
+  font-size: 1.2em;
+  color: #000;
+}
+
+div.sphinxsidebar ul {
+  color: #000;
+}
+
+div.sphinxsidebar input {
+  font-family: goodstyle, Arial, Helvetica, sans-serif;
+  border-color: #444;
+}
+
+div.document {
+  background-color: #f5f8e4;
+}
+
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+  color: #000;
+  font-family: goodstyle, Arial, Helvetica, sans-serif;
+  border-color: #444;
+  background-color: transparent;
+  border-bottom: 1px solid #444;
+}
+
+div.body h1 { margin-top: 0; font-size: 160%; }
+div.body h2 { font-size: 140%; }
+div.body h3 { font-size: 120%; }
+div.body h4 { font-size: 110%; }
+div.body h5 { font-size: 105%; }
+div.body h6 { font-size: 100%; }
+
+div.footer {
+  color: #000;
+}
+
+li.toctree-l2 {
+  font-size: 90%;
+}
+
+li.toctree-l3 {
+  font-size: 80%;
+}
+
+div.sphinxsidebarwrapper ul {
+  list-style-type: disc;
+  margin-top: 1px;
+  padding-left: 6px;
+}
+
+div.sphinxsidebarwrapper h3 {
+  font-size: 90%;
+  font-weight: bold;
+}
+
+div.body h1 {
+  font-size: 110%;
+}
+div.body h2 {
+  font-size: 105%;
+}
+div.body h3, div.body h4 {
+  font-size: 100%;
+}
+
+div.body p.topic-title {
+  margin-bottom: 2px;
+  font-size: 100%;
+}
+
+div.body p, div.body dd, div.body li {
+    text-align: justify;
+    line-height: 100%;
+}
+
+div.sphinxsidebar p {
+  color: #444;
+}
+
+tt.descname {
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+tt.descclassname {
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+dl {
+    padding-top: 10px;
+}
+
+table.indextable dt {
+    font-family: monospace;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 0.80em;
+    padding-bottom: 3px;
+}
+
+div.section {
+    padding-top: 20px;
+    padding-bottom: 30px;
+    }
+
+div.highlight-python {
+    font-size: .8em;
+}
+
+#introduction p > em {
+  text-align: right;
+  float: right;
+}
+
+#introduction p {
+  font-size: 90%;
+  margin-bottom: 3px;
+}
+
+#introduction #id2.docutils.footnote {
+  font-size: 80%;
+  margin-top: 25px;
+}
+
+#introduction table.docutils.footnote {
+  font-size: 80%;
+  margin-top: 5px;
+}
