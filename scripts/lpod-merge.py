@@ -254,7 +254,7 @@ if  __name__ == '__main__':
     if output_type == 'text':
         output_body = output_doc.get_body()
         toc = output_body.get_toc()
-        toc.toc_fill()
+        toc.fill()
 
     # Save
     if output_doc is not None:
