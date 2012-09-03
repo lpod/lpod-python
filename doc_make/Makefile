@@ -28,11 +28,11 @@ ALLSPHINXOPTS   = -d build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html      to make standalone HTML files"
-	@echo "  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
-	@echo "  pdf       to make PDF files, you can set PAPER=a4 or PAPER=letter"
-	@echo "  changes   to make an overview over all changed/added/deprecated items"
-	@echo "  linkcheck to check all external links for integrity"
-	@echo "  release   to make html/pdf and store the files in two tar.gz"
+#	@echo "  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
+#	@echo "  pdf       to make PDF files, you can set PAPER=a4 or PAPER=letter"
+#	@echo "  changes   to make an overview over all changed/added/deprecated items"
+#	@echo "  linkcheck to check all external links for integrity"
+#	@echo "  release   to make html/pdf and store the files in two tar.gz"
 
 clean:
 	-rm -rf build
@@ -41,7 +41,7 @@ clean:
 	-rm -rf autodocs
 
 lpod-check:
-	@if [ x$(PYTHON) == "x" ]; then \
+	@if [ x${PYTHON} == "x" ]; then \
 		echo "Please, you must first install lpod"; \
 		exit 1; \
 	fi

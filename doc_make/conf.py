@@ -37,7 +37,7 @@ except ImportError:
 extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['.templates']
+templates_path = ['templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -76,7 +76,7 @@ release = lpod.__version__
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.
-exclude_trees = ['build']
+exclude_trees = ['build', 'test']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
