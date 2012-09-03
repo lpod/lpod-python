@@ -2,6 +2,7 @@ MANIFEST
 version.txt
 python_path.txt
 build
+autodocs
 dist
 test/trash
 *.swp

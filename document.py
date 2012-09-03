@@ -177,6 +177,9 @@ class odf_document(object):
 
 
     def del_part(self, path):
+        """Mark a part for deletion. The path is relative to the archive,
+        e.g. "Pictures/100000000000032000000258912EB1C3.jpg"
+        """
         path = _get_part_path(path)
         cls = _get_part_class(path)
         if path == ODF_MANIFEST or cls is not None:
