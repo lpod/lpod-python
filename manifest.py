@@ -27,7 +27,7 @@
 
 # Import from lpod
 from element import odf_create_element
-from utils import obsolete
+#from utils import obsolete
 from xmlpart import odf_xmlpart
 
 
@@ -52,7 +52,7 @@ class odf_manifest(odf_xmlpart):
         expr = '//manifest:file-entry/attribute::manifest:full-path'
         return self.xpath(expr)
 
-    get_path_list = obsolete('get_path_list', get_paths)
+    #get_path_list = obsolete('get_path_list', get_paths)
 
 
     def get_path_medias(self):
@@ -67,7 +67,7 @@ class odf_manifest(odf_xmlpart):
                            file_entry.get_attribute('manifest:media-type')))
         return result
 
-    get_path_media_list = obsolete('get_path_media_list', get_path_medias)
+    #get_path_media_list = obsolete('get_path_media_list', get_path_medias)
 
 
     def get_media_type(self, full_path):

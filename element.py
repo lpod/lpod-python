@@ -37,7 +37,7 @@ from lxml.etree import XPath
 # Import from lpod
 from datatype import DateTime, Boolean
 from utils import _get_abspath, _get_elements, _get_element
-from utils import _get_style_tagname, get_value, obsolete
+from utils import _get_style_tagname, get_value  #, obsolete
 
 
 ODF_NAMESPACES = {
@@ -539,7 +539,7 @@ class odf_element(object):
             cache = None
         return [_make_odf_element(e, cache) for e in result]
 
-    get_element_list = obsolete('get_element_list', get_elements)
+    #get_element_list = obsolete('get_element_list', get_elements)
 
     # fixme : need original get_element as wrapper of get_elements
 
@@ -897,7 +897,7 @@ class odf_element(object):
             raise TypeError, 'odf_element or unicode expected, not "%s"' % (
                     type(unicode_or_element))
 
-    append_element = obsolete('append_element', append)
+    #append_element = obsolete('append_element', append)
 
 
     def delete(self, child=None):
@@ -1111,7 +1111,7 @@ class odf_element(object):
         return _get_elements(self, 'text:section', text_style=style,
                 content=content)
 
-    get_section_list = obsolete('get_section_list', get_sections)
+    #get_section_list = obsolete('get_section_list', get_sections)
 
 
     def get_section(self, position=0, content=None):
@@ -1147,7 +1147,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::text:p', text_style=style,
                 content=content)
 
-    get_paragraph_list = obsolete('get_paragraph_list', get_paragraphs)
+    #get_paragraph_list = obsolete('get_paragraph_list', get_paragraphs)
 
 
     def get_paragraph(self, position=0, content=None):
@@ -1183,7 +1183,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::text:span', text_style=style,
                 content=content)
 
-    get_span_list = obsolete('get_span_list', get_spans)
+    #get_span_list = obsolete('get_span_list', get_spans)
 
 
     def get_span(self, position=0, content=None):
@@ -1219,7 +1219,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::text:h', text_style=style,
                 outline_level=outline_level, content=content)
 
-    get_heading_list = obsolete('get_heading_list', get_headings)
+    #get_heading_list = obsolete('get_heading_list', get_headings)
 
 
     def get_heading(self, position=0, outline_level=None, content=None):
@@ -1255,7 +1255,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::text:list', text_style=style,
                 content=content)
 
-    get_list_list = obsolete('get_list_list', get_lists)
+    #get_list_list = obsolete('get_list_list', get_lists)
 
 
     def get_list(self, position=0, content=None):
@@ -1297,7 +1297,7 @@ class odf_element(object):
                 presentation_class=presentation_class, draw_style=style,
                 svg_title=title, svg_desc=description, content=content)
 
-    get_frame_list = obsolete('get_frame_list', get_frames)
+    #get_frame_list = obsolete('get_frame_list', get_frames)
 
 
     def get_frame(self, position=0, name=None,
@@ -1342,7 +1342,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::draw:image', text_style=style,
                 url=url, content=content)
 
-    get_image_list = obsolete('get_image_list', get_images)
+    #get_image_list = obsolete('get_image_list', get_images)
 
 
     def get_image(self, position=0, name=None, url=None, content=None):
@@ -1386,7 +1386,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::table:table',
                 table_style=style, content=content)
 
-    get_table_list = obsolete('get_table_list', get_tables)
+    #get_table_list = obsolete('get_table_list', get_tables)
 
 
     def get_table(self, position=0, name=None, content=None):
@@ -1428,7 +1428,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::text:note',
                 note_class=note_class, content=content)
 
-    get_note_list = obsolete('get_note_list', get_notes)
+    #get_note_list = obsolete('get_note_list', get_notes)
 
 
     def get_note(self, position=0, note_id=None, note_class=None,
@@ -1487,7 +1487,7 @@ class odf_element(object):
             annotations.append(annotation)
         return annotations
 
-    get_annotation_list = obsolete('get_annotation_list', get_annotations)
+    #get_annotation_list = obsolete('get_annotation_list', get_annotations)
 
 
     def get_annotation(self, position=0, creator=None, start_date=None,
@@ -1569,8 +1569,8 @@ class odf_element(object):
         return _get_elements(self, 'descendant::text:variable-set',
                 text_name=name)
 
-    get_variable_set_list = obsolete('get_variable_set_list',
-            get_variable_sets)
+    #get_variable_set_list = obsolete('get_variable_set_list',
+    #        get_variable_sets)
 
 
     def get_variable_set(self, name, position=-1):
@@ -1678,7 +1678,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::draw:page', draw_style=style,
                 content=content)
 
-    get_draw_page_list = obsolete('get_draw_page_list', get_draw_pages)
+    #get_draw_page_list = obsolete('get_draw_page_list', get_draw_pages)
 
 
     def get_draw_page(self, position=0, name=None, content=None):
@@ -1720,7 +1720,7 @@ class odf_element(object):
         return _get_elements(self, 'descendant::text:a', office_name=name,
                 office_title=title, url=url, content=content)
 
-    get_link_list = obsolete('get_link_list', get_links)
+    #get_link_list = obsolete('get_link_list', get_links)
 
 
     def get_link(self, position=0, name=None, title=None, url=None,
@@ -1757,7 +1757,7 @@ class odf_element(object):
         """
         return _get_elements(self, 'descendant::text:bookmark')
 
-    get_bookmark_list = obsolete('get_bookmark_list', get_bookmarks)
+    #get_bookmark_list = obsolete('get_bookmark_list', get_bookmarks)
 
 
     def get_bookmark(self, position=0, name=None):
@@ -1782,8 +1782,8 @@ class odf_element(object):
         """
         return _get_elements(self, 'descendant::text:bookmark-start')
 
-    get_bookmark_start_list = obsolete('get_bookmark_start_list',
-            get_bookmark_starts)
+    #get_bookmark_start_list = obsolete('get_bookmark_start_list',
+    #        get_bookmark_starts)
 
 
     def get_bookmark_start(self, position=0, name=None):
@@ -1808,8 +1808,8 @@ class odf_element(object):
         """
         return _get_elements(self, 'descendant::text:bookmark-end')
 
-    get_bookmark_end_list = obsolete('get_bookmark_end_list',
-            get_bookmark_ends)
+    #get_bookmark_end_list = obsolete('get_bookmark_end_list',
+    #        get_bookmark_ends)
 
 
     def get_bookmark_end(self, position=0, name=None):
@@ -1838,8 +1838,8 @@ class odf_element(object):
         """
         return _get_elements(self, 'descendant::text:reference-mark')
 
-    get_reference_mark_list = obsolete('get_reference_mark_list',
-            get_reference_marks)
+    #get_reference_mark_list = obsolete('get_reference_mark_list',
+    #        get_reference_marks)
 
 
     def get_reference_mark(self, position=0, name=None):
@@ -1864,8 +1864,8 @@ class odf_element(object):
         """
         return _get_elements(self, 'descendant::text:reference-mark-start')
 
-    get_reference_mark_start_list = obsolete('get_reference_mark_start_list',
-            get_reference_mark_starts)
+    #get_reference_mark_start_list = obsolete('get_reference_mark_start_list',
+    #        get_reference_mark_starts)
 
 
     def get_reference_mark_start(self, position=0, name=None):
@@ -1890,8 +1890,8 @@ class odf_element(object):
         """
         return _get_elements(self, 'descendant::text:reference-mark-end')
 
-    get_reference_mark_end_list = obsolete('get_reference_mark_end_list',
-            get_reference_mark_ends)
+    #get_reference_mark_end_list = obsolete('get_reference_mark_end_list',
+    #        get_reference_mark_ends)
 
 
     def get_reference_mark_end(self, position=0, name=None):
@@ -1951,7 +1951,7 @@ class odf_element(object):
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
 
-    get_draw_line_list = obsolete('get_draw_line_list', get_draw_lines)
+    #get_draw_line_list = obsolete('get_draw_line_list', get_draw_lines)
 
 
     def get_draw_line(self, position=0, id=None, content=None):
@@ -1993,8 +1993,8 @@ class odf_element(object):
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
 
-    get_draw_rectangle_list = obsolete('get_draw_rectangle_list',
-            get_draw_rectangles)
+    #get_draw_rectangle_list = obsolete('get_draw_rectangle_list',
+    #        get_draw_rectangles)
 
 
     def get_draw_rectangle(self, position=0, id=None, content=None):
@@ -2036,8 +2036,8 @@ class odf_element(object):
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
 
-    get_draw_ellipse_list = obsolete('get_draw_ellipse_list',
-            get_draw_ellipses)
+    #get_draw_ellipse_list = obsolete('get_draw_ellipse_list',
+    #        get_draw_ellipses)
 
 
     def get_draw_ellipse(self, position=0, id=None, content=None):
@@ -2079,8 +2079,8 @@ class odf_element(object):
                 draw_style=draw_style, draw_text_style=draw_text_style,
                 content=content)
 
-    get_draw_connector_list = obsolete('get_draw_connector_list',
-            get_draw_connectors)
+    #get_draw_connector_list = obsolete('get_draw_connector_list',
+    #        get_draw_connectors)
 
 
     def get_draw_connector(self, position=0, id=None, content=None):
@@ -2145,7 +2145,7 @@ class odf_element(object):
         """
         return _get_elements(self, 'text:table-of-content')
 
-    get_toc_list = obsolete('get_toc_list', get_tocs)
+    #get_toc_list = obsolete('get_toc_list', get_tocs)
 
 
     def get_toc(self, position=0, content=None):
@@ -2191,7 +2191,7 @@ class odf_element(object):
         tagname, famattr = self._get_style_tagname(family)
         return _get_elements(self, tagname, family=famattr)
 
-    get_style_list = obsolete('get_style_list', get_styles)
+    #get_style_list = obsolete('get_style_list', get_styles)
 
 
     def get_style(self, family, name_or_element=None, display_name=None):

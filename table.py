@@ -37,7 +37,7 @@ from bisect import bisect_left, insort
 from datatype import Boolean, Date, DateTime, Duration
 from element import odf_create_element, register_element_class, odf_element
 from element import _xpath_compile
-from utils import get_value, _set_value_and_type, obsolete, isiterable
+from utils import get_value, _set_value_and_type, isiterable   #, obsolete
 
 
 
@@ -656,7 +656,7 @@ class odf_cell(odf_element):
         if formula is not None:
             self.set_formula(formula)
 
-    set_cell_value = obsolete('set_cell_value', set_value)
+    #set_cell_value = obsolete('set_cell_value', set_value)
 
 
     def get_type(self):
@@ -765,7 +765,7 @@ class odf_cell(odf_element):
         """
         self.set_style_attribute('table:style-name', style)
 
-    set_cell_style = obsolete('set_cell_style', set_style)
+    #set_cell_style = obsolete('set_cell_style', set_style)
 
 
     def get_formula(self):
@@ -938,7 +938,7 @@ class odf_row(odf_element):
         """
         self.set_style_attribute('table:style-name', style)
 
-    set_row_style = obsolete('set_row_style', set_style)
+    #set_row_style = obsolete('set_row_style', set_style)
 
 
     def get_width(self):
@@ -1079,7 +1079,7 @@ class odf_row(odf_element):
             cells.append(cell)
         return cells
 
-    get_cell_list = obsolete('get_cell_list', get_cells)
+    #get_cell_list = obsolete('get_cell_list', get_cells)
 
 
     def _get_cell2(self, x, clone=True):
@@ -1904,7 +1904,7 @@ class odf_table(odf_element):
         return h
 
 
-    get_table_height = obsolete('get_table_height', get_height)
+    #get_table_height = obsolete('get_table_height', get_height)
 
 
     def get_width(self):
@@ -1932,7 +1932,7 @@ class odf_table(odf_element):
 
         return w
 
-    get_table_width = obsolete('get_table_width', get_width)
+    #get_table_width = obsolete('get_table_width', get_width)
 
 
     def get_size(self):
@@ -1996,7 +1996,7 @@ class odf_table(odf_element):
     def set_style(self, style):
         self.set_style_attribute('table:style-name', style)
 
-    set_table_style = obsolete('set_table_style', set_style)
+    #set_table_style = obsolete('set_table_style', set_style)
 
 
     def get_formatted_text(self, context):
@@ -2164,7 +2164,7 @@ class odf_table(odf_element):
             self.set_row(y, row, clone=False)
             self.__update_width(row)
 
-    set_table_values = obsolete('set_table_values', set_values)
+    #set_table_values = obsolete('set_table_values', set_values)
 
 
     def rstrip(self, aggressive=False):
@@ -2215,7 +2215,7 @@ class odf_table(odf_element):
         self._indexes['_cmap'] = {}
         self._compute_table_cache()
 
-    rstrip_table = obsolete('rstrip_table', rstrip)
+    #rstrip_table = obsolete('rstrip_table', rstrip)
 
 
     def transpose(self, coord=None):
@@ -2406,7 +2406,7 @@ class odf_table(odf_element):
             rows.append(row)
         return rows
 
-    get_row_list = obsolete('get_row_list', get_rows)
+    #get_row_list = obsolete('get_row_list', get_rows)
 
 
     def _get_row2(self, y, clone = True, create = True):
@@ -2752,7 +2752,7 @@ class odf_table(odf_element):
                 cells.append(row_cells)
         return cells
 
-    get_cell_list = obsolete('get_cell_list', get_cells)
+    #get_cell_list = obsolete('get_cell_list', get_cells)
 
 
     def get_cell(self, coord, clone=True):
@@ -3175,7 +3175,7 @@ class odf_table(odf_element):
             columns.append(column)
         return columns
 
-    get_column_list = obsolete('get_column_list', get_columns)
+    #get_column_list = obsolete('get_column_list', get_columns)
 
 
     def _get_column2(self, x):

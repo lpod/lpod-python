@@ -38,7 +38,7 @@ from const import ODF_MIMETYPES, ODF_PARTS, ODF_TYPES, ODF_MANIFEST
 from const import ODF_CONTENT, ODF_META, ODF_SETTINGS, ODF_STYLES
 from const import ODF_EXTENSIONS
 from manifest import odf_manifest
-from utils import _get_abspath, obsolete
+from utils import _get_abspath  #, obsolete
 from scriptutils import printwarn
 
 
@@ -510,7 +510,7 @@ def odf_new_container(path_or_file):
     clone.set_part(ODF_MANIFEST, manifest.serialize())
     return clone
 
-odf_new_document_from_template = obsolete('odf_new_document_from_template',
-        odf_new_container)
-odf_new_document_from_type = obsolete('odf_new_document_from_template',
-        odf_new_container)
+#odf_new_document_from_template = obsolete('odf_new_document_from_template',
+#        odf_new_container)
+#odf_new_document_from_type = obsolete('odf_new_document_from_template',
+#        odf_new_container)

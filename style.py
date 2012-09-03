@@ -29,7 +29,7 @@ from datatype import Boolean
 from element import register_element_class, odf_create_element, odf_element
 from image import odf_image
 from utils import _get_style_tagname, _expand_properties, _merge_dicts
-from utils import _get_element, obsolete, isiterable
+from utils import _get_element, isiterable  #,  obsolete
 
 
 # from CSS3 color map
@@ -512,7 +512,7 @@ class odf_style(odf_element):
     def get_name(self):
         return self.get_attribute('style:name')
 
-    get_style_name = obsolete('get_style_name', get_name)
+    #get_style_name = obsolete('get_style_name', get_name)
 
 
     def set_name(self, name):
@@ -548,8 +548,8 @@ class odf_style(odf_element):
         """
         return self.get_attribute('style:parent-style-name')
 
-    get_parent_style_name = obsolete('get_parent_style_name',
-            get_parent_style)
+    #get_parent_style_name = obsolete('get_parent_style_name',
+    #        get_parent_style)
 
 
     def set_parent_style(self, name):
@@ -615,7 +615,7 @@ class odf_style(odf_element):
             else:
                 element.set_attribute(key, value)
 
-    set_style_properties = obsolete('set_style_properties', set_properties)
+    #set_style_properties = obsolete('set_style_properties', set_properties)
 
 
     def del_properties(self, properties=[], area=None, *args):

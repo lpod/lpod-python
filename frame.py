@@ -31,7 +31,7 @@ from datatype import Unit
 from image import odf_create_image
 from paragraph import odf_create_paragraph
 from style import odf_create_style
-from utils import obsolete, isiterable, DPI
+from utils import isiterable, DPI # , obsolete
 
 
 
@@ -339,7 +339,7 @@ class odf_frame(odf_element):
         if anchor_type == 'page' and page_number:
             self.set_page_number(page_number)
 
-    set_frame_anchor_type = obsolete('set_frame_anchor_type', set_anchor_type)
+    #set_frame_anchor_type = obsolete('set_frame_anchor_type', set_anchor_type)
 
 
     def get_page_number(self):

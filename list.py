@@ -31,7 +31,7 @@
 from element import register_element_class, odf_element, odf_create_element
 from element import FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING
 from paragraph import odf_create_paragraph
-from utils import _get_element, _get_elements, obsolete, isiterable
+from utils import _get_element, _get_elements, isiterable  #, obsolete
 
 
 def odf_create_list_item(text_or_element=None):
@@ -107,7 +107,7 @@ class odf_list(odf_element):
         """
         return _get_elements(self, 'text:list-item', content=content)
 
-    get_item_list = obsolete('get_item_list', get_items)
+    #get_item_list = obsolete('get_item_list', get_items)
 
 
     def get_item(self, position=0, content=None):

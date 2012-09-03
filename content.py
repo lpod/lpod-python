@@ -27,7 +27,7 @@
 #
 
 # Import from lpod
-from utils import obsolete
+#from utils import obsolete
 from xmlpart import odf_xmlpart
 
 
@@ -67,7 +67,7 @@ class odf_content(odf_xmlpart):
             result.extend(context.get_styles(family=family))
         return result
 
-    get_style_list = obsolete('get_style_list', get_styles)
+    #get_style_list = obsolete('get_style_list', get_styles)
 
 
     def get_style(self, family, name_or_element=None, display_name=None):

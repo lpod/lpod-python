@@ -45,7 +45,7 @@ from meta import odf_meta
 from style import odf_style, odf_master_page, odf_font_style
 from style import registered_styles
 from styles import odf_styles
-from utils import obsolete
+#from utils import obsolete
 from xmlpart import odf_xmlpart
 
 
@@ -156,10 +156,10 @@ class odf_document(object):
             xmlparts[path] = part = cls(path, container)
         return part
 
-    get_content = obsolete('get_content', get_part, ODF_CONTENT)
-    get_meta = obsolete('get_meta', get_part, ODF_META)
-    get_styles = obsolete('get_styles', get_part, ODF_STYLES)
-    get_manifest = obsolete('get_manifest', get_part, ODF_MANIFEST)
+    #get_content = obsolete('get_content', get_part, ODF_CONTENT)
+    #get_meta = obsolete('get_meta', get_part, ODF_META)
+    #get_styles = obsolete('get_styles', get_part, ODF_STYLES)
+    #get_manifest = obsolete('get_manifest', get_part, ODF_MANIFEST)
 
 
     def set_part(self, path, data):
@@ -458,7 +458,7 @@ class odf_document(object):
         return (content.get_styles(family=family)
                 + styles.get_styles(family=family, automatic=automatic))
 
-    get_style_list = obsolete('get_style_list', get_styles)
+    #get_style_list = obsolete('get_style_list', get_styles)
 
     def get_style(self, family, name_or_element=None, display_name=None):
         """Return the style uniquely identified by the name/family pair. If
@@ -792,7 +792,7 @@ def odf_new_document(path_or_file):
     container = odf_new_container(path_or_file)
     return odf_document(container)
 
-odf_new_document_from_template = obsolete('odf_new_document_from_template',
-    odf_new_document)
-odf_new_document_from_type = obsolete('odf_new_document_from_type',
-    odf_new_document)
+#odf_new_document_from_template = obsolete('odf_new_document_from_template',
+#    odf_new_document)
+#odf_new_document_from_type = obsolete('odf_new_document_from_type',
+#    odf_new_document)

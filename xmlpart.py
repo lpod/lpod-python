@@ -34,7 +34,7 @@ from lxml.etree import parse, tostring
 
 # Import from lpod
 from element import _make_odf_element
-from utils import obsolete
+#from utils import obsolete
 
 
 class odf_xmlpart(object):
@@ -73,7 +73,7 @@ class odf_xmlpart(object):
         root = self.get_root()
         return root.xpath(xpath_query)
 
-    get_element_list = obsolete('get_element_list', get_elements)
+    #get_element_list = obsolete('get_element_list', get_elements)
 
 
     def get_element(self, xpath_query):
