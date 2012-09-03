@@ -1,0 +1,7 @@
+:mod:`lpod.shapes`
+##############################################
+.. automodule:: lpod.shapes
+   :synopsis: Lpod shapes module
+   :show-inheritance:
+   :members:
+   :undoc-members:

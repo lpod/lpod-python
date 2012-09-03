@@ -1,0 +1,7 @@
+:mod:`lpod.styles`
+##############################################
+.. automodule:: lpod.styles
+   :synopsis: Lpod styles module
+   :show-inheritance:
+   :members:
+   :undoc-members:

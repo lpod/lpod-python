@@ -1,0 +1,7 @@
+:mod:`lpod.smil`
+##############################################
+.. automodule:: lpod.smil
+   :synopsis: Implementation of SMIL
+   :show-inheritance:
+   :members:
+   :undoc-members:

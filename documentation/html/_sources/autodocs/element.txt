@@ -1,0 +1,7 @@
+:mod:`lpod.element`
+##############################################
+.. automodule:: lpod.element
+   :synopsis: Lpod element module
+   :show-inheritance:
+   :members:
+   :undoc-members:

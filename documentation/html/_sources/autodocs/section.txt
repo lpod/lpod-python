@@ -1,0 +1,7 @@
+:mod:`lpod.section`
+##############################################
+.. automodule:: lpod.section
+   :synopsis: Lpod section module
+   :show-inheritance:
+   :members:
+   :undoc-members:

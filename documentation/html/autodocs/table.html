@@ -1,0 +1,1555 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.table &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.toc" href="toc.html" />
+    <link rel="prev" title="lpod.styles" href="styles.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="toc.html" title="lpod.toc"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="styles.html" title="lpod.styles"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.table">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.table</span></tt><a class="headerlink" href="#module-lpod.table" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.table.odf_cell">
+<em class="property">class </em><tt class="descclassname">lpod.table.</tt><tt class="descname">odf_cell</tt><big>(</big><em>native_element</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.element.odf_element" class="reference external" href="element.html#lpod.element.odf_element"><tt class="xref docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>Class for the table cell element.</p>
+<dl class="method">
+<dt id="lpod.table.odf_cell.clone">
+<tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.get_currency">
+<tt class="descname">get_currency</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.get_currency" title="Permalink to this definition">¶</a></dt>
+<dd>Get the currency used for monetary values.</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.get_formula">
+<tt class="descname">get_formula</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.get_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the formula of the cell, or None if undefined.</p>
+<p>The formula is not interpreted in any way.</p>
+<p>Return: unicode</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.get_repeated">
+<tt class="descname">get_repeated</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.get_repeated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of times the cell is repeated.</p>
+<p>Always None when using the table API.</p>
+<p>Return: int or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.get_style">
+<tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.get_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the style of the cell itself.</p>
+<p>Return: unicode</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.get_type">
+<tt class="descname">get_type</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the type of the cell: boolean, float, date, string or time.</p>
+<p>Return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.get_value">
+<tt class="descname">get_value</tt><big>(</big><em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the Python value that represent the cell.</p>
+<p>Possible return types are unicode, int, Decimal, datetime,
+timedelta.
+If get_type is True, returns a tuple (value, ODF type of value)</p>
+<p>Return: Python type or tuple (python type, string)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.is_empty">
+<tt class="descname">is_empty</tt><big>(</big><em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_cell_style">
+<tt class="descname">set_cell_style</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_cell_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_cell_value">
+<tt class="descname">set_cell_value</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_cell_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_currency">
+<tt class="descname">set_currency</tt><big>(</big><em>currency</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_currency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the currency used for monetary values.</p>
+<p>Arguments:</p>
+<blockquote>
+currency &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_formula">
+<tt class="descname">set_formula</tt><big>(</big><em>formula</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the formula of the cell, or None to remove it.</p>
+<p>The formula is not interpreted in any way.</p>
+<p>Arguments:</p>
+<blockquote>
+formula &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_repeated">
+<tt class="descname">set_repeated</tt><big>(</big><em>repeated</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_repeated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the numnber of times the cell is repeated, or None to delete
+it.</p>
+<p>Arguments:</p>
+<blockquote>
+repeated &#8211; int or None</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_style">
+<tt class="descname">set_style</tt><big>(</big><em>style</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the style of the cell itself.</p>
+<p>Arguments:</p>
+<blockquote>
+style &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_text">
+<tt class="descname">set_text</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_type">
+<tt class="descname">set_type</tt><big>(</big><em>cell_type</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the type ofthe cell manually.</p>
+<p>Arguments:</p>
+<blockquote>
+cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217; or &#8216;time&#8217;</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_cell.set_value">
+<tt class="descname">set_value</tt><big>(</big><em>value</em>, <em>text=None</em>, <em>cell_type=None</em>, <em>currency=None</em>, <em>formula=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_cell.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the cell state from the Python value type.</p>
+<p>Text is how the cell is displayed. Cell type is guessed,
+unless provided.</p>
+<p>For monetary values, provide the name of the currency.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>value &#8211; Python type</p>
+<p>text &#8211; unicode</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217; or &#8216;percentage&#8217;</dd>
+</dl>
+<p>currency &#8211; unicode</p>
+</blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.table.odf_column">
+<em class="property">class </em><tt class="descclassname">lpod.table.</tt><tt class="descname">odf_column</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.element.odf_element" class="reference external" href="element.html#lpod.element.odf_element"><tt class="xref docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<dl class="method">
+<dt id="lpod.table.odf_column.clone">
+<tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_column.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_column.get_default_cell_style">
+<tt class="descname">get_default_cell_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_column.get_default_cell_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_column.get_repeated">
+<tt class="descname">get_repeated</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_column.get_repeated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of times the column is repeated.</p>
+<p>Always None when using the table API.</p>
+<p>Return: int or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_column.get_style">
+<tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_column.get_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the style of the column itself.</p>
+<p>Return: unicode</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_column.set_default_cell_style">
+<tt class="descname">set_default_cell_style</tt><big>(</big><em>style</em><big>)</big><a class="headerlink" href="#lpod.table.odf_column.set_default_cell_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_column.set_repeated">
+<tt class="descname">set_repeated</tt><big>(</big><em>repeated</em><big>)</big><a class="headerlink" href="#lpod.table.odf_column.set_repeated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the numnber of times the column is repeated, or None to delete
+it and update cache map.</p>
+<p>Arguments:</p>
+<blockquote>
+repeated &#8211; int or None</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_column.set_style">
+<tt class="descname">set_style</tt><big>(</big><em>style</em><big>)</big><a class="headerlink" href="#lpod.table.odf_column.set_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the style of the column itself.</p>
+<p>Arguments:</p>
+<blockquote>
+style &#8211; unicode</blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.table.odf_row">
+<em class="property">class </em><tt class="descclassname">lpod.table.</tt><tt class="descname">odf_row</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.element.odf_element" class="reference external" href="element.html#lpod.element.odf_element"><tt class="xref docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<dl class="method">
+<dt id="lpod.table.odf_row.append">
+<tt class="descname">append</tt><big>(</big><em>cell=None</em>, <em>clone=True</em>, <em>_repeated=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the given cell at the end of the row. Repeated cells are
+accepted. If no cell is given, an empty one is created.</p>
+<p>Do not use when working on a table, use <tt class="docutils literal"><span class="pre">odf_table.append_cell</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>cell &#8211; odf_cell</p>
+<p>_repeated &#8211; (optional), repeated value of the row</p>
+</blockquote>
+<p>returns the cell with x and y updated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.append_cell">
+<tt class="descname">append_cell</tt><big>(</big><em>cell=None</em>, <em>clone=True</em>, <em>_repeated=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.append_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the given cell at the end of the row. Repeated cells are
+accepted. If no cell is given, an empty one is created.</p>
+<p>Do not use when working on a table, use <tt class="docutils literal"><span class="pre">odf_table.append_cell</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>cell &#8211; odf_cell</p>
+<p>_repeated &#8211; (optional), repeated value of the row</p>
+</blockquote>
+<p>returns the cell with x and y updated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.clone">
+<tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_row.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.delete_cell">
+<tt class="descname">delete_cell</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.delete_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the cell at the given position &#8220;x&#8221; starting from 0.
+Alphabetical positions like &#8220;D&#8221; are accepted.</p>
+<p>Cells on the right will be shifted to the left. In a table, other
+rows remain unaffected.</p>
+<p>Arguments:</p>
+<blockquote>
+x &#8211; int or str</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.extend_cells">
+<tt class="descname">extend_cells</tt><big>(</big><em>cells=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#lpod.table.odf_row.extend_cells" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_cell">
+<tt class="descname">get_cell</tt><big>(</big><em>x</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the cell at position &#8220;x&#8221; starting from 0. Alphabetical
+positions like &#8220;D&#8221; are accepted.</p>
+<p>A  copy is returned, use <tt class="docutils literal"><span class="pre">set_cell</span></tt> to push it back.</p>
+<p>Arguments:</p>
+<blockquote>
+x &#8211; int or str</blockquote>
+<p>Return: odf_cell</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_cell_list">
+<tt class="descname">get_cell_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_cell_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_cells">
+<tt class="descname">get_cells</tt><big>(</big><em>coord=None</em>, <em>style=None</em>, <em>content=None</em>, <em>cell_type=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of cells matching the criteria.</p>
+<p>Filter by cell_type, with cell_type &#8216;all&#8217; will retrieve cells of any
+type, aka non empty cells.</p>
+<p>Filter by coordinates will retrieve the amount of cells defined by
+&#8216;coord&#8217;, minus the other filters.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; str or tuple of int : coordinates</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>content &#8211; regex, unicode</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: list of tuples</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_repeated">
+<tt class="descname">get_repeated</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_repeated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of times the row is repeated.</p>
+<p>Always None when using the table API.</p>
+<p>Return: int or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_style">
+<tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the style of the row itself.</p>
+<p>Return: unicode</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_value">
+<tt class="descname">get_value</tt><big>(</big><em>x</em>, <em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the value of the cell at position &#8220;x&#8221;.
+If get_type is True, returns the tuples (value, ODF type).</p>
+<p>If the cell is empty, returns None or (None, None)</p>
+<p>See <tt class="docutils literal"><span class="pre">get_cell</span></tt> and <tt class="docutils literal"><span class="pre">odf_cell.get_value</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_values">
+<tt class="descname">get_values</tt><big>(</big><em>coord=None</em>, <em>cell_type=None</em>, <em>complete=False</em>, <em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the cell values in this row.</p>
+<p>Filter by cell_type, with cell_type &#8216;all&#8217; will retrieve cells of any
+type, aka non empty cells.
+If cell_type is used and complete is True, missing values are
+replaced by None.
+If cell_type is None, complete is always True : with no cell type
+queried, get_values() returns None for each empty cell, the length
+of the list is equal to the length of the row (depending on
+coordinates use).</p>
+<p>If get_type is True, returns a tuple (value, ODF type of value), or
+(None, None) for empty cells if complete is True.</p>
+<p>Filter by coordinates will retrieve the amount of cells defined by
+coordinates with None for empty cells, except when using cell_type.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; str or tuple of int : coordinates in row</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>complete &#8211; boolean</p>
+<p>get_type &#8211; boolean</p>
+</blockquote>
+<p>Return: list of Python types, or list of tuples.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.get_width">
+<tt class="descname">get_width</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_row.get_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of expected cells in the row, i.e. addition
+repetitions.</p>
+<p>Return: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.insert_cell">
+<tt class="descname">insert_cell</tt><big>(</big><em>x</em>, <em>cell=None</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.insert_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert the given cell at position &#8220;x&#8221; starting from 0. If no cell
+is given, an empty one is created.</p>
+<p>Alphabetical positions like &#8220;D&#8221; are accepted.</p>
+<p>Do not use when working on a table, use <tt class="docutils literal"><span class="pre">odf_table.insert_cell</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str</p>
+<p>cell &#8211; odf_cell</p>
+</blockquote>
+<p>returns the cell with x and y updated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.is_empty">
+<tt class="descname">is_empty</tt><big>(</big><em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether every cell in the row has no value or the value
+evaluates to False (empty string), and no style.</p>
+<p>If aggressive is True, empty cells with style are considered empty.</p>
+<p>Arguments:</p>
+<blockquote>
+aggressive &#8211; bool</blockquote>
+<p>Return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.rstrip">
+<tt class="descname">rstrip</tt><big>(</big><em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.rstrip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove <em>in-place</em> empty cells at the right of the row. An empty
+cell has no value but can have style. If &#8220;aggressive&#8221; is True, style
+is ignored.</p>
+<p>Arguments:</p>
+<blockquote>
+aggressive &#8211; bool</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.set_cell">
+<tt class="descname">set_cell</tt><big>(</big><em>x</em>, <em>cell=None</em>, <em>clone=True</em>, <em>_get_repeat=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Push the cell back in the row at position &#8220;x&#8221; starting from 0.
+Alphabetical positions like &#8220;D&#8221; are accepted.</p>
+<p>Arguments:</p>
+<blockquote>
+x &#8211; int or str</blockquote>
+<p>returns the cell with x and y updated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.set_cells">
+<tt class="descname">set_cells</tt><big>(</big><em>cells=</em><span class="optional">[</span><span class="optional">]</span>, <em>start=0</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the cells in the row, from the &#8216;start&#8217; column.
+This method does not clear the row, use row.clear() before to start
+with an empty row.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>values &#8211; list of Python types</p>
+<p>start &#8211; int or str</p>
+<p>cells &#8211; list of cells</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.set_repeated">
+<tt class="descname">set_repeated</tt><big>(</big><em>repeated</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_repeated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the numnber of times the row is repeated, or None to delete
+it and update cache map.</p>
+<p>Arguments:</p>
+<blockquote>
+repeated &#8211; int or None</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.set_row_style">
+<tt class="descname">set_row_style</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_row_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.set_style">
+<tt class="descname">set_style</tt><big>(</big><em>style</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the style of the row itself.</p>
+<p>Arguments:</p>
+<blockquote>
+style &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.set_value">
+<tt class="descname">set_value</tt><big>(</big><em>x</em>, <em>value</em>, <em>style=None</em>, <em>cell_type=None</em>, <em>currency=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to set the value of the cell at position &#8220;x&#8221;.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str</p>
+<p>value &#8211; Python type</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;, &#8216;percentage&#8217;,</dt>
+<dd>&#8216;string&#8217; or &#8216;time&#8217;</dd>
+</dl>
+<p>currency &#8211; three-letter str</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>See <tt class="docutils literal"><span class="pre">get_cell</span></tt> and <tt class="docutils literal"><span class="pre">odf_cell.get_value</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.set_values">
+<tt class="descname">set_values</tt><big>(</big><em>values</em>, <em>start=0</em>, <em>style=None</em>, <em>cell_type=None</em>, <em>currency=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.set_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to set the value of cells in the row, from the &#8216;start&#8217;
+column vith values.
+This method does not clear the row, use row.clear() before to start
+with an empty row.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>values &#8211; list of Python types</p>
+<p>start &#8211; int or str</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217; or &#8216;percentage&#8217;</dd>
+</dl>
+<p>currency &#8211; three-letter str</p>
+<p>style &#8211; cell style</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_row.traverse">
+<tt class="descname">traverse</tt><big>(</big><em>start=None</em>, <em>end=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row.traverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield as many cell elements as expected cells in the row, i.e.
+expand repetitions by returning the same cell as many times as
+necessary.</p>
+<blockquote>
+<p>Arguments:</p>
+<blockquote>
+<p>start &#8211; int</p>
+<p>end &#8211; int</p>
+</blockquote>
+</blockquote>
+<p>Copies are returned, use <tt class="docutils literal"><span class="pre">set_cell</span></tt> to push them back.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.table.odf_row_group">
+<em class="property">class </em><tt class="descclassname">lpod.table.</tt><tt class="descname">odf_row_group</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_row_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.element.odf_element" class="reference external" href="element.html#lpod.element.odf_element"><tt class="xref docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>Class to group rows with common properties.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.table.odf_table">
+<em class="property">class </em><tt class="descclassname">lpod.table.</tt><tt class="descname">odf_table</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.element.odf_element" class="reference external" href="element.html#lpod.element.odf_element"><tt class="xref docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<dl class="method">
+<dt id="lpod.table.odf_table.append">
+<tt class="descname">append</tt><big>(</big><em>something</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.append" title="Permalink to this definition">¶</a></dt>
+<dd>Dispatch .append() call to append_row() or append_column().</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.append_cell">
+<tt class="descname">append_cell</tt><big>(</big><em>y</em>, <em>cell=None</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.append_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the given cell at the &#8220;y&#8221; coordinate. Repeated cells are
+accepted. If no cell is given, an empty one is created.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>Other rows remain untouched.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>y &#8211; int</p>
+<p>cell &#8211; odf_cell</p>
+</blockquote>
+<p>returns the cell with x and y updated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.append_column">
+<tt class="descname">append_column</tt><big>(</big><em>column=None</em>, <em>_repeated=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.append_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the column at the end of the table. If no column is given,
+an empty one is created.</p>
+<p>ODF columns don&#8217;t contain cells, only style information.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>Arguments:</p>
+<blockquote>
+column &#8211; odf_column</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.append_row">
+<tt class="descname">append_row</tt><big>(</big><em>row=None</em>, <em>clone=True</em>, <em>_repeated=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.append_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the row at the end of the table. If no row is given, an
+empty one is created.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>Note the columns are automatically created when the first row is
+inserted in an empty table. So better insert a filled row.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>row &#8211; odf_row</p>
+<p>_repeated &#8211; (optional), repeated value of the row</p>
+</blockquote>
+<p>returns the row, with updated row.y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.delete_cell">
+<tt class="descname">delete_cell</tt><big>(</big><em>coord</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.delete_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the cell at the given coordinates, so that next cells are
+shifted to the left.</p>
+<p>Coordinates are either a 2-uplet of (x, y) starting from 0, or a
+human-readable position like &#8220;C4&#8221;.</p>
+<p>Use &#8220;set_value&#8221; for erasing value.</p>
+<p>Arguments:</p>
+<blockquote>
+coord &#8211; (int, int) or str</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.delete_column">
+<tt class="descname">delete_column</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.delete_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the column at the given position. ODF columns don&#8217;t contain
+cells, only style information.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>Arguments:</p>
+<blockquote>
+x &#8211; int or str.isalpha()</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.delete_row">
+<tt class="descname">delete_row</tt><big>(</big><em>y</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.delete_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the row at the given &#8220;y&#8221; position.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>Arguments:</p>
+<blockquote>
+y &#8211; int or str</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.extend_rows">
+<tt class="descname">extend_rows</tt><big>(</big><em>rows=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#lpod.table.odf_table.extend_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a list of rows at the end of the table.</p>
+<p>Arguments:</p>
+<blockquote>
+rows &#8211; list of odf_row</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_cell">
+<tt class="descname">get_cell</tt><big>(</big><em>coord</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the cell at the given coordinates.</p>
+<p>They are either a 2-uplet of (x, y) starting from 0, or a
+human-readable position like &#8220;C4&#8221;.</p>
+<p>A copy is returned, use <tt class="docutils literal"><span class="pre">set_cell</span></tt> to push it back.</p>
+<p>Arguments:</p>
+<blockquote>
+coord &#8211; (int, int) or str</blockquote>
+<p>Return: odf_cell</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_cell_list">
+<tt class="descname">get_cell_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_cell_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_cells">
+<tt class="descname">get_cells</tt><big>(</big><em>coord=None</em>, <em>cell_type=None</em>, <em>style=None</em>, <em>content=None</em>, <em>flat=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the cells matching the criteria. If &#8216;coord&#8217; is None,
+parse the whole table, else parse the area defined by &#8216;coord&#8217;.</p>
+<p>Filter by  cell_type = &#8220;all&#8221;  will retrieve cells of any
+type, aka non empty cells.</p>
+<p>If flat is True (default is False), the method return a single list
+of all the values, else a list of lists of cells.</p>
+<p>if cell_type, style and content are None, get_cells() will return
+the exact number of cells of the area, including empty cells.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coordinates &#8211; str or tuple of int : coordinates of area</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>content &#8211; regex, unicode</p>
+<p>style &#8211; unicode</p>
+<p>flat &#8211; boolean</p>
+</blockquote>
+<p>Return: list of tuples</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_column">
+<tt class="descname">get_column</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the column at the given &#8220;x&#8221; position.</p>
+<p>ODF columns don&#8217;t contain cells, only style information.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>A copy is returned, use <tt class="docutils literal"><span class="pre">set_column</span></tt> to push it back.</p>
+<p>Arguments:</p>
+<blockquote>
+x &#8211; int or str.isalpha()</blockquote>
+<p>Return: odf_column</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_column_cells">
+<tt class="descname">get_column_cells</tt><big>(</big><em>x</em>, <em>style=None</em>, <em>content=None</em>, <em>cell_type=None</em>, <em>complete=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_column_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of cells at the given position.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>Filter by cell_type, with cell_type &#8216;all&#8217; will retrieve cells of any
+type, aka non empty cells.</p>
+<p>If complete is True, replace missing values by None.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str.isalpha()</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>content &#8211; regex, unicode</p>
+<p>style &#8211; unicode</p>
+<p>complete &#8211; boolean</p>
+</blockquote>
+<p>Return: list of odf_cell</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_column_list">
+<tt class="descname">get_column_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_column_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_column_values">
+<tt class="descname">get_column_values</tt><big>(</big><em>x</em>, <em>cell_type=None</em>, <em>complete=True</em>, <em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_column_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the list of Python values for the cells at the
+given position.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>Filter by cell_type, with cell_type &#8216;all&#8217; will retrieve cells of any
+type, aka non empty cells.
+If cell_type and complete is True, replace missing values by None.</p>
+<p>If get_type is True, returns a tuple (value, ODF type of value)</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str.isalpha()</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>complete &#8211; boolean</p>
+<p>get_type &#8211; boolean</p>
+</blockquote>
+<p>Return: list of Python types</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_columns">
+<tt class="descname">get_columns</tt><big>(</big><em>coord=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of columns matching the criteria. Each result is a
+tuple of (x, column).</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; str or tuple of int : coordinates of columns</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: list of columns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_columns_width">
+<tt class="descname">get_columns_width</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_columns_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_displayed">
+<tt class="descname">get_displayed</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_displayed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_formatted_text">
+<tt class="descname">get_formatted_text</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_formatted_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_height">
+<tt class="descname">get_height</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current height of the table.</p>
+<p>Return: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_print_ranges">
+<tt class="descname">get_print_ranges</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_print_ranges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_printable">
+<tt class="descname">get_printable</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_printable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_protected">
+<tt class="descname">get_protected</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_protected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_row">
+<tt class="descname">get_row</tt><big>(</big><em>y</em>, <em>clone=True</em>, <em>create=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the row at the given &#8220;y&#8221; position.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>A copy is returned, use <tt class="docutils literal"><span class="pre">set_cell</span></tt> to push it back.</p>
+<p>Arguments:</p>
+<blockquote>
+y &#8211; int or str</blockquote>
+<p>Return: odf_row</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_row_list">
+<tt class="descname">get_row_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_row_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_row_values">
+<tt class="descname">get_row_values</tt><big>(</big><em>y</em>, <em>cell_type=None</em>, <em>complete=True</em>, <em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_row_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the list of Python values for the cells of the row
+at the given &#8220;y&#8221; position.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>Filter by cell_type, with cell_type &#8216;all&#8217; will retrieve cells of any
+type, aka non empty cells.
+If cell_type and complete is True, replace missing values by None.</p>
+<p>If get_type is True, returns a tuple (value, ODF type of value)</p>
+<p>Arguments:</p>
+<blockquote>
+<p>y &#8211; int, str</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>complete &#8211; boolean</p>
+<p>get_type &#8211; boolean</p>
+</blockquote>
+<p>Return: list of lists of Python types</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_rows">
+<tt class="descname">get_rows</tt><big>(</big><em>coord=None</em>, <em>style=None</em>, <em>content=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of rows matching the criteria.</p>
+<p>Filter by coordinates will parse the area defined by the coordinates.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; str or tuple of int : coordinates of rows</p>
+<p>content &#8211; regex, unicode</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: list of rows</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_size">
+<tt class="descname">get_size</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the current width and height of the table.</p>
+<p>Return: (int, int)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_style">
+<tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_table_height">
+<tt class="descname">get_table_height</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_table_height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_table_width">
+<tt class="descname">get_table_width</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_table_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_value">
+<tt class="descname">get_value</tt><big>(</big><em>coord</em>, <em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the Python value of the cell at the given
+coordinates.</p>
+<p>If get_type is True, returns the tuples (value, ODF type)</p>
+<p>coord is either a 2-uplet of (x, y) starting from 0, or a
+human-readable position like &#8220;C4&#8221;. If an Area is given, the upper
+left position is used as coord.</p>
+<p>Arguments:</p>
+<blockquote>
+coord &#8211; (int, int) or str : coordinate</blockquote>
+<p>Return: Python type</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_values">
+<tt class="descname">get_values</tt><big>(</big><em>coord=None</em>, <em>cell_type=None</em>, <em>complete=True</em>, <em>get_type=False</em>, <em>flat=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a matrix of values of the table.</p>
+<p>Filter by coordinates will parse the area defined by the coordinates.</p>
+<p>If &#8216;cell_type&#8217; is used and &#8216;complete&#8217; is True (default), missing values
+are replaced by None.
+Filter by &#8216; cell_type = &#8220;all&#8221; &#8216; will retrieve cells of any
+type, aka non empty cells.</p>
+<p>If &#8216;cell_type&#8217; is None, complete is always True : with no cell type
+queried, get_values() returns None for each empty cell, the length
+each lists is equal to the width of the table.</p>
+<p>If get_type is True, returns tuples (value, ODF type of value), or
+(None, None) for empty cells with complete True.</p>
+<p>If flat is True, the methods return a single list of all the values.
+By default, flat is False.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; str or tuple of int : coordinates of area</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>complete &#8211; boolean</p>
+<p>get_type &#8211; boolean</p>
+</blockquote>
+<p>Return: list of lists of Python types</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.get_width">
+<tt class="descname">get_width</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current width of the table, measured on columns.</p>
+<p>Rows may have different widths, use the odf_table API to ensure width
+consistency.</p>
+<p>Return: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.insert_cell">
+<tt class="descname">insert_cell</tt><big>(</big><em>coord</em>, <em>cell=None</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.insert_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert the given cell at the given coordinates. If no cell is
+given, an empty one is created.</p>
+<p>Coordinates are either a 2-uplet of (x, y) starting from 0, or a
+human-readable position like &#8220;C4&#8221;.</p>
+<p>Cells on the right are shifted. Other rows remain untouched.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; (int, int) or str</p>
+<p>cell &#8211; odf_cell</p>
+</blockquote>
+<p>returns the cell with x and y updated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.insert_column">
+<tt class="descname">insert_column</tt><big>(</big><em>x</em>, <em>column=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.insert_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert the column before the given &#8220;x&#8221; position. If no column is
+given, an empty one is created.</p>
+<p>ODF columns don&#8217;t contain cells, only style information.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str.isalpha()</p>
+<p>column &#8211; odf_column</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.insert_row">
+<tt class="descname">insert_row</tt><big>(</big><em>y</em>, <em>row=None</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.insert_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert the row before the given &#8220;y&#8221; position. If no row is given,
+an empty one is created.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>If row is None, a new empty row is created.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>y &#8211; int or str</p>
+<p>row &#8211; odf_row</p>
+</blockquote>
+<p>returns the row, with updated row.y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.is_column_empty">
+<tt class="descname">is_column_empty</tt><big>(</big><em>x</em>, <em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.is_column_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return wether every cell in the column at &#8220;x&#8221; position has no value
+or the value evaluates to False (empty string), and no style.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>If aggressive is True, empty cells with style are considered empty.</p>
+<p>Return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.is_empty">
+<tt class="descname">is_empty</tt><big>(</big><em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether every cell in the table has no value or the value
+evaluates to False (empty string), and no style.</p>
+<p>If aggressive is True, empty cells with style are considered empty.</p>
+<p>Arguments:</p>
+<blockquote>
+aggressive &#8211; bool</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.is_row_empty">
+<tt class="descname">is_row_empty</tt><big>(</big><em>y</em>, <em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.is_row_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return wether every cell in the row at the given &#8220;y&#8221; position has
+no value or the value evaluates to False (empty string), and no style.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>If aggressive is True, empty cells with style are considered empty.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>y &#8211; int or str</p>
+<p>aggressive &#8211; bool</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.iter_values">
+<tt class="descname">iter_values</tt><big>(</big><em>coord=None</em>, <em>cell_type=None</em>, <em>complete=True</em>, <em>get_type=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.iter_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate through lines of Python values of the table.</p>
+<p>Filter by coordinates will parse the area defined by the coordinates.</p>
+<p>cell_type, complete, grt_type : see get_values()</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; str or tuple of int : coordinates of area</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;float&#8217;, &#8216;date&#8217;, &#8216;string&#8217;, &#8216;time&#8217;,</dt>
+<dd>&#8216;currency&#8217;, &#8216;percentage&#8217; or &#8216;all&#8217;</dd>
+</dl>
+<p>complete &#8211; boolean</p>
+<p>get_type &#8211; boolean</p>
+</blockquote>
+<p>Return: iterator of lists</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.rstrip">
+<tt class="descname">rstrip</tt><big>(</big><em>aggressive=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.rstrip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove <em>in-place</em> empty rows below and empty cells at the right of
+the table. Cells are empty if they contain no value or it evaluates
+to False, and no style.</p>
+<p>If aggressive is True, empty cells with style are removed too.</p>
+<p>Argument:</p>
+<blockquote>
+aggressive &#8211; bool</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.rstrip_table">
+<tt class="descname">rstrip_table</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.rstrip_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_cell">
+<tt class="descname">set_cell</tt><big>(</big><em>coord</em>, <em>cell=None</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace a cell of the table at the given coordinates.</p>
+<p>They are either a 2-uplet of (x, y) starting from 0, or a
+human-readable position like &#8220;C4&#8221;.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; (int, int) or str : coordinate</p>
+<p>cell &#8211; odf_cell</p>
+</blockquote>
+<p>return the cell, with x and y updated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_cell_image">
+<tt class="descname">set_cell_image</tt><big>(</big><em>coord</em>, <em>image_frame</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_cell_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do all the magic to display an image in the cell at the given
+coordinates.</p>
+<p>They are either a 2-uplet of (x, y) starting from 0, or a
+human-readable position like &#8220;C4&#8221;.</p>
+<p>The frame element must contain the expected image position and
+dimensions.</p>
+<p>Image insertion depends on the document type, so the type must be
+provided or the table element must be already attached to a document.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; (int, int) or str</p>
+<p>image_frame &#8211; odf_frame including an image</p>
+<p>type &#8211; &#8216;spreadsheet&#8217; or &#8216;text&#8217;</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_cells">
+<tt class="descname">set_cells</tt><big>(</big><em>cells</em>, <em>coord=None</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the cells in the table, from the &#8216;coord&#8217; position.</p>
+<p>&#8216;coord&#8217; is the coordinate of the upper left cell to be modified by
+values. If &#8216;coord&#8217; is None, default to the position (0,0) (&#8220;A1&#8221;).
+If &#8216;coord&#8217; is an area (e.g. &#8220;A2:B5&#8221;), the upper left position of this
+area is used as coordinate.</p>
+<p>The table is <em>not</em> cleared before the operation, to reset the table
+before setting cells, use table.clear().</p>
+<p>A list of lists is expected, with as many lists as rows to be set, and
+as many cell in each sublist as cells to be setted in the row.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>cells &#8211; cell object</p>
+<p>coord &#8211; tuple or str</p>
+<p>values &#8211; list of lists of python types</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_column">
+<tt class="descname">set_column</tt><big>(</big><em>x</em>, <em>column=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the column at the given &#8220;x&#8221; position.</p>
+<p>ODF columns don&#8217;t contain cells, only style information.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str.isalpha()</p>
+<p>column &#8211; odf_column</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_column_cells">
+<tt class="descname">set_column_cells</tt><big>(</big><em>x</em>, <em>cells</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_column_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to set the list of cells at the given position.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>The list must have the same length than the table height.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str.isalpha()</p>
+<p>cells &#8211; list of odf_cell</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_column_values">
+<tt class="descname">set_column_values</tt><big>(</big><em>x</em>, <em>values</em>, <em>cell_type=None</em>, <em>currency=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_column_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to set the list of Python values of cells at the given
+position.</p>
+<p>Position start at 0. So cell C4 is on column 2. Alphabetical position
+like &#8220;C&#8221; is accepted.</p>
+<p>The list must have the same length than the table height.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>x &#8211; int or str.isalpha()</p>
+<p>values &#8211; list of Python types</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;, &#8216;percentage&#8217;,</dt>
+<dd>&#8216;string&#8217; or &#8216;time&#8217;</dd>
+</dl>
+<p>currency &#8211; three-letter str</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_displayed">
+<tt class="descname">set_displayed</tt><big>(</big><em>display</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_displayed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_name">
+<tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_print_ranges">
+<tt class="descname">set_print_ranges</tt><big>(</big><em>print_ranges</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_print_ranges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_printable">
+<tt class="descname">set_printable</tt><big>(</big><em>printable</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_printable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_protected">
+<tt class="descname">set_protected</tt><big>(</big><em>protect</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_protected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_row">
+<tt class="descname">set_row</tt><big>(</big><em>y</em>, <em>row=None</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the row at the given position with the new one. Repetions of
+the old row will be adjusted.</p>
+<p>If row is None, a new empty row is created.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>y &#8211; int</p>
+<p>row &#8211; odf_row</p>
+</blockquote>
+<p>returns the row, with updated row.y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_row_cells">
+<tt class="descname">set_row_cells</tt><big>(</big><em>y</em>, <em>cells=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_row_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to set <em>all</em> the cells of the row at the given
+&#8220;y&#8221; position.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>y &#8211; int or str</p>
+<p>cells &#8211; list of Python types</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>returns the row, with updated row.y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_row_values">
+<tt class="descname">set_row_values</tt><big>(</big><em>y</em>, <em>values</em>, <em>cell_type=None</em>, <em>currency=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_row_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to set the values of <em>all</em> cells of the row at the given
+&#8220;y&#8221; position.</p>
+<p>Position start at 0. So cell A4 is on row 3.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>y &#8211; int or str</p>
+<p>values &#8211; list of Python types</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;, &#8216;percentage&#8217;,</dt>
+<dd>&#8216;string&#8217; or &#8216;time&#8217;</dd>
+</dl>
+<p>currency &#8211; three-letter str</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>returns the row, with updated row.y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_style">
+<tt class="descname">set_style</tt><big>(</big><em>style</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_table_style">
+<tt class="descname">set_table_style</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_table_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_table_values">
+<tt class="descname">set_table_values</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_table_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_value">
+<tt class="descname">set_value</tt><big>(</big><em>coord</em>, <em>value</em>, <em>cell_type=None</em>, <em>currency=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the Python value of the cell at the given coordinates.</p>
+<p>They are either a 2-uplet of (x, y) starting from 0, or a
+human-readable position like &#8220;C4&#8221;.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; (int, int) or str</p>
+<p>value &#8211; Python type</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;, &#8216;percentage&#8217;,</dt>
+<dd>&#8216;string&#8217; or &#8216;time&#8217;</dd>
+</dl>
+<p>currency &#8211; three-letter str</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.set_values">
+<tt class="descname">set_values</tt><big>(</big><em>values</em>, <em>coord=None</em>, <em>style=None</em>, <em>cell_type=None</em>, <em>currency=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the value of cells in the table, from the &#8216;coord&#8217; position
+with values.</p>
+<p>&#8216;coord&#8217; is the coordinate of the upper left cell to be modified by
+values. If &#8216;coord&#8217; is None, default to the position (0,0) (&#8220;A1&#8221;).
+If &#8216;coord&#8217; is an area (e.g. &#8220;A2:B5&#8221;), the upper left position of this
+area is used as coordinate.</p>
+<p>The table is <em>not</em> cleared before the operation, to reset the table
+before setting values, use table.clear().</p>
+<p>A list of lists is expected, with as many lists as rows, and as many
+items in each sublist as cells to be setted. None values in the list
+will create empty cells with no cell type (but eventually a style).</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; tuple or str</p>
+<p>values &#8211; list of lists of python types</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;, &#8216;percentage&#8217;,</dt>
+<dd>&#8216;string&#8217; or &#8216;time&#8217;</dd>
+</dl>
+<p>currency &#8211; three-letter str</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.to_csv">
+<tt class="descname">to_csv</tt><big>(</big><em>path_or_file=None</em>, <em>delimiter='</em>, <em>'</em>, <em>quotechar='&quot;'</em>, <em>lineterminator='n'</em>, <em>encoding='utf-8'</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the table as CSV in the file. If the file is a string, it is
+opened as a local path. Else a open file-like is expected; it will not
+be closed afterwards.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>path_or_file &#8211; str or file-like</p>
+<p>delimiter &#8211; str</p>
+<p>quotechar &#8211; str</p>
+<p>lineterminator &#8211; str</p>
+<p>encoding &#8211; str</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.transpose">
+<tt class="descname">transpose</tt><big>(</big><em>coord=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Swap <em>in-place</em> rows and columns of the table.</p>
+<p>If &#8216;coord&#8217; is not None, apply transpose only to the area defined by the
+coordinates. Beware, if area is not square, some cells mays be over
+written during the process.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>coord &#8211; str or tuple of int : coordinates of area</p>
+<p>start &#8211; int or str</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.traverse">
+<tt class="descname">traverse</tt><big>(</big><em>start=None</em>, <em>end=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.traverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield as many row elements as expected rows in the table, i.e.
+expand repetitions by returning the same row as many times as
+necessary.</p>
+<blockquote>
+<p>Arguments:</p>
+<blockquote>
+<p>start &#8211; int</p>
+<p>end &#8211; int</p>
+</blockquote>
+</blockquote>
+<p>Copies are returned, use <tt class="docutils literal"><span class="pre">set_row</span></tt> to push them back.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.table.odf_table.traverse_columns">
+<tt class="descname">traverse_columns</tt><big>(</big><em>start=None</em>, <em>end=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.traverse_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield as many column elements as expected columns in the table,
+i.e. expand repetitions by returning the same column as many times as
+necessary.</p>
+<blockquote>
+<p>Arguments:</p>
+<blockquote>
+<p>start &#8211; int</p>
+<p>end &#8211; int</p>
+</blockquote>
+</blockquote>
+<p>Copies are returned, use <tt class="docutils literal"><span class="pre">set_column</span></tt> to push them back.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.table.import_from_csv">
+<tt class="descclassname">lpod.table.</tt><tt class="descname">import_from_csv</tt><big>(</big><em>path_or_file</em>, <em>name</em>, <em>style=None</em>, <em>delimiter=None</em>, <em>quotechar=None</em>, <em>lineterminator=None</em>, <em>encoding='utf-8'</em><big>)</big><a class="headerlink" href="#lpod.table.import_from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the CSV file to an odf_table. If the file is a string, it is
+opened as a local path. Else a open file-like is expected; it will not be
+closed afterwards.</p>
+<p>CSV format can be autodetected to a certain limit, but encoding is
+important.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>path_or_file &#8211; str or file-like</p>
+<p>name &#8211; unicode</p>
+<p>style &#8211; str</p>
+<p>delimiter &#8211; str</p>
+<p>quotechar &#8211; str</p>
+<p>lineterminator &#8211; str</p>
+<p>encoding &#8211; str</p>
+</blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.table.odf_create_cell">
+<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_cell</tt><big>(</big><em>value=None</em>, <em>text=None</em>, <em>cell_type=None</em>, <em>currency=None</em>, <em>formula=None</em>, <em>repeated=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a cell element containing the given value. The textual
+representation is automatically formatted but can be provided. Cell type
+can be deduced as well, unless the number is a percentage or currency. If
+cell type is &#8220;currency&#8221;, the currency must be given. The cell can be
+repeated on the given number of columns.</p>
+<p>Arguments:</p>
+<blockquote>
+<dl class="docutils">
+<dt>value &#8211; bool, int, float, Decimal, date, datetime, str, unicode,</dt>
+<dd>timedelta</dd>
+</dl>
+<p>text &#8211; unicode</p>
+<dl class="docutils">
+<dt>cell_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;, &#8216;percentage&#8217;,</dt>
+<dd>&#8216;string&#8217; or &#8216;time&#8217;</dd>
+</dl>
+<p>currency &#8211; three-letter str</p>
+<p>repeated &#8211; int</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_cell</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.table.odf_create_column">
+<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_column</tt><big>(</big><em>default_cell_style=None</em>, <em>repeated=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column group element of the optionally given style. Cell
+style can be set for the whole column. If the properties apply to several
+columns, give the number of repeated columns.</p>
+<p>Columns don&#8217;t contain cells, just style information.</p>
+<p>You don&#8217;t generally have to create columns by hand, use the odf_table API.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>default_cell_style &#8211; unicode</p>
+<p>repeated &#8211; int</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_column</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.table.odf_create_header_rows">
+<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_header_rows</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.table.odf_create_header_rows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="lpod.table.odf_create_row">
+<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_row</tt><big>(</big><em>width=None</em>, <em>repeated=None</em>, <em>style=None</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a row element, optionally filled with &#8220;width&#8221; number of cells.</p>
+<p>Rows contain cells, their number determine the number of columns.</p>
+<p>You don&#8217;t generally have to create rows by hand, use the odf_table API.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>width &#8211; int</p>
+<p>repeated &#8211; int</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_row</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.table.odf_create_row_group">
+<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_row_group</tt><big>(</big><em>height=None</em>, <em>width=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_row_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a group of rows, optionnaly filled with &#8220;height&#8221; number of rows,
+of &#8220;width&#8221; cells each.</p>
+<p>Row group bear style information applied to a series of rows.</p>
+<p>Arguments:</p>
+<blockquote>
+height &#8211; int</blockquote>
+<p>Return odf_row_group</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.table.odf_create_table">
+<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_table</tt><big>(</big><em>name</em>, <em>width=None</em>, <em>height=None</em>, <em>protected=False</em>, <em>protection_key=None</em>, <em>display=True</em>, <em>printable=True</em>, <em>print_ranges=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a table element, optionally prefilled with &#8220;height&#8221; rows of
+&#8220;width&#8221; cells each.</p>
+<p>If the table is to be protected, a protection key must be provided, i.e. a
+hash value of the password (XXX what algorithm?).</p>
+<p>If the table must not be displayed, set &#8220;display&#8221; to False.</p>
+<p>If the table must not be printed, set &#8220;printable&#8221; to False. The table will
+not be printed when it is not displayed, whatever the value of this
+argument.</p>
+<p>Ranges of cells to print can be provided as a list of cell ranges, e.g.
+[&#8216;E6:K12&#8217;, &#8216;P6:R12&#8217;] or directly as a raw string, e.g. &#8220;E6:K12 P6:R12&#8221;.</p>
+<p>You can access and modify the XML tree manually, but you probably want to
+use the API to access and alter cells. It will save you from handling
+repetitions and the same number of cells for each row.</p>
+<p>If you use both the table API and the XML API, you are on your own for
+ensuiring model integrity.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>name &#8211; unicode</p>
+<p>width &#8211; int</p>
+<p>height &#8211; int</p>
+<p>protected &#8211; bool</p>
+<p>protection_key &#8211; str</p>
+<p>display &#8211; bool</p>
+<p>printable &#8211; bool</p>
+<p>print_ranges &#8211; list</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_table</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="styles.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.styles</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="toc.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.toc</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/table.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="toc.html" title="lpod.toc"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="styles.html" title="lpod.styles"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+:mod:`lpod.table`
+##############################################
+.. automodule:: lpod.table
+   :synopsis: Lpod table module
+   :show-inheritance:
+   :members:
+   :undoc-members:

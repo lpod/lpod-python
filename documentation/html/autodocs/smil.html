@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.smil &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.span" href="span.html" />
+    <link rel="prev" title="lpod.shapes" href="shapes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="span.html" title="lpod.span"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="shapes.html" title="lpod.shapes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.smil">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.smil</span></tt><a class="headerlink" href="#module-lpod.smil" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of SMIL</p>
+<p>We can find more informations here: <a class="reference external" href="http://www.w3.org/TR/SMIL20/">http://www.w3.org/TR/SMIL20/</a></p>
+<dl class="function">
+<dt id="lpod.smil.odf_create_anim_par">
+<tt class="descclassname">lpod.smil.</tt><tt class="descname">odf_create_anim_par</tt><big>(</big><em>presentation_node_type=None</em>, <em>smil_begin=None</em><big>)</big><a class="headerlink" href="#lpod.smil.odf_create_anim_par" title="Permalink to this definition">¶</a></dt>
+<dd><p>This element is a container for SMIL Presentation Animations.</p>
+<p>Arguments:</p>
+<blockquote>
+<dl class="docutils">
+<dt>presentation_node_type &#8211; default, on-click, with-previous,</dt>
+<dd>after-previous, timing-root, main-sequence
+and interactive-sequence</dd>
+</dl>
+<p>smil_begin &#8211; indefinite, 10s, [id].click, [id].begin</p>
+</blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.smil.odf_create_anim_seq">
+<tt class="descclassname">lpod.smil.</tt><tt class="descname">odf_create_anim_seq</tt><big>(</big><em>presentation_node_type=None</em><big>)</big><a class="headerlink" href="#lpod.smil.odf_create_anim_seq" title="Permalink to this definition">¶</a></dt>
+<dd><p>This element is a container for SMIL Presentation Animations. Animations
+inside this block are executed after the slide has executed its initial
+transition.</p>
+<p>Arguments:</p>
+<blockquote>
+<dl class="docutils">
+<dt>presentation_node_type &#8211; default, on-click, with-previous,</dt>
+<dd>after-previous, timing-root, main-sequence
+and interactive-sequence</dd>
+</dl>
+</blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.smil.odf_create_anim_transitionFilter">
+<tt class="descclassname">lpod.smil.</tt><tt class="descname">odf_create_anim_transitionFilter</tt><big>(</big><em>smil_dur=None</em>, <em>smil_type=None</em>, <em>smil_subtype=None</em>, <em>smil_direction=None</em>, <em>smil_fadeColor=None</em>, <em>smil_mode=None</em><big>)</big><a class="headerlink" href="#lpod.smil.odf_create_anim_transitionFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to make a beautiful transition between two frames.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>smil_dur &#8211; XXX complete me
+smil_type and smil_subtype &#8211; see <a class="reference external" href="http://www.w3.org/TR/SMIL20/smil-transitions.html#TransitionEffects-Appendix">http://www.w3.org/TR/SMIL20/smil-transitions.html#TransitionEffects-Appendix</a> to get a list of all types/subtypes
+smil_direction &#8211; forward, reverse
+smil_fadeColor &#8211; forward, reverse
+smil_mode &#8211; in, out</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="shapes.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.shapes</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="span.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.span</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/smil.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="span.html" title="lpod.span"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="shapes.html" title="lpod.shapes"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

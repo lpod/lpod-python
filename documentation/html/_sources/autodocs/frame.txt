@@ -1,0 +1,7 @@
+:mod:`lpod.frame`
+##############################################
+.. automodule:: lpod.frame
+   :synopsis: Lpod frame module
+   :show-inheritance:
+   :members:
+   :undoc-members:

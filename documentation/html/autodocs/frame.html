@@ -1,0 +1,401 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.frame &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.future" href="future.html" />
+    <link rel="prev" title="lpod.experimental" href="experimental.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="future.html" title="lpod.future"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="experimental.html" title="lpod.experimental"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.frame">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.frame</span></tt><a class="headerlink" href="#module-lpod.frame" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.frame.odf_frame">
+<em class="property">class </em><tt class="descclassname">lpod.frame.</tt><tt class="descname">odf_frame</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.element.odf_element" class="reference external" href="element.html#lpod.element.odf_element"><tt class="xref docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_anchor_type">
+<tt class="descname">get_anchor_type</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_anchor_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get how the frame is attached to its environment.</p>
+<p>Return: &#8216;page&#8217;, &#8216;frame&#8217;, &#8216;paragraph&#8217;, &#8216;char&#8217; or &#8216;as-char&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_formatted_text">
+<tt class="descname">get_formatted_text</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_formatted_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_id">
+<tt class="descname">get_id</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_image">
+<tt class="descname">get_image</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_layer">
+<tt class="descname">get_layer</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_page_number">
+<tt class="descname">get_page_number</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_page_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of the page where the frame is attached when the
+anchor type is &#8216;page&#8217;.</p>
+<p>Return: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_position">
+<tt class="descname">get_position</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the position of the frame relative to its anchor
+point.</p>
+<p>Position is a (left, top) tuple with items including the unit,
+e.g. (&#8216;10cm&#8217;, &#8216;15cm&#8217;).</p>
+<p>Return: (str, str)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_presentation_class">
+<tt class="descname">get_presentation_class</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_presentation_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_presentation_style">
+<tt class="descname">get_presentation_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_presentation_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_size">
+<tt class="descname">get_size</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the size of the frame.</p>
+<p>Size is a (width, height) tuple with items including the unit,
+e.g. (&#8216;10cm&#8217;, &#8216;15cm&#8217;).</p>
+<p>Return: (str, str)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_style">
+<tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_text_box">
+<tt class="descname">get_text_box</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_text_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_text_content">
+<tt class="descname">get_text_content</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_text_content" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.get_z_index">
+<tt class="descname">get_z_index</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.get_z_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_anchor_type">
+<tt class="descname">set_anchor_type</tt><big>(</big><em>anchor_type</em>, <em>page_number=None</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_anchor_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set how the frame is attached to its environment.</p>
+<p>When the type is &#8216;page&#8217;, you can give the number of the page where to
+attach.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>anchor_type &#8211; &#8216;page&#8217;, &#8216;frame&#8217;, &#8216;paragraph&#8217;, &#8216;char&#8217; or &#8216;as-char&#8217;</p>
+<p>page_number &#8211; int (when anchor_type == &#8216;page&#8217;)</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_frame_anchor_type">
+<tt class="descname">set_frame_anchor_type</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_frame_anchor_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_id">
+<tt class="descname">set_id</tt><big>(</big><em>frame_id</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_image">
+<tt class="descname">set_image</tt><big>(</big><em>url_or_element</em>, <em>text=None</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_layer">
+<tt class="descname">set_layer</tt><big>(</big><em>layer</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_name">
+<tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_page_number">
+<tt class="descname">set_page_number</tt><big>(</big><em>page_number</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_page_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the number of the page where the frame is attached when the
+anchor type is &#8216;page&#8217;, or None to delete it</p>
+<p>Arguments:</p>
+<blockquote>
+page_number &#8211; int or None</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_position">
+<tt class="descname">set_position</tt><big>(</big><em>position</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the position of the frame relative to its anchor
+point.</p>
+<p>Position is a (left, top) tuple with items including the unit,
+e.g. (&#8216;10cm&#8217;, &#8216;15cm&#8217;).</p>
+<p>Arguments:</p>
+<blockquote>
+position &#8211; (str, str)</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_presentation_class">
+<tt class="descname">set_presentation_class</tt><big>(</big><em>presentation_class</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_presentation_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_presentation_style">
+<tt class="descname">set_presentation_style</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_presentation_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_size">
+<tt class="descname">set_size</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the size of the frame.</p>
+<p>Size is a (width, height) tuple with items including the unit,
+e.g. (&#8216;10cm&#8217;, &#8216;15cm&#8217;). The dimensions can be None.</p>
+<p>Arguments:</p>
+<blockquote>
+size &#8211; (str, str)</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_style">
+<tt class="descname">set_style</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_text_box">
+<tt class="descname">set_text_box</tt><big>(</big><em>text_or_element=None</em>, <em>text_style=None</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_text_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_text_content">
+<tt class="descname">set_text_content</tt><big>(</big><em>text_or_element</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_text_content" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.frame.odf_frame.set_z_index">
+<tt class="descname">set_z_index</tt><big>(</big><em>z_index</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_frame.set_z_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.frame.odf_create_frame">
+<tt class="descclassname">lpod.frame.</tt><tt class="descname">odf_create_frame</tt><big>(</big><em>name=None</em>, <em>draw_id=None</em>, <em>style=None</em>, <em>position=None</em>, <em>size=('1cm'</em>, <em>'1cm')</em>, <em>z_index=0</em>, <em>presentation_class=None</em>, <em>anchor_type=None</em>, <em>page_number=None</em>, <em>layer=None</em>, <em>presentation_style=None</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_create_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a frame element of the given size. Position is relative to the
+context the frame is inserted in. If positioned by page, give the page
+number and the x, y position.</p>
+<p>Size is a (width, height) tuple and position is a (left, top) tuple; items
+are strings including the unit, e.g. (&#8216;10cm&#8217;, &#8216;15cm&#8217;).</p>
+<p>Frames are not useful by themselves. You should consider calling
+odf_create_image_frame or odf_create_text_frame directly.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>name &#8211; unicode</p>
+<p>draw_id &#8211; unicode</p>
+<p>style &#8211; unicode</p>
+<p>position &#8211; (str, str)</p>
+<p>size &#8211; (str, str)</p>
+<p>z_index &#8211; int (default 0)</p>
+<p>presentation_class &#8211; unicode</p>
+<p>anchor_type &#8211; &#8216;page&#8217;, &#8216;frame&#8217;, &#8216;paragraph&#8217;, &#8216;char&#8217; or &#8216;as-char&#8217;</p>
+<p>page_number (anchor_type=&#8217;page&#8217;) &#8211; int</p>
+<p>layer &#8211; unicode</p>
+<p>presentation_style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_frame</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.frame.odf_create_frame_position_style">
+<tt class="descclassname">lpod.frame.</tt><tt class="descname">odf_create_frame_position_style</tt><big>(</big><em>name=u'FramePosition'</em>, <em>horizontal_pos='from-left'</em>, <em>vertical_pos='from-top'</em>, <em>horizontal_rel='paragraph'</em>, <em>vertical_rel='paragraph'</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_create_frame_position_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper style for positioning frames in desktop applications that need
+it.</p>
+<p>Default arguments should be enough.</p>
+<p>Use the return value as the frame style or build a new graphic style with
+this style as the parent.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.frame.odf_create_image_frame">
+<tt class="descclassname">lpod.frame.</tt><tt class="descname">odf_create_image_frame</tt><big>(</big><em>url</em>, <em>text=None</em>, <em>name=None</em>, <em>draw_id=None</em>, <em>style=None</em>, <em>position=None</em>, <em>size=('1cm'</em>, <em>'1cm')</em>, <em>z_index=0</em>, <em>presentation_class=None</em>, <em>anchor_type=None</em>, <em>page_number=None</em>, <em>layer=None</em>, <em>presentation_style=None</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_create_image_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ready-to-use image, since it must be embedded in a
+frame.</p>
+<p>The optionnal text will appear above the image.</p>
+<p>Size is a (width, height) tuple and position is a (left, top) tuple;
+items are strings including the unit, e.g. (&#8216;21cm&#8217;, &#8216;29.7cm&#8217;).</p>
+<p>Arguments:</p>
+<blockquote>
+<p>url &#8211; str</p>
+<p>text &#8211; unicode</p>
+<p>name &#8211; unicode</p>
+<p>draw_id &#8211; unicode</p>
+<p>style &#8211; unicode</p>
+<p>position &#8211; (str, str)</p>
+<p>size &#8211; (str, str)</p>
+<p>z_index &#8211; int (default 0)</p>
+<p>presentation_class &#8211; unicode</p>
+<p>anchor_type &#8211; &#8216;page&#8217;, &#8216;frame&#8217;, &#8216;paragraph&#8217;, &#8216;char&#8217; or &#8216;as-char&#8217;</p>
+<p>page_number (anchor_type=&#8217;page&#8217;) &#8211; int</p>
+<p>layer &#8211; unicode</p>
+<p>presentation_style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_frame</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.frame.odf_create_text_frame">
+<tt class="descclassname">lpod.frame.</tt><tt class="descname">odf_create_text_frame</tt><big>(</big><em>text_or_element=None</em>, <em>text_style=None</em>, <em>name=None</em>, <em>draw_id=None</em>, <em>style=None</em>, <em>position=None</em>, <em>size=('1cm'</em>, <em>'1cm')</em>, <em>z_index=0</em>, <em>presentation_class=None</em>, <em>anchor_type=None</em>, <em>page_number=None</em>, <em>layer=None</em>, <em>presentation_style=None</em><big>)</big><a class="headerlink" href="#lpod.frame.odf_create_text_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ready-to-use text box, since it must be embedded in a frame.</p>
+<p>Size is a (width, height) tuple and position is a (left, top) tuple;
+items are strings including the unit, e.g. (&#8216;21cm&#8217;, &#8216;29.7cm&#8217;).</p>
+<p>Arguments:</p>
+<blockquote>
+<p>text_or_element &#8211; unicode or odf_element</p>
+<p>text_style &#8211; unicode</p>
+<p>name &#8211; unicode</p>
+<p>draw_id &#8211; unicode</p>
+<p>style &#8211; unicode</p>
+<p>position &#8211; (str, str)</p>
+<p>size &#8211; (str, str)</p>
+<p>z_index &#8211; int (default 0)</p>
+<p>presentation_class &#8211; unicode</p>
+<p>anchor_type &#8211; &#8216;page&#8217;, &#8216;frame&#8217;, &#8216;paragraph&#8217;, &#8216;char&#8217; or &#8216;as-char&#8217;</p>
+<p>page_number (anchor_type=&#8217;page&#8217;) &#8211; int</p>
+<p>layer &#8211; unicode</p>
+<p>presentation_style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_frame</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="experimental.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.experimental</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="future.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.future</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/frame.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="future.html" title="lpod.future"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="experimental.html" title="lpod.experimental"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

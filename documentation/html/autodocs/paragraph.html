@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.paragraph &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.reference" href="reference.html" />
+    <link rel="prev" title="lpod.note" href="note.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="lpod.reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="note.html" title="lpod.note"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.paragraph">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.paragraph</span></tt><a class="headerlink" href="#module-lpod.paragraph" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.paragraph.odf_paragraph">
+<em class="property">class </em><tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_paragraph</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.element.odf_element" class="reference external" href="element.html#lpod.element.odf_element"><tt class="xref docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>Specialised element for paragraphs.</p>
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.get_formatted_text">
+<tt class="descname">get_formatted_text</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.get_formatted_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.get_style">
+<tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.get_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.get_text_style">
+<tt class="descname">get_text_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.get_text_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.insert_annotation">
+<tt class="descname">insert_annotation</tt><big>(</big><em>annotation_element=None</em>, <em>after=None</em>, <em>body=None</em>, <em>creator=None</em>, <em>date=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_annotation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.insert_note">
+<tt class="descname">insert_note</tt><big>(</big><em>note_element=None</em>, <em>after=None</em>, <em>note_class='footnote'</em>, <em>note_id=None</em>, <em>citation=None</em>, <em>body=None</em>, <em>*args</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_note" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.insert_variable">
+<tt class="descname">insert_variable</tt><big>(</big><em>variable_element</em>, <em>after</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.set_bookmark">
+<tt class="descname">set_bookmark</tt><big>(</big><em>name</em>, <em>before=None</em>, <em>after=None</em>, <em>position=0</em>, <em>role=None</em>, <em>content=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_bookmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a bookmark before or after the characters in the text which
+match the regex before/after. When the regex matches more of one part
+of the text, position can be set to choose which part must be used.
+If before and after are None, we use only position that is the number
+of characters. So, by default, this function inserts a bookmark
+before the first character of the content. Role can be None, &#8220;start&#8221;
+or &#8220;end&#8221;, we insert respectively a position bookmark a bookmark-start
+or a bookmark-end. If content is not None these 2 calls are
+equivalent:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">paragraph</span><span class="o">.</span><span class="n">set_bookmark</span><span class="p">(</span><span class="s">&quot;bookmark&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s">&quot;xyz&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">paragraph</span><span class="o">.</span><span class="n">set_bookmark</span><span class="p">(</span><span class="s">&quot;bookmark&quot;</span><span class="p">,</span> <span class="n">before</span><span class="o">=</span><span class="s">&quot;xyz&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s">&quot;start&quot;</span><span class="p">)</span>
+<span class="n">paragraph</span><span class="o">.</span><span class="n">set_bookmark</span><span class="p">(</span><span class="s">&quot;bookmark&quot;</span><span class="p">,</span> <span class="n">after</span><span class="o">=</span><span class="s">&quot;xyz&quot;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s">&quot;end&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If position is a 2-tuple, these 2 calls are equivalent:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">paragraph</span><span class="o">.</span><span class="n">set_bookmark</span><span class="p">(</span><span class="s">&quot;bookmark&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>and:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">paragraph</span><span class="o">.</span><span class="n">set_bookmark</span><span class="p">(</span><span class="s">&quot;bookmark&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s">&quot;start&quot;</span><span class="p">)</span>
+<span class="n">paragraph</span><span class="o">.</span><span class="n">set_bookmark</span><span class="p">(</span><span class="s">&quot;bookmark&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s">&quot;end&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments:</p>
+<blockquote>
+<p>name &#8211; str</p>
+<p>before &#8211; unicode regex</p>
+<p>after &#8211; unicode regex</p>
+<p>position &#8211; int or (int, int)</p>
+<p>role &#8211; None, &#8220;start&#8221; or &#8220;end&#8221;</p>
+<p>content &#8211; unicode regex</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.set_link">
+<tt class="descname">set_link</tt><big>(</big><em>url</em>, <em>regex=None</em>, <em>offset=None</em>, <em>length=0</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_link" title="Permalink to this definition">¶</a></dt>
+<dd>Make a link from text content matching the regex OR the positional
+arguments.</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.set_span">
+<tt class="descname">set_span</tt><big>(</big><em>style</em>, <em>regex=None</em>, <em>offset=None</em>, <em>length=0</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_span" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the given style to text content matching the regex OR the
+positional arguments offset and length.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>style &#8211; style element or name</p>
+<p>regex &#8211; unicode regular expression</p>
+<p>offset &#8211; int</p>
+<p>length &#8211; int</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.set_style">
+<tt class="descname">set_style</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.set_text_style">
+<tt class="descname">set_text_style</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_text_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.paragraph.odf_create_line_break">
+<tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_create_line_break</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_create_line_break" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="lpod.paragraph.odf_create_paragraph">
+<tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_create_paragraph</tt><big>(</big><em>text_or_element=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_create_paragraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a paragraph element of the given style containing the optional
+given text.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>text &#8211; unicode or odf_element</p>
+<p>style &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_element</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.paragraph.odf_create_undividable_space">
+<tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_create_undividable_space</tt><big>(</big><em>number=1</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_create_undividable_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Arguments:</p>
+<blockquote>
+number &#8211; int</blockquote>
+<p>Return odf_element</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="note.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.note</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="reference.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.reference</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/paragraph.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="lpod.reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="note.html" title="lpod.note"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

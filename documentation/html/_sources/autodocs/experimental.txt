@@ -1,0 +1,10 @@
+:mod:`lpod.experimental`
+##############################################
+.. automodule:: lpod.experimental
+   :synopsis: 
+Loading his module activate the 'experimental' compatibility mode
+(aka experimental features)
+
+   :show-inheritance:
+   :members:
+   :undoc-members:

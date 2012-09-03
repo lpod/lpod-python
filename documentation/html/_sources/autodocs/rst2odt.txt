@@ -1,0 +1,7 @@
+:mod:`lpod.rst2odt`
+##############################################
+.. automodule:: lpod.rst2odt
+   :synopsis: Lpod rst2odt module
+   :show-inheritance:
+   :members:
+   :undoc-members:

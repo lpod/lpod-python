@@ -1,0 +1,9 @@
+:mod:`lpod.legacy`
+##############################################
+.. automodule:: lpod.legacy
+   :synopsis: 
+Loading his module activate the 'legacy' compatibility mode (aka versions 0.9.x)
+
+   :show-inheritance:
+   :members:
+   :undoc-members:

@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.styles &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.table" href="table.html" />
+    <link rel="prev" title="lpod.style" href="style.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="table.html" title="lpod.table"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="style.html" title="lpod.style"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.styles">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.styles</span></tt><a class="headerlink" href="#module-lpod.styles" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.styles.odf_styles">
+<em class="property">class </em><tt class="descclassname">lpod.styles.</tt><tt class="descname">odf_styles</tt><big>(</big><em>part_name</em>, <em>container</em><big>)</big><a class="headerlink" href="#lpod.styles.odf_styles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.xmlpart.odf_xmlpart" class="reference external" href="xmlpart.html#lpod.xmlpart.odf_xmlpart"><tt class="xref docutils literal"><span class="pre">lpod.xmlpart.odf_xmlpart</span></tt></a></p>
+<dl class="method">
+<dt id="lpod.styles.odf_styles.get_master_page">
+<tt class="descname">get_master_page</tt><big>(</big><em>position=0</em><big>)</big><a class="headerlink" href="#lpod.styles.odf_styles.get_master_page" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.styles.odf_styles.get_master_pages">
+<tt class="descname">get_master_pages</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.styles.odf_styles.get_master_pages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.styles.odf_styles.get_style">
+<tt class="descname">get_style</tt><big>(</big><em>family</em>, <em>name_or_element=None</em>, <em>display_name=None</em><big>)</big><a class="headerlink" href="#lpod.styles.odf_styles.get_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the style uniquely identified by the name/family pair. If
+the argument is already a style object, it will return it.</p>
+<p>If the name is None, the default style is fetched.</p>
+<p>If the name is not the internal name but the name you gave in the
+desktop application, use display_name instead.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>name_or_element &#8211; unicode, odf_style or None</p>
+<dl class="docutils">
+<dt>family &#8211; &#8216;paragraph&#8217;, &#8216;text&#8217;,  &#8216;graphic&#8217;, &#8216;table&#8217;, &#8216;list&#8217;,</dt>
+<dd>&#8216;number&#8217;, &#8216;page-layout&#8217;, &#8216;master-page&#8217;</dd>
+</dl>
+<p>display_name &#8211; unicode</p>
+</blockquote>
+<p>Return: odf_style or None if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.styles.odf_styles.get_style_list">
+<tt class="descname">get_style_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.styles.odf_styles.get_style_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.styles.odf_styles.get_styles">
+<tt class="descname">get_styles</tt><big>(</big><em>family=None</em>, <em>automatic=False</em><big>)</big><a class="headerlink" href="#lpod.styles.odf_styles.get_styles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of styles in the Content part, optionally limited
+to the given family.</p>
+<p>Arguments:</p>
+<blockquote>
+family &#8211; str</blockquote>
+<p>Return: list of odf_style</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="style.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.style</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="table.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.table</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/styles.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="table.html" title="lpod.table"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="style.html" title="lpod.style"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

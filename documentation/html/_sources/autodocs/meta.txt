@@ -1,0 +1,7 @@
+:mod:`lpod.meta`
+##############################################
+.. automodule:: lpod.meta
+   :synopsis: Lpod meta module
+   :show-inheritance:
+   :members:
+   :undoc-members:

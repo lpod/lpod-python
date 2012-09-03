@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.manifest &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.meta" href="meta.html" />
+    <link rel="prev" title="lpod.list" href="list.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="meta.html" title="lpod.meta"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="list.html" title="lpod.list"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.manifest">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.manifest</span></tt><a class="headerlink" href="#module-lpod.manifest" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.manifest.odf_manifest">
+<em class="property">class </em><tt class="descclassname">lpod.manifest.</tt><tt class="descname">odf_manifest</tt><big>(</big><em>part_name</em>, <em>container</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.xmlpart.odf_xmlpart" class="reference external" href="xmlpart.html#lpod.xmlpart.odf_xmlpart"><tt class="xref docutils literal"><span class="pre">lpod.xmlpart.odf_xmlpart</span></tt></a></p>
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.add_full_path">
+<tt class="descname">add_full_path</tt><big>(</big><em>full_path</em>, <em>media_type=''</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.add_full_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.del_full_path">
+<tt class="descname">del_full_path</tt><big>(</big><em>full_path</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.del_full_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.get_media_type">
+<tt class="descname">get_media_type</tt><big>(</big><em>full_path</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.get_media_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the media type of an existing path.</p>
+<p>Return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.get_path_list">
+<tt class="descname">get_path_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.get_path_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.get_path_media_list">
+<tt class="descname">get_path_media_list</tt><big>(</big><em>*dec_args</em>, <em>**dec_kw</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.get_path_media_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.get_path_medias">
+<tt class="descname">get_path_medias</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.get_path_medias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of (full_path, media_type) pairs in the manifest.</p>
+<p>Return: list of (unicode, str) tuples</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.get_paths">
+<tt class="descname">get_paths</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.get_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of full paths in the manifest.</p>
+<p>Return: list of unicode</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.manifest.odf_manifest.set_media_type">
+<tt class="descname">set_media_type</tt><big>(</big><em>full_path</em>, <em>media_type</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_manifest.set_media_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the media type of an existing path.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>full_path &#8211; unicode</p>
+<p>media_type &#8211; str</p>
+</blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.manifest.odf_create_file_entry">
+<tt class="descclassname">lpod.manifest.</tt><tt class="descname">odf_create_file_entry</tt><big>(</big><em>full_path</em>, <em>media_type</em><big>)</big><a class="headerlink" href="#lpod.manifest.odf_create_file_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="list.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.list</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="meta.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.meta</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/manifest.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="meta.html" title="lpod.meta"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="list.html" title="lpod.list"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

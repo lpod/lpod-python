@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.container &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.content" href="content.html" />
+    <link rel="prev" title="lpod.const" href="const.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="content.html" title="lpod.content"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="const.html" title="lpod.const"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.container">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.container</span></tt><a class="headerlink" href="#module-lpod.container" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.container.odf_container">
+<em class="property">class </em><tt class="descclassname">lpod.container.</tt><tt class="descname">odf_container</tt><big>(</big><em>path_or_file</em><big>)</big><a class="headerlink" href="#lpod.container.odf_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Representation of the ODF file.</p>
+<dl class="method">
+<dt id="lpod.container.odf_container.clone">
+<tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.container.odf_container.clone" title="Permalink to this definition">¶</a></dt>
+<dd>Make a copy of this container with no path.</dd></dl>
+
+<dl class="method">
+<dt id="lpod.container.odf_container.del_part">
+<tt class="descname">del_part</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#lpod.container.odf_container.del_part" title="Permalink to this definition">¶</a></dt>
+<dd>Mark a part for deletion.</dd></dl>
+
+<dl class="method">
+<dt id="lpod.container.odf_container.get_part">
+<tt class="descname">get_part</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#lpod.container.odf_container.get_part" title="Permalink to this definition">¶</a></dt>
+<dd>Get the bytes of a part of the ODF.</dd></dl>
+
+<dl class="method">
+<dt id="lpod.container.odf_container.get_parts">
+<tt class="descname">get_parts</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.container.odf_container.get_parts" title="Permalink to this definition">¶</a></dt>
+<dd>Get the list of members.</dd></dl>
+
+<dl class="method">
+<dt id="lpod.container.odf_container.save">
+<tt class="descname">save</tt><big>(</big><em>target=None</em>, <em>packaging=None</em>, <em>backup=False</em><big>)</big><a class="headerlink" href="#lpod.container.odf_container.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the container to the given target, a path or a file-like
+object.</p>
+<p>Package the output document in the same format than this document,
+unless &#8220;packaging&#8221; is different.</p>
+<p>Arguments:</p>
+<blockquote>
+<p>target &#8211; str or file-like</p>
+<p>packaging &#8211; &#8216;zip&#8217; or &#8216;flat&#8217;, or for debugging purpose &#8216;folder&#8217;</p>
+<p>backup &#8211; boolean</p>
+</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.container.odf_container.set_part">
+<tt class="descname">set_part</tt><big>(</big><em>path</em>, <em>data</em><big>)</big><a class="headerlink" href="#lpod.container.odf_container.set_part" title="Permalink to this definition">¶</a></dt>
+<dd>Replace or add a new part.</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.container.odf_get_container">
+<tt class="descclassname">lpod.container.</tt><tt class="descname">odf_get_container</tt><big>(</big><em>path_or_file</em><big>)</big><a class="headerlink" href="#lpod.container.odf_get_container" title="Permalink to this definition">¶</a></dt>
+<dd>Return an odf_container instance of the ODF document stored at the
+given local path or in the given (open) file-like object.</dd></dl>
+
+<dl class="function">
+<dt id="lpod.container.odf_new_container">
+<tt class="descclassname">lpod.container.</tt><tt class="descname">odf_new_container</tt><big>(</big><em>path_or_file</em><big>)</big><a class="headerlink" href="#lpod.container.odf_new_container" title="Permalink to this definition">¶</a></dt>
+<dd>Return an odf_container instance based on the given template.</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="const.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.const</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="content.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.content</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/container.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="content.html" title="lpod.content"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="const.html" title="lpod.const"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+:mod:`lpod.future`
+##############################################
+.. automodule:: lpod.future
+   :synopsis: 
+Loading his module activate the 'future' compatibility mode (aka versions 1.1+)
+
+   :show-inheritance:
+   :members:
+   :undoc-members:

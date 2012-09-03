@@ -1,0 +1,9 @@
+:mod:`lpod._flags`
+##############################################
+.. automodule:: lpod._flags
+   :synopsis: 
+Options flags management for Lpod. Internal use of the library.
+
+   :show-inheritance:
+   :members:
+   :undoc-members:

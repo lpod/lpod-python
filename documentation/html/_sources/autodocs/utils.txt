@@ -1,0 +1,7 @@
+:mod:`lpod.utils`
+##############################################
+.. automodule:: lpod.utils
+   :synopsis: Lpod utils module
+   :show-inheritance:
+   :members:
+   :undoc-members:

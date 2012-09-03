@@ -1,0 +1,7 @@
+:mod:`lpod.toc`
+##############################################
+.. automodule:: lpod.toc
+   :synopsis: Lpod toc module
+   :show-inheritance:
+   :members:
+   :undoc-members:

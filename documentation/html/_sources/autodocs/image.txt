@@ -1,0 +1,7 @@
+:mod:`lpod.image`
+##############################################
+.. automodule:: lpod.image
+   :synopsis: Lpod image module
+   :show-inheritance:
+   :members:
+   :undoc-members:

@@ -1,0 +1,7 @@
+:mod:`lpod.draw_page`
+##############################################
+.. automodule:: lpod.draw_page
+   :synopsis: Lpod draw_page module
+   :show-inheritance:
+   :members:
+   :undoc-members:

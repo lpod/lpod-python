@@ -1,0 +1,7 @@
+:mod:`lpod.tracked_changes`
+##############################################
+.. automodule:: lpod.tracked_changes
+   :synopsis: Lpod tracked_changes module
+   :show-inheritance:
+   :members:
+   :undoc-members:

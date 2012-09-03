@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lpod.meta &mdash; lpOD-python (version: current) documentation</title>
+    <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'current-stable-60-g27fffd7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
+    <link rel="up" title="lpod-python" href="../autodocs.html" />
+    <link rel="next" title="lpod.note" href="note.html" />
+    <link rel="prev" title="lpod.manifest" href="manifest.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="note.html" title="lpod.note"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="manifest.html" title="lpod.manifest"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lpod.meta">
+<h1><tt class="xref docutils literal"><span class="pre">lpod.meta</span></tt><a class="headerlink" href="#module-lpod.meta" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.meta.odf_meta">
+<em class="property">class </em><tt class="descclassname">lpod.meta.</tt><tt class="descname">odf_meta</tt><big>(</big><em>part_name</em>, <em>container</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="lpod.xmlpart.odf_xmlpart" class="reference external" href="xmlpart.html#lpod.xmlpart.odf_xmlpart"><tt class="xref docutils literal"><span class="pre">lpod.xmlpart.odf_xmlpart</span></tt></a></p>
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_comments">
+<tt class="descname">get_comments</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the description of the document. Also known as comments.</p>
+<p>Return: unicode (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_creation_date">
+<tt class="descname">get_creation_date</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_creation_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the creation date of the document.</p>
+<p>Return: datetime (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_creator">
+<tt class="descname">get_creator</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_creator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the creator of the document.</p>
+<p>Return: unicode (or None if inexistant)</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">get_creator</span><span class="p">()</span>
+<span class="go">Unknown</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_description">
+<tt class="descname">get_description</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the description of the document. Also known as comments.</p>
+<p>Return: unicode (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_editing_cycles">
+<tt class="descname">get_editing_cycles</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_editing_cycles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of times the document was edited, as reported by
+the generator.</p>
+<p>Return: int (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_editing_duration">
+<tt class="descname">get_editing_duration</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_editing_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the time the document was edited, as reported by the
+generator.</p>
+<p>Return: timedelta (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_generator">
+<tt class="descname">get_generator</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the signature of the software that generated this document.</p>
+<p>Return: unicode (or None if inexistant)</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">get_generator</span><span class="p">()</span>
+<span class="go">KOffice/2.0.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_initial_creator">
+<tt class="descname">get_initial_creator</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_initial_creator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the first creator of the document.</p>
+<p>Return: unicode (or None if inexistant)</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">get_initial_creator</span><span class="p">()</span>
+<span class="go">Unknown</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_keywords">
+<tt class="descname">get_keywords</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_keywords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the keywords of the document. Return the field as-is, without
+any assumption on the keyword separator.</p>
+<p>Return: unicode (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_language">
+<tt class="descname">get_language</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_language" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the language code of the document.</p>
+<p>Return: str (or None if inexistant)</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">get_language</span><span class="p">()</span>
+<span class="go">fr-FR</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_meta_body">
+<tt class="descname">get_meta_body</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_meta_body" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_modification_date">
+<tt class="descname">get_modification_date</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_modification_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the last modified date of the document.</p>
+<p>Return: datetime (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_statistic">
+<tt class="descname">get_statistic</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the statistic from the software that generated this document.</p>
+<p>Return: dict (or None if inexistant)</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">get_statistic</span><span class="p">():</span>
+<span class="go">{&#39;meta:table-count&#39;: 1,</span>
+<span class="go"> &#39;meta:image-count&#39;: 2,</span>
+<span class="go"> &#39;meta:object-count&#39;: 3,</span>
+<span class="go"> &#39;meta:page-count&#39;: 4,</span>
+<span class="go"> &#39;meta:paragraph-count&#39;: 5,</span>
+<span class="go"> &#39;meta:word-count&#39;: 6,</span>
+<span class="go"> &#39;meta:character-count&#39;: 7}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_subject">
+<tt class="descname">get_subject</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_subject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the subject of the document.</p>
+<p>Return: unicode (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_title">
+<tt class="descname">get_title</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the title of the document.</p>
+<p>This is not the first heading but the title metadata.</p>
+<p>Return: unicode (or None if inexistant)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.get_user_defined_metadata">
+<tt class="descname">get_user_defined_metadata</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.get_user_defined_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dict of unicode/value mapping.</p>
+<p>Value types can be: Decimal, date, time, boolean or unicode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_comments">
+<tt class="descname">set_comments</tt><big>(</big><em>description</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the description of the document. Also known as comments.</p>
+<p>Arguments:</p>
+<blockquote>
+description &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_creation_date">
+<tt class="descname">set_creation_date</tt><big>(</big><em>date</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_creation_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the creation date of the document.</p>
+<p>Arguments:</p>
+<blockquote>
+date &#8211; datetime</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_creator">
+<tt class="descname">set_creator</tt><big>(</big><em>creator</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_creator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the creator of the document.</p>
+<p>Arguments:</p>
+<blockquote>
+creator &#8211; unicode</blockquote>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">set_creator</span><span class="p">(</span><span class="s">u&quot;Plato&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_description">
+<tt class="descname">set_description</tt><big>(</big><em>description</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the description of the document. Also known as comments.</p>
+<p>Arguments:</p>
+<blockquote>
+description &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_editing_cycles">
+<tt class="descname">set_editing_cycles</tt><big>(</big><em>cycles</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_editing_cycles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the number of times the document was edited.</p>
+<p>Arguments:</p>
+<blockquote>
+cycles &#8211; int</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_editing_duration">
+<tt class="descname">set_editing_duration</tt><big>(</big><em>duration</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_editing_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the time the document was edited.</p>
+<p>Arguments:</p>
+<blockquote>
+duration &#8211; timedelta</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_generator">
+<tt class="descname">set_generator</tt><big>(</big><em>generator</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the signature of the software that generated this document.</p>
+<p>Arguments:</p>
+<blockquote>
+generator &#8211; unicode</blockquote>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">set_generator</span><span class="p">(</span><span class="s">u&quot;lpOD Project&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_initial_creator">
+<tt class="descname">set_initial_creator</tt><big>(</big><em>creator</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_initial_creator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the first creator of the document.</p>
+<p>Arguments:</p>
+<blockquote>
+creator &#8211; unicode</blockquote>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">set_initial_creator</span><span class="p">(</span><span class="s">u&quot;Plato&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_keywords">
+<tt class="descname">set_keywords</tt><big>(</big><em>keywords</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_keywords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the keywords of the document. Although the name is plural, a
+unicode string is required, so join your list first.</p>
+<p>Arguments:</p>
+<blockquote>
+keywords &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_language">
+<tt class="descname">set_language</tt><big>(</big><em>language</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_language" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the language code of the document.</p>
+<p>Arguments:</p>
+<blockquote>
+language &#8211; str</blockquote>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">set_language</span><span class="p">(</span><span class="s">&#39;fr-FR&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_modification_date">
+<tt class="descname">set_modification_date</tt><big>(</big><em>date</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_modification_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the last modified date of the document.</p>
+<p>Arguments:</p>
+<blockquote>
+date &#8211; datetime</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_statistic">
+<tt class="descname">set_statistic</tt><big>(</big><em>statistic</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the statistic for the documents: number of words, paragraphs,
+etc.</p>
+<p>Arguments:</p>
+<blockquote>
+statistic &#8211; dict</blockquote>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">statistic</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;meta:table-count&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="go">                 &#39;meta:image-count&#39;: 2,</span>
+<span class="go">                 &#39;meta:object-count&#39;: 3,</span>
+<span class="go">                 &#39;meta:page-count&#39;: 4,</span>
+<span class="go">                 &#39;meta:paragraph-count&#39;: 5,</span>
+<span class="go">                 &#39;meta:word-count&#39;: 6,</span>
+<span class="go">                 &#39;meta:character-count&#39;: 7}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">document</span><span class="o">.</span><span class="n">set_statistic</span><span class="p">(</span><span class="n">statistic</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_subject">
+<tt class="descname">set_subject</tt><big>(</big><em>subject</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_subject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the subject of the document.</p>
+<p>Arguments:</p>
+<blockquote>
+subject &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_title">
+<tt class="descname">set_title</tt><big>(</big><em>title</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the title of the document.</p>
+<p>This is not the first heading but the title metadata.</p>
+<p>Arguments:</p>
+<blockquote>
+title &#8211; unicode</blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.meta.odf_meta.set_user_defined_metadata">
+<tt class="descname">set_user_defined_metadata</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#lpod.meta.odf_meta.set_user_defined_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="manifest.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.manifest</span></tt></a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="note.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.note</span></tt></a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/autodocs/meta.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="note.html" title="lpod.note"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="manifest.html" title="lpod.manifest"
+             >previous</a> |</li>
+        <li><a href="../index.html">lpOD-python (version: current) documentation</a> &raquo;</li>
+          <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-60-g27fffd7. Last modified: 2012-09-03 16:26..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>
