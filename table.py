@@ -79,6 +79,34 @@ def _digit_to_alpha(digit):
 
 
 
+def _coordinates_to_alpha_area(coord):
+        # assuming : either (x,y) or (x,y,z,t), with positive values
+        if isinstance(coord, basestring):
+            # either A1 or A1:B2, returns A1:A1 if needed
+            parts = coord.strip().split(':')
+            if len(parts) == 1:
+                start = end = parts[0]
+            else:
+                start = parts[0]
+                end = parts[1]
+        elif isiterable(coord):
+            if len(coord) == 2:
+                x = coord[0]
+                y = coord[1]
+                z = x
+                t = y
+            else:
+            # should be 4 int
+                x, y, z, t = coord
+            start = _digit_to_alpha(x) + "%s" % (y+1)
+            end = _digit_to_alpha(z) + "%s" % (t+1)
+        else:
+            raise ValueError
+        range = start + ':' + end
+        return (start, end, range)
+
+
+
 def _increment(x, step):
     while x < 0:
         if step == 0:
@@ -596,6 +624,18 @@ def odf_create_table(name, width=None, height=None, protected=False,
             row = odf_create_row(width)
             element._append(row)
     element._compute_table_cache()
+    return element
+
+
+
+def odf_create_named_range(name, range, table_name, usage=None):
+    """Create a Named Range element.
+    """
+    element = odf_create_element('table:named-range')
+    element.set_name(name)
+    element.table_name = table_name
+    element.set_range(range)
+    element.set_usage(usage)
     return element
 
 
@@ -3519,6 +3559,84 @@ class odf_table(odf_element):
         return True
 
 
+    #
+    # Named Range
+    #
+
+
+    def get_named_ranges(self, table_name=None):
+        """Returns the list of available Name Ranges of the spreadsheet. If
+        table_name is provided, limits the search to these tables.
+
+        Arguments:
+
+            table_names -- str or list of str, names of tables
+
+        Return : list of odf_table_range
+        """
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        # fixme: need to be in a spreadsheet
+        all_named_ranges = body.get_named_ranges()
+        if not table_name:
+            return all_named_ranges
+        filter = []
+        if isinstance(table_name, basestring):
+            filter.append(table_name)
+        elif isiterable(table_name):
+            filter.extend(table_name)
+        else:
+            raise ValueError, "table_name must be string or Iterable, not %s" % type(table_name)
+        return [nr for nr in all_named_ranges if nr.table_name in filter]
+
+
+    def get_named_range(self, name):
+        """Returns the Name Ranges of the specified name. If
+        table_name is provided, limits the search to these tables.
+
+        Arguments:
+
+            name -- str, name of the named range object
+
+        Return : odf_named_range
+        """
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        return body.get_named_range(name)
+
+
+    def set_named_range(self, name, range, table_name=None, usage=None):
+        """
+
+        Return : odf_named_range
+        """
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        if len(name) == 0:
+            return ValueError, "Name required."
+        if table_name is None:
+            table_name = self.get_name()
+        named_range = odf_create_named_range(name, range, table_name, usage)
+        body.append_named_range(named_range)
+
+
+    def delete_named_range(self, name):
+        """
+
+        Return : odf_named_range
+        """
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        if len(name) == 0:
+            return ValueError, "Name required."
+        named_range = body.get_named_range(name)
+        if named_range:
+            named_range.delete()
+
 
     #
     # Utilities
@@ -3571,6 +3689,127 @@ class odf_table(odf_element):
             return file.getvalue()
         if close_after:
             file.close()
+
+
+
+class odf_named_range(odf_element):
+    """ODF Named Range. Identifies inside the spreadsheet a range of cells of a
+    table by a name and the name of the table.
+    Nota : to delete a Named Range, use: nr.delete()
+    """
+    def __init__(self, native_element):
+        odf_element.__init__(self, native_element)
+        self.name = self.get_attribute('table:name')
+        self.usage = None
+        cell_range_address = self.get_attribute('table:cell-range-address')
+        if not cell_range_address:
+            self.table_name = None
+            self.start = None
+            self.end = None
+            self.range = None
+            return
+        name_range = cell_range_address.replace('$', '')
+        name, range = name_range.split('.', 1)
+        self.table_name = name
+        range = range.replace('.', '')
+        self._set_range(range)
+
+
+    def set_usage(self, usage):
+        """Not implemented
+        """
+        self.usage = None
+
+
+    def set_name(self, name):
+        self.name = name
+        self.set_attribute('table:name', name)
+
+
+    def set_table_name(self, name):
+        self.table_name = name
+        self._update_attributes()
+
+
+    def _set_range(self, coord):
+        digits = _convert_coordinates(coord)
+        if len(digits) == 4:
+            x, y, z, t = digits
+        else:
+            x, y = digits
+            z, t = digits
+        self.start = x, y
+        self.end = z, t
+        self.range = x, y, z, t
+
+
+    def set_range(self, coord):
+        self._set_range(coord)
+        self._update_attributes()
+
+
+    def _update_attributes(self):
+        self.set_attribute('table:base-cell-address',
+                           self._make_base_cell_address() )
+        self.set_attribute('table:cell-range-address',
+                           self._make_cell_range_address() )
+
+
+    def _make_base_cell_address(self):
+        # assuming we got table_name and range
+        return '$%s.$%s$%s' % ( self.table_name,
+                                _digit_to_alpha(self.start[0]),
+                                self.start[1] + 1 )
+
+
+    def _make_cell_range_address(self):
+        # assuming we got table_name and range
+        if self.start == self.end:
+            return self._make_base_cell_address()
+        return '$%s.$%s$%s:.$%s$%s' % ( self.table_name,
+                                    _digit_to_alpha(self.start[0]),
+                                    self.start[1] + 1,
+                                    _digit_to_alpha(self.end[0]),
+                                    self.end[1] + 1)
+
+
+    def get_values(self, cell_type=None, complete=True,
+                   get_type=False, flat=False):
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        table = body.get_table(name = self.table_name)
+        return table.get_values(self.range, cell_type, complete,
+                   get_type, flat)
+
+
+    def get_value(self, get_type=False):
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        table = body.get_table(name = self.table_name)
+        return table.get_value(self.start, get_type)
+
+
+    def set_values(self, values, style=None, cell_type=None,
+                   currency=None):
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        table = body.get_table(name = self.table_name)
+        return table.set_values(values, coord=self.range, style=style,
+                   cell_type=cell_type, currency=currency)
+
+
+    def set_value(self, value, cell_type=None, currency=None,
+                  style=None):
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document"
+        table = body.get_table(name = self.table_name)
+        return table.set_value(coord=self.start, value=value,
+                               cell_type=cell_type,
+                               currency=currency, style=style)
 
 
 
@@ -3642,3 +3881,4 @@ register_element_class('table:covered-table-cell', odf_cell)
 register_element_class('table:table-row', odf_row, caching=True)
 register_element_class('table:table-column', odf_column)
 register_element_class('table:table', odf_table, caching=True)
+register_element_class('table:named-range', odf_named_range)

@@ -1409,6 +1409,50 @@ class odf_element(object):
                 table_name=name, content=content)
         return result
 
+    #
+    # Named Range
+    #
+
+    def get_named_ranges(self):
+        """Return all the tables named ranges.
+
+        Return: list of odf_named_range
+        """
+        named_ranges = self.get_elements(
+                        'descendant::table:named-expressions/table:named-range')
+        return named_ranges
+
+
+    def get_named_range(self, name):
+        """Return the named range of specified name.
+
+        Return: odf_named_range
+        """
+        named_range = self.get_elements(
+        'descendant::table:named-expressions/table:named-range[@table:name="%s"][1]' % name)
+        if named_range:
+            return named_range[0]
+        else:
+            return None
+
+
+    def append_named_range(self, named_range):
+        """Return all the tables named ranges.
+
+        Return: list of odf_named_range
+        """
+        if self.get_tag() != 'office:spreadsheet':
+            raise ValueError, "Element is no 'office:spreadsheet' : %s", self.get_tag()
+        named_expressions = self.get_element('descendant::table:named-expressions')
+        if not named_expressions:
+            named_expressions = odf_create_element('table:named-expressions')
+        # exists ?
+        current = named_expressions.get_element(
+            'table:named-range[@table:name="%s"][1]' % named_range.name)
+        if current:
+            named_expressions.delete(current)
+        named_expressions.append(named_range)
+
 
     #
     # Notes
@@ -1664,6 +1708,7 @@ class odf_element(object):
     #
     # Draw Pages
     #
+
     def get_draw_pages(self, style=None, content=None):
         """Return all the draw pages that match the criteria.
 
