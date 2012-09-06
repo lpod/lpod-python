@@ -214,7 +214,7 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
     if odf_idx in cache:
         current_item = cache[odf_idx]
     else:
-        current_item = vault.get_element_idx2(vault_scheme, odf_idx)
+        current_item = vault._get_element_idx2(vault_scheme, odf_idx)
     vault._indexes[vault_map_name] = {}
     target_idx = vault.index(current_item)
     if odf_idx > 0:
@@ -248,7 +248,7 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
         # deleting some overlapped items
         deleting = repeated_after
         while deleting < 0:
-            delete_item = vault.get_element_idx2(vault_scheme, target_idx + 1)
+            delete_item = vault._get_element_idx2(vault_scheme, target_idx + 1)
             if delete_item is None:
                 break
             is_repeated = delete_item.get_repeated() or 1
@@ -295,7 +295,7 @@ def _insert_item_in_vault(position, item, vault, vault_scheme, vault_map_name):
     if odf_idx in cache:
         current_item = cache[odf_idx]
     else:
-        current_item = vault.get_element_idx2(vault_scheme, odf_idx)
+        current_item = vault._get_element_idx2(vault_scheme, odf_idx)
     vault._indexes[vault_map_name] = {}
     target_idx = vault.index(current_item)
     if odf_idx > 0:
@@ -339,7 +339,7 @@ def _delete_item_in_vault(position, vault, vault_scheme, vault_map_name):
     if odf_idx in cache:
         current_item = cache[odf_idx]
     else:
-        current_item = vault.get_element_idx2(vault_scheme, odf_idx)
+        current_item = vault._get_element_idx2(vault_scheme, odf_idx)
     vault._indexes[vault_map_name] = {}
     if odf_idx > 0:
         before_cache = vault_map[odf_idx - 1]
@@ -630,6 +630,16 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
 def odf_create_named_range(name, range, table_name, usage=None):
     """Create a Named Range element.
+
+    Arguments:
+
+        name -- str, name of the named range
+
+        range -- str or tuple of int, cell or area coordinate
+
+        table_name -- str, name of the table
+
+        uage -- None or 'print-range', 'filter', 'repeat-column', 'repeat-row'
     """
     element = odf_create_element('table:named-range')
     element.set_name(name)
@@ -1016,7 +1026,7 @@ class odf_row(odf_element):
                 if idx in self._indexes['_rmap']:
                     cell = self._indexes['_rmap'][idx]
                 else:
-                    cell = self.get_element_idx2(_xpath_cell_idx, idx)
+                    cell = self._get_element_idx2(_xpath_cell_idx, idx)
                     self._indexes['_rmap'][idx] = cell
                 repeated = juska - before
                 before = juska
@@ -1054,7 +1064,7 @@ class odf_row(odf_element):
                 if idx in self._indexes['_rmap']:
                     cell = self._indexes['_rmap'][idx]
                 else:
-                    cell = self.get_element_idx2(_xpath_cell_idx, idx)
+                    cell = self._get_element_idx2(_xpath_cell_idx, idx)
                     self._indexes['_rmap'][idx] = cell
                 repeated = juska - before
                 before = juska
@@ -1136,7 +1146,7 @@ class odf_row(odf_element):
             if idx in self._indexes['_rmap']:
                 cell = self._indexes['_rmap'][idx]
             else:
-                cell = self.get_element_idx2(_xpath_cell_idx, idx)
+                cell = self._get_element_idx2(_xpath_cell_idx, idx)
                 self._indexes['_rmap'][idx] = cell
             return cell
         return None
@@ -1984,10 +1994,22 @@ class odf_table(odf_element):
 
 
     def get_name(self):
+        """Return the name of the table.
+        """
         return self.get_attribute('table:name')
 
 
     def set_name(self, name):
+        """Set the name of the table. Name can't be empty.
+        """
+        name = name.strip()
+        if len(name) == 0:
+            raise ValueError, "Empty name not allowed."
+        # first, update named ranges
+        # fixme : delete name ranges when deleting table, too.
+        nrs = self.get_named_ranges(table_name = self.get_name())
+        for nr in nrs:
+            nr.set_table_name(name)
         self.set_attribute('table:name', name)
 
 
@@ -2367,7 +2389,7 @@ class odf_table(odf_element):
                 if idx in self._indexes['_tmap']:
                     row = self._indexes['_tmap'][idx]
                 else:
-                    row = self.get_element_idx2(_xpath_row_idx, idx)
+                    row = self._get_element_idx2(_xpath_row_idx, idx)
                     self._indexes['_tmap'][idx] = row
                 repeated = juska - before
                 before = juska
@@ -2401,7 +2423,7 @@ class odf_table(odf_element):
                 if idx in self._indexes['_tmap']:
                     row = self._indexes['_tmap'][idx]
                 else:
-                    row = self.get_element_idx2(_xpath_row_idx, idx)
+                    row = self._get_element_idx2(_xpath_row_idx, idx)
                     self._indexes['_tmap'][idx] = row
                 repeated = juska - before
                 before = juska
@@ -2466,7 +2488,7 @@ class odf_table(odf_element):
             if idx in self._indexes['_tmap']:
                 row = self._indexes['_tmap'][idx]
             else:
-                row = self.get_element_idx2(_xpath_row_idx, idx)
+                row = self._get_element_idx2(_xpath_row_idx, idx)
                 self._indexes['_tmap'][idx] = row
             return row
         return None
@@ -3142,7 +3164,7 @@ class odf_table(odf_element):
                 if idx in self._indexes['_cmap']:
                     column = self._indexes['_cmap'][idx]
                 else:
-                    column = self.get_element_idx2(_xpath_column_idx, idx)
+                    column = self._get_element_idx2(_xpath_column_idx, idx)
                     self._indexes['_cmap'][idx] = column
                 repeated = juska - before
                 before = juska
@@ -3176,7 +3198,7 @@ class odf_table(odf_element):
                 if idx in self._indexes['_cmap']:
                     column = self._indexes['_cmap'][idx]
                 else:
-                    column = self.get_element_idx2(_xpath_column_idx, idx)
+                    column = self._get_element_idx2(_xpath_column_idx, idx)
                     self._indexes['_cmap'][idx] = column
                 repeated = juska - before
                 before = juska
@@ -3225,7 +3247,7 @@ class odf_table(odf_element):
         # Inside the defined table
         odf_idx = _find_odf_idx(self._cmap, x)
         if odf_idx is not None:
-            column = self.get_element_idx2(_xpath_column_idx, odf_idx)
+            column = self._get_element_idx2(_xpath_column_idx, odf_idx)
             # fixme : no clone here => change doc and unit tests
             return column.clone()
             #return row
@@ -3346,7 +3368,7 @@ class odf_table(odf_element):
             position = 0
         else:
             odf_idx = len(self._cmap) - 1
-            last_column = self.get_element_idx2(_xpath_column_idx, odf_idx)
+            last_column = self._get_element_idx2(_xpath_column_idx, odf_idx)
             position = self.index(last_column) + 1
         column.x = self.get_width()
         self.insert(column, position = position)
@@ -3576,8 +3598,7 @@ class odf_table(odf_element):
         """
         body = self.get_document_body()
         if not body:
-            raise ValueError, "Table is not inside a document"
-        # fixme: need to be in a spreadsheet
+            return []
         all_named_ranges = body.get_named_ranges()
         if not table_name:
             return all_named_ranges
@@ -3608,9 +3629,17 @@ class odf_table(odf_element):
 
 
     def set_named_range(self, name, range, table_name=None, usage=None):
-        """
+        """Create a Named Range element and insert it in the document.
 
-        Return : odf_named_range
+        Arguments:
+
+            name -- str, name of the named range
+
+            range -- str or tuple of int, cell or area coordinate
+
+            table_name -- str, name of the table
+
+            uage -- None or 'print-range', 'filter', 'repeat-column', 'repeat-row'
         """
         body = self.get_document_body()
         if not body:
@@ -3624,18 +3653,19 @@ class odf_table(odf_element):
 
 
     def delete_named_range(self, name):
-        """
+        """Delete the Named Range of specified name from the spreadsheet.
 
-        Return : odf_named_range
+        Arguments:
+
+            name -- str
         """
-        body = self.get_document_body()
-        if not body:
-            raise ValueError, "Table is not inside a document"
+        name = name.strip()
         if len(name) == 0:
             return ValueError, "Name required."
-        named_range = body.get_named_range(name)
-        if named_range:
-            named_range.delete()
+        body = self.get_document_body()
+        if not body:
+            raise ValueError, "Table is not inside a document."
+        body.delete_named_range(name)
 
 
     #
@@ -3695,12 +3725,25 @@ class odf_table(odf_element):
 class odf_named_range(odf_element):
     """ODF Named Range. Identifies inside the spreadsheet a range of cells of a
     table by a name and the name of the table.
-    Nota : to delete a Named Range, use: nr.delete()
+
+    Name Ranges have the following attributes:
+
+        name -- name of the named range
+
+        table_name -- name of the table
+
+        start -- first cell of the named range, tuple (x, y)
+
+        end -- last cell of the named range, tuple (x, y)
+
+        range -- range of the named range, tuple (x, y, z, t)
+
+        usage -- None or str, usage of the named range.
     """
     def __init__(self, native_element):
         odf_element.__init__(self, native_element)
         self.name = self.get_attribute('table:name')
-        self.usage = None
+        self.usage = self.get_attribute('table:range-usable-as')
         cell_range_address = self.get_attribute('table:cell-range-address')
         if not cell_range_address:
             self.table_name = None
@@ -3715,18 +3758,63 @@ class odf_named_range(odf_element):
         self._set_range(range)
 
 
-    def set_usage(self, usage):
-        """Not implemented
+    def set_usage(self, usage=None):
+        """Set the usage of the Named Range. Usage can be None (default) or one
+        of :
+            'print-range'
+            'filter'
+            'repeat-column'
+            'repeat-row'
+
+        Arguments:
+
+            usage -- None or str
         """
-        self.usage = None
+        if usage is not None:
+            usage=usage.strip().lower()
+            if usage not in ('print-range', 'filter', 'repeat-column',
+                             'repeat-row') :
+                usage = None
+        if usage is None:
+            self.del_attribute('table:range-usable-as')
+            self.usage = None
+        else:
+            self.set_attribute('table:range-usable-as', usage)
+            self.usage = usage
 
 
     def set_name(self, name):
+        """Set the name of the Named Range. The name is mandatory, if a Named
+        Range of the same name exists, it will be replaced.
+
+        Arguments:
+
+            name -- str
+        """
+        name = name.strip()
+        if len(name) == 0:
+            return ValueError, "Name required."
+        try:
+            body = self.get_document_body()
+            named_range = body.get_named_range(name)
+            if named_range:
+                named_range.delete()
+        except:
+            pass    # we are not on an inserted in a document.
         self.name = name
         self.set_attribute('table:name', name)
 
 
     def set_table_name(self, name):
+        """Set the name of the table of the Named Range. The name is mandatory.
+
+        Arguments:
+
+            name -- str
+        """
+        name = name.strip()
+        if len(name) == 0:
+            return ValueError, "Name required."
         self.table_name = name
         self._update_attributes()
 
@@ -3743,8 +3831,16 @@ class odf_named_range(odf_element):
         self.range = x, y, z, t
 
 
-    def set_range(self, coord):
-        self._set_range(coord)
+    def set_range(self, range):
+        """Set the range of the named range. Range can be either one cell
+        (like 'A1') or an area ('A1:B2'). It can be provided as an alpha numeric
+        value like "A1:B2' or a tuple like (0, 0, 1, 1) or (0, 0).
+
+        Arguments:
+
+            range -- str or tuple of int, cell or area coordinate
+        """
+        self._set_range(range)
         self._update_attributes()
 
 
@@ -3775,27 +3871,36 @@ class odf_named_range(odf_element):
 
     def get_values(self, cell_type=None, complete=True,
                    get_type=False, flat=False):
+        """Shortcut to retrieve the values of the cells of the named range. See
+        table.get_values() for the arguments description and return format.
+        """
         body = self.get_document_body()
         if not body:
-            raise ValueError, "Table is not inside a document"
+            raise ValueError, "Table is not inside a document."
         table = body.get_table(name = self.table_name)
         return table.get_values(self.range, cell_type, complete,
                    get_type, flat)
 
 
     def get_value(self, get_type=False):
+        """Shortcut to retrieve the value of the first cell of the named range.
+        See table.get_value() for the arguments description and return format.
+        """
         body = self.get_document_body()
         if not body:
-            raise ValueError, "Table is not inside a document"
+            raise ValueError, "Table is not inside a document."
         table = body.get_table(name = self.table_name)
         return table.get_value(self.start, get_type)
 
 
     def set_values(self, values, style=None, cell_type=None,
                    currency=None):
+        """Shortcut to set the values of the cells of the named range.
+        See table.set_values() for the arguments description.
+        """
         body = self.get_document_body()
         if not body:
-            raise ValueError, "Table is not inside a document"
+            raise ValueError, "Table is not inside a document."
         table = body.get_table(name = self.table_name)
         return table.set_values(values, coord=self.range, style=style,
                    cell_type=cell_type, currency=currency)
@@ -3803,9 +3908,12 @@ class odf_named_range(odf_element):
 
     def set_value(self, value, cell_type=None, currency=None,
                   style=None):
+        """Shortcut to set the value of the first cell of the named range.
+        See table.set_value() for the arguments description.
+        """
         body = self.get_document_body()
         if not body:
-            raise ValueError, "Table is not inside a document"
+            raise ValueError, "Table is not inside a document."
         table = body.get_table(name = self.table_name)
         return table.set_value(coord=self.start, value=value,
                                cell_type=cell_type,

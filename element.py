@@ -550,14 +550,14 @@ class odf_element(object):
             return _make_odf_element(result[0])
         return None
 
-    def get_element_idx(self, xpath_query, idx):
+    def _get_element_idx(self, xpath_query, idx):
         element = self.__element
         result = element.xpath("(%s)[%s]" % (xpath_query, idx+1), namespaces=ODF_NAMESPACES)
         if result:
             return _make_odf_element(result[0])
         return None
 
-    def get_element_idx2(self, xpath_instance, idx):
+    def _get_element_idx2(self, xpath_instance, idx):
         element = self.__element
         result = xpath_instance(element, idx=idx+1)
         if result:
@@ -1403,7 +1403,7 @@ class odf_element(object):
         Return: odf_table or None if not found
         """
         if name is None and content is None:
-            result = self.get_element_idx('descendant::table:table', position)
+            result = self._get_element_idx('descendant::table:table', position)
         else :
             result = _get_element(self, 'descendant::table:table', position,
                 table_name=name, content=content)
@@ -1424,7 +1424,11 @@ class odf_element(object):
 
 
     def get_named_range(self, name):
-        """Return the named range of specified name.
+        """Return the named range of specified name, or None if not found.
+
+        Arguments:
+
+            name -- str
 
         Return: odf_named_range
         """
@@ -1437,9 +1441,12 @@ class odf_element(object):
 
 
     def append_named_range(self, named_range):
-        """Return all the tables named ranges.
+        """Append the named range to the spreadsheet, replacing existing named
+        range of same name if any.
 
-        Return: list of odf_named_range
+        Arguments:
+
+            named_range -- ODF named nange
         """
         if self.get_tag() != 'office:spreadsheet':
             raise ValueError, "Element is no 'office:spreadsheet' : %s", self.get_tag()
@@ -1453,6 +1460,25 @@ class odf_element(object):
             named_expressions.delete(current)
         named_expressions.append(named_range)
 
+
+    def delete_named_range(self, name):
+        """Delete the Named Range of specified name from the spreadsheet.
+
+        Arguments:
+
+            name -- str
+        """
+        if self.get_tag() != 'office:spreadsheet':
+            raise ValueError, "Element is no 'office:spreadsheet' : %s", self.get_tag()
+        named_range = self.get_named_range(name)
+        if not named_range:
+            return
+        named_range.delete()
+        named_expressions = self.get_element('descendant::table:named-expressions')
+        element = named_expressions.__element
+        children = len(element.getchildren())
+        if not children:
+            self.delete(named_expressions)
 
     #
     # Notes
