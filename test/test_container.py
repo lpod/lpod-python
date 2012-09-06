@@ -5,6 +5,7 @@
 # Authors: Hervé Cauwelier <herve@itaapy.com>
 #          Luis Belmar-Letelier <luis@itaapy.com>
 #          David Versmisse <david.versmisse@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.org).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -120,25 +121,6 @@ class GetContainerTestCase(TestCase):
         container = odf_get_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
-
-# fixme : reactivate ftp
-    #def test_http(self):
-    #    file = urlopen('http://ftp.lpod-project.org/example.odt')
-    #    container = odf_get_container(file)
-    #    mimetype = container.get_part('mimetype')
-    #    self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
-    #
-    #
-    #def test_ftp(self):
-    #    ftp = FTP('ftp.lpod-project.org')
-    #    ftp.login()
-    #    file = StringIO()
-    #    ftp.retrbinary('RETR example.odt', file.write)
-    #    ftp.quit()
-    #    file.seek(0)
-    #    container = odf_get_container(file)
-    #    mimetype = container.get_part('mimetype')
-    #    self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
 

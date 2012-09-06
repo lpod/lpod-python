@@ -6,6 +6,7 @@
 #          Hervé Cauwelier <herve@itaapy.com>
 #          Luis Belmar-Letelier <luis@itaapy.com>
 #          David Versmisse <david.versmisse@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.org).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -119,23 +120,7 @@ class GetDocumentTestCase(TestCase):
         self.assert_(odf_get_document(path))
 
 #fixme : reactivitate ftp
-    #def test_http(self):
-    #    file = urlopen('http://ftp.lpod-project.org/example.odt')
-    #    document = odf_get_document(file)
-    #    self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
-    #
-    #
-    #def test_ftp(self):
-    #    ftp = FTP('ftp.lpod-project.org')
-    #    ftp.login()
-    #    file = StringIO()
-    #    ftp.retrbinary('RETR example.odt', file.write)
-    #    ftp.quit()
-    #    file.seek(0)
-    #    document = odf_get_document(file)
-    #    self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
-    #
-    #
+
 
 class DocumentTestCase(TestCase):
 
