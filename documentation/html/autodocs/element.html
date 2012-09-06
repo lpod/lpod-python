@@ -1,23 +1,29 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>lpod.element &mdash; lpOD-python (version: current) documentation</title>
+    
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     'current-stable-64-g5a41b73',
-        COLLAPSE_MODINDEX: false,
+        VERSION:     'current-stable-67-gd4b6bc9',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
@@ -32,8 +38,8 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="experimental.html" title="lpod.experimental"
              accesskey="N">next</a> |</li>
@@ -51,22 +57,34 @@
           <div class="body">
             
   <div class="section" id="module-lpod.element">
-<h1><tt class="xref docutils literal"><span class="pre">lpod.element</span></tt><a class="headerlink" href="#module-lpod.element" title="Permalink to this headline">¶</a></h1>
+<span id="lpod-element"></span><h1><a class="reference internal" href="#module-lpod.element" title="lpod.element: Lpod element module"><tt class="xref py py-mod docutils literal"><span class="pre">lpod.element</span></tt></a><a class="headerlink" href="#module-lpod.element" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lpod.element.odf_element">
 <em class="property">class </em><tt class="descclassname">lpod.element.</tt><tt class="descname">odf_element</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Representation of an XML element. Abstraction of the XML library
 behind.</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.append">
 <tt class="descname">append</tt><big>(</big><em>unicode_or_element</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.append" title="Permalink to this definition">¶</a></dt>
-<dd>Insert element or text in the last position.</dd></dl>
+<dd><p>Insert element or text in the last position.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.append_named_range">
+<tt class="descname">append_named_range</tt><big>(</big><em>named_range</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.append_named_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the named range to the spreadsheet, replacing existing named
+range of same name if any.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>named_range &#8211; ODF named nange</div></blockquote>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.clear">
 <tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.clear" title="Permalink to this definition">¶</a></dt>
-<dd>Remove text, children and attributes from the element.</dd></dl>
+<dd><p>Remove text, children and attributes from the element.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.clone">
@@ -86,7 +104,16 @@ behind.</p>
 element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
 <p>Arguments:</p>
 <blockquote>
-child &#8211; odf_element</blockquote>
+<div>child &#8211; odf_element</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.delete_named_range">
+<tt class="descname">delete_named_range</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.delete_named_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the Named Range of specified name from the spreadsheet.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; str</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -97,7 +124,8 @@ child &#8211; odf_element</blockquote>
 <dl class="method">
 <dt id="lpod.element.odf_element.extend">
 <tt class="descname">extend</tt><big>(</big><em>odf_elements</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.extend" title="Permalink to this definition">¶</a></dt>
-<dd>Fast append elements at the end of ourself using extend.</dd></dl>
+<dd><p>Fast append elements at the end of ourself using extend.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_annotation">
@@ -106,12 +134,12 @@ child &#8211; odf_element</blockquote>
 <p>End date is not included (as expected in Python).</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>creator &#8211; unicode</p>
 <p>start_date &#8211; date object</p>
 <p>end_date &#8211; date object</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_annotation or None if not found</p>
 </dd></dl>
 
@@ -122,11 +150,11 @@ child &#8211; odf_element</blockquote>
 <p>End date is not included (as expected in Python).</p>
 <p>Arguments:</p>
 <blockquote>
-<p>creator &#8211; unicode</p>
+<div><p>creator &#8211; unicode</p>
 <p>start_date &#8211; date object</p>
 <p>end_date &#8211; date object</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_annotation</p>
 </dd></dl>
 
@@ -146,9 +174,9 @@ child &#8211; odf_element</blockquote>
 <dd><p>Return the bookmark that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -158,9 +186,9 @@ child &#8211; odf_element</blockquote>
 <dd><p>Return the bookmark end that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -177,9 +205,9 @@ child &#8211; odf_element</blockquote>
 <dd><p>Return the bookmark start that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -200,8 +228,9 @@ child &#8211; odf_element</blockquote>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_changes_ids">
 <tt class="descname">get_changes_ids</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_changes_ids" title="Permalink to this definition">¶</a></dt>
-<dd>Return a list of ids that refers to a change region in the tracked
-changes list.</dd></dl>
+<dd><p>Return a list of ids that refers to a change region in the tracked
+changes list.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_children">
@@ -229,10 +258,10 @@ changes list.</dd></dl>
 <dd><p>Return the draw connector that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>id &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_shape or None if not found</p>
 </dd></dl>
 
@@ -242,10 +271,10 @@ changes list.</dd></dl>
 <dd><p>Return all the draw connectors that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>draw_style &#8211; unicode</p>
+<div><p>draw_style &#8211; unicode</p>
 <p>draw_text_style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_shape</p>
 </dd></dl>
 
@@ -255,10 +284,10 @@ changes list.</dd></dl>
 <dd><p>Return the draw ellipse that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>id &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_shape or None if not found</p>
 </dd></dl>
 
@@ -268,10 +297,10 @@ changes list.</dd></dl>
 <dd><p>Return all the draw ellipses that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>draw_style &#8211; unicode</p>
+<div><p>draw_style &#8211; unicode</p>
 <p>draw_text_style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_shape</p>
 </dd></dl>
 
@@ -291,10 +320,10 @@ changes list.</dd></dl>
 <dd><p>Return the draw line that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>id &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_shape or None if not found</p>
 </dd></dl>
 
@@ -304,10 +333,10 @@ changes list.</dd></dl>
 <dd><p>Return all the draw lines that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>draw_style &#8211; unicode</p>
+<div><p>draw_style &#8211; unicode</p>
 <p>draw_text_style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_shape</p>
 </dd></dl>
 
@@ -317,10 +346,10 @@ changes list.</dd></dl>
 <dd><p>Return the draw page that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_draw_page or None if not found</p>
 </dd></dl>
 
@@ -330,9 +359,9 @@ changes list.</dd></dl>
 <dd><p>Return all the draw pages that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_draw_page</p>
 </dd></dl>
 
@@ -342,10 +371,10 @@ changes list.</dd></dl>
 <dd><p>Return the draw rectangle that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>id &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_shape or None if not found</p>
 </dd></dl>
 
@@ -355,26 +384,16 @@ changes list.</dd></dl>
 <dd><p>Return all the draw rectangles that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>draw_style &#8211; unicode</p>
+<div><p>draw_style &#8211; unicode</p>
 <p>draw_text_style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_shape</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_element">
 <tt class="descname">get_element</tt><big>(</big><em>xpath_query</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_element" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.element.odf_element.get_element_idx">
-<tt class="descname">get_element_idx</tt><big>(</big><em>xpath_query</em>, <em>idx</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_element_idx" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.element.odf_element.get_element_idx2">
-<tt class="descname">get_element_idx2</tt><big>(</big><em>xpath_instance</em>, <em>idx</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_element_idx2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -385,7 +404,8 @@ changes list.</dd></dl>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_formatted_text">
 <tt class="descname">get_formatted_text</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_formatted_text" title="Permalink to this definition">¶</a></dt>
-<dd>This function must return a beautiful version of the text</dd></dl>
+<dd><p>This function must return a beautiful version of the text</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_frame">
@@ -393,11 +413,11 @@ changes list.</dd></dl>
 <dd><p>Return the section that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>title &#8211; unicode regex</p>
 <p>description &#8211; unicode regex</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_frame or None if not found</p>
 </dd></dl>
 
@@ -407,11 +427,11 @@ changes list.</dd></dl>
 <dd><p>Return all the frames that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>title &#8211; unicode regex</p>
 <p>description &#8211; unicode regex</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_frame</p>
 </dd></dl>
 
@@ -421,9 +441,9 @@ changes list.</dd></dl>
 <dd><p>Return the heading that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_heading or None if not found</p>
 </dd></dl>
 
@@ -433,9 +453,9 @@ changes list.</dd></dl>
 <dd><p>Return all the headings that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_heading</p>
 </dd></dl>
 
@@ -445,9 +465,9 @@ changes list.</dd></dl>
 <dd><p>Return the image that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -457,10 +477,10 @@ changes list.</dd></dl>
 <dd><p>Return all the sections that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; str</p>
+<div><p>style &#8211; str</p>
 <p>url &#8211; unicode regex</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_element</p>
 </dd></dl>
 
@@ -470,12 +490,12 @@ changes list.</dd></dl>
 <dd><p>Return the link that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
 <p>title &#8211; unicode</p>
 <p>url &#8211; unicode regex</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -485,11 +505,11 @@ changes list.</dd></dl>
 <dd><p>Return all the links that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>name &#8211; unicode</p>
+<div><p>name &#8211; unicode</p>
 <p>title &#8211; unicode</p>
 <p>url &#8211; unicode regex</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_element</p>
 </dd></dl>
 
@@ -499,9 +519,9 @@ changes list.</dd></dl>
 <dd><p>Return the list that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_list or None if not found</p>
 </dd></dl>
 
@@ -511,10 +531,27 @@ changes list.</dd></dl>
 <dd><p>Return all the lists that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_named_range">
+<tt class="descname">get_named_range</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_named_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the named range of specified name, or None if not found.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; str</div></blockquote>
+<p>Return: odf_named_range</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_named_ranges">
+<tt class="descname">get_named_ranges</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_named_ranges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the tables named ranges.</p>
+<p>Return: list of odf_named_range</p>
 </dd></dl>
 
 <dl class="method">
@@ -528,11 +565,11 @@ changes list.</dd></dl>
 <dd><p>Return the note that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>note_id &#8211; unicode</p>
 <p>note_class &#8211; &#8216;footnote&#8217; or &#8216;endnote&#8217;</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_note or None if not found</p>
 </dd></dl>
 
@@ -542,17 +579,18 @@ changes list.</dd></dl>
 <dd><p>Return all the notes that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>note_class &#8211; &#8216;footnote&#8217; or &#8216;endnote&#8217;</p>
+<div><p>note_class &#8211; &#8216;footnote&#8217; or &#8216;endnote&#8217;</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_note</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_orphan_draw_connectors">
 <tt class="descname">get_orphan_draw_connectors</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_orphan_draw_connectors" title="Permalink to this definition">¶</a></dt>
-<dd>Return a list of connectors which don&#8217;t have any shape connected
-to them.</dd></dl>
+<dd><p>Return a list of connectors which don&#8217;t have any shape connected
+to them.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_outline_level">
@@ -565,9 +603,9 @@ to them.</dd></dl>
 <dd><p>Return the paragraph that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_paragraph or None if not found</p>
 </dd></dl>
 
@@ -577,9 +615,9 @@ to them.</dd></dl>
 <dd><p>Return all the paragraphs that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_paragraph</p>
 </dd></dl>
 
@@ -599,9 +637,9 @@ to them.</dd></dl>
 <dd><p>Return the reference mark that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -611,9 +649,9 @@ to them.</dd></dl>
 <dd><p>Return the reference mark end that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -630,9 +668,9 @@ to them.</dd></dl>
 <dd><p>Return the reference mark start that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -661,9 +699,9 @@ to them.</dd></dl>
 <dd><p>Return the section that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -673,9 +711,9 @@ to them.</dd></dl>
 <dd><p>Return all the sections that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_element</p>
 </dd></dl>
 
@@ -685,9 +723,9 @@ to them.</dd></dl>
 <dd><p>Return the span that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_span or None if not found</p>
 </dd></dl>
 
@@ -697,9 +735,9 @@ to them.</dd></dl>
 <dd><p>Return all the spans that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_span</p>
 </dd></dl>
 
@@ -712,13 +750,13 @@ the argument is already a style object, it will return it.</p>
 desktop application, use display_name instead.</p>
 <p>Arguments:</p>
 <blockquote>
-<dl class="docutils">
+<div><dl class="docutils">
 <dt>family &#8211; &#8216;paragraph&#8217;, &#8216;text&#8217;, &#8216;graphic&#8217;, &#8216;table&#8217;, &#8216;list&#8217;,</dt>
 <dd>&#8216;number&#8217;</dd>
 </dl>
 <p>name_or_element &#8211; unicode or odf_style</p>
 <p>display_name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_style or None if not found</p>
 </dd></dl>
 
@@ -729,7 +767,7 @@ desktop application, use display_name instead.</p>
 name (or all by default).</p>
 <p>Arguments:</p>
 <blockquote>
-name &#8211; unicode</blockquote>
+<div>name &#8211; unicode</div></blockquote>
 <p>Return: list</p>
 </dd></dl>
 
@@ -754,10 +792,10 @@ name &#8211; unicode</blockquote>
 <dd><p>Return the table that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>name &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_table or None if not found</p>
 </dd></dl>
 
@@ -767,9 +805,9 @@ name &#8211; unicode</blockquote>
 <dd><p>Return all the tables that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; unicode</p>
+<div><p>style &#8211; unicode</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: list of odf_table</p>
 </dd></dl>
 
@@ -798,8 +836,9 @@ name &#8211; unicode</blockquote>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_text_content">
 <tt class="descname">get_text_content</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_content" title="Permalink to this definition">¶</a></dt>
-<dd>Like &#8220;get_text&#8221; but return the text of the embedded paragraph:
-annotations, cells...</dd></dl>
+<dd><p>Like &#8220;get_text&#8221; but return the text of the embedded paragraph:
+annotations, cells...</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_toc">
@@ -807,9 +846,9 @@ annotations, cells...</dd></dl>
 <dd><p>Return the table of contents that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>position &#8211; int</p>
+<div><p>position &#8211; int</p>
 <p>content &#8211; unicode regex</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_toc or None if not found</p>
 </dd></dl>
 
@@ -823,7 +862,8 @@ annotations, cells...</dd></dl>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_tracked_changes">
 <tt class="descname">get_tracked_changes</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_tracked_changes" title="Permalink to this definition">¶</a></dt>
-<dd>Return the tracked-changes part in the text body.</dd></dl>
+<dd><p>Return the tracked-changes part in the text body.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_user_field_decl">
@@ -853,12 +893,12 @@ found.</p>
 <dd><p>Return the value of the given user field name.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>name &#8211; unicode</p>
+<div><p>name &#8211; unicode</p>
 <dl class="docutils">
 <dt>value_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;,</dt>
 <dd>&#8216;percentage&#8217;, &#8216;string&#8217;, &#8216;time&#8217; or automatic</dd>
 </dl>
-</blockquote>
+</div></blockquote>
 <p>Return: most appropriate Python type</p>
 </dd></dl>
 
@@ -890,9 +930,9 @@ found.</p>
 <dd><p>Return the variable set for the given name (last one by default).</p>
 <p>Arguments:</p>
 <blockquote>
-<p>name &#8211; unicode</p>
+<div><p>name &#8211; unicode</p>
 <p>position &#8211; int</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_element or None if not found</p>
 </dd></dl>
 
@@ -902,12 +942,12 @@ found.</p>
 <dd><p>Return the last value of the given variable name.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>name &#8211; unicode</p>
+<div><p>name &#8211; unicode</p>
 <dl class="docutils">
 <dt>value_type &#8211; &#8216;boolean&#8217;, &#8216;currency&#8217;, &#8216;date&#8217;, &#8216;float&#8217;,</dt>
 <dd>&#8216;percentage&#8217;, &#8216;string&#8217;, &#8216;time&#8217; or automatic</dd>
 </dl>
-</blockquote>
+</div></blockquote>
 <p>Return: most appropriate Python type</p>
 </dd></dl>
 
@@ -917,7 +957,7 @@ found.</p>
 <dd><p>Return all the variable sets that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
-name &#8211; unicode</blockquote>
+<div>name &#8211; unicode</div></blockquote>
 <p>Return: list of odf_element</p>
 </dd></dl>
 
@@ -936,13 +976,13 @@ name &#8211; unicode</blockquote>
 <p>Position start at 0.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>element &#8211; odf_element</p>
+<div><p>element &#8211; odf_element</p>
 <dl class="docutils">
 <dt>xmlposition &#8211; FIRST_CHILD, LAST_CHILD, NEXT_SIBLING</dt>
 <dd>or PREV_SIBLING</dd>
 </dl>
 <p>position &#8211; int</p>
-</blockquote>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -953,7 +993,7 @@ the text content of the element.</p>
 <p>Python regular expression syntax applies.</p>
 <p>Arguments:</p>
 <blockquote>
-pattern &#8211; unicode</blockquote>
+<div>pattern &#8211; unicode</div></blockquote>
 <p>Return: bool</p>
 </dd></dl>
 
@@ -968,9 +1008,9 @@ split into two consecutive spans.</p>
 <p>Python regular expression syntax applies.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>pattern &#8211; unicode</p>
+<div><p>pattern &#8211; unicode</p>
 <p>new &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: int</p>
 </dd></dl>
 
@@ -982,7 +1022,7 @@ the element, or None if not found.</p>
 <p>Python regular expression syntax applies.</p>
 <p>Arguments:</p>
 <blockquote>
-pattern &#8211; unicode</blockquote>
+<div>pattern &#8211; unicode</div></blockquote>
 <p>Return: int or None</p>
 </dd></dl>
 
@@ -1014,7 +1054,8 @@ pattern &#8211; unicode</blockquote>
 <dl class="method">
 <dt id="lpod.element.odf_element.set_style_attribute">
 <tt class="descname">set_style_attribute</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.set_style_attribute" title="Permalink to this definition">¶</a></dt>
-<dd>Shortcut to accept a style object as a value.</dd></dl>
+<dd><p>Shortcut to accept a style object as a value.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.set_svg_description">
@@ -1034,7 +1075,7 @@ Return a new element as there may be a more appropriate class
 afterwards. XXX side effects?</p>
 <p>Arguments:</p>
 <blockquote>
-qname &#8211; str</blockquote>
+<div>qname &#8211; str</div></blockquote>
 <p>Return: odf_element or a subclass</p>
 </dd></dl>
 
@@ -1048,7 +1089,8 @@ qname &#8211; str</blockquote>
 <dl class="method">
 <dt id="lpod.element.odf_element.set_text">
 <tt class="descname">set_text</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.set_text" title="Permalink to this definition">¶</a></dt>
-<dd>Set the text content of the element.</dd></dl>
+<dd><p>Set the text content of the element.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.set_text_content">
@@ -1061,15 +1103,16 @@ annotations, cells...</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.xpath">
 <tt class="descname">xpath</tt><big>(</big><em>xpath_query</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.xpath" title="Permalink to this definition">¶</a></dt>
-<dd>Apply XPath query to the element and its subtree. Return list of
-odf_element or odf_text instances translated from the nodes found.</dd></dl>
+<dd><p>Apply XPath query to the element and its subtree. Return list of
+odf_element or odf_text instances translated from the nodes found.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="lpod.element.odf_text">
 <em class="property">class </em><tt class="descclassname">lpod.element.</tt><tt class="descname">odf_text</tt><big>(</big><em>text_result</em><big>)</big><a class="headerlink" href="#lpod.element.odf_text" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">unicode</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unicode</span></tt></p>
 <p>Representation of an XML text node. Created to hide the specifics of
 lxml in searching text nodes using XPath.</p>
 <p>Constructed like any unicode object but only accepts lxml text objects.</p>
@@ -1108,10 +1151,10 @@ odf_element class.</p>
 specialized style classes.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>qname &#8211; str</p>
+<div><p>qname &#8211; str</p>
 <p>cls &#8211; Python class</p>
 <p>family &#8211; str</p>
-</blockquote>
+</div></blockquote>
 </dd></dl>
 
 </div>
@@ -1122,30 +1165,30 @@ specialized style classes.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="draw_page.html"
-                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.draw_page</span></tt></a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="experimental.html"
-                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.experimental</span></tt></a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="../_sources/autodocs/element.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="draw_page.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.draw_page</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="experimental.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">lpod.experimental</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/autodocs/element.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1157,7 +1200,7 @@ specialized style classes.</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../modindex.html" title="Global Module Index"
+          <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="experimental.html" title="lpod.experimental"
@@ -1170,9 +1213,9 @@ specialized style classes.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009-2012, lpOD team.
-      Last updated on Last release: lpOD current-stable-64-g5a41b73. Last modified: 2012-09-03 17:56..
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+        &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-67-gd4b6bc9. Last modified: 2012-09-06 15:15..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

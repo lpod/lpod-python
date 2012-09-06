@@ -1,23 +1,29 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>lpod.document &mdash; lpOD-python (version: current) documentation</title>
+    
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     'current-stable-64-g5a41b73',
-        COLLAPSE_MODINDEX: false,
+        VERSION:     'current-stable-67-gd4b6bc9',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
@@ -32,8 +38,8 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="draw_page.html" title="lpod.draw_page"
              accesskey="N">next</a> |</li>
@@ -51,11 +57,11 @@
           <div class="body">
             
   <div class="section" id="module-lpod.document">
-<h1><tt class="xref docutils literal"><span class="pre">lpod.document</span></tt><a class="headerlink" href="#module-lpod.document" title="Permalink to this headline">¶</a></h1>
+<span id="lpod-document"></span><h1><a class="reference internal" href="#module-lpod.document" title="lpod.document: Lpod document module"><tt class="xref py py-mod docutils literal"><span class="pre">lpod.document</span></tt></a><a class="headerlink" href="#module-lpod.document" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lpod.document.odf_document">
 <em class="property">class </em><tt class="descclassname">lpod.document.</tt><tt class="descname">odf_document</tt><big>(</big><em>container</em><big>)</big><a class="headerlink" href="#lpod.document.odf_document" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Abstraction of the ODF document.</p>
 <dl class="method">
 <dt id="lpod.document.odf_document.add_file">
@@ -64,7 +70,7 @@
 Return the full path to reference it in the content.</p>
 <p>Arguments:</p>
 <blockquote>
-path_or_file &#8211; str or file-like</blockquote>
+<div>path_or_file &#8211; str or file-like</div></blockquote>
 <p>Return: str</p>
 </dd></dl>
 
@@ -78,8 +84,9 @@ path_or_file &#8211; str or file-like</blockquote>
 <dl class="method">
 <dt id="lpod.document.odf_document.del_part">
 <tt class="descname">del_part</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#lpod.document.odf_document.del_part" title="Permalink to this definition">¶</a></dt>
-<dd>Mark a part for deletion. The path is relative to the archive,
-e.g. &#8220;Pictures/100000000000032000000258912EB1C3.jpg&#8221;</dd></dl>
+<dd><p>Mark a part for deletion. The path is relative to the archive,
+e.g. &#8220;Pictures/100000000000032000000258912EB1C3.jpg&#8221;</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.document.odf_document.delete_styles">
@@ -91,8 +98,9 @@ e.g. &#8220;Pictures/100000000000032000000258912EB1C3.jpg&#8221;</dd></dl>
 <dl class="method">
 <dt id="lpod.document.odf_document.get_body">
 <tt class="descname">get_body</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.document.odf_document.get_body" title="Permalink to this definition">¶</a></dt>
-<dd>Return the body element of the content part, where actual content
-is inserted.</dd></dl>
+<dd><p>Return the body element of the content part, where actual content
+is inserted.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.document.odf_document.get_formated_meta">
@@ -122,8 +130,9 @@ its own API.</p>
 <dl class="method">
 <dt id="lpod.document.odf_document.get_parts">
 <tt class="descname">get_parts</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.document.odf_document.get_parts" title="Permalink to this definition">¶</a></dt>
-<dd>Return available part names with path inside the archive, e.g.
-[&#8216;content.xml&#8217;, ..., &#8216;Pictures/100000000000032000000258912EB1C3.jpg&#8217;]</dd></dl>
+<dd><p>Return available part names with path inside the archive, e.g.
+[&#8216;content.xml&#8217;, ..., &#8216;Pictures/100000000000032000000258912EB1C3.jpg&#8217;]</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.document.odf_document.get_style">
@@ -135,13 +144,13 @@ the argument is already a style object, it will return it.</p>
 desktop application, use display_name instead.</p>
 <p>Arguments:</p>
 <blockquote>
-<dl class="docutils">
+<div><dl class="docutils">
 <dt>family &#8211; &#8216;paragraph&#8217;, &#8216;text&#8217;,  &#8216;graphic&#8217;, &#8216;table&#8217;, &#8216;list&#8217;,</dt>
 <dd>&#8216;number&#8217;, &#8216;page-layout&#8217;, &#8216;master-page&#8217;</dd>
 </dl>
 <p>name &#8211; unicode or odf_element or None</p>
 <p>display_name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_style or None if not found.</p>
 </dd></dl>
 
@@ -152,7 +161,7 @@ desktop application, use display_name instead.</p>
 name (or all by default).</p>
 <p>Arguments:</p>
 <blockquote>
-name &#8211; unicode</blockquote>
+<div>name &#8211; unicode</div></blockquote>
 <p>Return: list</p>
 </dd></dl>
 
@@ -192,11 +201,11 @@ table-column, table-row, table-cell, table-page, chart, drawing-page,
 graphic, presentation, control and ruby.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>style &#8211; odf_style</p>
+<div><p>style &#8211; odf_style</p>
 <p>name &#8211; unicode</p>
 <p>automatic &#8211; bool</p>
 <p>default &#8211; bool</p>
-</blockquote>
+</div></blockquote>
 <p>Returns : style name &#8211; str</p>
 </dd></dl>
 
@@ -217,18 +226,19 @@ as a Zip file (default) or a flat XML file (unimplemented). XML parts
 can be pretty printed.</p>
 <p>Arguments:</p>
 <blockquote>
-<p>target &#8211; str or file-like object</p>
+<div><p>target &#8211; str or file-like object</p>
 <p>packaging &#8211; &#8216;zip&#8217; or &#8216;flat&#8217;, or for debugging purpose &#8216;folder&#8217;</p>
 <p>pretty &#8211; bool</p>
 <p>backup &#8211; boolean</p>
-</blockquote>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
 <dt id="lpod.document.odf_document.set_part">
 <tt class="descname">set_part</tt><big>(</big><em>path</em>, <em>data</em><big>)</big><a class="headerlink" href="#lpod.document.odf_document.set_part" title="Permalink to this definition">¶</a></dt>
-<dd>Set the bytes of the given part. The path is relative to the
-archive, e.g. &#8220;Pictures/100000000000032000000258912EB1C3.jpg&#8221;.</dd></dl>
+<dd><p>Set the bytes of the given part. The path is relative to the
+archive, e.g. &#8220;Pictures/100000000000032000000258912EB1C3.jpg&#8221;.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.document.odf_document.show_styles">
@@ -282,30 +292,30 @@ template found at the given path.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="datatype.html"
-                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.datatype</span></tt></a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="draw_page.html"
-                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.draw_page</span></tt></a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="../_sources/autodocs/document.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="datatype.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.datatype</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="draw_page.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">lpod.draw_page</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/autodocs/document.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -317,7 +327,7 @@ template found at the given path.</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../modindex.html" title="Global Module Index"
+          <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="draw_page.html" title="lpod.draw_page"
@@ -330,9 +340,9 @@ template found at the given path.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009-2012, lpOD team.
-      Last updated on Last release: lpOD current-stable-64-g5a41b73. Last modified: 2012-09-03 17:56..
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+        &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-67-gd4b6bc9. Last modified: 2012-09-06 15:15..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

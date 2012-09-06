@@ -1,23 +1,29 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>lpod.content &mdash; lpOD-python (version: current) documentation</title>
+    
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     'current-stable-64-g5a41b73',
-        COLLAPSE_MODINDEX: false,
+        VERSION:     'current-stable-67-gd4b6bc9',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="lpOD-python (version: current) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
@@ -32,8 +38,8 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="datatype.html" title="lpod.datatype"
              accesskey="N">next</a> |</li>
@@ -51,11 +57,11 @@
           <div class="body">
             
   <div class="section" id="module-lpod.content">
-<h1><tt class="xref docutils literal"><span class="pre">lpod.content</span></tt><a class="headerlink" href="#module-lpod.content" title="Permalink to this headline">¶</a></h1>
+<span id="lpod-content"></span><h1><a class="reference internal" href="#module-lpod.content" title="lpod.content: Lpod content module"><tt class="xref py py-mod docutils literal"><span class="pre">lpod.content</span></tt></a><a class="headerlink" href="#module-lpod.content" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lpod.content.odf_content">
 <em class="property">class </em><tt class="descclassname">lpod.content.</tt><tt class="descname">odf_content</tt><big>(</big><em>part_name</em>, <em>container</em><big>)</big><a class="headerlink" href="#lpod.content.odf_content" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a title="lpod.xmlpart.odf_xmlpart" class="reference external" href="xmlpart.html#lpod.xmlpart.odf_xmlpart"><tt class="xref docutils literal"><span class="pre">lpod.xmlpart.odf_xmlpart</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="xmlpart.html#lpod.xmlpart.odf_xmlpart" title="lpod.xmlpart.odf_xmlpart"><tt class="xref py py-class docutils literal"><span class="pre">lpod.xmlpart.odf_xmlpart</span></tt></a></p>
 <dl class="method">
 <dt id="lpod.content.odf_content.get_body">
 <tt class="descname">get_body</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.content.odf_content.get_body" title="Permalink to this definition">¶</a></dt>
@@ -71,13 +77,13 @@ the argument is already a style object, it will return it.</p>
 desktop application, use display_name instead.</p>
 <p>Arguments:</p>
 <blockquote>
-<dl class="docutils">
+<div><dl class="docutils">
 <dt>family &#8211; &#8216;paragraph&#8217;, &#8216;text&#8217;, &#8216;graphic&#8217;, &#8216;table&#8217;, &#8216;list&#8217;,</dt>
 <dd>&#8216;number&#8217;</dd>
 </dl>
 <p>name_or_element &#8211; unicode or odf_style</p>
 <p>display_name &#8211; unicode</p>
-</blockquote>
+</div></blockquote>
 <p>Return: odf_style or None if not found</p>
 </dd></dl>
 
@@ -88,7 +94,7 @@ desktop application, use display_name instead.</p>
 to the given family.</p>
 <p>Arguments:</p>
 <blockquote>
-family &#8211; str</blockquote>
+<div>family &#8211; str</div></blockquote>
 <p>Return: list of odf_style</p>
 </dd></dl>
 
@@ -102,30 +108,30 @@ family &#8211; str</blockquote>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="container.html"
-                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.container</span></tt></a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="datatype.html"
-                                  title="next chapter"><tt class="docutils literal"><span class="pre">lpod.datatype</span></tt></a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="../_sources/autodocs/content.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="container.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.container</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="datatype.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">lpod.datatype</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/autodocs/content.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -137,7 +143,7 @@ family &#8211; str</blockquote>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../modindex.html" title="Global Module Index"
+          <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="datatype.html" title="lpod.datatype"
@@ -150,9 +156,9 @@ family &#8211; str</blockquote>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009-2012, lpOD team.
-      Last updated on Last release: lpOD current-stable-64-g5a41b73. Last modified: 2012-09-03 17:56..
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+        &copy; Copyright 2009-2012, lpOD team.
+      Last updated on Last release: lpOD current-stable-67-gd4b6bc9. Last modified: 2012-09-06 15:15..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
