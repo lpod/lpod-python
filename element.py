@@ -4,6 +4,7 @@
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
 #          Romain Gauthier <romain@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.org).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -1450,9 +1451,10 @@ class odf_element(object):
         """
         if self.get_tag() != 'office:spreadsheet':
             raise ValueError, "Element is no 'office:spreadsheet' : %s", self.get_tag()
-        named_expressions = self.get_element('descendant::table:named-expressions')
+        named_expressions = self.get_element('table:named-expressions')
         if not named_expressions:
             named_expressions = odf_create_element('table:named-expressions')
+            self.append(named_expressions)
         # exists ?
         current = named_expressions.get_element(
             'table:named-range[@table:name="%s"][1]' % named_range.name)
@@ -1474,7 +1476,7 @@ class odf_element(object):
         if not named_range:
             return
         named_range.delete()
-        named_expressions = self.get_element('descendant::table:named-expressions')
+        named_expressions = self.get_element('table:named-expressions')
         element = named_expressions.__element
         children = len(element.getchildren())
         if not children:

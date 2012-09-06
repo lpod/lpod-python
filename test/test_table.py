@@ -5,6 +5,7 @@
 # Authors: Romain Gauthier <romain@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
 #          David Versmisse <david.versmisse@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.org).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -38,6 +39,7 @@ from lpod.table import _alpha_to_digit, _digit_to_alpha
 from lpod.table import _convert_coordinates, odf_cell, odf_row
 from lpod.table import odf_create_cell, odf_create_row, odf_create_column
 from lpod.table import odf_create_table, import_from_csv, odf_column
+from lpod.table import odf_create_named_range, import_from_csv, odf_column
 
 
 csv_data = '"A float","3.14"\n"A date","1975-05-07"\n'
@@ -1749,6 +1751,7 @@ class TestRowCellGetValues(TestCase):
         self.assertEqual(value, (None, None))
 
 
+
 class TestColumn(TestCase):
 
     def setUp(self):
@@ -1794,6 +1797,7 @@ class TestColumn(TestCase):
         self.assertEqual(column.get_style(), u"co2")
         column.set_style(None)
         self.assertEqual(column.get_style(), None)
+
 
 
 class TestTable(TestCase):
@@ -2034,6 +2038,7 @@ class TestTable(TestCase):
                 [1, 1, 1, 2, 3, 3,    3,   6],
                 [1, 1, 1, 2, 3, None, 3,   None],
                 [1, 2, 3, 4, 5, None, 7,   None]])
+
 
 
 class TestTableGetValues(TestCase):
@@ -2824,6 +2829,347 @@ class TestTableCell(TestCase):
                  [1, 2, 3, 4, 5, 6,    7]])
         # Test columns are synchronized
         self.assertEqual(table.get_width(), 7)
+
+
+
+class TestTableNamedRange(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        document2 = odf_get_document('samples/simple_table_named_range.ods')
+        self.body = document.get_body()
+        # no clones !
+        self.table = self.body.get_table(name=u"Example1")
+        self.body2 = document2.get_body()
+        self.table2 = self.body2.get_table(name=u"Example1")
+
+
+    def test_create_bad_nr(self):
+        self.assertRaises(TypeError, odf_create_named_range)
+
+
+    def test_create_nr(self):
+        nr = odf_create_named_range(u'nr name ù', 'A1:C2', u'table name é',
+                                    usage = 'filter')
+        result="""<table:named-range table:name="nr name &#249;" table:base-cell-address="$table name &#233;.$A$1" table:cell-range-address="$table name &#233;.$A$1:.$C$2" table:range-usable-as="filter"/>"""
+        self.assertEqual(nr.serialize(), result)
+
+
+    def test_usage_1(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertEqual(nr.usage, None)
+        nr.set_usage('blob')
+        self.assertEqual(nr.usage, None)
+
+
+    def test_usage_2(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_usage('filter')
+        self.assertEqual(nr.usage, 'filter')
+        nr.set_usage('blob')
+        self.assertEqual(nr.usage, None)
+
+
+    def test_usage_3(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_usage('Print-Range')
+        self.assertEqual(nr.usage, 'print-range')
+        nr.set_usage(None)
+        self.assertEqual(nr.usage, None)
+
+
+    def test_usage_4(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_usage(u'repeat-column')
+        self.assertEqual(nr.usage, 'repeat-column')
+
+
+    def test_usage_5(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_usage('repeat-row')
+        self.assertEqual(nr.usage, 'repeat-row')
+
+
+    def test_name_1(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertEqual(nr.name, 'nr name')
+
+
+    def test_name_2(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_name(u'  New Name  ô ')
+        self.assertEqual(nr.name, u'New Name  ô')
+
+
+    def test_name_3(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertRaises(ValueError, nr.set_name, '   ')
+
+
+    def test_table_name_1(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertEqual(nr.table_name, 'tablename')
+
+
+    def test_table_name_2(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_table_name('  new name ')
+        self.assertEqual(nr.table_name, 'new name')
+
+
+    def test_table_name_3(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertRaises(ValueError, nr.set_table_name, '   ')
+
+
+    def test_range_1(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertRaises(ValueError, nr.set_range, '   ')
+
+
+    def test_range_2(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertEqual(nr.range, (0, 0, 2, 1))
+        self.assertEqual(nr.start, (0, 0))
+        self.assertEqual(nr.end, (2, 1))
+
+
+    def test_range_3(self):
+        nr = odf_create_named_range(u'nr name', 'A1', u'tablename')
+        self.assertEqual(nr.range, (0, 0, 0, 0))
+        self.assertEqual(nr.start, (0, 0))
+        self.assertEqual(nr.end, (0, 0))
+
+
+    def test_range_4(self):
+        nr = odf_create_named_range(u'nr name', (1, 2, 3, 4), u'tablename')
+        self.assertEqual(nr.range, (1, 2, 3, 4))
+        self.assertEqual(nr.start, (1, 2))
+        self.assertEqual(nr.end, (3, 4))
+
+
+    def test_range_5(self):
+        nr = odf_create_named_range(u'nr name', (5, 6), u'tablename')
+        self.assertEqual(nr.range, (5, 6, 5, 6))
+        self.assertEqual(nr.start, (5, 6))
+        self.assertEqual(nr.end, (5, 6))
+
+
+    def test_range_6(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_range('B3')
+        self.assertEqual(nr.range, (1, 2, 1, 2))
+        self.assertEqual(nr.start, (1, 2))
+        self.assertEqual(nr.end, (1, 2))
+
+
+    def test_range_7(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_range('B3:b10')
+        self.assertEqual(nr.range, (1, 2, 1, 9))
+        self.assertEqual(nr.start, (1, 2))
+        self.assertEqual(nr.end, (1, 9))
+
+
+    def test_range_8(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_range((1,5,0,9))
+        self.assertEqual(nr.range, (1, 5, 0, 9))
+        self.assertEqual(nr.start, (1, 5))
+        self.assertEqual(nr.end, (0, 9))
+
+
+    def test_range_9(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr.set_range((0,9))
+        self.assertEqual(nr.range, (0, 9, 0, 9))
+        self.assertEqual(nr.start, (0, 9))
+        self.assertEqual(nr.end, (0, 9))
+
+
+    def test_value_bad_1(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertRaises(ValueError, nr.get_values)
+
+
+    def test_value_bad_2(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertRaises(ValueError, nr.get_value)
+
+
+    def test_value_bad_3(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertRaises(ValueError, nr.set_values, [[1, 2]])
+
+
+    def test_value_bad_4(self):
+        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        self.assertRaises(ValueError, nr.set_value, 42)
+
+
+    def test_body_table_get_1(self):
+        self.assertEqual(self.table.get_named_ranges(), [])
+
+
+    def test_body_table_get_2(self):
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['nr_1', 'nr_6'])
+
+
+    def test_body_table_get_3(self):
+        table2 = self.table2.clone()
+        self.assertEqual(table2.get_named_ranges(), [])
+
+
+    def test_body_table_get_4(self):
+        table = self.table2
+        back_nr = table.get_named_range('nr_1')
+        self.assertEqual(back_nr.name, 'nr_1')
+
+
+    def test_body_table_get_4_1(self):
+        table = self.table2
+        back_nr = table.get_named_range('nr_1xxx')
+        self.assertEqual(back_nr, None)
+
+
+    def test_body_table_get_4_2(self):
+        table = self.table2
+        back_nr = table.get_named_range('nr_6')
+        self.assertEqual(back_nr.name, 'nr_6')
+        self.assertEqual(back_nr.table_name, 'Example1')
+        self.assertEqual(back_nr.start, (3, 2))
+        self.assertEqual(back_nr.end, (5, 3))
+        self.assertEqual(back_nr.range, (3, 2, 5, 3))
+        self.assertEqual(back_nr.usage, 'print-range')
+
+
+    def test_body_table_get_5(self):
+        table = self.table
+        back_nr = table.get_named_range('nr_1')
+        self.assertEqual(back_nr, None)
+
+
+    def test_body_table_set_0(self):
+        self.assertRaises(ValueError, self.table2.set_named_range, '   ', 'A1:C2')
+
+
+    def test_body_table_set_1(self):
+        self.table2.set_named_range("new", "A1:B1")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['nr_1', 'nr_6', 'new'])
+
+
+    def test_body_table_set_3(self):
+        self.table2.set_named_range("new", "A1:B1")
+        back_nr = self.table2.get_named_range('new')
+        self.assertEqual(back_nr.usage, None)
+        self.assertEqual(back_nr.range, (0, 0, 1, 0))
+        self.assertEqual(back_nr.start, (0, 0))
+        self.assertEqual(back_nr.end, (1, 0))
+        self.assertEqual(back_nr.table_name, 'Example1')
+        # reset
+        self.table2.set_named_range("new", "A1:c2")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['nr_1', 'nr_6', 'new'])
+        back_nr = self.table2.get_named_range('new')
+        self.assertEqual(back_nr.usage, None)
+        self.assertEqual(back_nr.range, (0, 0, 2, 1))
+        self.assertEqual(back_nr.start, (0, 0))
+        self.assertEqual(back_nr.end, (2, 1))
+        self.assertEqual(back_nr.table_name, 'Example1')
+
+
+    def test_body_table_delete_1(self):
+        self.table2.delete_named_range("xxx")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['nr_1', 'nr_6'])
+
+
+    def test_body_table_delete_2(self):
+        self.table2.delete_named_range("nr_1")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['nr_6'])
+
+
+    def test_body_table_delete_3(self):
+        self.table2.set_named_range("new", "A1:c2")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['nr_1', 'nr_6', 'new'])
+        self.table2.delete_named_range("nr_1")
+        self.table2.delete_named_range("nr_6")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['new'])
+        self.table2.delete_named_range("new")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, [])
+        self.table2.delete_named_range("new")
+        self.table2.delete_named_range("xxx")
+        self.table2.set_named_range("hop", "A1:C2")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['hop'])
+        self.table2.set_named_range("hop", "A2:d8")
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['hop'])
+        nr = self.table2.get_named_range('hop')
+        self.assertEqual(nr.range, (0, 1, 3, 7))
+
+
+    def test_body_table_get_value_1(self):
+        result = self.table2.get_named_range("nr_1").get_value()
+        self.assertEqual(result, 1)
+
+
+    def test_body_table_get_value_2(self):
+        result = self.table2.get_named_range("nr_1").get_value(get_type = True)
+        self.assertEqual(result, (1, 'float'))
+
+
+    def test_body_table_get_value_3(self):
+        result = self.table2.get_named_range("nr_1").get_values()
+        self.assertEqual(result, [[1]])
+
+
+    def test_body_table_get_value_4(self):
+        result = self.table2.get_named_range("nr_1").get_values(flat = True)
+        self.assertEqual(result, [1])
+
+
+    def test_body_table_get_value_5(self):
+        result = self.table2.get_named_range("nr_6").get_values(flat = True)
+        self.assertEqual(result, [2, 3, 3, 4, 5, 6])
+
+
+    def test_body_table_get_value_6(self):
+        result = self.table2.get_named_range("nr_6").get_value()
+        self.assertEqual(result, 2)
+
+
+    def test_body_table_set_value_1(self):
+        self.table2.get_named_range("nr_6").set_value('AAA')
+        self.assertEqual(self.table2.get_value('D3'), 'AAA')
+        self.assertEqual(self.table2.get_value('E3'), 3)
+
+
+    def test_body_table_set_value_2(self):
+        self.table2.get_named_range("nr_6").set_values([[10,11,12],[13,14,15]])
+        self.assertEqual(self.table2.get_values(), [[1, 1, 1, 2, 3, 3, 3],
+                                                    [1, 1, 1, 2, 3, 3, 3],
+                                                    [1, 1, 1, 10, 11, 12, 3],
+                                                    [1, 2, 3, 13, 14, 15, 7]])
+
+
+    def test_body_change_name_table(self):
+        self.table2.set_name('new table')
+        result = [ nr.name for nr in self.table2.get_named_ranges()]
+        self.assertEqual(result, ['nr_1', 'nr_6'])
+        back_nr = self.table2.get_named_range('nr_6')
+        self.assertEqual(back_nr.name, 'nr_6')
+        self.assertEqual(back_nr.table_name, 'new table')
+        self.assertEqual(back_nr.start, (3, 2))
+        self.assertEqual(back_nr.end, (5, 3))
+        self.assertEqual(back_nr.range, (3, 2, 5, 3))
+        self.assertEqual(back_nr.usage, 'print-range')
 
 
 

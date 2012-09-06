@@ -3589,6 +3589,8 @@ class odf_table(odf_element):
     def get_named_ranges(self, table_name=None):
         """Returns the list of available Name Ranges of the spreadsheet. If
         table_name is provided, limits the search to these tables.
+        Beware : named ranges are stored at the body level, thus do not call
+        this method on a cloned table.
 
         Arguments:
 
@@ -3615,6 +3617,8 @@ class odf_table(odf_element):
     def get_named_range(self, name):
         """Returns the Name Ranges of the specified name. If
         table_name is provided, limits the search to these tables.
+        Beware : named ranges are stored at the body level, thus do not call
+        this method on a cloned table.
 
         Arguments:
 
@@ -3630,6 +3634,8 @@ class odf_table(odf_element):
 
     def set_named_range(self, name, range, table_name=None, usage=None):
         """Create a Named Range element and insert it in the document.
+        Beware : named ranges are stored at the body level, thus do not call
+        this method on a cloned table.
 
         Arguments:
 
@@ -3644,8 +3650,8 @@ class odf_table(odf_element):
         body = self.get_document_body()
         if not body:
             raise ValueError, "Table is not inside a document"
-        if len(name) == 0:
-            return ValueError, "Name required."
+        if not name:
+            raise ValueError, "Name required."
         if table_name is None:
             table_name = self.get_name()
         named_range = odf_create_named_range(name, range, table_name, usage)
@@ -3654,14 +3660,16 @@ class odf_table(odf_element):
 
     def delete_named_range(self, name):
         """Delete the Named Range of specified name from the spreadsheet.
+        Beware : named ranges are stored at the body level, thus do not call
+        this method on a cloned table.
 
         Arguments:
 
             name -- str
         """
         name = name.strip()
-        if len(name) == 0:
-            return ValueError, "Name required."
+        if not name:
+            raise ValueError, "Name required."
         body = self.get_document_body()
         if not body:
             raise ValueError, "Table is not inside a document."
@@ -3776,7 +3784,10 @@ class odf_named_range(odf_element):
                              'repeat-row') :
                 usage = None
         if usage is None:
-            self.del_attribute('table:range-usable-as')
+            try:
+                self.del_attribute('table:range-usable-as')
+            except KeyError:
+                pass
             self.usage = None
         else:
             self.set_attribute('table:range-usable-as', usage)
@@ -3792,8 +3803,8 @@ class odf_named_range(odf_element):
             name -- str
         """
         name = name.strip()
-        if len(name) == 0:
-            return ValueError, "Name required."
+        if not name:
+            raise ValueError, "Name required."
         try:
             body = self.get_document_body()
             named_range = body.get_named_range(name)
@@ -3813,8 +3824,8 @@ class odf_named_range(odf_element):
             name -- str
         """
         name = name.strip()
-        if len(name) == 0:
-            return ValueError, "Name required."
+        if not name:
+            raise ValueError, "Name required."
         self.table_name = name
         self._update_attributes()
 
