@@ -32,6 +32,7 @@ from cStringIO import StringIO
 from csv import reader, Sniffer
 from textwrap import wrap
 from bisect import bisect_left, insort
+import string
 
 # Import from lpod
 from datatype import Boolean, Date, DateTime, Duration
@@ -50,13 +51,30 @@ _xpath_cell_idx = _xpath_compile('(table:table-cell|table:covered-table-cell)[$i
 
 
 
+def _table_name_check(name):
+    if not isinstance(name, basestring):
+        raise ValueError, "String required."
+    name = name.strip()
+    if not name :
+        raise ValueError, "Empty name not allowed."
+    for character in ('\n', '/', '\\', "'") :
+        if character in name:
+            raise ValueError, 'Character %s not allowed.' % character
+    return name
+
+
+_forbidden_in_named_range = [x for x in string.printable if x not in
+                            string.letters and x not in
+                            string.digits and x !='_']
+
+
 def _alpha_to_digit(alpha):
     """Translates A to 0, B to 1, etc. So "AB" is value 27.
     """
     if type(alpha) is int:
         return alpha
     if not alpha.isalpha():
-        raise ValueError, 'column name "%s" is malformed' % alpha
+        raise ValueError, 'column name "%s" is malformed' % str(alpha)
     column = 0
     for c in alpha.lower():
         v = ord(c) - ord('a') + 1
@@ -69,7 +87,7 @@ def _digit_to_alpha(digit):
     if type(digit) is str and digit.isalpha():
         return digit
     if not type(digit) is int:
-        raise ValueError, 'column number "%s" is invalid' % digit
+        raise ValueError, 'column number "%s" is invalid' % str(digit)
     digit += 1
     column = ''
     while digit:
@@ -629,7 +647,9 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
 
 def odf_create_named_range(name, range, table_name, usage=None):
-    """Create a Named Range element.
+    """Create a Named Range element. 'name' must contains only letters, digits
+    and '_', and must not be like a coordinate as 'A1'. 'table_name' must be
+    a correct table name (no "'" or "/" in it).
 
     Arguments:
 
@@ -643,7 +663,7 @@ def odf_create_named_range(name, range, table_name, usage=None):
     """
     element = odf_create_element('table:named-range')
     element.set_name(name)
-    element.table_name = table_name
+    element.table_name = _table_name_check(table_name)
     element.set_range(range)
     element.set_usage(usage)
     return element
@@ -1754,7 +1774,7 @@ class odf_table(odf_element):
         elif len(coord) == 4:
             x, y, z, t = coord
         else:
-            raise ValueError, "ValueError %s" % coord
+            raise ValueError, "ValueError %s" % str(coord)
         if x and x < 0:
             x = _increment(x, self.get_width())
         if y and y < 0:
@@ -2000,11 +2020,10 @@ class odf_table(odf_element):
 
 
     def set_name(self, name):
-        """Set the name of the table. Name can't be empty.
+        """Set the name of the table. Name can't be empty and can't have the
+        character "'" or '/'.
         """
-        name = name.strip()
-        if len(name) == 0:
-            raise ValueError, "Empty name not allowed."
+        name = _table_name_check(name)
         # first, update named ranges
         # fixme : delete name ranges when deleting table, too.
         nrs = self.get_named_ranges(table_name = self.get_name())
@@ -3761,6 +3780,8 @@ class odf_named_range(odf_element):
             return
         name_range = cell_range_address.replace('$', '')
         name, range = name_range.split('.', 1)
+        if name.startswith("'") and name.endswith("'"):
+            name = name[1:-1]
         self.table_name = name
         range = range.replace('.', '')
         self._set_range(range)
@@ -3796,7 +3817,9 @@ class odf_named_range(odf_element):
 
     def set_name(self, name):
         """Set the name of the Named Range. The name is mandatory, if a Named
-        Range of the same name exists, it will be replaced.
+        Range of the same name exists, it will be replaced. Name must contains
+        only alphanumerics characters and '_', and can not be of a cell
+        coordinates form like 'AB12'.
 
         Arguments:
 
@@ -3805,6 +3828,22 @@ class odf_named_range(odf_element):
         name = name.strip()
         if not name:
             raise ValueError, "Name required."
+        for x in name:
+            if x in _forbidden_in_named_range:
+                raise ValueError, "Character forbidden '%s' " % x
+        step = ''
+        for x in name:
+            if x in string.letters and step in ('', 'A'):
+                step = 'A'
+                continue
+            elif step in ('A', 'A1') and x in string.digits:
+                step = 'A1'
+                continue
+            else:
+                step = ''
+                break
+        if step == 'A1':
+            raise ValueError, "Name of the type 'ABC123' is not allowed."
         try:
             body = self.get_document_body()
             named_range = body.get_named_range(name)
@@ -3823,10 +3862,7 @@ class odf_named_range(odf_element):
 
             name -- str
         """
-        name = name.strip()
-        if not name:
-            raise ValueError, "Name required."
-        self.table_name = name
+        self.table_name = _table_name_check(name)
         self._update_attributes()
 
 
@@ -3864,16 +3900,24 @@ class odf_named_range(odf_element):
 
     def _make_base_cell_address(self):
         # assuming we got table_name and range
-        return '$%s.$%s$%s' % ( self.table_name,
+        if ' ' in self.table_name:
+            name = "'%s'" % self.table_name
+        else:
+            name = self.table_name
+        return '$%s.$%s$%s' % (name,
                                 _digit_to_alpha(self.start[0]),
                                 self.start[1] + 1 )
 
 
     def _make_cell_range_address(self):
         # assuming we got table_name and range
+        if ' ' in self.table_name:
+            name = "'%s'" % self.table_name
+        else:
+            name = self.table_name
         if self.start == self.end:
             return self._make_base_cell_address()
-        return '$%s.$%s$%s:.$%s$%s' % ( self.table_name,
+        return '$%s.$%s$%s:.$%s$%s' % (name,
                                     _digit_to_alpha(self.start[0]),
                                     self.start[1] + 1,
                                     _digit_to_alpha(self.end[0]),

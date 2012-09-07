@@ -441,6 +441,22 @@ class TestCreateTable(TestCase):
         self.assertEqual(table.serialize(), expected)
 
 
+    def test_bad_name_1(self):
+        self.assertRaises(ValueError, odf_create_table, ' ')
+
+
+    def test_bad_name_2(self):
+        self.assertRaises(ValueError, odf_create_table, "ee'ee")
+
+
+    def test_bad_name_3(self):
+        self.assertRaises(ValueError, odf_create_table, 'ee/ee')
+
+
+    def test_bad_name_4(self):
+        self.assertRaises(ValueError, odf_create_table, 'ee\nee')
+
+
     def test_width_height(self):
         table = odf_create_table(u"A Table", width=1, height=2)
         expected = ('<table:table table:name="A Table">'
@@ -2848,22 +2864,67 @@ class TestTableNamedRange(TestCase):
         self.assertRaises(TypeError, odf_create_named_range)
 
 
+    def test_create_bad_nr_2(self):
+        self.assertRaises(ValueError, odf_create_named_range, ' ', 'A1',
+                                                            'tname')
+
+
+    def test_create_bad_nr_3(self):
+        self.assertRaises(ValueError, odf_create_named_range, 'A1', 'A1',
+                                                            'tname')
+
+
+    def test_create_bad_nr_4(self):
+        self.assertRaises(ValueError, odf_create_named_range, 'a space', 'A1',
+                                                            'tname')
+
+
+    def test_create_bad_nr_5(self):
+        self.assertRaises(ValueError, odf_create_named_range, '===', 'A1',
+                                                            'tname')
+
+
+    def test_create_bad_nr_6(self):
+        self.assertRaises(ValueError, odf_create_named_range, 'ok', 'A1',
+                                                            '/ ')
+
+
+    def test_create_bad_nr_7(self):
+        self.assertRaises(ValueError, odf_create_named_range, 'ok', 'A1',
+                                                            ' ')
+
+
+    def test_create_bad_nr_8(self):
+        self.assertRaises(ValueError, odf_create_named_range, 'ok', 'A1',
+                                                            '\\')
+
+
+    def test_create_bad_nr_9(self):
+        self.assertRaises(ValueError, odf_create_named_range, 'ok', 'A1',
+                                                            'tname\nsecond line')
+
+
+    def test_create_bad_nr_10(self):
+        self.assertRaises(ValueError, odf_create_named_range, 'ok', 'A1',
+                                                            42)
+
+
     def test_create_nr(self):
-        nr = odf_create_named_range(u'nr name ù', 'A1:C2', u'table name é',
+        nr = odf_create_named_range(u'nr_name_ù', 'A1:C2', u'table name é',
                                     usage = 'filter')
-        result="""<table:named-range table:name="nr name &#249;" table:base-cell-address="$table name &#233;.$A$1" table:cell-range-address="$table name &#233;.$A$1:.$C$2" table:range-usable-as="filter"/>"""
+        result="""<table:named-range table:name="nr_name_&#249;" table:base-cell-address="$'table name &#233;'.$A$1" table:cell-range-address="$'table name &#233;'.$A$1:.$C$2" table:range-usable-as="filter"/>"""
         self.assertEqual(nr.serialize(), result)
 
 
     def test_usage_1(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'a123a', 'A1:C2', u'tablename')
         self.assertEqual(nr.usage, None)
         nr.set_usage('blob')
         self.assertEqual(nr.usage, None)
 
 
     def test_usage_2(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_usage('filter')
         self.assertEqual(nr.usage, 'filter')
         nr.set_usage('blob')
@@ -2871,7 +2932,7 @@ class TestTableNamedRange(TestCase):
 
 
     def test_usage_3(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_usage('Print-Range')
         self.assertEqual(nr.usage, 'print-range')
         nr.set_usage(None)
@@ -2879,84 +2940,84 @@ class TestTableNamedRange(TestCase):
 
 
     def test_usage_4(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_usage(u'repeat-column')
         self.assertEqual(nr.usage, 'repeat-column')
 
 
     def test_usage_5(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_usage('repeat-row')
         self.assertEqual(nr.usage, 'repeat-row')
 
 
     def test_name_1(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
-        self.assertEqual(nr.name, 'nr name')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
+        self.assertEqual(nr.name, 'nr_name')
 
 
     def test_name_2(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
-        nr.set_name(u'  New Name  ô ')
-        self.assertEqual(nr.name, u'New Name  ô')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
+        nr.set_name(u'  New_Name_ô ')
+        self.assertEqual(nr.name, u'New_Name_ô')
 
 
     def test_name_3(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertRaises(ValueError, nr.set_name, '   ')
 
 
     def test_table_name_1(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertEqual(nr.table_name, 'tablename')
 
 
     def test_table_name_2(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_table_name('  new name ')
         self.assertEqual(nr.table_name, 'new name')
 
 
     def test_table_name_3(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertRaises(ValueError, nr.set_table_name, '   ')
 
 
     def test_range_1(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertRaises(ValueError, nr.set_range, '   ')
 
 
     def test_range_2(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertEqual(nr.range, (0, 0, 2, 1))
         self.assertEqual(nr.start, (0, 0))
         self.assertEqual(nr.end, (2, 1))
 
 
     def test_range_3(self):
-        nr = odf_create_named_range(u'nr name', 'A1', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1', u'tablename')
         self.assertEqual(nr.range, (0, 0, 0, 0))
         self.assertEqual(nr.start, (0, 0))
         self.assertEqual(nr.end, (0, 0))
 
 
     def test_range_4(self):
-        nr = odf_create_named_range(u'nr name', (1, 2, 3, 4), u'tablename')
+        nr = odf_create_named_range(u'nr_name', (1, 2, 3, 4), u'tablename')
         self.assertEqual(nr.range, (1, 2, 3, 4))
         self.assertEqual(nr.start, (1, 2))
         self.assertEqual(nr.end, (3, 4))
 
 
     def test_range_5(self):
-        nr = odf_create_named_range(u'nr name', (5, 6), u'tablename')
+        nr = odf_create_named_range(u'nr_name', (5, 6), u'tablename')
         self.assertEqual(nr.range, (5, 6, 5, 6))
         self.assertEqual(nr.start, (5, 6))
         self.assertEqual(nr.end, (5, 6))
 
 
     def test_range_6(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range('B3')
         self.assertEqual(nr.range, (1, 2, 1, 2))
         self.assertEqual(nr.start, (1, 2))
@@ -2964,7 +3025,7 @@ class TestTableNamedRange(TestCase):
 
 
     def test_range_7(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range('B3:b10')
         self.assertEqual(nr.range, (1, 2, 1, 9))
         self.assertEqual(nr.start, (1, 2))
@@ -2972,7 +3033,7 @@ class TestTableNamedRange(TestCase):
 
 
     def test_range_8(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range((1,5,0,9))
         self.assertEqual(nr.range, (1, 5, 0, 9))
         self.assertEqual(nr.start, (1, 5))
@@ -2980,7 +3041,7 @@ class TestTableNamedRange(TestCase):
 
 
     def test_range_9(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range((0,9))
         self.assertEqual(nr.range, (0, 9, 0, 9))
         self.assertEqual(nr.start, (0, 9))
@@ -2988,22 +3049,22 @@ class TestTableNamedRange(TestCase):
 
 
     def test_value_bad_1(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertRaises(ValueError, nr.get_values)
 
 
     def test_value_bad_2(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertRaises(ValueError, nr.get_value)
 
 
     def test_value_bad_3(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertRaises(ValueError, nr.set_values, [[1, 2]])
 
 
     def test_value_bad_4(self):
-        nr = odf_create_named_range(u'nr name', 'A1:C2', u'tablename')
+        nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         self.assertRaises(ValueError, nr.set_value, 42)
 
 
