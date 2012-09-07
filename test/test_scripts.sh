@@ -15,6 +15,7 @@ lp_convert2 () {  $p/lpod-convert.py $s/simple_table.ods a.csv && rm a.csv ;}
 lp_convert3 () {  $p/lpod-convert.py $s/example.odt a.txt && rm a.txt ;}
 lp_convert4 () {  $p/lpod-convert.py $s/example.odp a.html && rm a.html ;}
 lp_diff () {  $p/lpod-diff.py $s/example.odt $s/base_text.odt ;}
+lp_folder () {  $p/lpod-folder.py $s/example.odt && rm -r $s/example.odt.folder ;}
 lp_high () {  $p/lpod-highlight.py -o a.odt -b $s/example.odt First && rm a.odt ;}
 lp_merge () { $p/lpod-merge.py -o a.odt $s/base_text.odt $s/example.odt && rm a.odt ;}
 lp_meta () { $p/lpod-meta.py $s/meta.odt ;}
@@ -30,6 +31,7 @@ lp_convert2
 lp_convert3
 lp_convert4
 lp_diff
+lp_folder
 lp_high
 lp_merge
 lp_meta
