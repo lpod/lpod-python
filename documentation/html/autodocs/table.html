@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     'current-stable-70-g3f5acd9',
+        VERSION:     'current-stable-72-ga67260b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -280,7 +280,9 @@ table.get_values() for the arguments description and return format.</p>
 <dt id="lpod.table.odf_named_range.set_name">
 <tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.table.odf_named_range.set_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the name of the Named Range. The name is mandatory, if a Named
-Range of the same name exists, it will be replaced.</p>
+Range of the same name exists, it will be replaced. Name must contains
+only alphanumerics characters and &#8216;_&#8217;, and can not be of a cell
+coordinates form like &#8216;AB12&#8217;.</p>
 <p>Arguments:</p>
 <blockquote>
 <div>name &#8211; str</div></blockquote>
@@ -1257,7 +1259,8 @@ like &#8220;C&#8221; is accepted.</p>
 <dl class="method">
 <dt id="lpod.table.odf_table.set_name">
 <tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the name of the table. Name can&#8217;t be empty.</p>
+<dd><p>Set the name of the table. Name can&#8217;t be empty and can&#8217;t have the
+character &#8220;&#8217;&#8221; or &#8216;/&#8217;.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1526,7 +1529,9 @@ columns, give the number of repeated columns.</p>
 <dl class="function">
 <dt id="lpod.table.odf_create_named_range">
 <tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_named_range</tt><big>(</big><em>name</em>, <em>range</em>, <em>table_name</em>, <em>usage=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_named_range" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a Named Range element.</p>
+<dd><p>Create a Named Range element. &#8216;name&#8217; must contains only letters, digits
+and &#8216;_&#8217;, and must not be like a coordinate as &#8216;A1&#8217;. &#8216;table_name&#8217; must be
+a correct table name (no &#8220;&#8217;&#8221; or &#8220;/&#8221; in it).</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>name &#8211; str, name of the named range</p>
@@ -1653,7 +1658,7 @@ ensuiring model integrity.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2012, lpOD team.
-      Last updated on Last release: lpOD current-stable-70-g3f5acd9. Last modified: 2012-09-06 17:58..
+      Last updated on Last release: lpOD current-stable-72-ga67260b. Last modified: 2012-09-07 17:02..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
