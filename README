@@ -14,7 +14,7 @@ Maintained branches are:
 
     - legacy  : compatible with 0.9x versions
     - current : next stable version
-    - master  : currently, master = legacy
+    - master  : currently, master = current
 
 The most recent version of this package is there:
 
@@ -26,20 +26,24 @@ How to get the code with git:
     git checkout current
 
 
+Documentation: see the ./documentation/html folder.
+
 
 Some usefull packages for the use of the lpod-python library:
 
-    - Lpod documentation:
-
-        https://github.com/lpod/lpod-docs
 
     - Programming recipes for the lpod-python library:
 
         https://github.com/lpod/lpod-python-recipes
 
 
+    - Lpod global documentation (currently inaccurate):
 
-About the Lpod Project, see :
+        https://github.com/lpod/lpod-docs
+
+
+
+About the Lpod Project, see:
 
     http://lpod-project.org
 
