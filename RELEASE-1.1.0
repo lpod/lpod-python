@@ -1,0 +1,114 @@
+=================
+LpOD-python 1.1.0
+=================
+
+This library is the python implementation of the lpOD Project (Languages &
+Platforms OpenDocument, definition of a Free Software API implementing the
+ISO/IEC 26300 standard).
+
+This release is a major release, breaking compatibility on previous version
+as regards table management.
+
+
+See the README file for project informations and URLs.
+
+
+Main changes:
+
+
+- Improved algorithms for table read and write access. See the script
+  ./test/use_case_perf.py to check performances.
+
+
+- Most table methods do accept/require a coordinate range, which may break
+  compatibility with prior versions. Example:
+
+  - version 0.9.3 :
+        table.get_values(self):
+        """Get a matrix of all Python values of the table."""
+
+    - version 1.1.0 :
+        table.get_values(self, coord=None, cell_type=None, complete=True,
+                   get_type=False, flat=False):
+        """Get a matrix of values of the table..."""
+
+
+- New feature: ODF named ranges management in spreadsheet tables. Named ranges
+  are accessible both from document.body() and directly from table objects (when
+  the table is inserted in an existent document.body).
+
+
+- Updated training material: see the programming recipes for the lpod-python
+  library: https://github.com/lpod/lpod-python-recipes
+
+
+- Documentation: html auto generated documentation is available with the
+  package, see ./documentation/html. The former global Lpod documentation is not
+  accurate as regards actual programming with this library, but still valuable
+  for the general architecture of the library.
+
+
+- QA: more unit tests, programming recipes and scripts are now part of testing
+  cycle.
+
+
+- Fixes: many fixes, including repeated cells management, tables, rows and
+  columns sizes.
+
+
+- Various: flags for future/experimental features (currently unused).
+
+
+- container.py: lpod-python½ tries to save/load malformed documents (e.g. without
+  mimetype). Less tracebacks and more warnings when working on documents with
+  missing parts. For debugging purpose, new 'folder' format and 'backup' option
+  for document.save() method, see the new lpod-folder.py script.
+
+
+- element.py: cache for xpath pre-compiled queries. Cache at the ODF_element
+  level for some classes (tables). Optimizations for some xpath queries. New
+  methods, mostly for internal use (_get_element_idx,
+  elements_repeated_sequence, extend, get_named_ranges, get_named_range,
+  append_named_range, delete_named_range)
+
+
+- style.py: use of the CSS3 color map. New functions to manage table cells
+  styles: (make_table_cell_border_string, odf_create_table_cell_style).
+
+
+- table.py: new algorithm to access a cell in a row or table, a row or a column
+  in a table. ODF named range feature. Check on name validity for tables and
+  named ranges. Areas, ranges and coordinates improved, most methods try to
+  guess actual meaning of strange coordinates specifications. Better and faster
+  ODF 'repeated' concept management. Faster table, row and column traverse()
+  methods, traverse() get 2 new options, 'start' and 'end'. Better clone()
+  management (mostly for internal use). Cells have 2 new attributes: .x and .y,
+  updated when the cell is read or written in some row or table container. Same:
+  row have a .y attribute, columns have a .x attribute. New 'get_type' option
+  for the get_value() and get_values() methods. New
+  get_cells() /set_cells() /get_column_cells() methods, that require a coordinate
+  or area as argument. set_cell(), set_row() return the actual inserted item,
+  with updated x and y. row.set_value() /set_values() and
+  table.set_value() /set_values() /set_row_values() /set_column_values() allow to
+  set the cell_type and currency of the cell, and to set the specified area of
+  the table. Enhancement of row.get_values() and
+  table.get_values() /iter_values() /get_row_values() /get_column_values(), with
+  new options and filters: coord range, cell_type, complete, get_type. New
+  method row.set_cells to set cells from a 'start' position. Former dangerous
+  table.append() method tries now to dispatch between table.append_row() and
+  table.append_column(). New algorithm for table.get_height() and
+  table.get_width(). Validity checks in table.set_name(). New table.transpose()
+  method. table.get_cells() accepts a range area, a new filter on cell_type, and
+  an optionnal 'flat' output format. table.get_rows() and get_columns() accept a
+  range argument. table.get_columns_width() now returns table.get_width(). In
+  all methods, former 'coordinates' argument unified to 'coord'.
+
+  New class: odf_named_range(odf_element), with attributes: name, table_name,
+  start, end, range, usage and methods: set_usage(), set_name(),
+  set_table_name(), set_range(), get_values(), get_value(), set_values(),
+  set_value().
+
+  New functions and methods: odf_create_named_range, row.extend_cells(),
+  table.extend_rows(), row.set_cells(), table.set_row_cells(),
+  table.transpose(), table.set_cells(), table.get_named_ranges(),
+  table.get_named_range(), table.set_named_range(), table.delete_named_range().
