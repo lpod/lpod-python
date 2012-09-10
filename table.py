@@ -180,7 +180,7 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
     current_pos = before_cache + 1
     current_repeated = current_cache - before_cache
     repeated_before = position - current_pos
-    repeated_after = current_repeated - repeated_before - repeated
+    repeated_after = current_repeated - repeated_before - 1
     if repeated_before >= 1:
         #Update repetition
         current_item._set_repeated(repeated_before)
@@ -199,21 +199,6 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
         after_item = current_item.clone()
         after_item._set_repeated(repeated_after)
         vault.insert(after_item, position = target_idx + 1)
-    # setting a repeated item !
-    if repeated_after < 0:
-        # deleting some overlapped items
-        deleting = repeated_after
-        while deleting < 0:
-            delete_item = vault.get_element_idx2(vault_scheme, target_idx + 1)
-            if delete_item is None:
-                break
-            is_repeated = delete_item.get_repeated() or 1
-            is_repeated += deleting
-            if is_repeated > 1:
-                delete_item._set_repeated(is_repeated)
-            else:
-                vault.delete(delete_item)
-            deleting = is_repeated
     # update cache
     # remove existing
     idx = odf_idx
@@ -228,12 +213,6 @@ def _set_item_in_vault(position, item, vault, vault_scheme, vault_map_name, clon
     if repeated_after >= 1:
         idx += 1
         map = _insert_map_once(map, idx, repeated_after)
-    if repeated_after < 0:
-        idx += 1
-        while repeated_after < 0:
-            if idx < len(map):
-                map = _erase_map_once(map, idx)
-            repeated_after += 1
     setattr(vault, vault_map_name, map)
     return new_item
 

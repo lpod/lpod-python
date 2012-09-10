@@ -938,7 +938,7 @@ class TestTableCache(TestCase):
 
 
     def test_row_repeat_twice(self):
-        row = odf_create_row(repeated=6)
+        row = odf_create_row(repeated=5)
         table = self.table.clone()
         table.insert_row(2, row)
         cell = odf_create_cell(value=333, repeated=2)
@@ -951,8 +951,8 @@ class TestTableCache(TestCase):
         row.set_repeated(3)
         table.set_row(4, row)
         self.assertEqual(table.get_height(), 4      # initial height
-                                            + 6     # *insert* row with repeated 6
-                                            + 3 -3) # *set* row with repeated 3
+                                            + 5     # *insert* row with repeated 5
+                                            + 3 -1) # *set* row with repeated 3
         self.assertEqual(table.get_values(),
                 [[1, 1, 1, 2, 3, 3, 3],
                  [1, 1, 1, 2, 3, 3, 3],
@@ -961,6 +961,7 @@ class TestTableCache(TestCase):
                  [None, None, None, None, 333, 333, None],
                  [None, None, None, None, 333, 333, None],
                  [None, None, None, None, 333, 333, None],
+                 [None, None, None, None, None, None, None],
                  [None, None, None, None, None, None, None],
                  [1, 1, 1, 2, 3, 3, 3],
                  [1, 2, 3, 4, 5, 6, 7]])
