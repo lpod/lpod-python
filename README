@@ -17,7 +17,7 @@ Maintained branches are:
 
     - legacy  : compatible with 0.9x versions
     - current : next stable version
-    - master  : currently, master = legacy
+    - master  : currently, master = current
 
 The most recent version of this package is there:
 
