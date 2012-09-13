@@ -22,7 +22,7 @@ The most recent version of this package is there:
 
 How to get the code with git:
 
-    git clone git://github.com/lpod/lpod-python
+    git clone git://github.com/lpod/lpod-python.git
     git checkout current
 
 
