@@ -58,7 +58,6 @@ def _get_formatted_text(element, context, with_text=True):
                                                  with_text=True))
             # Try to convert some styles in rst_mode
             elif tag == 'text:span':
-                # XXX Move this part in span.py ??
                 text = _get_formatted_text(obj, context, with_text=True)
                 if not rst_mode:
                     result.append(text)
@@ -165,6 +164,27 @@ def odf_create_undividable_space(number=1):
     # FIXME what is number?
     element = odf_create_element('text:s')
     element.set_attribute('text:c', str(number))
+    return element
+
+
+
+def _odf_create_span(text=None, style=None):
+    """Create a span element of the given style containing the optional
+    given text.
+
+    Arguments:
+
+        style -- unicode
+
+        text -- unicode
+
+    Return: odf_element
+    """
+    element = odf_create_element('text:span')
+    if text:
+        element.set_text(text)
+    if style:
+        element.set_style(style)
     return element
 
 
@@ -284,9 +304,6 @@ class odf_paragraph(odf_element):
 
             length -- int
         """
-        # XXX FIX ME cyclic import
-        from span import odf_create_span
-
         if isinstance(style, odf_style):
             style = style.get_name()
         if offset:
@@ -316,7 +333,7 @@ class odf_paragraph(odf_element):
                     before = text[:start]
                     match = text[start:end]
                     after = text[end:]
-                    span = odf_create_span(match, style=style)
+                    span = _odf_create_span(match, style=style)
                     span.set_tail(after)
                     if is_text:
                         container.set_text(before)
@@ -423,4 +440,10 @@ class odf_paragraph(odf_element):
 
 
 
+class odf_span(odf_paragraph):
+    pass
+
+
+
 register_element_class('text:p', odf_paragraph)
+register_element_class('text:span', odf_span)

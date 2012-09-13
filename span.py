@@ -24,36 +24,12 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-# Import from lpod
-from element import odf_create_element, register_element_class
-from paragraph import odf_paragraph
+########
+########
+########  Content move in paragraph.py
+########
+########
 
+from paragraph import _odf_create_span
 
-
-def odf_create_span(text=None, style=None):
-    """Create a span element of the given style containing the optional
-    given text.
-
-    Arguments:
-
-        style -- unicode
-
-        text -- unicode
-
-    Return: odf_element
-    """
-    element = odf_create_element('text:span')
-    if text:
-        element.set_text(text)
-    if style:
-        element.set_style(style)
-    return element
-
-
-
-class odf_span(odf_paragraph):
-    pass
-
-
-
-register_element_class('text:span', odf_span)
+odf_create_span = _odf_create_span
