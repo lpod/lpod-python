@@ -31,6 +31,8 @@ from unittest import TestCase, main
 # Import from lpod
 from lpod.document import odf_get_document
 from lpod.paragraph import odf_create_paragraph, odf_paragraph
+from lpod.paragraph import odf_create_spaces, odf_create_tabulation
+from lpod.paragraph import odf_create_line_break
 from lpod.element import odf_create_element
 
 
@@ -113,6 +115,39 @@ class TestParagraph(TestCase):
         body = self.body
         paragraph = body.get_paragraph(position=999)
         self.assertEqual(paragraph, None)
+
+
+
+class TestParagraphItems(TestCase):
+
+    def test_create_space(self):
+        sp1 = odf_create_spaces()
+        expected = ('<text:s text:c="1"/>')
+        self.assertEqual(sp1.serialize(), expected)
+
+
+    def test_create_spaces(self):
+        sp5 = odf_create_spaces(5)
+        expected = ('<text:s text:c="5"/>')
+        self.assertEqual(sp5.serialize(), expected)
+
+
+    def test_create_tabulation(self):
+        tab = odf_create_tabulation()
+        expected = ('<text:tab/>')
+        self.assertEqual(tab.serialize(), expected)
+
+
+    def test_create_tabulation_pos(self):
+        tab = odf_create_tabulation(4)
+        expected = ('<text:tab text:tab-ref="4"/>')
+        self.assertEqual(tab.serialize(), expected)
+
+
+    def test_create_line_break(self):
+        lb = odf_create_line_break()
+        expected = ('<text:line-break/>')
+        self.assertEqual(lb.serialize(), expected)
 
 
 

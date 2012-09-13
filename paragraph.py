@@ -148,23 +148,60 @@ def _get_formatted_text(element, context, with_text=True):
 
 
 
-def odf_create_line_break():
-    return odf_create_element('text:line-break')
-
-
-
-def odf_create_undividable_space(number=1):
+#def odf_create_undividable_space(number=1):
+def odf_create_spaces(number=1):
     """
+    This element shall be used to represent the second and all following “ “
+    (U+0020, SPACE) characters in a sequence of “ “ (U+0020, SPACE) characters.
+    Note: It is not an error if the character preceding the element is not a
+    white space character, but it is good practice to use this element only for
+    the second and all following SPACE characters in a sequence.
+
     Arguments:
 
         number -- int
 
     Return odf_element
     """
-    # FIXME what is number?
     element = odf_create_element('text:s')
     element.set_attribute('text:c', str(number))
     return element
+
+
+
+def odf_create_tabulation(position=None):
+    """
+    This element represents the [UNICODE] tab character (HORIZONTAL TABULATION,
+    U+0009).
+
+    The position attribute contains the number of the tab-stop to which
+    a tab character refers. The position 0 marks the start margin of a
+    paragraph. Note: The position attribute is only a hint to help non-layout
+    oriented consumers to determine the tab/tab-stop association. Layout
+    oriented consumers should determine the tab positions based on the style
+    information
+
+    Arguments:
+
+        number -- int
+
+    Return odf_element
+    """
+    element = odf_create_element('text:tab')
+    if position is not None:
+        if position >=0:
+            element.set_attribute('text:tab-ref', str(position))
+    return element
+
+
+
+def odf_create_line_break():
+    """
+    This element represents a line break.
+
+    Return odf_element
+    """
+    return odf_create_element('text:line-break')
 
 
 
