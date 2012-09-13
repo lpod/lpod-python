@@ -43,7 +43,7 @@ from link import odf_create_link
 from list import odf_create_list, odf_create_list_item
 from note import odf_create_note
 from paragraph import odf_create_paragraph, odf_create_line_break
-from paragraph import odf_create_undividable_space
+from paragraph import odf_create_spaces
 from span import odf_create_span
 from scriptutils import printwarn
 from style import odf_create_style
@@ -287,8 +287,9 @@ def convert_literal_block(node, context):
                         tmp = u"".join(tmp)
                         paragraph.append(tmp)
                         tmp = []
+                    paragraph.append(' ')
                     paragraph.append(
-                              odf_create_undividable_space(spaces))
+                              odf_create_spaces(spaces - 1))
                     spaces = 0
                 elif spaces == 1:
                     tmp.append(' ')
