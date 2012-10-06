@@ -148,7 +148,6 @@ def _get_formatted_text(element, context, with_text=True):
 
 
 
-#def odf_create_undividable_space(number=1):
 def odf_create_spaces(number=1):
     """
     This element shall be used to represent the second and all following “ “

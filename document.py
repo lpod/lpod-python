@@ -42,7 +42,7 @@ from container import odf_get_container, odf_new_container, odf_container
 from content import odf_content
 from manifest import odf_manifest
 from meta import odf_meta
-from style import odf_style, odf_master_page, odf_font_style
+from style import odf_style, odf_master_page, odf_font_style, odf_page_layout
 from style import registered_styles
 from styles import odf_styles
 #from utils import obsolete
@@ -538,9 +538,17 @@ class odf_document(object):
             existing = part.get_style(family, name)
         # Font face declarations
         elif isinstance(style, odf_font_style):
-            # XXX If inserted in styles.xml => It doesn't work, it's normal?
-            part = self.get_part(ODF_CONTENT)
+            if default:
+                part = self.get_part(ODF_STYLES)
+            else:
+                part = self.get_part(ODF_CONTENT)
             container = part.get_element("office:font-face-decls")
+            existing = part.get_style(family, name)
+        # page layout style
+        elif isinstance(style, odf_page_layout):
+            part = self.get_part(ODF_STYLES)
+            # force to automatic
+            container = part.get_element("office:automatic-styles")
             existing = part.get_style(family, name)
         # Common style
         elif isinstance(style, odf_style):
