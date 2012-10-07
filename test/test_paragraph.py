@@ -150,6 +150,49 @@ class TestParagraphItems(TestCase):
         self.assertEqual(lb.serialize(), expected)
 
 
+    def test_append_plain_text_unicode(self):
+        txt = u'A test,\n   \twith \n\n some é and \t and     5 spaces.'
+        para = odf_create_paragraph()
+        para.append_plain_text(txt)
+        expected = ('<text:p>A test,<text:line-break/> <text:s text:c="2"/>'
+                    '<text:tab/>with <text:line-break/><text:line-break/> '
+                    'some &#233; and <text:tab/> and <text:s text:c="4"/>'
+                    '5 spaces.</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_append_plain_text_utf8(self):
+        txt = 'A test,\n   \twith \n\n some é and \t and     5 spaces.'
+        para = odf_create_paragraph()
+        para.append_plain_text(txt, 'utf-8')
+        expected = ('<text:p>A test,<text:line-break/> <text:s text:c="2"/>'
+                    '<text:tab/>with <text:line-break/><text:line-break/> '
+                    'some &#233; and <text:tab/> and <text:s text:c="4"/>'
+                    '5 spaces.</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_append_plain_text_guess_utf8(self):
+        txt = 'A test,\n   \twith \n\n some é and \t and     5 spaces.'
+        para = odf_create_paragraph()
+        para.append_plain_text(txt)
+        expected = ('<text:p>A test,<text:line-break/> <text:s text:c="2"/>'
+                    '<text:tab/>with <text:line-break/><text:line-break/> '
+                    'some &#233; and <text:tab/> and <text:s text:c="4"/>'
+                    '5 spaces.</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_append_plain_text_guess_iso(self):
+        txt = 'A test,\n   \twith \n\n some \xe9 and \t and     5 spaces.'
+        para = odf_create_paragraph()
+        para.append_plain_text(txt)
+        expected = ('<text:p>A test,<text:line-break/> <text:s text:c="2"/>'
+                    '<text:tab/>with <text:line-break/><text:line-break/> '
+                    'some &#233; and <text:tab/> and <text:s text:c="4"/>'
+                    '5 spaces.</text:p>')
+        self.assertEqual(para.serialize(), expected)
+        
 
 class TestSetSpan(TestCase):
 

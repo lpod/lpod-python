@@ -38,6 +38,29 @@ from note import odf_create_note, odf_create_annotation
 from style import odf_style
 
 
+_rsplitter = compile(u'(\n|\t|  +)', UNICODE)
+_rspace = compile(u'^  +$', UNICODE)
+
+
+
+def _guess_decode(text):
+    """Try to decode text using common encoding
+    """
+    done = False
+    for encoding in ('utf-8', 'iso8859-1', 'ascii'):
+        try:
+            decoded = text.decode(encoding)
+            done = True
+            break
+        except UnicodeDecodeError:
+            continue
+    if done:
+        return decoded
+    else:
+        raise UnicodeDecodeError
+
+
+
 def _get_formatted_text(element, context, with_text=True):
     document = context['document']
     rst_mode = context['rst_mode']
@@ -271,6 +294,34 @@ class odf_paragraph(odf_element):
         result = [_get_formatted_text(self, context, with_text=True)]
         result.append(u'\n\n')
         return u''.join(result)
+
+
+    def append_plain_text(self, text=u'', encoding=None):
+        """Append unicode plain text to the paragraph, replacing '\n', '\t'
+           and multiple spaces by ODF corresponding tags.
+        """
+        if not isinstance(text, unicode):
+            if encoding:
+                text = text.decode(encoding)
+            else:
+                text = _guess_decode(text)
+        blocs = _rsplitter.split(text)
+        for b in blocs:
+            if not b:
+                continue
+            if b == u'\n':
+                self.append(odf_create_line_break())
+                continue
+            if b == u'\t':
+                self.append(odf_create_tabulation())
+                continue
+            if _rspace.match(b):
+                # follow ODF standard : n spaces => one space + spacer(n-1)
+                self.append(u' ')
+                self.append(odf_create_spaces(len(b) - 1))
+                continue
+            # standard piece of text:
+            self.append(b)
 
 
     def insert_note(self, note_element=None, after=None,
