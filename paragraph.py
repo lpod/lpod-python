@@ -297,7 +297,7 @@ class odf_paragraph(odf_element):
 
 
     def append_plain_text(self, text=u'', encoding=None):
-        """Append unicode plain text to the paragraph, replacing '\n', '\t'
+        """Append unicode plain text to the paragraph, replacing <CR>, <TAB>
            and multiple spaces by ODF corresponding tags.
         """
         if not isinstance(text, unicode):
