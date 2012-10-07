@@ -394,13 +394,41 @@ class odf_paragraph(odf_element):
         if isinstance(style, odf_style):
             style = style.get_name()
         if offset:
-            # XXX quickly hacking the offset
-            text = self.get_text()
-            if length:
-                regex = text[offset:offset + length]
-            else:
-                regex = text[offset:]
-            regex = escape(regex)
+            counted = 0
+            for text in self.xpath("//text()"):
+                if len(text) + counted <= offset:
+                    counted += len(text)
+                    continue
+                if length > 0:
+                    length = min(length, len(text))
+                else:
+                    length = len(text)
+                # Static information about the text node
+                container = text.get_parent()
+                wrapper = container.get_parent()
+                is_text = text.is_text()
+                start = offset - counted
+                end = start + length
+                # Do not use the text node as it changes at each loop
+                if is_text:
+                    text = container.get_text()
+                else:
+                    text = container.get_tail()
+                before = text[:start]
+                match = text[start:end]
+                after = text[end:]
+                span = _odf_create_span(match, style=style)
+                span.set_tail(after)
+                if is_text:
+                    container.set_text(before)
+                    # Insert as first child
+                    container.insert(span, position=0)
+                else:
+                    container.set_tail(before)
+                    # Insert as next sibling
+                    index = wrapper.index(container)
+                    wrapper.insert(span, position=index + 1)
+                return
         if regex:
             pattern = compile(unicode(regex), UNICODE)
             for text in self.xpath('descendant::text()'):
