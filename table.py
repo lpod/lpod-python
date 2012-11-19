@@ -872,6 +872,16 @@ class odf_cell(odf_element):
         return True
 
 
+    def _is_spanned(self):
+        if self.get_tag() == 'table:covered-table-cell':
+            return True
+        if self.get_attribute('table:number-columns-spanned') is not None:
+            return True
+        if self.get_attribute('table:number-rows-spanned') is not None:
+            return True
+        return False
+
+
 
 class odf_row(odf_element):
 
