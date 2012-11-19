@@ -3706,6 +3706,84 @@ class odf_table(odf_element):
 
 
     #
+    # Cell span
+    #
+
+
+    def set_span(self, area, merge=False):
+        """Create a Cell Span : span the first cell of the area on several
+        columns and/or rows.
+        If merge is True, replace text of the cell by the concatenation of
+        existing text in covered cells.
+        Beware : if merge is True, old text is changed, if merge is False
+        (the default), old text in coverd cells is still present but not
+        displayed by most GUI.
+
+        If the area defines only one cell, the set span will do nothing.
+        It is not allowed to apply set span to an area whose one cell already
+        belongs to previous cell span.
+
+        Area can be either one cell (like 'A1') or an area ('A1:B2'). It can
+        be provided as an alpha numeric value like "A1:B2' or a tuple like
+        (0, 0, 1, 1) or (0, 0).
+
+        Arguments:
+
+            area -- str or tuple of int, cell or area coordinate
+
+            merge -- boolean
+        """
+        # get area
+        digits = _convert_coordinates(area)
+        if len(digits) == 4:
+            x, y, z, t = digits
+        else:
+            x, y = digits
+            z, t = digits
+        start = x, y
+        end = z, t
+        if start == end:
+            # one cell : do nothing
+            return False
+        # check for previous span
+        good = True
+        cells = self.get_cells((x,y,z,t))
+        for row in cells:
+            for cell in row:
+                if cell._is_spanned():
+                    good = False
+                    break
+            if not good:
+                break
+        if not good:
+            return False
+        # do it:
+        if merge:
+            txt_list = []
+            for row in cells:
+                for cell in row:
+                    txt = cell.get_text_content()
+                    if txt:
+                        txt_list.append(txt)
+                        cell.set_text('')
+            new_text = ' '.join(txt_list)
+            if new_text:
+                cells[0][0].set_text(new_txt)
+        cols = z - x + 1
+        cells[0][0].set_attribute('table:number-columns-spanned', str(cols))
+        rows = t - y + 1
+        cells[0][0].set_attribute('table:number-rows-spanned', str(cols))
+        for cell in cells[0][1:]:
+            cell._set_tag_raw('table:covered-table-cell')
+        for row in cells[1:]:
+            for cell in row:
+                cell._set_tag_raw('table:covered-table-cell')
+        # replace cells in table
+        self.set_cells(cells, coord=start, clone=False)
+        return True
+
+
+    #
     # Utilities
     #
 

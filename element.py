@@ -488,6 +488,10 @@ class odf_element(object):
         return _get_prefixed_name(element.tag)
 
 
+    def _set_tag_raw(self, qname):
+        element = self.__element
+        element.tag = '{%s}%s' % _decode_qname(qname)
+        
     def set_tag(self, qname):
         """Change the tag name of the element with the given qualified name.
         Return a new element as there may be a more appropriate class
