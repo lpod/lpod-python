@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.table &mdash; lpOD-python (version: v1.1.2) documentation</title>
+    <title>lpod.table &mdash; lpOD-python (version: v1.1.3) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     'v1.1.2',
+        VERSION:     'v1.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: v1.1.2) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: v1.1.3) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.toc" href="toc.html" />
     <link rel="prev" title="lpod.styles" href="styles.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="styles.html" title="lpod.styles"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: v1.1.2) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: v1.1.3) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -544,9 +544,8 @@ This method does not clear the row, use row.clear() before to start
 with an empty row.</p>
 <p>Arguments:</p>
 <blockquote>
-<div><p>values &#8211; list of Python types</p>
+<div><p>cells &#8211; list of cells</p>
 <p>start &#8211; int or str</p>
-<p>cells &#8211; list of cells</p>
 </div></blockquote>
 </dd></dl>
 
@@ -687,6 +686,20 @@ inserted in an empty table. So better insert a filled row.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lpod.table.odf_table.del_span">
+<tt class="descname">del_span</tt><big>(</big><em>area</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.del_span" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a Cell Span. &#8216;area&#8217; is the cell coordiante of the upper left
+cell of the spanned area.</p>
+<p>Area can be either one cell (like &#8216;A1&#8217;) or an area (&#8216;A1:B2&#8217;). It can
+be provided as an alpha numeric value like &#8220;A1:B2&#8217; or a tuple like
+(0, 0, 1, 1) or (0, 0). If an area is provided, the upper left cell
+is used.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>area &#8211; str or tuple of int, cell or area coordinate</div></blockquote>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.table.odf_table.delete_cell">
 <tt class="descname">delete_cell</tt><big>(</big><em>coord</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.delete_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete the cell at the given coordinates, so that next cells are
@@ -743,7 +756,7 @@ this method on a cloned table.</p>
 
 <dl class="method">
 <dt id="lpod.table.odf_table.get_cell">
-<tt class="descname">get_cell</tt><big>(</big><em>coord</em>, <em>clone=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_cell" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_cell</tt><big>(</big><em>coord</em>, <em>clone=True</em>, <em>keep_repeated=True</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.get_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the cell at the given coordinates.</p>
 <p>They are either a 2-uplet of (x, y) starting from 0, or a
 human-readable position like &#8220;C4&#8221;.</p>
@@ -1344,6 +1357,29 @@ the old row will be adjusted.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lpod.table.odf_table.set_span">
+<tt class="descname">set_span</tt><big>(</big><em>area</em>, <em>merge=False</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_span" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Cell Span : span the first cell of the area on several
+columns and/or rows.
+If merge is True, replace text of the cell by the concatenation of
+existing text in covered cells.
+Beware : if merge is True, old text is changed, if merge is False
+(the default), old text in coverd cells is still present but not
+displayed by most GUI.</p>
+<p>If the area defines only one cell, the set span will do nothing.
+It is not allowed to apply set span to an area whose one cell already
+belongs to previous cell span.</p>
+<p>Area can be either one cell (like &#8216;A1&#8217;) or an area (&#8216;A1:B2&#8217;). It can
+be provided as an alpha numeric value like &#8220;A1:B2&#8217; or a tuple like
+(0, 0, 1, 1) or (0, 0).</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>area &#8211; str or tuple of int, cell or area coordinate</p>
+<p>merge &#8211; boolean</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.table.odf_table.set_style">
 <tt class="descname">set_style</tt><big>(</big><em>style</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_style" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1652,13 +1688,13 @@ ensuiring model integrity.</p>
         <li class="right" >
           <a href="styles.html" title="lpod.styles"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: v1.1.2) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: v1.1.3) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2012, lpOD team.
-      Last updated on Last release: lpOD v1.1.2. Last modified: 2012-11-19 14:21..
+      Last updated on Last release: lpOD v1.1.3. Last modified: 2012-11-19 21:54..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
