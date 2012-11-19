@@ -3757,6 +3757,10 @@ class odf_table(odf_element):
                 break
         if not good:
             return False
+        # Check boundaries
+        if z >= self.get_width() or t >= self.get_height():
+            self.set_cell(coord = end)
+            cells = self.get_cells((x,y,z,t))
         # do it:
         if merge:
             txt_list = []
@@ -3772,12 +3776,57 @@ class odf_table(odf_element):
         cols = z - x + 1
         cells[0][0].set_attribute('table:number-columns-spanned', str(cols))
         rows = t - y + 1
-        cells[0][0].set_attribute('table:number-rows-spanned', str(cols))
+        cells[0][0].set_attribute('table:number-rows-spanned', str(rows))
         for cell in cells[0][1:]:
             cell._set_tag_raw('table:covered-table-cell')
         for row in cells[1:]:
             for cell in row:
                 cell._set_tag_raw('table:covered-table-cell')
+        # replace cells in table
+        self.set_cells(cells, coord=start, clone=False)
+        return True
+
+
+    def del_span(self, area):
+        """Delete a Cell Span. 'area' is the cell coordiante of the upper left
+        cell of the spanned area.
+
+        Area can be either one cell (like 'A1') or an area ('A1:B2'). It can
+        be provided as an alpha numeric value like "A1:B2' or a tuple like
+        (0, 0, 1, 1) or (0, 0). If an area is provided, the upper left cell
+        is used.
+
+        Arguments:
+
+            area -- str or tuple of int, cell or area coordinate
+        """
+        # get area
+        digits = _convert_coordinates(area)
+        if len(digits) == 4:
+            x, y, _z, _t = digits
+        else:
+            x, y = digits
+        start = x, y
+        # check for previous span
+        cell0 = self.get_cell(start)
+        try:
+            nb_cols = int(cell0.get_attribute('table:number-columns-spanned'))
+        except (TypeError, ValueError):
+            return False
+        try:
+            nb_rows = int(cell0.get_attribute('table:number-rows-spanned'))
+        except (TypeError, ValueError):
+            return False
+        z = x + nb_cols - 1
+        t = y + nb_rows - 1
+        cells = self.get_cells((x,y,z,t))
+        cells[0][0].del_attribute('table:number-columns-spanned')
+        cells[0][0].del_attribute('table:number-rows-spanned')
+        for cell in cells[0][1:]:
+            cell._set_tag_raw('table:table-cell')
+        for row in cells[1:]:
+            for cell in row:
+                cell._set_tag_raw('table:table-cell')
         # replace cells in table
         self.set_cells(cells, coord=start, clone=False)
         return True
