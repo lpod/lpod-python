@@ -120,8 +120,8 @@ def _coordinates_to_alpha_area(coord):
             end = _digit_to_alpha(z) + "%s" % (t+1)
         else:
             raise ValueError
-        range = start + ':' + end
-        return (start, end, range)
+        crange = start + ':' + end
+        return (start, end, crange)
 
 
 
@@ -646,7 +646,7 @@ def odf_create_table(name, width=None, height=None, protected=False,
 
 
 
-def odf_create_named_range(name, range, table_name, usage=None):
+def odf_create_named_range(name, crange, table_name, usage=None):
     """Create a Named Range element. 'name' must contains only letters, digits
     and '_', and must not be like a coordinate as 'A1'. 'table_name' must be
     a correct table name (no "'" or "/" in it).
@@ -655,7 +655,7 @@ def odf_create_named_range(name, range, table_name, usage=None):
 
         name -- str, name of the named range
 
-        range -- str or tuple of int, cell or area coordinate
+        crange -- str or tuple of int, cell or area coordinate
 
         table_name -- str, name of the table
 
@@ -664,7 +664,7 @@ def odf_create_named_range(name, range, table_name, usage=None):
     element = odf_create_element('table:named-range')
     element.set_name(name)
     element.table_name = _table_name_check(table_name)
-    element.set_range(range)
+    element.set_range(crange)
     element.set_usage(usage)
     return element
 
@@ -3661,7 +3661,7 @@ class odf_table(odf_element):
         return body.get_named_range(name)
 
 
-    def set_named_range(self, name, range, table_name=None, usage=None):
+    def set_named_range(self, name, crange, table_name=None, usage=None):
         """Create a Named Range element and insert it in the document.
         Beware : named ranges are stored at the body level, thus do not call
         this method on a cloned table.
@@ -3670,7 +3670,7 @@ class odf_table(odf_element):
 
             name -- str, name of the named range
 
-            range -- str or tuple of int, cell or area coordinate
+            crange -- str or tuple of int, cell or area coordinate
 
             table_name -- str, name of the table
 
@@ -3683,7 +3683,7 @@ class odf_table(odf_element):
             raise ValueError, "Name required."
         if table_name is None:
             table_name = self.get_name()
-        named_range = odf_create_named_range(name, range, table_name, usage)
+        named_range = odf_create_named_range(name, crange, table_name, usage)
         body.append_named_range(named_range)
 
 
@@ -3773,7 +3773,7 @@ class odf_named_range(odf_element):
 
         end -- last cell of the named range, tuple (x, y)
 
-        range -- range of the named range, tuple (x, y, z, t)
+        crange -- range of the named range, tuple (x, y, z, t)
 
         usage -- None or str, usage of the named range.
     """
@@ -3786,15 +3786,15 @@ class odf_named_range(odf_element):
             self.table_name = None
             self.start = None
             self.end = None
-            self.range = None
+            self.crange = None
             return
         name_range = cell_range_address.replace('$', '')
-        name, range = name_range.split('.', 1)
+        name, crange = name_range.split('.', 1)
         if name.startswith("'") and name.endswith("'"):
             name = name[1:-1]
         self.table_name = name
-        range = range.replace('.', '')
-        self._set_range(range)
+        crange = crange.replace('.', '')
+        self._set_range(crange)
 
 
     def set_usage(self, usage=None):
@@ -3885,19 +3885,19 @@ class odf_named_range(odf_element):
             z, t = digits
         self.start = x, y
         self.end = z, t
-        self.range = x, y, z, t
+        self.crange = x, y, z, t
 
 
-    def set_range(self, range):
+    def set_range(self, crange):
         """Set the range of the named range. Range can be either one cell
         (like 'A1') or an area ('A1:B2'). It can be provided as an alpha numeric
         value like "A1:B2' or a tuple like (0, 0, 1, 1) or (0, 0).
 
         Arguments:
 
-            range -- str or tuple of int, cell or area coordinate
+            crange -- str or tuple of int, cell or area coordinate
         """
-        self._set_range(range)
+        self._set_range(crange)
         self._update_attributes()
 
 
@@ -3943,7 +3943,7 @@ class odf_named_range(odf_element):
         if not body:
             raise ValueError, "Table is not inside a document."
         table = body.get_table(name = self.table_name)
-        return table.get_values(self.range, cell_type, complete,
+        return table.get_values(self.crange, cell_type, complete,
                    get_type, flat)
 
 
@@ -3967,7 +3967,7 @@ class odf_named_range(odf_element):
         if not body:
             raise ValueError, "Table is not inside a document."
         table = body.get_table(name = self.table_name)
-        return table.set_values(values, coord=self.range, style=style,
+        return table.set_values(values, coord=self.crange, style=style,
                    cell_type=cell_type, currency=currency)
 
 

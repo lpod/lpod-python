@@ -2990,28 +2990,28 @@ class TestTableNamedRange(TestCase):
 
     def test_range_2(self):
         nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
-        self.assertEqual(nr.range, (0, 0, 2, 1))
+        self.assertEqual(nr.crange, (0, 0, 2, 1))
         self.assertEqual(nr.start, (0, 0))
         self.assertEqual(nr.end, (2, 1))
 
 
     def test_range_3(self):
         nr = odf_create_named_range(u'nr_name', 'A1', u'tablename')
-        self.assertEqual(nr.range, (0, 0, 0, 0))
+        self.assertEqual(nr.crange, (0, 0, 0, 0))
         self.assertEqual(nr.start, (0, 0))
         self.assertEqual(nr.end, (0, 0))
 
 
     def test_range_4(self):
         nr = odf_create_named_range(u'nr_name', (1, 2, 3, 4), u'tablename')
-        self.assertEqual(nr.range, (1, 2, 3, 4))
+        self.assertEqual(nr.crange, (1, 2, 3, 4))
         self.assertEqual(nr.start, (1, 2))
         self.assertEqual(nr.end, (3, 4))
 
 
     def test_range_5(self):
         nr = odf_create_named_range(u'nr_name', (5, 6), u'tablename')
-        self.assertEqual(nr.range, (5, 6, 5, 6))
+        self.assertEqual(nr.crange, (5, 6, 5, 6))
         self.assertEqual(nr.start, (5, 6))
         self.assertEqual(nr.end, (5, 6))
 
@@ -3019,7 +3019,7 @@ class TestTableNamedRange(TestCase):
     def test_range_6(self):
         nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range('B3')
-        self.assertEqual(nr.range, (1, 2, 1, 2))
+        self.assertEqual(nr.crange, (1, 2, 1, 2))
         self.assertEqual(nr.start, (1, 2))
         self.assertEqual(nr.end, (1, 2))
 
@@ -3027,7 +3027,7 @@ class TestTableNamedRange(TestCase):
     def test_range_7(self):
         nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range('B3:b10')
-        self.assertEqual(nr.range, (1, 2, 1, 9))
+        self.assertEqual(nr.crange, (1, 2, 1, 9))
         self.assertEqual(nr.start, (1, 2))
         self.assertEqual(nr.end, (1, 9))
 
@@ -3035,7 +3035,7 @@ class TestTableNamedRange(TestCase):
     def test_range_8(self):
         nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range((1,5,0,9))
-        self.assertEqual(nr.range, (1, 5, 0, 9))
+        self.assertEqual(nr.crange, (1, 5, 0, 9))
         self.assertEqual(nr.start, (1, 5))
         self.assertEqual(nr.end, (0, 9))
 
@@ -3043,7 +3043,7 @@ class TestTableNamedRange(TestCase):
     def test_range_9(self):
         nr = odf_create_named_range(u'nr_name', 'A1:C2', u'tablename')
         nr.set_range((0,9))
-        self.assertEqual(nr.range, (0, 9, 0, 9))
+        self.assertEqual(nr.crange, (0, 9, 0, 9))
         self.assertEqual(nr.start, (0, 9))
         self.assertEqual(nr.end, (0, 9))
 
@@ -3101,7 +3101,7 @@ class TestTableNamedRange(TestCase):
         self.assertEqual(back_nr.table_name, 'Example1')
         self.assertEqual(back_nr.start, (3, 2))
         self.assertEqual(back_nr.end, (5, 3))
-        self.assertEqual(back_nr.range, (3, 2, 5, 3))
+        self.assertEqual(back_nr.crange, (3, 2, 5, 3))
         self.assertEqual(back_nr.usage, 'print-range')
 
 
@@ -3125,7 +3125,7 @@ class TestTableNamedRange(TestCase):
         self.table2.set_named_range("new", "A1:B1")
         back_nr = self.table2.get_named_range('new')
         self.assertEqual(back_nr.usage, None)
-        self.assertEqual(back_nr.range, (0, 0, 1, 0))
+        self.assertEqual(back_nr.crange, (0, 0, 1, 0))
         self.assertEqual(back_nr.start, (0, 0))
         self.assertEqual(back_nr.end, (1, 0))
         self.assertEqual(back_nr.table_name, 'Example1')
@@ -3135,7 +3135,7 @@ class TestTableNamedRange(TestCase):
         self.assertEqual(result, ['nr_1', 'nr_6', 'new'])
         back_nr = self.table2.get_named_range('new')
         self.assertEqual(back_nr.usage, None)
-        self.assertEqual(back_nr.range, (0, 0, 2, 1))
+        self.assertEqual(back_nr.crange, (0, 0, 2, 1))
         self.assertEqual(back_nr.start, (0, 0))
         self.assertEqual(back_nr.end, (2, 1))
         self.assertEqual(back_nr.table_name, 'Example1')
@@ -3173,7 +3173,7 @@ class TestTableNamedRange(TestCase):
         result = [ nr.name for nr in self.table2.get_named_ranges()]
         self.assertEqual(result, ['hop'])
         nr = self.table2.get_named_range('hop')
-        self.assertEqual(nr.range, (0, 1, 3, 7))
+        self.assertEqual(nr.crange, (0, 1, 3, 7))
 
 
     def test_body_table_get_value_1(self):
@@ -3229,7 +3229,7 @@ class TestTableNamedRange(TestCase):
         self.assertEqual(back_nr.table_name, 'new table')
         self.assertEqual(back_nr.start, (3, 2))
         self.assertEqual(back_nr.end, (5, 3))
-        self.assertEqual(back_nr.range, (3, 2, 5, 3))
+        self.assertEqual(back_nr.crange, (3, 2, 5, 3))
         self.assertEqual(back_nr.usage, 'print-range')
 
 
