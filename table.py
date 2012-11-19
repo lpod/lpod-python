@@ -1432,11 +1432,9 @@ class odf_row(odf_element):
 
         Arguments:
 
-            values -- list of Python types
+            cells -- list of cells
 
             start -- int or str
-
-            cells -- list of cells
         """
         if start is None:
             start = 0
@@ -2846,7 +2844,7 @@ class odf_table(odf_element):
     #get_cell_list = obsolete('get_cell_list', get_cells)
 
 
-    def get_cell(self, coord, clone=True):
+    def get_cell(self, coord, clone=True, keep_repeated=True):
         """Get the cell at the given coordinates.
 
         They are either a 2-uplet of (x, y) starting from 0, or a
@@ -2867,6 +2865,10 @@ class odf_table(odf_element):
         else:
             # Inside the defined table
             cell = self._get_row2_base(y).get_cell(x, clone=clone)
+            if not keep_repeated:
+                repeated = cell.get_repeated or 1
+                if repeated >= 2:
+                    cell.set_repeated(None)
         cell.x = x
         cell.y = y
         return cell
@@ -3747,7 +3749,15 @@ class odf_table(odf_element):
             return False
         # check for previous span
         good = True
-        cells = self.get_cells((x,y,z,t))
+        # Check boundaries and empty cells : need to crate non existent cells
+        # so don't use get_cells directly, but get_cell
+        cells = []
+        for yy in range(y, t + 1):
+            row_cells = []
+            for xx in range(x, z + 1):
+                row_cells.append(self.get_cell((xx, yy),
+                                        clone = True, keep_repeated = False))
+            cells.append(row_cells)
         for row in cells:
             for cell in row:
                 if cell._is_spanned():
@@ -3758,21 +3768,31 @@ class odf_table(odf_element):
         if not good:
             return False
         # Check boundaries
-        if z >= self.get_width() or t >= self.get_height():
-            self.set_cell(coord = end)
-            cells = self.get_cells((x,y,z,t))
+        #if z >= self.get_width() or t >= self.get_height():
+        #    self.set_cell(coord = end)
+        #    print area, z, t
+        #    cells = self.get_cells((x, y, z, t))
+        #    print cells
         # do it:
         if merge:
-            txt_list = []
+            val_list = []
             for row in cells:
                 for cell in row:
-                    txt = cell.get_text_content()
-                    if txt:
-                        txt_list.append(txt)
-                        cell.set_text('')
-            new_text = ' '.join(txt_list)
-            if new_text:
-                cells[0][0].set_text(new_txt)
+                    if cell.is_empty(aggressive = True):
+                        continue
+                    val = cell.get_value()
+                    if val is not None:
+                        if isinstance(val, basestring):
+                            val.strip()
+                        if val !=u'':
+                            val_list.append(val)
+                        cell.clear()
+            if val_list:
+                if len(val_list) == 1:
+                    cells[0][0].set_value(val_list[0])
+                else:
+                    value = ' '.join([str(v) for v in val_list if v])
+                    cells[0][0].set_value(value)
         cols = z - x + 1
         cells[0][0].set_attribute('table:number-columns-spanned', str(cols))
         rows = t - y + 1
@@ -3783,7 +3803,7 @@ class odf_table(odf_element):
             for cell in row:
                 cell._set_tag_raw('table:covered-table-cell')
         # replace cells in table
-        self.set_cells(cells, coord=start, clone=False)
+        self.set_cells(cells, coord = start, clone = False)
         return True
 
 
@@ -3828,7 +3848,7 @@ class odf_table(odf_element):
             for cell in row:
                 cell._set_tag_raw('table:table-cell')
         # replace cells in table
-        self.set_cells(cells, coord=start, clone=False)
+        self.set_cells(cells, coord = start, clone = False)
         return True
 
 

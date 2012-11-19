@@ -2057,6 +2057,619 @@ class TestTable(TestCase):
 
 
 
+class TestTableCellSpan(TestCase):
+    # simpletable :
+    #   1	1	1	2	3	3	3
+    #   1	1	1	2	3	3	3
+    #   1	1	1	2	3	3	3
+    #   1   2	3	4	5	6	7
+
+    def setUp(self):
+        document = odf_get_document('samples/simple_table.ods')
+        self.body = body = document.get_body()
+        self.table = body.get_table(name=u"Example1")
+        self.table2 = self.table.clone()
+        self.table2.set_value('a1', 'a')
+        self.table2.set_value('b1', 'b')
+        self.table2.set_value('d1', 'd')
+        self.table2.set_value('b2', '')
+        self.table2.set_value('c2', 'C')
+        self.table2.set_value('d2', '')
+
+
+    def test_span_bad1(self):
+        table = self.table.clone()
+        self.assertEqual(table.set_span('a1:a1'), False)
+
+
+    def test_span_sp1(self):
+        table = self.table.clone()
+        table.set_span('a1:a2')
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        for coord in ('a1', 'a2'):
+            self.assertEqual(table.get_cell(coord)._is_spanned(), True)
+        for coord in ('b1', 'b2', 'a3'):
+            self.assertEqual(table.get_cell(coord)._is_spanned(), False)
+        self.assertEqual(table.set_span('a1:a2'), False)
+        self.assertEqual(table.del_span('a1:a2'), True)
+        self.assertEqual(table.del_span('a1:a2'), False)
+        for coord in ('a1', 'a2'):
+            self.assertEqual(table.get_cell(coord)._is_spanned(), False)
+
+
+    def test_span_sp1_merge(self):
+        table = self.table2.clone()
+        table.set_span('a1:a2', merge = True)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[u'a 1', u'b', 1, u'd', 3, 3, 3],
+                 [None, u'', u'C', u'', 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        for coord in ('a1', 'a2'):
+            self.assertEqual(table.get_cell(coord)._is_spanned(), True)
+        for coord in ('b1', 'b2', 'a3'):
+            self.assertEqual(table.get_cell(coord)._is_spanned(), False)
+        self.assertEqual(table.set_span('a1:a2'), False)
+        self.assertEqual(table.del_span('a1:a2'), True)
+        self.assertEqual(table.del_span('a1:a2'), False)
+        for coord in ('a1', 'a2'):
+            self.assertEqual(table.get_cell(coord)._is_spanned(), False)
+
+
+    def test_span_sp2(self):
+        table = self.table.clone()
+        zone = 'a1:b3'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[True,  True,  False, False, False, False, False],
+                 [True,  True,  False, False, False, False, False],
+                 [True,  True,  False, False, False, False, False],
+                 [False, False, False, False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp2_merge(self):
+        table = self.table2.clone()
+        zone = 'a1:b3'
+        table.set_span(zone, merge = True)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[u'a b 1 1 1' , None, 1, u'd', 3, 3, 3],
+                 [None, None, u'C', u'', 3, 3, 3],
+                 [None, None, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[True,  True,  False, False, False, False, False],
+                 [True,  True,  False, False, False, False, False],
+                 [True,  True,  False, False, False, False, False],
+                 [False, False, False, False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp3(self):
+        table = self.table.clone()
+        zone = 'c1:c3'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  True, False, False, False, False],
+                 [False,  False,  True, False, False, False, False],
+                 [False,  False,  True, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+    # table 2
+    #[[u'a', u'b', 1, u'd', 3, 3, 3],
+    # [1, u'', u'C', u'', 3, 3, 3],
+    # [1, 1, 1, 2, 3, 3, 3],
+    # [1, 2, 3, 4, 5, 6, 7]])
+
+    def test_span_sp3_merge(self):
+        table = self.table2.clone()
+        zone = 'c1:c3'
+        table.set_span(zone, merge = True)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[u'a', u'b', u'1 C 1', u'd', 3, 3, 3],
+                 [1, u'', None, u'', 3, 3, 3],
+                 [1, 1, None, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  True, False, False, False, False],
+                 [False,  False,  True, False, False, False, False],
+                 [False,  False,  True, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp4(self):
+        table = self.table.clone()
+        zone = 'g1:g4'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, True],
+                 [False,  False,  False, False, False, False, True],
+                 [False,  False,  False, False, False, False, True],
+                 [False,  False,  False, False, False, False, True]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp4(self):
+        table = self.table2.clone()
+        zone = 'g1:g4'
+        table.set_span(zone, merge = True)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[u'a', u'b', 1, u'd', 3, 3, u'3 3 3 7'],
+                 [1, u'', u'C', u'', 3, 3, None],
+                 [1, 1, 1, 2, 3, 3, None],
+                 [1, 2, 3, 4, 5, 6, None]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, True],
+                 [False,  False,  False, False, False, False, True],
+                 [False,  False,  False, False, False, False, True],
+                 [False,  False,  False, False, False, False, True]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp5(self):
+        table = self.table.clone()
+        zone = 'a3:c4'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [True,   True,   True,  False, False, False, False],
+                 [True,   True,   True,  False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp5_merge(self):
+        table = self.table2.clone()
+        zone = 'a3:c4'
+        table.set_span(zone, merge = True)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[u'a', u'b', 1, u'd', 3, 3, 3],
+                 [1, u'', u'C', u'', 3, 3, 3],
+                 [u'1 1 1 1 2 3', None, None, 2, 3, 3, 3],
+                 [None, None, None, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [True,   True,   True,  False, False, False, False],
+                 [True,   True,   True,  False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp6(self):
+        table = self.table.clone()
+        zone = 'b3:f3'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  True,   True,  True,  True,  True,  False],
+                 [False,  False,  False, False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_sp6_2zone(self):
+        table = self.table.clone()
+        zone = 'b3:f3'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  True,   True,  True,  True,  True,  False],
+                 [False,  False,  False, False, False, False, False]])
+        zone2 = 'a2:a4'
+        table.set_span(zone2)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [True,  False,  False, False, False, False, False],
+                 [True,  True,   True,  True,  True,  True,  False],
+                 [True,  False,  False, False, False, False, False]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [True,  False,  False, False, False, False, False],
+                 [True,  False,   False,  False,  False,  False,  False],
+                 [True,  False,  False, False, False, False, False]])
+        self.assertEqual(table.del_span(zone2), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False]])
+
+
+    def test_span_bigger(self):
+        table = self.table.clone()
+        zone = 'e2:i4'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 2, 3, 4, 5, 6, 7, None, None]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False,  True,  True, True, True, True],
+                 [False,  False,  False, False,  True,  True, True, True, True],
+                 [False,  False,  False, False,  True,  True, True, True, True]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False, False, False]])
+
+
+    def test_span_bigger_merge(self):
+        table = self.table.clone()
+        zone = 'f4:f5'
+        table.set_span(zone, merge = True)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 1, 1, 2, 3, 3, 3],
+                 [1, 2, 3, 4, 5, 6, 7],
+                 [None, None, None, None, None, None, None]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, True, False],
+                 [False,  False,  False, False, False, True]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False]])
+
+
+    def test_span_bigger_outside(self):
+        table = self.table.clone()
+        zone = 'g6:i7'
+        table.set_span(zone)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 2, 3, 4, 5, 6, 7, None, None],
+                 [None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False,   False,  False,  False],
+                 [False,  False,  False, False,   False,  False,  False],
+                 [False,  False,  False, False,   False,  False,  False],
+                 [False,  False,  False, False,   False,  False,  False],
+                 [],
+                 [False,  False,  False, False,   False,  False,  True, True, True],
+                 [False,  False,  False, False,   False,  False,  True, True, True]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [],
+                 [False,  False,  False, False, False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False, False, False]])
+
+
+    def test_span_bigger_outside_merge(self):
+        table = self.table.clone()
+        zone = 'g6:i7'
+        table.set_span(zone, merge = True)
+        # span change only display
+        self.assertEqual(table.get_values(),
+                [[1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 1, 1, 2, 3, 3, 3, None, None],
+                 [1, 2, 3, 4, 5, 6, 7, None, None],
+                 [None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None]])
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False,   False,  False,  False],
+                 [False,  False,  False, False,   False,  False,  False],
+                 [False,  False,  False, False,   False,  False,  False],
+                 [False,  False,  False, False,   False,  False,  False],
+                 [],
+                 [False,  False,  False, False,   False,  False,  True, True, True],
+                 [False,  False,  False, False,   False,  False,  True, True, True]])
+        self.assertEqual(table.del_span(zone), True)
+        res = []
+        for r in table.get_cells():
+            test_row = []
+            for cell in r:
+                test_row.append(cell._is_spanned())
+            res.append(test_row)
+        self.assertEqual(res,
+                [[False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False],
+                 [],
+                 [False,  False,  False, False, False, False, False, False, False],
+                 [False,  False,  False, False, False, False, False, False, False]])
+
+
+
 class TestTableGetValues(TestCase):
 
 #    simpletable :
