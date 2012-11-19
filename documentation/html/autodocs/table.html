@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.table &mdash; lpOD-python (version: dev_jd) documentation</title>
+    <title>lpod.table &mdash; lpOD-python (version: v1.1.2) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     'dev_jd-v1.1.0-6-g4f3fe4e',
+        VERSION:     'v1.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: dev_jd) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: v1.1.2) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.toc" href="toc.html" />
     <link rel="prev" title="lpod.styles" href="styles.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="styles.html" title="lpod.styles"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: dev_jd) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: v1.1.2) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -259,7 +259,7 @@ table by a name and the name of the table.</p>
 <p>table_name &#8211; name of the table</p>
 <p>start &#8211; first cell of the named range, tuple (x, y)</p>
 <p>end &#8211; last cell of the named range, tuple (x, y)</p>
-<p>range &#8211; range of the named range, tuple (x, y, z, t)</p>
+<p>crange &#8211; range of the named range, tuple (x, y, z, t)</p>
 <p>usage &#8211; None or str, usage of the named range.</p>
 </div></blockquote>
 <dl class="method">
@@ -290,13 +290,13 @@ coordinates form like &#8216;AB12&#8217;.</p>
 
 <dl class="method">
 <dt id="lpod.table.odf_named_range.set_range">
-<tt class="descname">set_range</tt><big>(</big><em>range</em><big>)</big><a class="headerlink" href="#lpod.table.odf_named_range.set_range" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_range</tt><big>(</big><em>crange</em><big>)</big><a class="headerlink" href="#lpod.table.odf_named_range.set_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the range of the named range. Range can be either one cell
 (like &#8216;A1&#8217;) or an area (&#8216;A1:B2&#8217;). It can be provided as an alpha numeric
 value like &#8220;A1:B2&#8217; or a tuple like (0, 0, 1, 1) or (0, 0).</p>
 <p>Arguments:</p>
 <blockquote>
-<div>range &#8211; str or tuple of int, cell or area coordinate</div></blockquote>
+<div>crange &#8211; str or tuple of int, cell or area coordinate</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -1265,14 +1265,14 @@ character &#8220;&#8217;&#8221; or &#8216;/&#8217;.</p>
 
 <dl class="method">
 <dt id="lpod.table.odf_table.set_named_range">
-<tt class="descname">set_named_range</tt><big>(</big><em>name</em>, <em>range</em>, <em>table_name=None</em>, <em>usage=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_named_range" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_named_range</tt><big>(</big><em>name</em>, <em>crange</em>, <em>table_name=None</em>, <em>usage=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_table.set_named_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Named Range element and insert it in the document.
 Beware : named ranges are stored at the body level, thus do not call
 this method on a cloned table.</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>name &#8211; str, name of the named range</p>
-<p>range &#8211; str or tuple of int, cell or area coordinate</p>
+<p>crange &#8211; str or tuple of int, cell or area coordinate</p>
 <p>table_name &#8211; str, name of the table</p>
 <p>uage &#8211; None or &#8216;print-range&#8217;, &#8216;filter&#8217;, &#8216;repeat-column&#8217;, &#8216;repeat-row&#8217;</p>
 </div></blockquote>
@@ -1528,14 +1528,14 @@ columns, give the number of repeated columns.</p>
 
 <dl class="function">
 <dt id="lpod.table.odf_create_named_range">
-<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_named_range</tt><big>(</big><em>name</em>, <em>range</em>, <em>table_name</em>, <em>usage=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_named_range" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">lpod.table.</tt><tt class="descname">odf_create_named_range</tt><big>(</big><em>name</em>, <em>crange</em>, <em>table_name</em>, <em>usage=None</em><big>)</big><a class="headerlink" href="#lpod.table.odf_create_named_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Named Range element. &#8216;name&#8217; must contains only letters, digits
 and &#8216;_&#8217;, and must not be like a coordinate as &#8216;A1&#8217;. &#8216;table_name&#8217; must be
 a correct table name (no &#8220;&#8217;&#8221; or &#8220;/&#8221; in it).</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>name &#8211; str, name of the named range</p>
-<p>range &#8211; str or tuple of int, cell or area coordinate</p>
+<p>crange &#8211; str or tuple of int, cell or area coordinate</p>
 <p>table_name &#8211; str, name of the table</p>
 <p>uage &#8211; None or &#8216;print-range&#8217;, &#8216;filter&#8217;, &#8216;repeat-column&#8217;, &#8216;repeat-row&#8217;</p>
 </div></blockquote>
@@ -1652,13 +1652,13 @@ ensuiring model integrity.</p>
         <li class="right" >
           <a href="styles.html" title="lpod.styles"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: dev_jd) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: v1.1.2) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2012, lpOD team.
-      Last updated on Last release: lpOD dev_jd-v1.1.0-6-g4f3fe4e. Last modified: 2012-10-07 21:25..
+      Last updated on Last release: lpOD v1.1.2. Last modified: 2012-11-19 14:21..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
