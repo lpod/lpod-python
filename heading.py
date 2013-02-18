@@ -61,7 +61,7 @@ def odf_create_heading(level, text=None, restart_numbering=False,
     if restart_numbering:
         element.set_attribute('text:restart-numbering', 'true')
     if start_value:
-        element.set_attribute('text:start-value', start_value)
+        element.set_attribute('text:start-value', '%s' % start_value)
     if suppress_numbering:
         element.set_attribute('text:suppress-numbering', 'true')
     if style:
