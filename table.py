@@ -883,6 +883,10 @@ class odf_cell(odf_element):
 
 
 
+odf_covered_cell = odf_cell
+
+
+
 class odf_row(odf_element):
 
     # Private API
@@ -4197,7 +4201,7 @@ def import_from_csv(path_or_file, name, style=None, delimiter=None,
 
 # Register
 register_element_class('table:table-cell', odf_cell)
-register_element_class('table:covered-table-cell', odf_cell)
+register_element_class('table:covered-table-cell', odf_covered_cell)
 register_element_class('table:table-row', odf_row, caching=True)
 register_element_class('table:table-column', odf_column)
 register_element_class('table:table', odf_table, caching=True)
