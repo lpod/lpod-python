@@ -5,7 +5,7 @@
 # Authors: Hervé Cauwelier <herve@itaapy.com>
 #          David Versmisse <david.versmisse@itaapy.com>
 #
-# This file is part of Lpod (see: http://lpod-project.org).
+# This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
 # the terms of either:
 #
@@ -130,7 +130,7 @@ body.append(heading)
 text = u'The lpOD project is made to generate easily OpenDocuments.'
 paragraph = odf_create_paragraph(text, style=u"Standard")
 paragraph.insert_note(after=u"lpOD project", note_id='note1',
-    citation=u'1', body=u'http://lpod-project.org/')
+    citation=u'1', body=u'http://lpod-project.net/')
 body.append(paragraph)
 
 # A paragraph with a highlighted word

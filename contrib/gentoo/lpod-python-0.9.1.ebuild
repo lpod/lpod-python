@@ -6,8 +6,8 @@ NEED_PYTHON=2.6
 inherit distutils
 
 DESCRIPTION="languages & platforms OpenDocument - Python library"
-HOMEPAGE="http://lpod-project.org"
-SRC_URI="http://download.lpod-project.org/${PN}/${P}.tar.gz"
+HOMEPAGE="http://lpod-project.net"
+SRC_URI="http://download.lpod-project.net/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-3 Apache-2.0"
 SLOT="0"

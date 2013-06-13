@@ -5,7 +5,7 @@
 # Authors: Romain Gauthier <romain@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
 #
-# This file is part of Lpod (see: http://lpod-project.org).
+# This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
 # the terms of either:
 #

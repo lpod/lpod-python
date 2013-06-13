@@ -7,9 +7,9 @@ pkgrel=1
 pkgdesc="Languages & Platforms OpenDocument: Python implementation"
 arch=('any')
 license=('GPL3' 'APACHE2')
-url="http://www.lpod-project.org/"
+url="http://www.lpod-project.net/"
 depends=('python-lxml' 'pygobject')
-source=("http://download.lpod-project.org/lpod-python/lpod-python-$pkgver.tar.gz")
+source=("http://download.lpod-project.net/lpod-python/lpod-python-$pkgver.tar.gz")
 md5sums=('9a5425245c9cad1ca0f72c0f50833824')
 
 build() {

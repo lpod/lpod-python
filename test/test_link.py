@@ -5,7 +5,7 @@
 # Authors: Romain Gauthier <romain@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
 #
-# This file is part of Lpod (see: http://lpod-project.org).
+# This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
 # the terms of either:
 #
@@ -151,7 +151,7 @@ class TestLinks(TestCase):
         body = self.body
         link = body.get_link(url=ur'lpod')
         url = link.get_attribute('xlink:href')
-        self.assertEqual(url, u'http://lpod-project.org/')
+        self.assertEqual(url, u'http://lpod-project.net/')
 
 
     def test_get_link_by_path_context(self):
@@ -159,7 +159,7 @@ class TestLinks(TestCase):
         section2 = body.get_section(position=1)
         link = section2.get_link(url=ur'\.org')
         url = link.get_url()
-        self.assertEqual(url, u'http://lpod-project.org/')
+        self.assertEqual(url, u'http://lpod-project.net/')
 
 
     def test_get_link_list_not_found(self):

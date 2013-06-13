@@ -6,7 +6,7 @@
 # Authors: David Versmisse <david.versmisse@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
 #
-# This file is part of Lpod (see: http://lpod-project.org).
+# This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
 # the terms of either:
 #
@@ -67,7 +67,7 @@ core.setup(description='lpOD Library',
            package_dir={'lpod': '.'},
            scripts=scripts,
            packages=['lpod'],
-           url='http://www.lpod-project.org/',
+           url='http://www.lpod-project.net/',
            version=release,
            author="lpOD Team",
-           author_email="team@lpod-project.org")
+           author_email="team@lpod-project.net")

@@ -4,7 +4,7 @@
 #
 # Authors: Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
-# This file is part of Lpod (see: http://lpod-project.org).
+# This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
 # the terms of either:
 #
@@ -40,14 +40,14 @@ from lpod.container import odf_get_container
 class NetworkTest(TestCase):
 
     def test_http_container(self):
-        file = urlopen('http://ftp.lpod-project.org/example.odt')
+        file = urlopen('http://ftp.lpod-project.net/example.odt')
         container = odf_get_container(file)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_ftp_container(self):
-        ftp = FTP('ftp.lpod-project.org')
+        ftp = FTP('ftp.lpod-project.net')
         ftp.login()
         file = StringIO()
         ftp.retrbinary('RETR example.odt', file.write)
@@ -59,13 +59,13 @@ class NetworkTest(TestCase):
 
 
     def test_http_document(self):
-        file = urlopen('http://ftp.lpod-project.org/example.odt')
+        file = urlopen('http://ftp.lpod-project.net/example.odt')
         document = odf_get_document(file)
         self.assertEqual(document.get_mimetype(), ODF_EXTENSIONS['odt'])
 
 
     def test_ftp_document(self):
-        ftp = FTP('ftp.lpod-project.org')
+        ftp = FTP('ftp.lpod-project.net')
         ftp.login()
         file = StringIO()
         ftp.retrbinary('RETR example.odt', file.write)
