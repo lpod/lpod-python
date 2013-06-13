@@ -167,7 +167,6 @@ def register_element_class(qname, cls, family=None, caching=False):
         family -- str
     """
     # Turn tag name into what lxml is expecting
-    print qname
     tag = '{%s}%s' % _decode_qname(qname)
     if (tag, family) in __class_registry:
         return # fix doc generation multi import

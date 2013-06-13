@@ -157,7 +157,7 @@ class TestLinks(TestCase):
     def test_get_link_by_path_context(self):
         body = self.body
         section2 = body.get_section(position=1)
-        link = section2.get_link(url=ur'\.org')
+        link = section2.get_link(url=ur'\.net')
         url = link.get_url()
         self.assertEqual(url, u'http://lpod-project.net/')
 
