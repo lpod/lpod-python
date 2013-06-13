@@ -167,9 +167,11 @@ def register_element_class(qname, cls, family=None, caching=False):
         family -- str
     """
     # Turn tag name into what lxml is expecting
+    print qname
     tag = '{%s}%s' % _decode_qname(qname)
     if (tag, family) in __class_registry:
-        raise ValueError,  'element "%s" already registered' % qname
+        return # fix doc generation multi import
+        #raise ValueError,  'element "%s" already registered' % qname
     __class_registry[(tag, family)] = (cls, caching)
 
 
@@ -491,7 +493,7 @@ class odf_element(object):
     def _set_tag_raw(self, qname):
         element = self.__element
         element.tag = '{%s}%s' % _decode_qname(qname)
-        
+
     def set_tag(self, qname):
         """Change the tag name of the element with the given qualified name.
         Return a new element as there may be a more appropriate class
