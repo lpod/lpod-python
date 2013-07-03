@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
 #
@@ -27,7 +27,7 @@
 #
 
 # Import from the Standard Library
-from distutils import core
+from setuptools import setup
 from os import listdir
 from os.path import join
 from sys import executable
@@ -59,15 +59,14 @@ scripts = [ name for name in scripts if name in filenames ]
 # Make the python_path.txt file
 open('python_path.txt', 'w').write(executable)
 
-# And call core.setup ....
-core.setup(description='lpOD Library',
-           license='GPLv3 + Apache v2',
-           name='lpod-python',
-           package_data={'lpod': data_files},
-           package_dir={'lpod': '.'},
-           scripts=scripts,
-           packages=['lpod'],
-           url='http://www.lpod-project.net/',
-           version=release,
-           author="lpOD Team",
-           author_email="team@lpod-project.net")
+setup(description='lpOD Library',
+      license='GPLv3 + Apache v2',
+      name='lpod-python',
+      package_data={'lpod': data_files},
+      package_dir={'lpod': 'lpod'},
+      scripts=scripts,
+      packages=['lpod'],
+      url='http://www.lpod-project.net/',
+      version=release,
+      author="lpOD Team",
+      author_email="team@lpod-project.net")
