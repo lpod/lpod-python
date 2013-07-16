@@ -3055,7 +3055,7 @@ class odf_table(odf_element):
             cell.delete(child)
         # Now it all depends on the document type
         if type == 'spreadsheet':
-            image_frame.set_frame_anchor_type(None)
+            image_frame.set_anchor_type(None)
             # The frame needs end coordinates
             width, height = image_frame.get_size()
             image_frame.set_attribute('table:end-x', width)
