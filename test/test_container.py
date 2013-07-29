@@ -45,31 +45,31 @@ class NewContainerFromTemplateTestCase(TestCase):
 
     def test_bad_template(self):
         self.assertRaises(IOError, odf_new_container,
-                '../templates/notexisting')
+                '../lpod/templates/notexisting')
 
     def test_text_template(self):
-        path = '../templates/text.ott'
+        path = '../lpod/templates/text.ott'
         container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odt'])
 
 
     def test_spreadsheet_template(self):
-        path = '../templates/spreadsheet.ots'
+        path = '../lpod/templates/spreadsheet.ots'
         container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['ods'])
 
 
     def test_presentation_template(self):
-        path = '../templates/presentation.otp'
+        path = '../lpod/templates/presentation.otp'
         container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odp'])
 
 
     def test_drawing_template(self):
-        path = '../templates/drawing.otg'
+        path = '../lpod/templates/drawing.otg'
         container = odf_new_container(path)
         mimetype = container.get_part('mimetype')
         self.assertEqual(mimetype, ODF_EXTENSIONS['odg'])
