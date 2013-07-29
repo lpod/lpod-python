@@ -33,28 +33,18 @@ from os.path import join
 from sys import executable
 
 # Import from lpod
-from release import has_git, get_release, get_git_files
+from release import has_git, get_release
 
 
 if has_git():
     # Make the version.txt file
     release = get_release()
     open('version.txt', 'w').write(release)
-    # Make the MANIFEST file and search for the data
-    filenames = get_git_files()
-    filenames = [ name for name in filenames if not name.startswith('test') ]
-    filenames.extend(['MANIFEST', 'version.txt'])
-    open('MANIFEST', 'w').write('\n'.join(filenames))
 else:
     release = open('version.txt').read().strip()
-    filenames = [ line.strip() for line in open('MANIFEST') ]
-
-# Find all non-Python source
-data_files = [ name for name in filenames if not name.endswith('.py') ]
 
 # Find all the scripts => It's easy: all the files in scripts/
 scripts = [ join('scripts', filename) for filename in listdir('scripts') ]
-scripts = [ name for name in scripts if name in filenames ]
 
 # Make the python_path.txt file
 open('python_path.txt', 'w').write(executable)
@@ -62,7 +52,7 @@ open('python_path.txt', 'w').write(executable)
 setup(description='lpOD Library',
       license='GPLv3 + Apache v2',
       name='lpod-python',
-      package_data={'lpod': data_files},
+      package_data={'': ['templates/*']},
       package_dir={'lpod': 'lpod'},
       scripts=scripts,
       packages=['lpod'],

@@ -48,30 +48,30 @@ class NewDocumentFromTemplateTestCase(TestCase):
 
     def test_bad_template(self):
         self.assertRaises(IOError, odf_new_document,
-                '../templates/notexisting')
+                '../lpod/templates/notexisting')
 
     def test_text_template(self):
-        path = '../templates/text.ott'
+        path = '../lpod/templates/text.ott'
         self.assert_(odf_new_document(path))
 
 
     def test_spreadsheet_template(self):
-        path = '../templates/spreadsheet.ots'
+        path = '../lpod/templates/spreadsheet.ots'
         self.assert_(odf_new_document(path))
 
 
     def test_presentation_template(self):
-        path = '../templates/presentation.otp'
+        path = '../lpod/templates/presentation.otp'
         self.assert_(odf_new_document(path))
 
 
     def test_drawing_template(self):
-        path = '../templates/drawing.otg'
+        path = '../lpod/templates/drawing.otg'
         self.assert_(odf_new_document(path))
 
 
     def test_mimetype(self):
-        path = '../templates/drawing.otg'
+        path = '../lpod/templates/drawing.otg'
         document = odf_new_document(path)
         mimetype = document.get_part('mimetype')
         self.assertFalse('template' in mimetype)
@@ -195,7 +195,7 @@ class DocumentTestCase(TestCase):
 class TestStyle(TestCase):
 
     def setUp(self):
-        self.document = odf_get_document('../templates/lpod_styles.odt')
+        self.document = odf_get_document('../lpod/templates/lpod_styles.odt')
 
 
     def test_get_styles(self):

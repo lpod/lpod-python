@@ -1,0 +1,11 @@
+include INSTALL
+include *.txt *.py *.md
+include RELEASE*
+recursive-include contrib *
+recursive-include doc_make *
+recursive-include documentation *
+recursive-include test *.py *.od? *.txt *.csv *.zip
+prune doc_make/build
+prune doc_make/autodocs
+prune test/test_output
+
