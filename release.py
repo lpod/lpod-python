@@ -74,8 +74,10 @@ def get_release():
         return output
     version, delta, sha = output.split('-')
     if branch == 'master':
-        return '-'.join((version, delta, sha))
-    return '-'.join((branch, version, delta, sha))
+        #return '-'.join((version, delta, sha))
+        return sha
+    #return '-'.join((branch, version, delta, sha))
+    return '-'.join((branch, sha))
 
 
 

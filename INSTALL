@@ -1,13 +1,16 @@
 Install Dependencies:
   - python >= 2.6: http://www.python.org/
+  - python setuptools: https://pypi.python.org/pypi/setuptools
   - lxml >= 2.0: http://codespeak.net/lxml/
   - recommanded : Python Imaging Library (PIL)
 
     Dependencies Packages:
      - Debian:
+        python-setuptools
         python-lxml
         python-imaging
      - CentOS:
+        python-setuptools
         python-lxml
         python-imaging
 

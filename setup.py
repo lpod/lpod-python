@@ -26,24 +26,26 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-# Import from the Standard Library
 from setuptools import setup
-from os import listdir
-from os.path import join
+import os
 from sys import executable
+import re
 
-# Import from lpod
+# Import local
 from release import has_git, get_release
 
+g = {}
+execfile(os.path.join('lpod', '_version.py'), g)
+lpod_version = g['__version__']
 
 if has_git():
-    # Ignore version.txt
-    release = get_release()
+    release = '-'.join((lpod_version, get_release()))
 else:
-    release = open('version.txt').read().strip()
+    release = lpod_version
 
 # Find all the scripts => It's easy: all the files in scripts/
-scripts = [ join('scripts', filename) for filename in listdir('scripts') ]
+scripts = [ os.path.join('scripts', filename)
+           for filename in os.listdir('scripts') ]
 
 # Make the python_path.txt file
 open('python_path.txt', 'w').write(executable)

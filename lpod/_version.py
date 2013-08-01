@@ -1,10 +1,9 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2012 Ars Aperta, Itaapy, Pierlis, Talend.
 #
-# Authors: David Versmisse <david.versmisse@itaapy.com>
-#          Hervé Cauwelier <herve@itaapy.com>
-#          Romain Gauthier <romain@itaapy.com>
+# Authors: Jerome Dumonteil <jerome.dumonteil@itaapy.com>
+#
 #
 # This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -25,33 +24,10 @@
 #    You may obtain a copy of the License at
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
+"""
+version.
+"""
 
-# Import from lpod
-from utils import _get_abspath
-from _version import __version__
+__version_info__ = (1, 1, 4)
+__version__ = '.'.join(str(i) for i in __version_info__)
 
-__installation_path__ = _get_abspath('')
-
-
-# Constants at the first level
-from const import *
-
-
-# Register element classes
-import draw_page
-import frame
-import heading
-import list
-import note
-import paragraph
-import section
-import shapes
-import span
-import style
-import table
-import toc
-import tracked_changes
-
-# Silent pyflakes
-draw_page, frame, heading, list, note, paragraph, section, shapes, span,
-style, table, toc, tracked_changes

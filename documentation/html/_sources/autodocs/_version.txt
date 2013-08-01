@@ -1,7 +1,9 @@
-:mod:`lpod.release`
+:mod:`lpod._version`
 ##############################################
-.. automodule:: lpod.release
-   :synopsis: Lpod release module
+.. automodule:: lpod._version
+   :synopsis: 
+version.
+
    :show-inheritance:
    :members:
    :undoc-members:
