@@ -37,9 +37,8 @@ from release import has_git, get_release
 
 
 if has_git():
-    # Make the version.txt file
+    # Ignore version.txt
     release = get_release()
-    open('version.txt', 'w').write(release)
 else:
     release = open('version.txt').read().strip()
 

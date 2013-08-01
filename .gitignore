@@ -1,5 +1,5 @@
 MANIFEST
-version.txt
+#version.txt
 python_path.txt
 build
 doc_make/autodocs
