@@ -4,7 +4,7 @@ include RELEASE*
 recursive-include contrib *
 recursive-include doc_make *
 recursive-include documentation *
-recursive-include test *.py *.od? *.txt *.csv *.zip
+recursive-include test *.py *.od? *.txt *.csv *.zip *.xml
 prune doc_make/build
 prune doc_make/autodocs
 prune test/test_output
