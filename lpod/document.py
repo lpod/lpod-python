@@ -28,10 +28,10 @@
 
 # Import from the Standard Library
 import sys
+import os
 from copy import deepcopy
 from mimetypes import guess_type
 from operator import itemgetter
-from os.path import splitext, join
 from uuid import uuid4
 
 # Import from lpod
@@ -360,41 +360,41 @@ class odf_document(object):
 
         if type(path_or_file) is unicode or type(path_or_file) is str:
             path_or_file = path_or_file.encode('utf_8')
-            file = open(path_or_file, 'rb')
+            handler = open(path_or_file, 'rb')
             name = path_or_file
             close_after = True
         else:
-            file = path_or_file
+            handler = path_or_file
             name = getattr(_file, 'name')
-        name = name.count('./') and name.split('./')[-1] or name
+        name = os.path.basename(name)
         # Generate a safe portable name
         uuid = str(uuid4())
         if name is None:
             name = uuid
             media_type = ''
         else:
-            basename, extension = splitext(name)
-            name = basename + extension.lower()
+            root, extension = os.path.splitext(name)
+            extension = extension.lower()
+            name = root + extension
             media_type, encoding = guess_type(name)
             # Check this name is already used in the document
             fullpath = 'Pictures/%s' % name
             if fullpath in medias:
-                _, extension = splitext(name)
-                basename = '%s_%s' % (basename, uuid)
-                name = basename + extension.lower()
+                root = '%s_%s' % (root, uuid)
+                name = root + extension
                 media_type, encoding = guess_type(name)
 
         if manifest.get_media_type('Pictures/') is None:
             manifest.add_full_path('Pictures/')
 
-        full_path = join('Pictures',name)
-        self.container.set_part(full_path, file.read())
+        full_path = os.path.join('Pictures', name)
+        self.container.set_part(full_path, handler.read())
 
         # Update manifest
         manifest.add_full_path(full_path, media_type)
         # Close file
         if close_after:
-            file.close()
+            handler.close()
         return full_path
 
 
