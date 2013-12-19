@@ -38,10 +38,10 @@ g = {}
 execfile(os.path.join('lpod', '_version.py'), g)
 lpod_version = g['__version__']
 
-if has_git():
-    release = '-'.join((lpod_version, get_release()))
-else:
-    release = lpod_version
+#if has_git():
+#    release = '-'.join((lpod_version, get_release()))
+#else:
+release = lpod_version
 
 # Find all the scripts => It's easy: all the files in scripts/
 scripts = [ os.path.join('scripts', filename)
