@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.paragraph &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>lpod.paragraph &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
-    <link rel="next" title="lpod.reference" href="reference.html" />
+    <link rel="next" title="lpod.paragraph_base" href="paragraph_base.html" />
     <link rel="prev" title="lpod.note" href="note.html" /> 
   </head>
   <body>
@@ -41,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="reference.html" title="lpod.reference"
+          <a href="paragraph_base.html" title="lpod.paragraph_base"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="note.html" title="lpod.note"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -61,34 +61,54 @@
 <dl class="class">
 <dt id="lpod.paragraph.odf_paragraph">
 <em class="property">class </em><tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_paragraph</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
-<p>Specialised element for paragraphs.</p>
+<dd><p>Bases: <a class="reference internal" href="paragraph_base.html#lpod.paragraph_base.paragraph_base" title="lpod.paragraph_base.paragraph_base"><tt class="xref py py-class docutils literal"><span class="pre">lpod.paragraph_base.paragraph_base</span></tt></a></p>
+<p>Specialised element for paragraphs &lt;text:p&gt;. The &lt;text:p&gt; element
+represents a paragraph, which is the basic unit of text in an OpenDocument
+file.</p>
 <dl class="method">
-<dt id="lpod.paragraph.odf_paragraph.append_plain_text">
-<tt class="descname">append_plain_text</tt><big>(</big><em>text=u''</em>, <em>encoding=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.append_plain_text" title="Permalink to this definition">¶</a></dt>
-<dd><p>Append unicode plain text to the paragraph, replacing &lt;CR&gt;, &lt;TAB&gt;
-and multiple spaces by ODF corresponding tags.</p>
+<dt id="lpod.paragraph.odf_paragraph.insert_annotation">
+<tt class="descname">insert_annotation</tt><big>(</big><em>annotation_element=None</em>, <em>before=None</em>, <em>after=None</em>, <em>position=0</em>, <em>content=None</em>, <em>body=None</em>, <em>creator=None</em>, <em>date=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert an annotation, at the position defined by the regex (before,
+after, content) or by positionnal argument (position). If content is
+provided, the annotation covers the full content regex. Else, the
+annotation is positionned either &#8216;before&#8217; or &#8216;after&#8217; provided regex.</p>
+<p>If content is an odf element (ie: paragraph, span, ...), the full inner
+content is covered by the annotation (of the position just after if
+content is a single empty tag).</p>
+<p>If content/before or after exists (regex) and return a group of matching
+positions, the position value is the index of matching place to use.</p>
+<p>annotation_element can contain a previously created annotation, else
+the annotation is created from the body, creator and optional date
+(current date by default).</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>annotation_element &#8211; annotation element or name</p>
+<p>before &#8211; unicode regular expression or None</p>
+<p>after &#8211; unicode regular expression or None</p>
+<p>content &#8211; unicode regular expression or None, or odf_element</p>
+<p>position &#8211; int or tuple of int</p>
+<p>body &#8211; unicode or odf_element</p>
+<p>creator &#8211; unicode</p>
+<p>date &#8211; datetime</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
-<dt id="lpod.paragraph.odf_paragraph.get_formatted_text">
-<tt class="descname">get_formatted_text</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.get_formatted_text" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.paragraph.odf_paragraph.get_style">
-<tt class="descname">get_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.get_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.paragraph.odf_paragraph.get_text_style">
-<tt class="descname">get_text_style</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.get_text_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.paragraph.odf_paragraph.insert_annotation">
-<tt class="descname">insert_annotation</tt><big>(</big><em>annotation_element=None</em>, <em>after=None</em>, <em>body=None</em>, <em>creator=None</em>, <em>date=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_annotation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="lpod.paragraph.odf_paragraph.insert_annotation_end">
+<tt class="descname">insert_annotation_end</tt><big>(</big><em>annotation_element</em>, <em>before=None</em>, <em>after=None</em>, <em>position=0</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_annotation_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert an annotation end tag for an existing annotation. If some end
+tag already exists, replace it. Annotation end tag is set at the
+position defined by the regex (before or after).</p>
+<p>If content/before or after (regex) returns a group of matching
+positions, the position value is the index of matching place to use.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>annotation_element &#8211; annotation element (mandatory)</p>
+<p>before &#8211; unicode regular expression or None</p>
+<p>after &#8211; unicode regular expression or None</p>
+<p>position &#8211; int</p>
+</div></blockquote>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.paragraph.odf_paragraph.insert_note">
@@ -96,9 +116,75 @@ and multiple spaces by ODF corresponding tags.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.insert_reference">
+<tt class="descname">insert_reference</tt><big>(</big><em>name</em>, <em>ref_format=''</em>, <em>before=None</em>, <em>after=None</em>, <em>position=0</em>, <em>display=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and Insert a reference to a content marked by a reference
+mark. The odf_reference element (&lt;text:reference-ref&gt;) represents a
+field that references a &lt;text:reference-mark-start&gt; or
+&lt;text:reference-mark&gt; element. Its text:reference-format attribute
+specifies what is displayed from the referenced element. Default is
+&#8216;page&#8217; Actual content is not automatically updated except for the &#8216;text&#8217;
+format.</p>
+<p>Name is mandatory and should represent an existing reference mark of the
+document.
+The ref_format is the type of formt reference : default is &#8216;page&#8217;. The
+reference is inserted the position defined by the regex (before/after),
+or by positionnal argument (position). If &#8216;display&#8217; is provided, it will
+be used as the text value for the reference.
+If after is an odf element, the reference is inserted as first child of
+this element.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>name &#8211; unicode</p>
+<dl class="docutils">
+<dt>ref_format &#8211; one of <span class="classifier-delimiter">:</span> <span class="classifier">&#8216;chapter&#8217;, &#8216;direction&#8217;, &#8216;page&#8217;, &#8216;text&#8217;,</span></dt>
+<dd>&#8216;caption&#8217;, &#8216;category-and-value&#8217;, &#8216;value&#8217;,
+&#8216;number&#8217;, &#8216;number-all-superior&#8217;,
+&#8216;number-no-superior&#8217;</dd>
+</dl>
+<p>before &#8211; unicode regular expression or None</p>
+<p>after &#8211; unicode regular expression or odf element or None</p>
+<p>position &#8211; int</p>
+<p>display &#8211; unicode or None</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.paragraph.odf_paragraph.insert_variable">
 <tt class="descname">insert_variable</tt><big>(</big><em>variable_element</em>, <em>after</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.insert_variable" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.remove_link">
+<tt class="descname">remove_link</tt><big>(</big><em>links</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.remove_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send back a copy of the element, the sub_links (not a clone) removed.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>links &#8211; odf_link or list of odf_link</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.remove_links">
+<tt class="descname">remove_links</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.remove_links" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send back a copy of the element, without links tags.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.remove_span">
+<tt class="descname">remove_span</tt><big>(</big><em>spans</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.remove_span" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send back a copy of the element, the spans (not a clone) removed.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>spans &#8211; odf_element or list of odf_element</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.remove_spans">
+<tt class="descname">remove_spans</tt><big>(</big><em>keep_heading=True</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.remove_spans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send back a copy of the element, without span styles.
+If keep_heading is True (default), the first level heading style is left
+unchanged.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.paragraph.odf_paragraph.set_bookmark">
@@ -143,8 +229,60 @@ equivalent:</p>
 <dl class="method">
 <dt id="lpod.paragraph.odf_paragraph.set_link">
 <tt class="descname">set_link</tt><big>(</big><em>url</em>, <em>regex=None</em>, <em>offset=None</em>, <em>length=0</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_link" title="Permalink to this definition">¶</a></dt>
-<dd><p>Make a link from text content matching the regex OR the positional
-arguments.</p>
+<dd><p>Make a link to the provided url from text content matching the regex
+OR the positional arguments offset and length.</p>
+<p>(match, tail: provided by decorator)</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>url &#8211; unicode</p>
+<p>regex &#8211; unicode regular expression</p>
+<p>offset &#8211; int</p>
+<p>length &#8211; int</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.set_reference_mark">
+<tt class="descname">set_reference_mark</tt><big>(</big><em>name</em>, <em>before=None</em>, <em>after=None</em>, <em>position=0</em>, <em>content=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_reference_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a reference mark, at the position defined by the regex
+(before, after, content) or by positionnal argument (position). If
+content is provided, the annotation covers the full range content regex
+(instances of odf_reference_mark_start and odf_reference_mark_end are
+created). Else, an instance of odf_reference_mark is positionned either
+&#8216;before&#8217; or &#8216;after&#8217; provided regex.</p>
+<p>If content is an odf element (ie: paragraph, span, ...), the full inner
+content is referenced (of the position just after if content is a single
+empty tag).</p>
+<p>If content/before or after exists (regex) and return a group of matching
+positions, the position value is the index of matching place to use.</p>
+<p>Name is mandatory and shall be unique in the document for the preference
+mark range.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>name &#8211; unicode</p>
+<p>before &#8211; unicode regular expression or None</p>
+<p>after &#8211; unicode regular expression or None, or odf_element</p>
+<p>content &#8211; unicode regular expression or None, or odf_element</p>
+<p>position &#8211; int or tuple of int</p>
+</div></blockquote>
+<p>Return: the created reference or reference start</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.paragraph.odf_paragraph.set_reference_mark_end">
+<tt class="descname">set_reference_mark_end</tt><big>(</big><em>reference_mark</em>, <em>before=None</em>, <em>after=None</em>, <em>position=0</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_reference_mark_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert/move a reference_mark_end for an existing reference mark. If
+some end tag already exists, replace it. Reference tag is set at the
+position defined by the regex (before or after).</p>
+<p>If content/before or after (regex) returns a group of matching
+positions, the position value is the index of matching place to use.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>reference_mark &#8211; reference element (mandatory)</p>
+<p>before &#8211; unicode regular expression or None</p>
+<p>after &#8211; unicode regular expression or None</p>
+<p>position &#8211; int</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -152,6 +290,7 @@ arguments.</p>
 <tt class="descname">set_span</tt><big>(</big><em>style</em>, <em>regex=None</em>, <em>offset=None</em>, <em>length=0</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_span" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the given style to text content matching the regex OR the
 positional arguments offset and length.</p>
+<p>(match, tail: provided by decorator)</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>style &#8211; style element or name</p>
@@ -161,29 +300,12 @@ positional arguments offset and length.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="method">
-<dt id="lpod.paragraph.odf_paragraph.set_style">
-<tt class="descname">set_style</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lpod.paragraph.odf_paragraph.set_text_style">
-<tt class="descname">set_text_style</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_paragraph.set_text_style" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="lpod.paragraph.odf_span">
 <em class="property">class </em><tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_span</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_span" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lpod.paragraph.odf_paragraph" title="lpod.paragraph.odf_paragraph"><tt class="xref py py-class docutils literal"><span class="pre">lpod.paragraph.odf_paragraph</span></tt></a></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="lpod.paragraph.odf_create_line_break">
-<tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_create_line_break</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_create_line_break" title="Permalink to this definition">¶</a></dt>
-<dd><p>This element represents a line break.</p>
-<p>Return odf_element</p>
 </dd></dl>
 
 <dl class="function">
@@ -199,37 +321,6 @@ given text.</p>
 <p>Return: odf_element</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="lpod.paragraph.odf_create_spaces">
-<tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_create_spaces</tt><big>(</big><em>number=1</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_create_spaces" title="Permalink to this definition">¶</a></dt>
-<dd><p>This element shall be used to represent the second and all following “ “
-(U+0020, SPACE) characters in a sequence of “ “ (U+0020, SPACE) characters.
-Note: It is not an error if the character preceding the element is not a
-white space character, but it is good practice to use this element only for
-the second and all following SPACE characters in a sequence.</p>
-<p>Arguments:</p>
-<blockquote>
-<div>number &#8211; int</div></blockquote>
-<p>Return odf_element</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="lpod.paragraph.odf_create_tabulation">
-<tt class="descclassname">lpod.paragraph.</tt><tt class="descname">odf_create_tabulation</tt><big>(</big><em>position=None</em><big>)</big><a class="headerlink" href="#lpod.paragraph.odf_create_tabulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>This element represents the [UNICODE] tab character (HORIZONTAL TABULATION,
-U+0009).</p>
-<p>The position attribute contains the number of the tab-stop to which
-a tab character refers. The position 0 marks the start margin of a
-paragraph. Note: The position attribute is only a hint to help non-layout
-oriented consumers to determine the tab/tab-stop association. Layout
-oriented consumers should determine the tab positions based on the style
-information</p>
-<p>Arguments:</p>
-<blockquote>
-<div>number &#8211; int</div></blockquote>
-<p>Return odf_element</p>
-</dd></dl>
-
 </div>
 
 
@@ -240,10 +331,10 @@ information</p>
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="note.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.note</span></tt></a></p>
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">lpod.note</span></tt></a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="reference.html"
-                        title="next chapter"><tt class="docutils literal"><span class="pre">lpod.reference</span></tt></a></p>
+  <p class="topless"><a href="paragraph_base.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">lpod.paragraph_base</span></tt></a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/autodocs/paragraph.txt"
@@ -276,18 +367,18 @@ information</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="reference.html" title="lpod.reference"
+          <a href="paragraph_base.html" title="lpod.paragraph_base"
              >next</a> |</li>
         <li class="right" >
           <a href="note.html" title="lpod.note"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

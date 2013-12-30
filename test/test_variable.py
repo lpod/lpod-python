@@ -35,6 +35,7 @@ from lpod.variable import odf_create_variable_decl, odf_create_variable_set
 from lpod.variable import odf_create_variable_get
 from lpod.variable import odf_create_user_field_decl
 from lpod.variable import odf_create_user_field_get
+from lpod.variable import odf_create_user_field_input
 from lpod.variable import odf_create_page_number_variable
 from lpod.variable import odf_create_page_count_variable
 from lpod.variable import odf_create_date_variable, odf_create_time_variable

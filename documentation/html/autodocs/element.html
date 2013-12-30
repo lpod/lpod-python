@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.element &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>lpod.element &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.experimental" href="experimental.html" />
     <link rel="prev" title="lpod.draw_page" href="draw_page.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="draw_page.html" title="lpod.draw_page"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -98,13 +98,16 @@ range of same name if any.</p>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.delete">
-<tt class="descname">delete</tt><big>(</big><em>child=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><em>child=None</em>, <em>keep_tail=True</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete the given element from the XML tree. If no element is given,
 &#8220;self&#8221; is deleted. The XML library may allow to continue to use an
 element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
+<p>if keep_tail is True (default), the tail text is not erased.</p>
 <p>Arguments:</p>
 <blockquote>
-<div>child &#8211; odf_element</div></blockquote>
+<div><p>child &#8211; odf_element</p>
+<p>keep_tail &#8211; boolean (default to True), True for most usages.</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -129,9 +132,8 @@ element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_annotation">
-<tt class="descname">get_annotation</tt><big>(</big><em>position=0</em>, <em>creator=None</em>, <em>start_date=None</em>, <em>end_date=None</em>, <em>content=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_annotation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the section that matches the criteria.</p>
-<p>End date is not included (as expected in Python).</p>
+<tt class="descname">get_annotation</tt><big>(</big><em>position=0</em>, <em>creator=None</em>, <em>start_date=None</em>, <em>end_date=None</em>, <em>content=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the annotation that matches the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>position &#8211; int</p>
@@ -139,15 +141,34 @@ element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
 <p>start_date &#8211; date object</p>
 <p>end_date &#8211; date object</p>
 <p>content &#8211; unicode regex</p>
+<p>name &#8211; unicode</p>
 </div></blockquote>
 <p>Return: odf_annotation or None if not found</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lpod.element.odf_element.get_annotation_end">
+<tt class="descname">get_annotation_end</tt><big>(</big><em>position=0</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_annotation_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the annotation end that matches the criteria.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>position &#8211; int</p>
+<p>name &#8211; unicode</p>
+</div></blockquote>
+<p>Return: odf_element or None if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_annotation_ends">
+<tt class="descname">get_annotation_ends</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_annotation_ends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the annotation ends.</p>
+<p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.element.odf_element.get_annotations">
 <tt class="descname">get_annotations</tt><big>(</big><em>creator=None</em>, <em>start_date=None</em>, <em>end_date=None</em>, <em>content=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_annotations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all the sections that match the criteria.</p>
-<p>End date is not included (as expected in Python).</p>
+<dd><p>Return all the annotations that match the criteria.</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>creator &#8211; unicode</p>
@@ -167,6 +188,36 @@ element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
 <dt id="lpod.element.odf_element.get_attributes">
 <tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_attributes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_between">
+<tt class="descname">get_between</tt><big>(</big><em>tag1</em>, <em>tag2</em>, <em>as_text=False</em>, <em>clean=True</em>, <em>no_header=True</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns elements between tag1 and tag2, tag1 and tag2 shall
+be unique and having an id attribute.
+(WARN: buggy if tag1/tag2 defines a malformed odf xml.)
+If as_text is True: returns the text content.
+If clean is True: suppress unwanted tags (deletions marks, ...)
+If no_header is True: existing text:h are changed in text:p
+By default: returns a list of odf_element, cleaned and without headers.</p>
+<p>Implementation and standard retrictions:
+Only text:h and text:p sould be &#8216;cut&#8217; by an insert tag, so inner parts
+of insert tags are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>any text:h, text:p or sub tag of these</li>
+<li>some text, part of a parent text:h or text:p</li>
+</ul>
+</div></blockquote>
+<p>Arguments:</p>
+<blockquote>
+<div><p>tag1 &#8211; odf_element</p>
+<p>tag2 &#8211; odf_element</p>
+<p>as_text &#8211; boolean</p>
+<p>clean &#8211; boolean</p>
+<p>no_header &#8211; boolean</p>
+</div></blockquote>
+<p>Return: list of odf_paragraph or odf_header</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_bookmark">
@@ -240,17 +291,22 @@ changes list.</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_dc_creator">
 <tt class="descname">get_dc_creator</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_dc_creator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get dc:creator value.</p>
+<p>Return: unicode (or None if inexistant)</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_dc_date">
 <tt class="descname">get_dc_date</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_dc_date" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the dc:date value.</p>
+<p>Return: datetime (or None if inexistant)</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_document_body">
 <tt class="descname">get_document_body</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_document_body" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the document body : &#8216;office:body&#8217;</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_draw_connector">
@@ -586,6 +642,13 @@ changes list.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lpod.element.odf_element.get_office_names">
+<tt class="descname">get_office_names</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_office_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the used office:name tags values of the element.</p>
+<p>Return: list of unique str</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.element.odf_element.get_orphan_draw_connectors">
 <tt class="descname">get_orphan_draw_connectors</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_orphan_draw_connectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of connectors which don&#8217;t have any shape connected
@@ -634,7 +697,9 @@ to them.</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_reference_mark">
 <tt class="descname">get_reference_mark</tt><big>(</big><em>position=0</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_mark" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the reference mark that matches the criteria.</p>
+<dd><p>Return the reference mark that match the criteria. Either single
+position reference mark (text:reference-mark) or start of range
+reference (text:reference-mark-start).</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>position &#8211; int</p>
@@ -646,7 +711,9 @@ to them.</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_reference_mark_end">
 <tt class="descname">get_reference_mark_end</tt><big>(</big><em>position=0</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_mark_end" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the reference mark end that matches the criteria.</p>
+<dd><p>Return the reference mark end that matches the criteria. Search only
+the tags text:reference-mark-end.
+Consider using : get_reference_marks()</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>position &#8211; int</p>
@@ -658,14 +725,32 @@ to them.</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_reference_mark_ends">
 <tt class="descname">get_reference_mark_ends</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_mark_ends" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all the reference mark ends.</p>
+<dd><p>Return all the reference mark ends. Search only the tags
+text:reference-mark-end.
+Consider using : get_reference_marks()</p>
 <p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_reference_mark_single">
+<tt class="descname">get_reference_mark_single</tt><big>(</big><em>position=0</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_mark_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the reference mark that matches the criteria. Search only the
+tags text:reference-mark.
+Consider using : get_reference_mark()</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>position &#8211; int</p>
+<p>name &#8211; unicode</p>
+</div></blockquote>
+<p>Return: odf_element or None if not found</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_reference_mark_start">
 <tt class="descname">get_reference_mark_start</tt><big>(</big><em>position=0</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_mark_start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the reference mark start that matches the criteria.</p>
+<dd><p>Return the reference mark start that matches the criteria. Search
+only the tags text:reference-mark-start.
+Consider using : get_reference_mark()</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>position &#8211; int</p>
@@ -677,15 +762,39 @@ to them.</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.get_reference_mark_starts">
 <tt class="descname">get_reference_mark_starts</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_mark_starts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all the reference mark starts.</p>
+<dd><p>Return all the reference mark starts. Search only the tags
+text:reference-mark-start.
+Consider using : get_reference_marks()</p>
 <p>Return: list of odf_element</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.get_reference_marks">
 <tt class="descname">get_reference_marks</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_marks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all the reference marks.</p>
+<dd><p>Return all the reference marks, either single position reference
+(text:reference-mark) or start of range reference
+(text:reference-mark-start).</p>
 <p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_reference_marks_single">
+<tt class="descname">get_reference_marks_single</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_reference_marks_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the reference marks. Search only the tags
+text:reference-mark.
+Consider using : get_reference_marks()</p>
+<p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_references">
+<tt class="descname">get_references</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_references" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the references (text:reference-ref). If name is
+provided, returns the references of that name.</p>
+<p>Return: list of odf_element</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; unicode or None</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -834,6 +943,98 @@ name (or all by default).</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lpod.element.odf_element.get_text_change">
+<tt class="descname">get_text_change</tt><big>(</big><em>position=0</em>, <em>idx=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the text change that matches the criteria. Either single
+deletion (text:change) or start of range of changes (text:change-start).
+position : index of the element to retrieve if several matches, default
+is 0.
+idx : change-id of the element.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>position &#8211; int</p>
+<p>idx &#8211; unicode</p>
+</div></blockquote>
+<p>Return: odf_element or None if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_text_change_deletion">
+<tt class="descname">get_text_change_deletion</tt><big>(</big><em>position=0</em>, <em>idx=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_change_deletion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the text change of deletion kind that matches the criteria.
+Search only for the tags text:change.
+Consider using : get_text_change()</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>position &#8211; int</p>
+<p>idx &#8211; unicode</p>
+</div></blockquote>
+<p>Return: odf_element or None if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_text_change_deletions">
+<tt class="descname">get_text_change_deletions</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_change_deletions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the text changes of deletion kind: the tags text:change.
+Consider using : get_text_changes()</p>
+<p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_text_change_end">
+<tt class="descname">get_text_change_end</tt><big>(</big><em>position=0</em>, <em>idx=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_change_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the text change-end that matches the criteria. Search only
+the tags text:change-end.
+Consider using : get_text_change()</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>position &#8211; int</p>
+<p>idx &#8211; unicode</p>
+</div></blockquote>
+<p>Return: odf_element or None if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_text_change_ends">
+<tt class="descname">get_text_change_ends</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_change_ends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the text change-end. Search only the tags
+text:change-end.
+Consider using : get_text_changes()</p>
+<p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_text_change_start">
+<tt class="descname">get_text_change_start</tt><big>(</big><em>position=0</em>, <em>idx=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_change_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the text change-start that matches the criteria. Search
+only the tags text:change-start.
+Consider using : get_text_change()</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>position &#8211; int</p>
+<p>idx &#8211; unicode</p>
+</div></blockquote>
+<p>Return: odf_element or None if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_text_change_starts">
+<tt class="descname">get_text_change_starts</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_change_starts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the text change-start. Search only for the tags
+text:change-start.
+Consider using : get_text_changes()</p>
+<p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_text_changes">
+<tt class="descname">get_text_changes</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the text changes, either single deletion
+(text:change) or start of range of changes (text:change-start).</p>
+<p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.element.odf_element.get_text_content">
 <tt class="descname">get_text_content</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_text_content" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like &#8220;get_text&#8221; but return the text of the embedded paragraph:
@@ -863,6 +1064,35 @@ annotations, cells...</p>
 <dt id="lpod.element.odf_element.get_tracked_changes">
 <tt class="descname">get_tracked_changes</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_tracked_changes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tracked-changes part in the text body.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_user_defined">
+<tt class="descname">get_user_defined</tt><big>(</big><em>name</em>, <em>position=0</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_user_defined" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the user defined declaration for the given name.</p>
+<p>return: odf_element or none if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_user_defined_list">
+<tt class="descname">get_user_defined_list</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_user_defined_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the user defined field declarations.</p>
+<p>Return: list of odf_element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.get_user_defined_value">
+<tt class="descname">get_user_defined_value</tt><big>(</big><em>name</em>, <em>value_type=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.get_user_defined_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of the given user defined field name.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>name &#8211; unicode</p>
+<dl class="docutils">
+<dt>value_type &#8211; &#8216;boolean&#8217;, &#8216;date&#8217;, &#8216;float&#8217;,</dt>
+<dd>&#8216;string&#8217;, &#8216;time&#8217; or automatic</dd>
+</dl>
+</div></blockquote>
+<p>Return: most appropriate Python type</p>
 </dd></dl>
 
 <dl class="method">
@@ -970,9 +1200,10 @@ found.</p>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.insert">
-<tt class="descname">insert</tt><big>(</big><em>element</em>, <em>xmlposition=None</em>, <em>position=None</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.insert" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">insert</tt><big>(</big><em>element</em>, <em>xmlposition=None</em>, <em>position=None</em>, <em>start=False</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert an element relatively to ourself.</p>
-<p>Insert either using DOM vocabulary or by numeric position.</p>
+<p>Insert either using DOM vocabulary or by numeric position.
+If text start is True, insert the element before any existing text.</p>
 <p>Position start at 0.</p>
 <p>Arguments:</p>
 <blockquote>
@@ -981,8 +1212,16 @@ found.</p>
 <dt>xmlposition &#8211; FIRST_CHILD, LAST_CHILD, NEXT_SIBLING</dt>
 <dd>or PREV_SIBLING</dd>
 </dl>
+<p>start &#8211; Boolean</p>
 <p>position &#8211; int</p>
 </div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.is_empty">
+<tt class="descname">is_empty</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.element.odf_element.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the element is empty : no text, no children, no tail</p>
+<p>Return: Boolean</p>
 </dd></dl>
 
 <dl class="method">
@@ -1015,6 +1254,20 @@ split into two consecutive spans.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lpod.element.odf_element.replace_document_body">
+<tt class="descname">replace_document_body</tt><big>(</big><em>new_body</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.replace_document_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change in place the full document body content.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.replace_element">
+<tt class="descname">replace_element</tt><big>(</big><em>old_element</em>, <em>new_element</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.replace_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces in place a sub element with the element passed as second
+argument.</p>
+<p>Warning : no clone for old element.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.element.odf_element.search">
 <tt class="descname">search</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the first position of the pattern in the text content of
@@ -1039,12 +1292,20 @@ the element, or None if not found.</p>
 <dl class="method">
 <dt id="lpod.element.odf_element.set_dc_creator">
 <tt class="descname">set_dc_creator</tt><big>(</big><em>creator</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.set_dc_creator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set dc:creator value.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>creator &#8211; unicode</div></blockquote>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.set_dc_date">
 <tt class="descname">set_dc_date</tt><big>(</big><em>date</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.set_dc_date" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set the dc:date value.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>darz &#8211; DateTime</div></blockquote>
+</dd></dl>
 
 <dl class="method">
 <dt id="lpod.element.odf_element.set_outline_level">
@@ -1098,6 +1359,39 @@ afterwards. XXX side effects?</p>
 <dd><p>Like &#8220;set_text&#8221; but set the text of the embedded paragraph:
 annotations, cells...</p>
 <p>Create the paragraph if missing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.strip_elements">
+<tt class="descname">strip_elements</tt><big>(</big><em>sub_elements</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.strip_elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the tags of provided elements, keeping inner childs and text.</p>
+<p>Return : the striped element.</p>
+<p>Warning : no clone in sub_elements list.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>sub_elements &#8211; odf_element or list of odf_element</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.element.odf_element.strip_tags">
+<tt class="descname">strip_tags</tt><big>(</big><em>strip=None</em>, <em>protect=None</em>, <em>default='text:p'</em><big>)</big><a class="headerlink" href="#lpod.element.odf_element.strip_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the tags listed in strip, recursively, keeping inner childs
+and text. Tags listed in protect stop the removal one level depth. If
+the first level element is stripped, default is used to embed the
+content in the default element. If default is None and first level is
+striped, a list of text and children is returned. Return : the striped
+element.</p>
+<p>strip_tags should be used by on purpose methods (strip_span ...)
+(Method name taken from lxml).</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>strip &#8211; iterable list of unicode odf tags, or None</p>
+<p>protect &#8211; iterable list of unicode odf tags, or None</p>
+<p>default &#8211; unicode odf tag, or None</p>
+</div></blockquote>
+<p>Return:</p>
+<blockquote>
+<div>odf_element or list.</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -1167,7 +1461,7 @@ specialized style classes.</p>
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="draw_page.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.draw_page</span></tt></a></p>
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">lpod.draw_page</span></tt></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="experimental.html"
                         title="next chapter"><tt class="docutils literal"><span class="pre">lpod.experimental</span></tt></a></p>
@@ -1208,13 +1502,13 @@ specialized style classes.</p>
         <li class="right" >
           <a href="draw_page.html" title="lpod.draw_page"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

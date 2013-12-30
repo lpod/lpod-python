@@ -1,0 +1,7 @@
+:mod:`lpod.paragraph_base`
+##############################################
+.. automodule:: lpod.paragraph_base
+   :synopsis: Lpod paragraph_base module
+   :show-inheritance:
+   :members:
+   :undoc-members:

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.link &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>lpod.link &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.list" href="list.html" />
     <link rel="prev" title="lpod.legacy" href="legacy.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="legacy.html" title="lpod.legacy"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -61,7 +61,7 @@
 <dl class="class">
 <dt id="lpod.link.odf_link">
 <em class="property">class </em><tt class="descclassname">lpod.link.</tt><tt class="descname">odf_link</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.link.odf_link" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="paragraph.html#lpod.paragraph.odf_paragraph" title="lpod.paragraph.odf_paragraph"><tt class="xref py py-class docutils literal"><span class="pre">lpod.paragraph.odf_paragraph</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="paragraph_base.html#lpod.paragraph_base.paragraph_base" title="lpod.paragraph_base.paragraph_base"><tt class="xref py py-class docutils literal"><span class="pre">lpod.paragraph_base.paragraph_base</span></tt></a></p>
 <dl class="method">
 <dt id="lpod.link.odf_link.get_name">
 <tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.link.odf_link.get_name" title="Permalink to this definition">¶</a></dt>
@@ -127,13 +127,14 @@
 
 <dl class="function">
 <dt id="lpod.link.odf_create_link">
-<tt class="descclassname">lpod.link.</tt><tt class="descname">odf_create_link</tt><big>(</big><em>url</em>, <em>name=None</em>, <em>title=None</em>, <em>target_frame=None</em>, <em>style=None</em>, <em>visited_style=None</em><big>)</big><a class="headerlink" href="#lpod.link.odf_create_link" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">lpod.link.</tt><tt class="descname">odf_create_link</tt><big>(</big><em>url</em>, <em>name=None</em>, <em>title=None</em>, <em>text=None</em>, <em>target_frame=None</em>, <em>style=None</em>, <em>visited_style=None</em><big>)</big><a class="headerlink" href="#lpod.link.odf_create_link" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a text:a odf_element.</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>url &#8211; str</p>
 <p>name &#8211; unicode</p>
 <p>title &#8211; unicode</p>
+<p>text &#8211; unicode</p>
 <p>target_frame &#8211; &#8216;_self&#8217;, &#8216;_blank&#8217;, &#8216;_parent&#8217;, &#8216;_top&#8217;</p>
 <p>style &#8211; string</p>
 <p>visited_style &#8211; string</p>
@@ -150,7 +151,7 @@
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="legacy.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.legacy</span></tt></a></p>
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">lpod.legacy</span></tt></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="list.html"
                         title="next chapter"><tt class="docutils literal"><span class="pre">lpod.list</span></tt></a></p>
@@ -191,13 +192,13 @@
         <li class="right" >
           <a href="legacy.html" title="lpod.legacy"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

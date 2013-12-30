@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.tracked_changes &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>lpod.tracked_changes &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.utils" href="utils.html" />
     <link rel="prev" title="lpod.toc" href="toc.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="toc.html" title="lpod.toc"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -59,9 +59,416 @@
   <div class="section" id="module-lpod.tracked_changes">
 <span id="lpod-tracked-changes"></span><h1><a class="reference internal" href="#module-lpod.tracked_changes" title="lpod.tracked_changes: Lpod tracked_changes module"><tt class="xref py py-mod docutils literal"><span class="pre">lpod.tracked_changes</span></tt></a><a class="headerlink" href="#module-lpod.tracked_changes" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
+<dt id="lpod.tracked_changes.odf_change_info">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_change_info</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_change_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>The &lt;office:change-info&gt; element represents who made a change and when.
+It may also contain a comment (one or more &lt;text:p&gt; elements) on the
+change.</p>
+<p>The comments available in the &lt;office:change-info&gt; element are available
+through :</p>
+<blockquote>
+<div><ul class="simple">
+<li>get_paragraphs and get_paragraph methods for actual odf_paragraph.</li>
+<li>get_comments for a plain text version</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_change_info.get_comments">
+<tt class="descname">get_comments</tt><big>(</big><em>joined=True</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_change_info.get_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get text content of the comments. If joined is True (default), the
+text of different paragraphs is concatenated, else a list of strings,
+one per paragraph, is returned.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>joined &#8211; boolean (default is True)</div></blockquote>
+<p>Return: unicode or list of unicode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_change_info.set_comments">
+<tt class="descname">set_comments</tt><big>(</big><em>text=u''</em>, <em>replace=True</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_change_info.set_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the text content of the comments. If replace is True (default),
+the new text replace old comments, else it is added at the end.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>text &#8211; unicode</p>
+<p>replace &#8211; boolean</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_change_info.set_dc_creator">
+<tt class="descname">set_dc_creator</tt><big>(</big><em>creator=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_change_info.set_dc_creator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the creator of the change. Default for creator is &#8216;Unknown&#8217;.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>creator &#8211; unicode (or None)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_change_info.set_dc_date">
+<tt class="descname">set_dc_date</tt><big>(</big><em>date=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_change_info.set_dc_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the date of the change. If date is None, use current time.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>date &#8211; datetime</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.tracked_changes.odf_text_change">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_text_change</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>The &lt;text:change&gt; element marks a position in an empty region where text
+has been deleted.</p>
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_change_element">
+<tt class="descname">get_change_element</tt><big>(</big><em>tracked_changes=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_change_element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_change_info">
+<tt class="descname">get_change_info</tt><big>(</big><em>tracked_changes=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_change_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_changed_region">
+<tt class="descname">get_changed_region</tt><big>(</big><em>tracked_changes=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_changed_region" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_deleted">
+<tt class="descname">get_deleted</tt><big>(</big><em>tracked_changes=None</em>, <em>as_text=False</em>, <em>no_header=False</em>, <em>clean=True</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the deleted informations stored in the
+&lt;text:deletion&gt; stored in the tracked changes.</p>
+<p>Return: odf_paragraph (or None).&#8221;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_end">
+<tt class="descname">get_end</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_id">
+<tt class="descname">get_id</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_inserted">
+<tt class="descname">get_inserted</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_inserted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.get_start">
+<tt class="descname">get_start</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.get_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change.set_id">
+<tt class="descname">set_id</tt><big>(</big><em>idx</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change.set_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.tracked_changes.odf_text_change_end">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_text_change_end</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lpod.tracked_changes.odf_text_change" title="lpod.tracked_changes.odf_text_change"><tt class="xref py py-class docutils literal"><span class="pre">lpod.tracked_changes.odf_text_change</span></tt></a></p>
+<p>The &lt;text:change-end&gt; element marks the end of a region with content
+where text has been inserted or the format has been changed.</p>
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change_end.get_deleted">
+<tt class="descname">get_deleted</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_end.get_deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change_end.get_end">
+<tt class="descname">get_end</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_end.get_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change_end.get_inserted">
+<tt class="descname">get_inserted</tt><big>(</big><em>as_text=False</em>, <em>no_header=False</em>, <em>clean=True</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_end.get_inserted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the content between text:change-start and text:change-end.</p>
+<p>If no content exists (deletion tag), returns None (or u&#8217;&#8217; if text flag
+is True).
+If as_text is True: returns the text content.
+If clean is True: suppress unwanted tags (deletions marks, ...)
+If no_header is True: existing text:h are changed in text:p
+By default: returns a list of odf_element, cleaned and with headers
+By default: returns a list of odf_text or odf_element.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>as_text &#8211; boolean</p>
+<p>clean &#8211; boolean</p>
+<p>no_header &#8211; boolean</p>
+</div></blockquote>
+<p>Return: list or odf_paragraph or text</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change_end.get_start">
+<tt class="descname">get_start</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_end.get_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the corresponding annotation starting tag or None.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.tracked_changes.odf_text_change_start">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_text_change_start</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lpod.tracked_changes.odf_text_change_end" title="lpod.tracked_changes.odf_text_change_end"><tt class="xref py py-class docutils literal"><span class="pre">lpod.tracked_changes.odf_text_change_end</span></tt></a></p>
+<p>The &lt;text:change-start&gt; element marks the start of a region with content
+where text has been inserted or the format has been changed.</p>
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change_start.delete">
+<tt class="descname">delete</tt><big>(</big><em>child=None</em>, <em>keep_tail=True</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_start.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the given element from the XML tree. If no element is given,
+&#8220;self&#8221; is deleted. The XML library may allow to continue to use an
+element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
+<p>For odf_text_change_start : delete also the end tag if exists.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>child &#8211; odf_element</p>
+<p>keep_tail &#8211; boolean (default to True), True for most usages.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change_start.get_end">
+<tt class="descname">get_end</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_start.get_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the corresponding change-end tag or None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_change_start.get_start">
+<tt class="descname">get_start</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_change_start.get_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.tracked_changes.odf_text_changed_region">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_text_changed_region</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_changed_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>Each &lt;text:changed-region&gt; element contains a single element, one of
+&lt;text:insertion&gt;, &lt;text:deletion&gt;, or &lt;text:format-change&gt; that
+corresponds to a change being tracked within the scope of the
+&lt;text:tracked-changes&gt; element that contains the &lt;text:changed-region&gt;
+instance.
+The xml:id attribute of the &lt;text:changed-region&gt; is referenced
+from the &lt;text:change&gt;, &lt;text:change-start&gt; and &lt;text:change-end&gt;
+elements that identify where the change applies to markup in the scope of
+the &lt;text:tracked-changes&gt; element.</p>
+<dl class="docutils">
+<dt>Warning <span class="classifier-delimiter">:</span> <span class="classifier">for this implementation, text:change should be referenced only</span></dt>
+<dd><blockquote class="first">
+<div>once in the scope, which is different from ODF 1.2 requirement:</div></blockquote>
+<p class="last">&#8221; A &lt;text:changed-region&gt; can be referenced by more than one
+change, but the corresponding referencing change mark elements
+shall be of the same change type - insertion, format change or
+deletion. &#8220;</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_changed_region.get_change_element">
+<tt class="descname">get_change_element</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_changed_region.get_change_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the change element child. It can be either: &lt;text:insertion&gt;,
+&lt;text:deletion&gt;, or &lt;text:format-change&gt; as an odf_element object.</p>
+<p>Return: odf_element.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_changed_region.get_change_info">
+<tt class="descname">get_change_info</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_changed_region.get_change_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the &lt;office:change-info&gt; element of the change
+element child.</p>
+<p>Return: odf_change_info element.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_changed_region.get_id">
+<tt class="descname">get_id</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_changed_region.get_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the text:id attribute.</p>
+<p>Return: unicode</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_changed_region.set_change_info">
+<tt class="descname">set_change_info</tt><big>(</big><em>change_info=None</em>, <em>creator=None</em>, <em>date=None</em>, <em>comments=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_changed_region.set_change_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to set the change_info element of the sub change element.
+See odf_text_insertion.set_change_info() for details.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_changed_region.set_id">
+<tt class="descname">set_id</tt><big>(</big><em>idx</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_changed_region.set_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set both the text:id and xml:id attributes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.tracked_changes.odf_text_deletion">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_text_deletion</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_deletion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lpod.tracked_changes.odf_text_insertion" title="lpod.tracked_changes.odf_text_insertion"><tt class="xref py py-class docutils literal"><span class="pre">lpod.tracked_changes.odf_text_insertion</span></tt></a></p>
+<p>The &lt;text:deletion&gt; element contains information that identifies the
+person responsible for a deletion and the date of that deletion. This
+information may also contain one or more &lt;text:p&gt; elements which contains
+a comment on the deletion. The &lt;text:deletion&gt; element may also contain
+content that was deleted while change tracking was enabled. The position
+where the text was deleted is marked by a &lt;text:change&gt; element. Deleted
+text is contained in a paragraph element. To reconstruct the original
+text, the paragraph containing the deleted text is merged with its
+surrounding paragraph or heading element. To reconstruct the text before
+a deletion took place:</p>
+<blockquote>
+<div><ul class="simple">
+<li>If the change mark is inside a paragraph, insert the content that was</li>
+</ul>
+<p>deleted, but remove all leading start tags up to and including the
+first &lt;text:p&gt; element and all trailing end tags up to and including
+the last &lt;/text:p&gt; or &lt;/text:h&gt; element. If the last trailing element
+is a &lt;/text:h&gt;, change the end tag &lt;/text:p&gt; following this insertion
+to a &lt;/text:h&gt; element.
+- If the change mark is inside a heading, insert the content that was
+deleted, but remove all leading start tags up to and including the
+first &lt;text:h&gt; element and all trailing end tags up to and including
+the last &lt;/text:h&gt; or &lt;/text:p&gt; element. If the last trailing element
+is a &lt;/text:p&gt;, change the end tag &lt;/text:h&gt; following this insertion
+to a &lt;/text:p&gt; element.
+- Otherwise, copy the text content of the &lt;text:deletion&gt; element in
+place of the change mark.</p>
+</div></blockquote>
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_deletion.get_deleted">
+<tt class="descname">get_deleted</tt><big>(</big><em>as_text=False</em>, <em>no_header=False</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_deletion.get_deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the deleted informations stored in the &lt;text:deletion&gt;.
+If as_text is True: returns the text content.
+If no_header is True: existing text:h are changed in text:p</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>as_text &#8211; boolean</p>
+<p>no_header &#8211; boolean</p>
+</div></blockquote>
+<p>Return: odf_paragraph and odf_header list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_deletion.get_inserted">
+<tt class="descname">get_inserted</tt><big>(</big><em>as_text=False</em>, <em>no_header=False</em>, <em>clean=True</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_deletion.get_inserted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return None (or u&#8217;&#8216;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_deletion.set_deleted">
+<tt class="descname">set_deleted</tt><big>(</big><em>paragraph_or_list</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_deletion.set_deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the deleted informations stored in the &lt;text:deletion&gt;. An
+actual content that was deleted is expected, embeded in a odf_paragraph
+element or odf_header.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>paragraph_or_list &#8211; odf_paragraph or odf_header element (or list)</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.tracked_changes.odf_text_format_change">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_text_format_change</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_format_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lpod.tracked_changes.odf_text_insertion" title="lpod.tracked_changes.odf_text_insertion"><tt class="xref py py-class docutils literal"><span class="pre">lpod.tracked_changes.odf_text_insertion</span></tt></a></p>
+<p>The &lt;text:format-change&gt; element represents any change in formatting
+attributes. The region where the change took place is marked by
+&lt;text:change-start&gt;, &lt;text:change-end&gt; or &lt;text:change&gt; elements.</p>
+<p>Note: This element does not contain formatting changes that have taken
+place.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.tracked_changes.odf_text_insertion">
+<em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_text_insertion</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_insertion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>The &lt;text:insertion&gt; element contains the information that identifies
+the person responsible for a change and the date of that change. This
+information may also contain one or more &lt;text:p&gt; elements which contains
+a comment on the insertion. The &lt;text:insertion&gt; element&#8217;s parent
+&lt;text:changed-region&gt; element has an xml:id or text:id attribute, the
+value of which binds that parent element to the text:change-id attribute
+on the &lt;text:change-start&gt; and &lt;text:change-end&gt; elements.</p>
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_insertion.get_change_info">
+<tt class="descname">get_change_info</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_insertion.get_change_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the &lt;office:change-info&gt; child of the element.</p>
+<p>Return: odf_change_info element.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_insertion.get_deleted">
+<tt class="descname">get_deleted</tt><big>(</big><em>as_text=False</em>, <em>no_header=False</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_insertion.get_deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return: None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_insertion.get_inserted">
+<tt class="descname">get_inserted</tt><big>(</big><em>as_text=False</em>, <em>no_header=False</em>, <em>clean=True</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_insertion.get_inserted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to text:change-start.get_inserted(). Return the content
+between text:change-start and text:change-end.</p>
+<p>If no content exists (deletion tag), returns None (or u&#8217;&#8217; if text flag
+is True).
+if pragraph is True: returns the content embedded in a paragraph
+odf_element.
+If text is True: returns the annotated text.
+By default: returns a list of odf_text or odf_element.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>paragraph &#8211; boolean</p>
+<p>text &#8211; boolean</p>
+</div></blockquote>
+<p>Return: list or odf_paragraph or text</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.tracked_changes.odf_text_insertion.set_change_info">
+<tt class="descname">set_change_info</tt><big>(</big><em>change_info=None</em>, <em>creator=None</em>, <em>date=None</em>, <em>comments=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_text_insertion.set_change_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the change info element for the change element. If change_info
+is not provided, creator, date and comments will be used to build a
+suitable change info element. Default for creator is &#8216;Unknown&#8217;,
+default for date is current time and default for comments is no
+comment at all.
+The new change info element will replace any existant chenge info.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>change_info &#8211; odf_change_info element (or None)</p>
+<p>cretor &#8211; unicode (or None)</p>
+<p>date &#8211; datetime (or None)</p>
+<p>comments &#8211; list of odf_paragraph elements (or None)</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="lpod.tracked_changes.odf_tracked_changes">
 <em class="property">class </em><tt class="descclassname">lpod.tracked_changes.</tt><tt class="descname">odf_tracked_changes</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_tracked_changes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>The &lt;text:tracked-changes&gt; element acts as a container for
+&lt;text:changed-region&gt; elements that represent changes in a certain scope
+of an OpenDocument document. This scope is the element in which the
+&lt;text:tracked-changes&gt; element occurs. Changes in this scope shall be
+tracked by &lt;text:changed-region&gt; elements contained in the
+&lt;text:tracked-changes&gt; element in this scope. If a &lt;text:tracked-changes&gt;
+element is absent, there are no tracked changes in the corresponding
+scope. In this case, all change mark elements in this scope shall be
+ignored.</p>
 <dl class="method">
 <dt id="lpod.tracked_changes.odf_tracked_changes.get_changed_region">
 <tt class="descname">get_changed_region</tt><big>(</big><em>position=0</em>, <em>text_id=None</em>, <em>creator=None</em>, <em>date=None</em>, <em>content=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_tracked_changes.get_changed_region" title="Permalink to this definition">¶</a></dt>
@@ -69,7 +476,7 @@
 
 <dl class="method">
 <dt id="lpod.tracked_changes.odf_tracked_changes.get_changed_regions">
-<tt class="descname">get_changed_regions</tt><big>(</big><em>creator=None</em>, <em>date=None</em>, <em>content=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_tracked_changes.get_changed_regions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_changed_regions</tt><big>(</big><em>creator=None</em>, <em>date=None</em>, <em>content=None</em>, <em>role=None</em><big>)</big><a class="headerlink" href="#lpod.tracked_changes.odf_tracked_changes.get_changed_regions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -84,7 +491,7 @@
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="toc.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.toc</span></tt></a></p>
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">lpod.toc</span></tt></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="utils.html"
                         title="next chapter"><tt class="docutils literal"><span class="pre">lpod.utils</span></tt></a></p>
@@ -125,13 +532,13 @@
         <li class="right" >
           <a href="toc.html" title="lpod.toc"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

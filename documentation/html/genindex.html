@@ -10,7 +10,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>Index &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="index.html" /> 
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li> 
+        <li><a href="index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -131,7 +131,7 @@
   </dt>
 
       
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.append_plain_text">append_plain_text() (lpod.paragraph.odf_paragraph method)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.paragraph_base.append_plain_text">append_plain_text() (lpod.paragraph_base.paragraph_base method)</a>
   </dt>
 
       
@@ -372,6 +372,20 @@
   <dt><a href="autodocs/element.html#lpod.element.odf_element.delete">delete() (lpod.element.odf_element method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation.delete">(lpod.note.odf_annotation method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark_start.delete">(lpod.reference.odf_reference_mark_start method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_start.delete">(lpod.tracked_changes.odf_text_change_start method)</a>
+  </dt>
+
+      </dl></dd>
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
@@ -471,6 +485,12 @@
   </dt>
 
   </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference.format_allowed">format_allowed (lpod.reference.odf_reference attribute)</a>
+  </dt>
+
+  </dl></td>
 </tr></table>
 
 <h2 id="G">G</h2>
@@ -485,7 +505,19 @@
   </dt>
 
       
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation.get_annotated">get_annotated() (lpod.note.odf_annotation method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_annotation">get_annotation() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_annotation_end">get_annotation_end() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_annotation_ends">get_annotation_ends() (lpod.element.odf_element method)</a>
   </dt>
 
       
@@ -498,6 +530,10 @@
 
       
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_attributes">get_attributes() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_between">get_between() (lpod.element.odf_element method)</a>
   </dt>
 
       
@@ -567,9 +603,39 @@
 
       </dl></dd>
       
-  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_tracked_changes.get_changed_region">get_changed_region() (lpod.tracked_changes.odf_tracked_changes method)</a>
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_change_element">get_change_element() (lpod.tracked_changes.odf_text_change method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_changed_region.get_change_element">(lpod.tracked_changes.odf_text_changed_region method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_change_info">get_change_info() (lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_changed_region.get_change_info">(lpod.tracked_changes.odf_text_changed_region method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_insertion.get_change_info">(lpod.tracked_changes.odf_text_insertion method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_changed_region">get_changed_region() (lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_tracked_changes.get_changed_region">(lpod.tracked_changes.odf_tracked_changes method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_tracked_changes.get_changed_regions">get_changed_regions() (lpod.tracked_changes.odf_tracked_changes method)</a>
   </dt>
@@ -614,6 +680,12 @@
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_comments">get_comments() (lpod.meta.odf_meta method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_change_info.get_comments">(lpod.tracked_changes.odf_change_info method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_creation_date">get_creation_date() (lpod.meta.odf_meta method)</a>
   </dt>
@@ -638,6 +710,24 @@
   <dt><a href="autodocs/table.html#lpod.table.odf_column.get_default_cell_style">get_default_cell_style() (lpod.table.odf_column method)</a>
   </dt>
 
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_deleted">get_deleted() (lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_end.get_deleted">(lpod.tracked_changes.odf_text_change_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_deletion.get_deleted">(lpod.tracked_changes.odf_text_deletion method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_insertion.get_deleted">(lpod.tracked_changes.odf_text_insertion method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_description">get_description() (lpod.meta.odf_meta method)</a>
   </dt>
@@ -731,6 +821,28 @@
 
       </dl></dd>
       
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation.get_end">get_end() (lpod.note.odf_annotation method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation_end.get_end">(lpod.note.odf_annotation_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_end">(lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_end.get_end">(lpod.tracked_changes.odf_text_change_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_start.get_end">(lpod.tracked_changes.odf_text_change_start method)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="autodocs/style.html#lpod.style.odf_currency_style.get_family">get_family() (lpod.style.odf_currency_style method)</a>
   </dt>
 
@@ -801,6 +913,10 @@
   </dt>
 
       
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference.get_format">get_format() (lpod.reference.odf_reference method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/document.html#lpod.document.odf_document.get_formated_meta">get_formated_meta() (lpod.document.odf_document method)</a>
   </dt>
 
@@ -830,7 +946,7 @@
   </dt>
 
         
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.get_formatted_text">(lpod.paragraph.odf_paragraph method)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.paragraph_base.get_formatted_text">(lpod.paragraph_base.paragraph_base method)</a>
   </dt>
 
         
@@ -903,6 +1019,14 @@
   <dt><a href="autodocs/shapes.html#lpod.shapes.odf_shape.get_id">(lpod.shapes.odf_shape method)</a>
   </dt>
 
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_id">(lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_changed_region.get_id">(lpod.tracked_changes.odf_text_changed_region method)</a>
+  </dt>
+
       </dl></dd>
       
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_image">get_image() (lpod.element.odf_element method)</a>
@@ -922,6 +1046,24 @@
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_initial_creator">get_initial_creator() (lpod.meta.odf_meta method)</a>
   </dt>
 
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_inserted">get_inserted() (lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_end.get_inserted">(lpod.tracked_changes.odf_text_change_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_deletion.get_inserted">(lpod.tracked_changes.odf_text_deletion method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_insertion.get_inserted">(lpod.tracked_changes.odf_text_insertion method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="autodocs/list.html#lpod.list.odf_list.get_item">get_item() (lpod.list.odf_list method)</a>
   </dt>
@@ -1004,8 +1146,6 @@
   </dt>
 
       </dl></dd>
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_modification_date">get_modification_date() (lpod.meta.odf_meta method)</a>
   </dt>
@@ -1021,6 +1161,22 @@
 
         
   <dt><a href="autodocs/link.html#lpod.link.odf_link.get_name">(lpod.link.odf_link method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation.get_name">(lpod.note.odf_annotation method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation_end.get_name">(lpod.note.odf_annotation_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference.get_name">(lpod.reference.odf_reference method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark.get_name">(lpod.reference.odf_reference_mark method)</a>
   </dt>
 
         
@@ -1064,6 +1220,8 @@
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_next_sibling">get_next_sibling() (lpod.element.odf_element method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/style.html#lpod.style.odf_master_page.get_next_style">get_next_style() (lpod.style.odf_master_page method)</a>
   </dt>
@@ -1074,6 +1232,10 @@
 
       
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_notes">get_notes() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_office_names">get_office_names() (lpod.element.odf_element method)</a>
   </dt>
 
       
@@ -1223,6 +1385,10 @@
   </dt>
 
       
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_reference_mark_single">get_reference_mark_single() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_reference_mark_start">get_reference_mark_start() (lpod.element.odf_element method)</a>
   </dt>
 
@@ -1232,6 +1398,28 @@
 
       
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_reference_marks">get_reference_marks() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_reference_marks_single">get_reference_marks_single() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark_start.get_referenced">get_referenced() (lpod.reference.odf_reference_mark_start method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark.get_referenced_text">get_referenced_text() (lpod.reference.odf_reference_mark method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark_end.get_referenced_text">(lpod.reference.odf_reference_mark_end method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_references">get_references() (lpod.element.odf_element method)</a>
   </dt>
 
       
@@ -1319,6 +1507,28 @@
   </dt>
 
       
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation.get_start">get_start() (lpod.note.odf_annotation method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation_end.get_start">(lpod.note.odf_annotation_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.get_start">(lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_end.get_start">(lpod.tracked_changes.odf_text_change_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_start.get_start">(lpod.tracked_changes.odf_text_change_start method)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_statistic">get_statistic() (lpod.meta.odf_meta method)</a>
   </dt>
 
@@ -1348,7 +1558,7 @@
   </dt>
 
         
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.get_style">(lpod.paragraph.odf_paragraph method)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.paragraph_base.get_style">(lpod.paragraph_base.paragraph_base method)</a>
   </dt>
 
         
@@ -1461,6 +1671,38 @@
   </dt>
 
       
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_change">get_text_change() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_change_deletion">get_text_change_deletion() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_change_deletions">get_text_change_deletions() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_change_end">get_text_change_end() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_change_ends">get_text_change_ends() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_change_start">get_text_change_start() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_change_starts">get_text_change_starts() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_changes">get_text_changes() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/element.html#lpod.element.odf_element.get_text_content">get_text_content() (lpod.element.odf_element method)</a>
   </dt>
 
@@ -1471,7 +1713,7 @@
 
       </dl></dd>
       
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.get_text_style">get_text_style() (lpod.paragraph.odf_paragraph method)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.paragraph_base.get_text_style">get_text_style() (lpod.paragraph_base.paragraph_base method)</a>
   </dt>
 
       <dd><dl>
@@ -1525,6 +1767,10 @@
 
       </dl></dd>
       
+  <dt><a href="autodocs/note.html#lpod.note.get_unique_office_name">get_unique_office_name() (in module lpod.note)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/image.html#lpod.image.odf_image.get_url">get_url() (lpod.image.odf_image method)</a>
   </dt>
 
@@ -1535,7 +1781,23 @@
 
       </dl></dd>
       
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_user_defined">get_user_defined() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_user_defined_list">get_user_defined_list() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_user_defined_metadata">get_user_defined_metadata() (lpod.meta.odf_meta method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.get_user_defined_metadata_of_name">get_user_defined_metadata_of_name() (lpod.meta.odf_meta method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.get_user_defined_value">get_user_defined_value() (lpod.element.odf_element method)</a>
   </dt>
 
       
@@ -1665,6 +1927,10 @@
   </dt>
 
       
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.insert_annotation_end">insert_annotation_end() (lpod.paragraph.odf_paragraph method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/table.html#lpod.table.odf_row.insert_cell">insert_cell() (lpod.table.odf_row method)</a>
   </dt>
 
@@ -1687,11 +1953,15 @@
   </dt>
 
       
-  <dt><a href="autodocs/table.html#lpod.table.odf_table.insert_row">insert_row() (lpod.table.odf_table method)</a>
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.insert_reference">insert_reference() (lpod.paragraph.odf_paragraph method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="autodocs/table.html#lpod.table.odf_table.insert_row">insert_row() (lpod.table.odf_table method)</a>
+  </dt>
+
       
   <dt><a href="autodocs/document.html#lpod.document.odf_document.insert_style">insert_style() (lpod.document.odf_document method)</a>
   </dt>
@@ -1705,10 +1975,14 @@
   </dt>
 
       
-  <dt><a href="autodocs/table.html#lpod.table.odf_cell.is_empty">is_empty() (lpod.table.odf_cell method)</a>
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.is_empty">is_empty() (lpod.element.odf_element method)</a>
   </dt>
 
       <dd><dl>
+        
+  <dt><a href="autodocs/table.html#lpod.table.odf_cell.is_empty">(lpod.table.odf_cell method)</a>
+  </dt>
+
         
   <dt><a href="autodocs/table.html#lpod.table.odf_row.is_empty">(lpod.table.odf_row method)</a>
   </dt>
@@ -1820,12 +2094,12 @@
   <dt><a href="autodocs/list.html#module-lpod.list">lpod.list (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/manifest.html#module-lpod.manifest">lpod.manifest (module)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/meta.html#module-lpod.meta">lpod.meta (module)</a>
   </dt>
@@ -1836,6 +2110,10 @@
 
       
   <dt><a href="autodocs/paragraph.html#module-lpod.paragraph">lpod.paragraph (module)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/paragraph_base.html#module-lpod.paragraph_base">lpod.paragraph_base (module)</a>
   </dt>
 
       
@@ -1937,11 +2215,19 @@
   </dt>
 
       
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation_end">odf_annotation_end (class in lpod.note)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/style.html#lpod.style.odf_background_image">odf_background_image (class in lpod.style)</a>
   </dt>
 
       
   <dt><a href="autodocs/table.html#lpod.table.odf_cell">odf_cell (class in lpod.table)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_change_info">odf_change_info (class in lpod.tracked_changes)</a>
   </dt>
 
       
@@ -1970,6 +2256,10 @@
 
       
   <dt><a href="autodocs/note.html#lpod.note.odf_create_annotation">odf_create_annotation() (in module lpod.note)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/note.html#lpod.note.odf_create_annotation_end">odf_create_annotation_end() (in module lpod.note)</a>
   </dt>
 
       
@@ -2105,7 +2395,7 @@
   </dt>
 
       
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_create_line_break">odf_create_line_break() (in module lpod.paragraph)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.odf_create_line_break">odf_create_line_break() (in module lpod.paragraph_base)</a>
   </dt>
 
       
@@ -2145,6 +2435,10 @@
   </dt>
 
       
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_create_reference">odf_create_reference() (in module lpod.reference)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/reference.html#lpod.reference.odf_create_reference_mark">odf_create_reference_mark() (in module lpod.reference)</a>
   </dt>
 
@@ -2169,7 +2463,7 @@
   </dt>
 
       
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_create_spaces">odf_create_spaces() (in module lpod.paragraph)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.odf_create_spaces">odf_create_spaces() (in module lpod.paragraph_base)</a>
   </dt>
 
       
@@ -2180,8 +2474,6 @@
   <dt><a href="autodocs/variable.html#lpod.variable.odf_create_subject_variable">odf_create_subject_variable() (in module lpod.variable)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/table.html#lpod.table.odf_create_table">odf_create_table() (in module lpod.table)</a>
   </dt>
@@ -2191,13 +2483,15 @@
   </dt>
 
       
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_create_tabulation">odf_create_tabulation() (in module lpod.paragraph)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.odf_create_tabulation">odf_create_tabulation() (in module lpod.paragraph_base)</a>
   </dt>
 
       
   <dt><a href="autodocs/frame.html#lpod.frame.odf_create_text_frame">odf_create_text_frame() (in module lpod.frame)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/variable.html#lpod.variable.odf_create_time_variable">odf_create_time_variable() (in module lpod.variable)</a>
   </dt>
@@ -2219,6 +2513,10 @@
   </dt>
 
       
+  <dt><a href="autodocs/variable.html#lpod.variable.odf_create_user_defined">odf_create_user_defined() (in module lpod.variable)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/variable.html#lpod.variable.odf_create_user_field_decl">odf_create_user_field_decl() (in module lpod.variable)</a>
   </dt>
 
@@ -2228,6 +2526,10 @@
 
       
   <dt><a href="autodocs/variable.html#lpod.variable.odf_create_user_field_get">odf_create_user_field_get() (in module lpod.variable)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/variable.html#lpod.variable.odf_create_user_field_input">odf_create_user_field_input() (in module lpod.variable)</a>
   </dt>
 
       
@@ -2371,6 +2673,22 @@
   </dt>
 
       
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference">odf_reference (class in lpod.reference)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark">odf_reference_mark (class in lpod.reference)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark_end">odf_reference_mark_end (class in lpod.reference)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark_start">odf_reference_mark_start (class in lpod.reference)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/table.html#lpod.table.odf_row">odf_row (class in lpod.table)</a>
   </dt>
 
@@ -2407,6 +2725,34 @@
   </dt>
 
       
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change">odf_text_change (class in lpod.tracked_changes)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_end">odf_text_change_end (class in lpod.tracked_changes)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change_start">odf_text_change_start (class in lpod.tracked_changes)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_changed_region">odf_text_changed_region (class in lpod.tracked_changes)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_deletion">odf_text_deletion (class in lpod.tracked_changes)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_format_change">odf_text_format_change (class in lpod.tracked_changes)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_insertion">odf_text_insertion (class in lpod.tracked_changes)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/style.html#lpod.style.odf_time_style">odf_time_style (class in lpod.style)</a>
   </dt>
 
@@ -2436,6 +2782,10 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.paragraph_base">paragraph_base (class in lpod.paragraph_base)</a>
+  </dt>
+
       
   <dt><a href="autodocs/scriptutils.html#lpod.scriptutils.printerr">printerr() (in module lpod.scriptutils)</a>
   </dt>
@@ -2476,10 +2826,42 @@
   <dt><a href="autodocs/style.html#lpod.style.register_style">register_style() (in module lpod.style)</a>
   </dt>
 
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.remove_all_reference_marks">remove_all_reference_marks() (in module lpod.reference)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.remove_link">remove_link() (lpod.paragraph.odf_paragraph method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.remove_links">remove_links() (lpod.paragraph.odf_paragraph method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.remove_reference_mark">remove_reference_mark() (in module lpod.reference)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.remove_span">remove_span() (lpod.paragraph.odf_paragraph method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.remove_spans">remove_spans() (lpod.paragraph.odf_paragraph method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/element.html#lpod.element.odf_element.replace">replace() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.replace_document_body">replace_document_body() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.replace_element">replace_element() (lpod.element.odf_element method)</a>
   </dt>
 
       
@@ -2589,6 +2971,16 @@
 
       </dl></dd>
       
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_changed_region.set_change_info">set_change_info() (lpod.tracked_changes.odf_text_changed_region method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_insertion.set_change_info">(lpod.tracked_changes.odf_text_insertion method)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="autodocs/note.html#lpod.note.odf_note.set_citation">set_citation() (lpod.note.odf_note method)</a>
   </dt>
 
@@ -2612,6 +3004,12 @@
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.set_comments">set_comments() (lpod.meta.odf_meta method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_change_info.set_comments">(lpod.tracked_changes.odf_change_info method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="autodocs/meta.html#lpod.meta.odf_meta.set_creation_date">set_creation_date() (lpod.meta.odf_meta method)</a>
   </dt>
@@ -2628,12 +3026,28 @@
   <dt><a href="autodocs/element.html#lpod.element.odf_element.set_dc_creator">set_dc_creator() (lpod.element.odf_element method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_change_info.set_dc_creator">(lpod.tracked_changes.odf_change_info method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="autodocs/element.html#lpod.element.odf_element.set_dc_date">set_dc_date() (lpod.element.odf_element method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_change_info.set_dc_date">(lpod.tracked_changes.odf_change_info method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="autodocs/table.html#lpod.table.odf_column.set_default_cell_style">set_default_cell_style() (lpod.table.odf_column method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_deletion.set_deleted">set_deleted() (lpod.tracked_changes.odf_text_deletion method)</a>
   </dt>
 
       
@@ -2687,6 +3101,10 @@
   </dt>
 
       
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference.set_format">set_format() (lpod.reference.odf_reference method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/table.html#lpod.table.odf_cell.set_formula">set_formula() (lpod.table.odf_cell method)</a>
   </dt>
 
@@ -2723,6 +3141,14 @@
 
         
   <dt><a href="autodocs/shapes.html#lpod.shapes.odf_shape.set_id">(lpod.shapes.odf_shape method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_change.set_id">(lpod.tracked_changes.odf_text_change method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/tracked_changes.html#lpod.tracked_changes.odf_text_changed_region.set_id">(lpod.tracked_changes.odf_text_changed_region method)</a>
   </dt>
 
       </dl></dd>
@@ -2792,6 +3218,22 @@
   </dt>
 
         
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation.set_name">(lpod.note.odf_annotation method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/note.html#lpod.note.odf_annotation_end.set_name">(lpod.note.odf_annotation_end method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference.set_name">(lpod.reference.odf_reference method)</a>
+  </dt>
+
+        
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference_mark.set_name">(lpod.reference.odf_reference_mark method)</a>
+  </dt>
+
+        
   <dt><a href="autodocs/shapes.html#lpod.shapes.draw_group.set_name">(lpod.shapes.draw_group method)</a>
   </dt>
 
@@ -2816,12 +3258,12 @@
   <dt><a href="autodocs/table.html#lpod.table.odf_table.set_named_range">set_named_range() (lpod.table.odf_table method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/style.html#lpod.style.odf_master_page.set_next_style">set_next_style() (lpod.style.odf_master_page method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/style.html#lpod.style.odf_background_image.set_opacity">set_opacity() (lpod.style.odf_background_image method)</a>
   </dt>
@@ -2911,6 +3353,14 @@
   </dt>
 
       
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.set_reference_mark">set_reference_mark() (lpod.paragraph.odf_paragraph method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.set_reference_mark_end">set_reference_mark_end() (lpod.paragraph.odf_paragraph method)</a>
+  </dt>
+
+      
   <dt><a href="autodocs/style.html#lpod.style.odf_background_image.set_repeat">set_repeat() (lpod.style.odf_background_image method)</a>
   </dt>
 
@@ -2988,7 +3438,7 @@
   </dt>
 
         
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.set_style">(lpod.paragraph.odf_paragraph method)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.paragraph_base.set_style">(lpod.paragraph_base.paragraph_base method)</a>
   </dt>
 
         
@@ -3085,7 +3535,7 @@
 
       </dl></dd>
       
-  <dt><a href="autodocs/paragraph.html#lpod.paragraph.odf_paragraph.set_text_style">set_text_style() (lpod.paragraph.odf_paragraph method)</a>
+  <dt><a href="autodocs/paragraph_base.html#lpod.paragraph_base.paragraph_base.set_text_style">set_text_style() (lpod.paragraph_base.paragraph_base method)</a>
   </dt>
 
       <dd><dl>
@@ -3196,6 +3646,18 @@
   <dt><a href="autodocs/scriptutils.html#lpod.scriptutils.StdoutWriter">StdoutWriter (class in lpod.scriptutils)</a>
   </dt>
 
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.strip_elements">strip_elements() (lpod.element.odf_element method)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.strip_references">strip_references() (in module lpod.reference)</a>
+  </dt>
+
+      
+  <dt><a href="autodocs/element.html#lpod.element.odf_element.strip_tags">strip_tags() (lpod.element.odf_element method)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
@@ -3238,6 +3700,12 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="autodocs/datatype.html#lpod.datatype.Unit">Unit (class in lpod.datatype)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="autodocs/reference.html#lpod.reference.odf_reference.update">update() (lpod.reference.odf_reference method)</a>
   </dt>
 
   </dl></td>
@@ -3305,12 +3773,12 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li> 
+        <li><a href="index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

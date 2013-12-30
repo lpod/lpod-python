@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.reference &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>lpod.reference &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +25,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.rst2odt" href="rst2odt.html" />
-    <link rel="prev" title="lpod.paragraph" href="paragraph.html" /> 
+    <link rel="prev" title="lpod.paragraph_base" href="paragraph_base.html" /> 
   </head>
   <body>
     <div class="related">
@@ -44,9 +44,9 @@
           <a href="rst2odt.html" title="lpod.rst2odt"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="paragraph.html" title="lpod.paragraph"
+          <a href="paragraph_base.html" title="lpod.paragraph_base"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -58,25 +58,267 @@
             
   <div class="section" id="module-lpod.reference">
 <span id="lpod-reference"></span><h1><a class="reference internal" href="#module-lpod.reference" title="lpod.reference: Lpod reference module"><tt class="xref py py-mod docutils literal"><span class="pre">lpod.reference</span></tt></a><a class="headerlink" href="#module-lpod.reference" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lpod.reference.odf_reference">
+<em class="property">class </em><tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_reference</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>A reference to a content marked by a reference mark.
+The odf_reference element (&lt;text:reference-ref&gt;) represents a field that
+references a &lt;text:reference-mark-start&gt; or &lt;text:reference-mark&gt; element.
+Its text:reference-format attribute specifies what is displayed from the
+referenced element. Default is &#8216;page&#8217;
+Actual content is not updated except for the &#8216;text&#8217;
+format by the update() method.</p>
+<p>Consider using: lpod.paragraph.insert_reference()</p>
+<dl class="docutils">
+<dt>Values for text:reference-format :</dt>
+<dd><p class="first">The defined values for the text:reference-format attribute supported by
+all reference fields are:
+&#8216;chapter&#8217;: displays the number of the chapter in which the referenced
+item appears.
+&#8216;direction&#8217;: displays whether the referenced item is above or below the
+reference field.
+&#8216;page&#8217;: displays the number of the page on which the referenced item
+appears.
+&#8216;text&#8217;: displays the text of the referenced item.
+Additional defined values for the text:reference-format attribute
+supported by references to sequence fields are:
+&#8216;caption&#8217;: displays the caption in which the sequence is used.
+&#8216;category-and-value&#8217;: displays the name and value of the sequence.
+&#8216;value&#8217;: displays the value of the sequence.</p>
+<p>References to bookmarks and other references support additional values,
+which display the list label of the referenced item. If the referenced
+item is contained in a list or a numbered paragraph, the list label is
+the formatted number of the paragraph which contains the referenced
+item. If the referenced item is not contained in a list or numbered
+paragraph, the list label is empty, and the referenced field therefore
+displays nothing. If the referenced bookmark or reference contains more
+than one paragraph, the list label of the paragraph at which the
+bookmark or reference starts is taken.</p>
+<p>Additional defined values for the text:reference-format attribute
+supported by all references to bookmark&#8217;s or other reference fields are:</p>
+<p class="last">&#8216;number&#8217;: displays the list label of the referenced item. [...]
+&#8216;number-all-superior&#8217;: displays the list label of the referenced item
+and adds the contents of all list labels of superior levels in front of
+it. [...]
+&#8216;number-no-superior&#8217;: displays the contents of the list label of the
+referenced item.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="lpod.reference.odf_reference.get_format">
+<tt class="descname">get_format</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference.get_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.reference.odf_reference.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.reference.odf_reference.set_format">
+<tt class="descname">set_format</tt><big>(</big><em>ref_format=''</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference.set_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the text:reference-format attribute.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>ref_format &#8211; unicode</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.reference.odf_reference.set_name">
+<tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference.set_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the text:ref-name attribute.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; unicode</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.reference.odf_reference.update">
+<tt class="descname">update</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the content of the reference text field. Currently only
+&#8216;text&#8217; format is implemented. Other values, for example the &#8216;page&#8217; text
+field, may need to be refreshed through a visual ODF parser.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lpod.reference.odf_reference.format_allowed">
+<tt class="descname">format_allowed</tt><em class="property"> = ('chapter', 'direction', 'page', 'text', 'caption', 'category-and-value', 'value', 'number', 'number-all-superior', 'number-no-superior')</em><a class="headerlink" href="#lpod.reference.odf_reference.format_allowed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.reference.odf_reference_mark">
+<em class="property">class </em><tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_reference_mark</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>A point reference.
+A point reference marks a position in text and is represented by a single
+&lt;text:reference-mark&gt; element.</p>
+<dl class="method">
+<dt id="lpod.reference.odf_reference_mark.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.reference.odf_reference_mark.get_referenced_text">
+<tt class="descname">get_referenced_text</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark.get_referenced_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only usefull for for subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.reference.odf_reference_mark.set_name">
+<tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark.set_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the text:name attribute.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; unicode</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.reference.odf_reference_mark_end">
+<em class="property">class </em><tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_reference_mark_end</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lpod.reference.odf_reference_mark" title="lpod.reference.odf_reference_mark"><tt class="xref py py-class docutils literal"><span class="pre">lpod.reference.odf_reference_mark</span></tt></a></p>
+<p>The &lt;text:reference-mark-end&gt; element represents the end of a range
+reference.</p>
+<dl class="method">
+<dt id="lpod.reference.odf_reference_mark_end.get_referenced_text">
+<tt class="descname">get_referenced_text</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark_end.get_referenced_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the text between reference-mark-start and reference-mark-end.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.reference.odf_reference_mark_start">
+<em class="property">class </em><tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_reference_mark_start</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lpod.reference.odf_reference_mark_end" title="lpod.reference.odf_reference_mark_end"><tt class="xref py py-class docutils literal"><span class="pre">lpod.reference.odf_reference_mark_end</span></tt></a></p>
+<p>The &lt;text:reference-mark-start&gt; element represents the start of a
+range reference.</p>
+<dl class="method">
+<dt id="lpod.reference.odf_reference_mark_start.delete">
+<tt class="descname">delete</tt><big>(</big><em>child=None</em>, <em>keep_tail=True</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark_start.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the given element from the XML tree. If no element is given,
+&#8220;self&#8221; is deleted. The XML library may allow to continue to use an
+element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
+<p>For odf_reference_mark_start : delete the reference-end tag if exists.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>child &#8211; odf_element</p>
+<p>keep_tail &#8211; boolean (default to True), True for most usages.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.reference.odf_reference_mark_start.get_referenced">
+<tt class="descname">get_referenced</tt><big>(</big><em>no_header=False</em>, <em>clean=True</em>, <em>as_xml=False</em>, <em>as_list=False</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_reference_mark_start.get_referenced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the document content between the start and end tags of the
+reference. The content returned by this method can spread over several
+headers and paragraphs.
+By default, the content is returned as an &lt;office:text&gt; odf element.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>no_header &#8211; boolean (default to False), translate existing headers</dt>
+<dd>tags &lt;text:h&gt; into paragraphs &lt;text:p&gt;.</dd>
+<dt>clean &#8211; boolean (default to True), suppress unwanted tags. Striped</dt>
+<dd>tags are : &#8216;text:change&#8217;, &#8216;text:change-start&#8217;,
+&#8216;text:change-end&#8217;, &#8216;text:reference-mark&#8217;,
+&#8216;text:reference-mark-start&#8217;, &#8216;text:reference-mark-end&#8217;.</dd>
+<dt>as_xml &#8211; boolean (default to False), format the returned content as</dt>
+<dd>a XML string (serialization).</dd>
+<dt>as_list &#8211; boolean (default to False), do not embed the returned</dt>
+<dd>content in a &lt;office:text&#8217;&gt; element, instead simply
+return a raw list of odf elements.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.reference.odf_create_reference">
+<tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_create_reference</tt><big>(</big><em>name</em>, <em>ref_format=''</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_create_reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a reference to a content marked by a reference mark. An actual
+reference mark with the provided name should exist.
+Consider using: lpod.paragraph.insert_reference()</p>
+<p>The text:ref-name attribute identifies a &lt;text:reference-mark&gt; or
+&lt;text:referencemark-start&gt; element by the value of that element&#8217;s text:name
+attribute.
+If ref_format is &#8216;text&#8217;, the current text content of the reference_mark is
+retrieved.
+insert_reference
+Arguments:</p>
+<blockquote>
+<div><p>name &#8211; unicode : name of the reference mark</p>
+<dl class="docutils">
+<dt>ref_format &#8211; unicode <span class="classifier-delimiter">:</span> <span class="classifier">format of the field. Default is &#8216;page&#8217;, allowed</span></dt>
+<dd>values are &#8216;chapter&#8217;, &#8216;direction&#8217;, &#8216;page&#8217;, &#8216;text&#8217;,
+&#8216;caption&#8217;, &#8216;category-and-value&#8217;, &#8216;value&#8217;, &#8216;number&#8217;,
+&#8216;number-all-superior&#8217;, &#8216;number-no-superior&#8217;.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
 <dl class="function">
 <dt id="lpod.reference.odf_create_reference_mark">
 <tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_create_reference_mark</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_create_reference_mark" title="Permalink to this definition">¶</a></dt>
-<dd><p>Arguments:</p>
-<p>name &#8211; unicode</p>
+<dd><p>A point reference. A point reference marks a position in text and is
+represented by a single &lt;text:reference-mark&gt; element.
+Consider using the wrapper: lpod.paragraph.set_reference_mark()</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; unicode</div></blockquote>
 </dd></dl>
 
 <dl class="function">
 <dt id="lpod.reference.odf_create_reference_mark_end">
 <tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_create_reference_mark_end</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_create_reference_mark_end" title="Permalink to this definition">¶</a></dt>
-<dd><p>Arguments:</p>
-<p>name &#8211; unicode</p>
+<dd><p>The &lt;text:reference-mark-end&gt; element represent the end of a range
+reference.
+Consider using the wrappers: lpod.paragraph.set_reference_mark() and
+lpod.paragraph.set_reference_mark_end()</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; unicode</div></blockquote>
 </dd></dl>
 
 <dl class="function">
 <dt id="lpod.reference.odf_create_reference_mark_start">
 <tt class="descclassname">lpod.reference.</tt><tt class="descname">odf_create_reference_mark_start</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.reference.odf_create_reference_mark_start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Arguments:</p>
-<p>name &#8211; unicode</p>
+<dd><p>The &lt;text:reference-mark-start&gt; element represent the start of a range
+reference.
+Consider using the wrapper: lpod.paragraph.set_reference_mark()</p>
+<p>Arguments:</p>
+<blockquote>
+<div>name &#8211; unicode</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.reference.remove_all_reference_marks">
+<tt class="descclassname">lpod.reference.</tt><tt class="descname">remove_all_reference_marks</tt><big>(</big><em>element</em><big>)</big><a class="headerlink" href="#lpod.reference.remove_all_reference_marks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all the &#8216;text:reference-mark&#8217;, &#8216;text:reference-mark-start&#8217;, and
+&#8216;text:reference-mark-end&#8217; tags of the element, keeping inner sub elements.
+Nota : using the .delete() on the reference mark will delete inner content.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.reference.remove_reference_mark">
+<tt class="descclassname">lpod.reference.</tt><tt class="descname">remove_reference_mark</tt><big>(</big><em>element</em>, <em>position=0</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.reference.remove_reference_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the &#8216;text:reference-mark&#8217;, &#8216;text:reference-mark-start&#8217;, and
+&#8216;text:reference-mark-end&#8217; tags of the element, identified by name or
+position, keeping inner sub elements.
+Nota : using the .delete() on the reference mark will delete inner content.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.reference.strip_references">
+<tt class="descclassname">lpod.reference.</tt><tt class="descname">strip_references</tt><big>(</big><em>element</em><big>)</big><a class="headerlink" href="#lpod.reference.strip_references" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all the &#8216;text:reference-ref&#8217; tags of the element, keeping inner
+sub elements (for example the referenced valus if format is &#8216;text&#8217;).
+Nota : using the .delete() on the reference mark will delete inner content.</p>
 </dd></dl>
 
 </div>
@@ -88,8 +330,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="paragraph.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.paragraph</span></tt></a></p>
+  <p class="topless"><a href="paragraph_base.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">lpod.paragraph_base</span></tt></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="rst2odt.html"
                         title="next chapter"><tt class="docutils literal"><span class="pre">lpod.rst2odt</span></tt></a></p>
@@ -128,15 +370,15 @@
           <a href="rst2odt.html" title="lpod.rst2odt"
              >next</a> |</li>
         <li class="right" >
-          <a href="paragraph.html" title="lpod.paragraph"
+          <a href="paragraph_base.html" title="lpod.paragraph_base"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

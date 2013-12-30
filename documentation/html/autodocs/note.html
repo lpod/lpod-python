@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.note &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>lpod.note &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.paragraph" href="paragraph.html" />
     <link rel="prev" title="lpod.meta" href="meta.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="meta.html" title="lpod.meta"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -68,13 +68,103 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="lpod.note.odf_annotation.delete">
+<tt class="descname">delete</tt><big>(</big><em>child=None</em><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the given element from the XML tree. If no element is given,
+&#8220;self&#8221; is deleted. The XML library may allow to continue to use an
+element now &#8220;orphan&#8221; as long as you have a reference to it.</p>
+<p>For odf_annotation : delete the annotation-end tag if exists.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>child &#8211; odf_element</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.note.odf_annotation.get_annotated">
+<tt class="descname">get_annotated</tt><big>(</big><em>as_text=False</em>, <em>no_header=True</em>, <em>clean=True</em><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.get_annotated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the annotated content from an annotation.</p>
+<p>If no content exists (single position annotation or annotation-end not
+found), returns [] (or u&#8217;&#8217; if text flag is True).
+If as_text is True: returns the text content.
+If clean is True: suppress unwanted tags (deletions marks, ...)
+If no_header is True: existing text:h are changed in text:p
+By default: returns a list of odf_element, cleaned and without headers.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>as_text &#8211; boolean</p>
+<p>clean &#8211; boolean</p>
+<p>no_header &#8211; boolean</p>
+</div></blockquote>
+<p>Return: list or odf_element or text</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.note.odf_annotation.get_body">
 <tt class="descname">get_body</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.get_body" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="lpod.note.odf_annotation.get_end">
+<tt class="descname">get_end</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.get_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the corresponding annotation-end tag or None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.note.odf_annotation.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.note.odf_annotation.get_start">
+<tt class="descname">get_start</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.get_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lpod.note.odf_annotation.set_body">
 <tt class="descname">set_body</tt><big>(</big><em>text_or_element</em><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.set_body" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.note.odf_annotation.set_name">
+<tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation.set_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lpod.note.odf_annotation_end">
+<em class="property">class </em><tt class="descclassname">lpod.note.</tt><tt class="descname">odf_annotation_end</tt><big>(</big><em>native_element</em>, <em>cache=None</em><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="element.html#lpod.element.odf_element" title="lpod.element.odf_element"><tt class="xref py py-class docutils literal"><span class="pre">lpod.element.odf_element</span></tt></a></p>
+<p>The &lt;office:annotation-end&gt; element may be used to define the end of a
+text range of document content that spans element boundaries. In that case,
+an &lt;office:annotation&gt; element shall precede the &lt;office:annotation-end&gt;
+element. Both elements shall have the same value for their office:name
+attribute. The &lt;office:annotation-end&gt; element shall be preceded by an
+&lt;office:annotation&gt; element that has the same value for its office:name
+attribute as the &lt;office:annotation-end&gt; element. An &lt;office:annotation-end&gt;
+element without a preceding &lt;office:annotation&gt; element that has the same
+name assigned is ignored.</p>
+<dl class="method">
+<dt id="lpod.note.odf_annotation_end.get_end">
+<tt class="descname">get_end</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation_end.get_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.note.odf_annotation_end.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation_end.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lpod.note.odf_annotation_end.get_start">
+<tt class="descname">get_start</tt><big>(</big><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation_end.get_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the corresponding annotation starting tag or None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lpod.note.odf_annotation_end.set_name">
+<tt class="descname">set_name</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#lpod.note.odf_annotation_end.set_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -131,15 +221,37 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="lpod.note.get_unique_office_name">
+<tt class="descclassname">lpod.note.</tt><tt class="descname">get_unique_office_name</tt><big>(</big><em>element=None</em><big>)</big><a class="headerlink" href="#lpod.note.get_unique_office_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide an autogenerated unique &lt;office:name&gt; for the document.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="lpod.note.odf_create_annotation">
-<tt class="descclassname">lpod.note.</tt><tt class="descname">odf_create_annotation</tt><big>(</big><em>text_or_element=None</em>, <em>creator=None</em>, <em>date=None</em><big>)</big><a class="headerlink" href="#lpod.note.odf_create_annotation" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">lpod.note.</tt><tt class="descname">odf_create_annotation</tt><big>(</big><em>text_or_element=None</em>, <em>creator=None</em>, <em>date=None</em>, <em>name=None</em>, <em>parent=None</em><big>)</big><a class="headerlink" href="#lpod.note.odf_create_annotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an annotation element credited to the given creator with the
-given text, optionally dated (current date by default).</p>
+given text, optionally dated (current date by default).
+If name not provided and some parent is provided, the name is autogenerated.</p>
 <p>Arguments:</p>
 <blockquote>
 <div><p>text &#8211; unicode or odf_element</p>
 <p>creator &#8211; unicode</p>
 <p>date &#8211; datetime</p>
+<p>name &#8211; unicode</p>
+<p>parent &#8211; odf_element</p>
+</div></blockquote>
+<p>Return: odf_element</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lpod.note.odf_create_annotation_end">
+<tt class="descclassname">lpod.note.</tt><tt class="descname">odf_create_annotation_end</tt><big>(</big><em>annotation=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#lpod.note.odf_create_annotation_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an annotation-end element. Either annotation or name must be
+provided to have proper reference for the annotation-end.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>annotation &#8211; odf_annotation element</p>
+<p>name &#8211; unicode</p>
 </div></blockquote>
 <p>Return: odf_element</p>
 </dd></dl>
@@ -169,7 +281,7 @@ optionally referencing it using the given note_id.</p>
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="meta.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.meta</span></tt></a></p>
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">lpod.meta</span></tt></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="paragraph.html"
                         title="next chapter"><tt class="docutils literal"><span class="pre">lpod.paragraph</span></tt></a></p>
@@ -210,13 +322,13 @@ optionally referencing it using the given note_id.</p>
         <li class="right" >
           <a href="meta.html" title="lpod.meta"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

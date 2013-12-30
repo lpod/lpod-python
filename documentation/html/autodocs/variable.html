@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lpod.variable &mdash; lpOD-python (version: 1.1.5) documentation</title>
+    <title>lpod.variable &mdash; lpOD-python (version: 1.1.6) documentation</title>
     
     <link rel="stylesheet" href="../_static/lpod.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="lpOD-python (version: 1.1.5) documentation" href="../index.html" />
+    <link rel="top" title="lpOD-python (version: 1.1.6) documentation" href="../index.html" />
     <link rel="up" title="lpod-python" href="../autodocs.html" />
     <link rel="next" title="lpod.xmlpart" href="xmlpart.html" />
     <link rel="prev" title="lpod.utils" href="utils.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="utils.html" title="lpod.utils"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" accesskey="U">lpod-python</a> &raquo;</li> 
       </ul>
     </div>  
@@ -130,6 +130,23 @@
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="lpod.variable.odf_create_user_defined">
+<tt class="descclassname">lpod.variable.</tt><tt class="descname">odf_create_user_defined</tt><big>(</big><em>name</em>, <em>value=None</em>, <em>value_type=None</em>, <em>text=None</em>, <em>style=None</em>, <em>from_document=None</em><big>)</big><a class="headerlink" href="#lpod.variable.odf_create_user_defined" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a user defined field (text:user-defined). If the current
+document is provided, try to extract the content of the meta user defined
+field of same name.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>name &#8211; str, name of the user defined field</p>
+<p>value &#8211; python typed value, value of the field</p>
+<p>value_type &#8211; str, office:value-type known type</p>
+<p>text &#8211; str</p>
+<p>style &#8211; str</p>
+<p>from_document &#8211; ODF document</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
 <dt id="lpod.variable.odf_create_user_field_decl">
 <tt class="descclassname">lpod.variable.</tt><tt class="descname">odf_create_user_field_decl</tt><big>(</big><em>name</em>, <em>value</em>, <em>value_type=None</em><big>)</big><a class="headerlink" href="#lpod.variable.odf_create_user_field_decl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -142,6 +159,11 @@
 <dl class="function">
 <dt id="lpod.variable.odf_create_user_field_get">
 <tt class="descclassname">lpod.variable.</tt><tt class="descname">odf_create_user_field_get</tt><big>(</big><em>name</em>, <em>value</em>, <em>value_type=None</em>, <em>text=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.variable.odf_create_user_field_get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="lpod.variable.odf_create_user_field_input">
+<tt class="descclassname">lpod.variable.</tt><tt class="descname">odf_create_user_field_input</tt><big>(</big><em>name</em>, <em>value</em>, <em>value_type=None</em>, <em>text=None</em>, <em>style=None</em><big>)</big><a class="headerlink" href="#lpod.variable.odf_create_user_field_input" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -174,7 +196,7 @@
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="utils.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">lpod.utils</span></tt></a></p>
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">lpod.utils</span></tt></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="xmlpart.html"
                         title="next chapter"><tt class="docutils literal"><span class="pre">lpod.xmlpart</span></tt></a></p>
@@ -215,13 +237,13 @@
         <li class="right" >
           <a href="utils.html" title="lpod.utils"
              >previous</a> |</li>
-        <li><a href="../index.html">lpOD-python (version: 1.1.5) documentation</a> &raquo;</li>
+        <li><a href="../index.html">lpOD-python (version: 1.1.6) documentation</a> &raquo;</li>
           <li><a href="../autodocs.html" >lpod-python</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.5. Last modified: 2013-08-12 16:07..
+      Last updated on Last release: lpOD 1.1.6. Last modified: 2013-12-30 17:27..
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
