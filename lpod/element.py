@@ -1072,22 +1072,17 @@ class odf_element(object):
                 element.tail = tail
             position = 0
         if position is not None:
-            check_tags(self.get_tag(), child_tag)
             current.insert(position, element)
         elif xmlposition is FIRST_CHILD:
-            check_tags(self.get_tag(), child_tag)
             current.insert(0, element)
         elif xmlposition is LAST_CHILD:
-            check_tags(self.get_tag(), child_tag)
             current.append(element)
         elif xmlposition is NEXT_SIBLING:
             parent = current.getparent()
-            check_tags(_get_prefixed_name(parent.tag), child_tag)
             index = parent.index(current)
             parent.insert(index + 1, element)
         elif xmlposition is PREV_SIBLING:
             parent = current.getparent()
-            check_tags(_get_prefixed_name(parent.tag), child_tag)
             index = parent.index(current)
             parent.insert(index, element)
         else:
@@ -1098,7 +1093,6 @@ class odf_element(object):
         """Fast append elements at the end of ourself using extend.
         """
         if odf_elements:
-            #(no check_tags for now)
             current = self.__element
             elements = [ element.__element for element in odf_elements]
             current.extend(elements)

@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2013 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: David Versmisse <david.versmisse@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -471,29 +472,38 @@ class odf_meta(odf_xmlpart):
 
         Value types can be: Decimal, date, time, boolean or unicode.
         """
-
         result = {}
-        for meta in self.get_elements('//meta:user-defined'):
+        for item in self.get_elements('//meta:user-defined'):
             # Read the values
-            name = meta.get_attribute('meta:name')
-            value_type = meta.get_attribute('meta:value-type')
-            if value_type is None:
-                value_type = 'string'
-            value = meta.get_text()
-            # Interpretation
-            if value_type == 'boolean':
-                result[name] = Boolean.decode(value)
-            elif value_type in  ('float', 'percentage', 'currency'):
-                result[name] = Decimal(value)
-            elif value_type == 'date':
-                if 'T' in value:
-                    result[name] = DateTime.decode(value)
-                else:
-                    result[name] = Date.decode(value)
-            elif value_type == 'string':
-                result[name] = value
-            elif value_type == 'time':
-                result[name] = Duration.decode(value)
+            name = item.get_attribute('meta:name')
+            value = self._get_meta_value(item)
+            result[name] = value
+        return result
+
+
+    def get_user_defined_metadata_of_name(self, keyname):
+        """Return the content of the user defined metadata of that name.
+        Return None if no name matchs or a dic of fields.
+
+        Arguments:
+
+            name -- string, name (meta:name content)
+        """
+        result = {}
+        found = False
+        for item in self.get_elements('//meta:user-defined'):
+            # Read the values
+            name = item.get_attribute('meta:name')
+            if name == keyname:
+                found = True
+                break
+        if not found:
+            return None
+        result['name'] = name
+        value, value_type, text = self._get_meta_value(item, full=True)
+        result['value'] = value
+        result['value_type'] = value_type
+        result['text'] = text
         return result
 
 
@@ -530,3 +540,32 @@ class odf_meta(odf_xmlpart):
             self.get_meta_body().append(metadata)
         metadata.set_attribute('meta:value-type', value_type)
         metadata.set_text(value)
+
+
+    @staticmethod
+    def _get_meta_value(element, full=False):
+        """get_value deicated to the meta data part, for one meta element.
+        """
+        name = element.get_attribute('meta:name')
+        value_type = element.get_attribute('meta:value-type')
+        if value_type is None:
+            value_type = 'string'
+        text = element.get_text()
+        # Interpretation
+        if value_type == 'boolean':
+            value = Boolean.decode(text)
+        elif value_type in  ('float', 'percentage', 'currency'):
+            value = Decimal(text)
+        elif value_type == 'date':
+            if 'T' in text:
+                value = DateTime.decode(text)
+            else:
+                value = Date.decode(text)
+        elif value_type == 'string':
+            value = text
+        elif value_type == 'time':
+            value = Duration.decode(text)
+        if full:
+            return (value, value_type, text)
+        else:
+            return value

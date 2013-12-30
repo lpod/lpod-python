@@ -125,6 +125,34 @@ class ElementTestCase(TestCase):
         self.assertEqual(element.serialize(), '<text:p/>')
 
 
+    def test_delete_self_2(self):
+        element = odf_create_element('<text:p><text:span/>keep</text:p>')
+        child = element.get_element('//text:span')
+        child.delete()
+        self.assertEqual(element.serialize(), '<text:p>keep</text:p>')
+
+
+    def test_delete_self_3(self):
+        element = odf_create_element('<text:p>before<text:span/>keep</text:p>')
+        child = element.get_element('//text:span')
+        child.delete()
+        self.assertEqual(element.serialize(), '<text:p>beforekeep</text:p>')
+
+
+    def test_delete_self_4(self):
+        element = odf_create_element('<text:p><tag>x</tag>before<text:span/>keep</text:p>')
+        child = element.get_element('//text:span')
+        child.delete()
+        self.assertEqual(element.serialize(), '<text:p><tag>x</tag>beforekeep</text:p>')
+
+
+    def test_delete_self_5(self):
+        element = odf_create_element('<text:p><tag>x</tag><text:span/>keep</text:p>')
+        child = element.get_element('//text:span')
+        child.delete()
+        self.assertEqual(element.serialize(), '<text:p><tag>x</tag>keep</text:p>')
+
+
     def test_delete_root(self):
         element = odf_create_element('<text:p><text:span/></text:p>')
         root = element.get_root()
@@ -288,33 +316,41 @@ class ElementTraverseTestCase(TestCase):
 
 
     def test_insert_element_first_child(self):
-        element = odf_create_element('<root><a/></root>')
-        child = odf_create_element('<b/>')
+        element = odf_create_element(
+            '<office:text><text:p/><text:p/></office:text>')
+        child = odf_create_element('<text:h/>')
         element.insert(child, FIRST_CHILD)
-        self.assertEqual(element.serialize(), '<root><b/><a/></root>')
+        self.assertEqual(element.serialize(),
+                    '<office:text><text:h/><text:p/><text:p/></office:text>')
 
 
     def test_insert_element_last_child(self):
-        element = odf_create_element('<root><a/></root>')
-        child = odf_create_element('<b/>')
+        element = odf_create_element(
+            '<office:text><text:p/><text:p/></office:text>')
+        child = odf_create_element('<text:h/>')
         element.append(child)
-        self.assertEqual(element.serialize(), '<root><a/><b/></root>')
+        self.assertEqual(element.serialize(),
+                    '<office:text><text:p/><text:p/><text:h/></office:text>')
 
 
     def test_insert_element_next_sibling(self):
-        root = odf_create_element('<root><a/><b/></root>')
-        element = root.get_elements('//a')[0]
-        sibling = odf_create_element('<c/>')
+        root = odf_create_element(
+            '<office:text><text:p/><text:p/></office:text>')
+        element = root.get_elements('//text:p')[0]
+        sibling = odf_create_element('<text:h/>')
         element.insert(sibling, NEXT_SIBLING)
-        self.assertEqual(root.serialize(), '<root><a/><c/><b/></root>')
+        self.assertEqual(root.serialize(),
+                    '<office:text><text:p/><text:h/><text:p/></office:text>')
 
 
     def test_insert_element_prev_sibling(self):
-        root = odf_create_element('<root><a/><b/></root>')
-        element = root.get_elements('//a')[0]
-        sibling = odf_create_element('<c/>')
+        root = odf_create_element(
+            '<office:text><text:p/><text:p/></office:text>')
+        element = root.get_elements('//text:p')[0]
+        sibling = odf_create_element('<text:h/>')
         element.insert(sibling, PREV_SIBLING)
-        self.assertEqual(root.serialize(), '<root><c/><a/><b/></root>')
+        self.assertEqual(root.serialize(),
+                    '<office:text><text:h/><text:p/><text:p/></office:text>')
 
 
     def test_insert_element_bad_element(self):
@@ -340,13 +376,14 @@ class ElementTraverseTestCase(TestCase):
 
 
     def test_append_element(self):
-        element = odf_create_element("<root/>")
+        element = odf_create_element("text:p")
         element.append(u"f")
         element.append(u"oo1")
-        element.append(odf_create_element("<a/>"))
+        element.append(odf_create_element("text:line-break"))
         element.append(u"f")
         element.append(u"oo2")
-        self.assertEqual(element.serialize(), "<root>foo1<a/>foo2</root>")
+        self.assertEqual(element.serialize(),
+                         "<text:p>foo1<text:line-break/>foo2</text:p>")
 
 
 

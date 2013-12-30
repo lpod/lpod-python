@@ -92,8 +92,8 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         draw_id=None, draw_name=None, draw_style=None, draw_text_style=None,
         table_name=None, table_style=None, style_name=None,
         display_name=None, note_class=None, text_id=None, text_name=None,
-        office_name=None, office_title=None, outline_level=None, level=None,
-        page_layout=None, master_page=None, parent_style=None,
+        change_id=None, office_name=None, office_title=None, outline_level=None,
+        level=None, page_layout=None, master_page=None, parent_style=None,
         presentation_class=None, position=None, **kw):
     query = [element_name]
     attributes = kw
@@ -123,6 +123,8 @@ def _make_xpath_query(element_name, family=None, text_style=None,
         attributes['text:id'] = text_id
     if text_name:
         attributes['text:name'] = text_name
+    if change_id:
+        attributes['text:change-id'] = change_id
     if office_name:
         attributes['office:name'] = office_name
     if office_title:
@@ -401,15 +403,15 @@ def _set_value_and_type(element, value=None, value_type=None, text=None,
 # Public API
 ######################################################################
 def get_value(element, value_type=None, try_get_text=True, get_type=False):
-    """Only for "with office:value-type" elements
+    """Only for "with office:value-type" elements, not for meta fields
     """
     if value_type is None:
         value_type = element.get_attribute('office:value-type')
     if value_type == 'boolean':
         value = element.get_attribute('office:boolean-value')
         if get_type:
-            return (Boolean.decode(value), value_type)
-        return Boolean.decode(value)
+            return (value, value_type)
+        return value  # value is already decoded by get_attribute for booleans
     elif value_type in  ('float', 'percentage', 'currency'):
         value = dec(element.get_attribute('office:value'))
         # Return 3 instead of 3.0 if possible

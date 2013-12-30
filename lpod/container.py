@@ -88,16 +88,16 @@ class odf_container(object):
                 self.__packaging = 'zip'
             except BadZipfile:
                 if zip_expected:
-                    raise ValueError, "corrupted or not an OpenDocument archive"
+                    raise ValueError("corrupted or not an OpenDocument archive")
                 # Maybe XML document
                 try:
                     mimetype = self.__get_xml_part('mimetype')
                 except ValueError:
-                    raise ValueError, "bad OpenDocument format"
+                    raise ValueError("bad OpenDocument format")
                 self.__packaging = 'flat'
             if mimetype not in ODF_MIMETYPES:
                 message = 'Document of unknown type "%s"' % mimetype
-                raise ValueError, message
+                raise ValueError(message)
             self.__parts = {'mimetype': mimetype}
 
 
@@ -123,7 +123,7 @@ class odf_container(object):
         """Get bytes of a part from the XML-only ODF. No cache.
         """
         if name not in ODF_PARTS and name != 'mimetype':
-            raise ValueError, ("Third-party parts are not supported "
+            raise ValueError("Third-party parts are not supported "
                                "in an XML-only ODF document")
         data = self.__get_data()
         if name == 'mimetype':
@@ -340,7 +340,7 @@ class odf_container(object):
         if path in loaded_parts:
             part = loaded_parts[path]
             if part is None:
-                raise ValueError, 'part "%s" is deleted' % path
+                raise ValueError('part "%s" is deleted' % path)
             if self.__packaging == 'folder':
                 cache_ts = self.__parts_ts.get(path, -1)
                 current_ts = self.__get_folder_part_timestamp(path)
@@ -434,7 +434,7 @@ class odf_container(object):
                 packaging = 'zip' # default
         packaging = packaging.strip().lower()
         if packaging not in ('zip', 'flat', 'folder'):
-            raise ValueError, 'packaging type "%s" not supported' % packaging
+            raise ValueError('packaging type "%s" not supported' % packaging)
         # Load parts else they will be considered deleted
         for path in self.get_parts():
             if path not in parts:
@@ -458,7 +458,8 @@ class odf_container(object):
                 dest_file = target
         if packaging == 'folder':
             if not isinstance(target, basestring):
-                raise ValueError, "Saving in folder format requires a folder name, not %s." % target
+                raise ValueError("Saving in folder format requires a folder "
+                                 "name, not %s." % target)
             if not target.endswith('.folder'):
                 target = target + '.folder'
             if backup:

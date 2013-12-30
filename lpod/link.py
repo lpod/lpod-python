@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2013 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -25,12 +26,13 @@
 #
 
 # Import from lpod
-from element import odf_create_element, register_element_class
-from paragraph import odf_paragraph
+from element import odf_element, odf_create_element, register_element_class
+from paragraph import paragraph_base
 
 
-def odf_create_link(url, name=None, title=None, target_frame=None, style=None,
-        visited_style=None):
+
+def odf_create_link(url, name=None, title=None, text=None, target_frame=None,
+                    style=None, visited_style=None):
     """Return a text:a odf_element.
 
     Arguments:
@@ -40,6 +42,8 @@ def odf_create_link(url, name=None, title=None, target_frame=None, style=None,
         name -- unicode
 
         title -- unicode
+
+        text -- unicode
 
         target_frame -- '_self', '_blank', '_parent', '_top'
 
@@ -53,6 +57,10 @@ def odf_create_link(url, name=None, title=None, target_frame=None, style=None,
         link.set_name(name)
     if title is not None:
         link.set_title(title)
+    if text is not None:
+        link.set_text(text)
+    #if target_frame is None:
+    #    target_frame = '_self'
     if target_frame is not None:
         link.set_target_frame(target_frame)
         if target_frame == '_blank':
@@ -67,7 +75,7 @@ def odf_create_link(url, name=None, title=None, target_frame=None, style=None,
 
 
 
-class odf_link(odf_paragraph):
+class odf_link(paragraph_base):
 
     def get_name(self):
         return self.get_attribute('office:name')

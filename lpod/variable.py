@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2013 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -26,8 +27,10 @@
 
 # Import from lpod
 from datatype import Date, DateTime, Duration
+from const import ODF_META
 from utils import _set_value_and_type
 from element import odf_create_element
+
 
 
 def odf_create_variable_decls():
@@ -89,6 +92,58 @@ def odf_create_user_field_get(name, value, value_type=None, text=None,
         style=None):
     element = odf_create_element('text:user-field-get')
     element.set_attribute('text:name', name)
+    text = _set_value_and_type(element, value=value, value_type=value_type,
+            text=text)
+    element.set_text(text)
+    if style is not None:
+        element.set_style_attribute('style:data-style-name', style)
+    return element
+
+
+
+def odf_create_user_field_input(name, value, value_type=None, text=None,
+        style=None):
+    element = odf_create_element('text:user-field-input')
+    element.set_attribute('text:name', name)
+    text = _set_value_and_type(element, value=value, value_type=value_type,
+            text=text)
+    element.set_text(text)
+    if style is not None:
+        element.set_style_attribute('style:data-style-name', style)
+    return element
+
+
+
+def odf_create_user_defined(name, value=None, value_type=None, text=None,
+        style=None, from_document=None):
+    """Return a user defined field (text:user-defined). If the current
+    document is provided, try to extract the content of the meta user defined
+    field of same name.
+
+    Arguments:
+
+        name -- str, name of the user defined field
+
+        value -- python typed value, value of the field
+
+        value_type -- str, office:value-type known type
+
+        text -- str
+
+        style -- str
+
+        from_document -- ODF document
+    """
+    element = odf_create_element('text:user-defined')
+    element.set_attribute('text:name', name)
+    if from_document is not None:
+        meta_infos = from_document.get_part(ODF_META)
+        if meta_infos is not None:
+            content = meta_infos.get_user_defined_metadata_of_name(name)
+            if content is not None:
+                value = content.get('value', None)
+                value_type = content.get('value_type', None)
+                text = content.get('text', None)
     text = _set_value_and_type(element, value=value, value_type=value_type,
             text=text)
     element.set_text(text)

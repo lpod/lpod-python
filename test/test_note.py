@@ -221,7 +221,7 @@ class TestAnnotation(TestCase):
         # Create
         annotation = odf_create_annotation(u"Lost Dialogs", creator=u"Plato",
                 date=datetime(2009, 6, 22, 17, 18, 42))
-        expected = ('<office:annotation>'
+        expected = ('<office:annotation office:name="__Fieldmark__lpod_1">'
                       '<text:p>'
                         'Lost Dialogs'
                       '</text:p>'
@@ -345,7 +345,7 @@ class TestAnnotation(TestCase):
         paragraph = odf_create_paragraph(u"Un paragraphe")
         paragraph.insert_annotation(annotation, after=u"para")
         expected = ('<text:p>Un para'
-                      '<office:annotation>'
+                      '<office:annotation office:name="__Fieldmark__lpod_1">'
                         '<text:p>It\'s like you\'re in a cave.</text:p>'
                         '<dc:creator>Plato</dc:creator>'
                         '<dc:date>2009-08-19T00:00:00</dc:date>'

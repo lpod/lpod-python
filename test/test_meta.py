@@ -301,6 +301,15 @@ class TestMetadata(TestCase):
         self.assertEqual(metadata, expected)
 
 
+    def test_get_user_defined_metadata_of_name(self):
+        meta = self.meta
+        ref = u'Référence'
+        metadata = meta.get_user_defined_metadata_of_name(ref)
+        expected = {'name': ref,
+                    'text': u'true',
+                    'value': True,
+                    'value_type': u'boolean'}
+        self.assertEqual(metadata, expected)
 
 if __name__ == '__main__':
     main()

@@ -95,7 +95,7 @@ class odf_manifest(odf_xmlpart):
         expr = '//manifest:file-entry[attribute::manifest:full-path="%s"]'
         result = self.xpath(expr % full_path)
         if not result:
-            raise KeyError, 'path "%s" not found' % full_path
+            raise KeyError('path "%s" not found' % full_path)
         file_entry = result[0]
         file_entry.set_attribute('manifest:media-type', str(media_type))
 
@@ -114,7 +114,7 @@ class odf_manifest(odf_xmlpart):
         expr = '//manifest:file-entry[attribute::manifest:full-path="%s"]'
         result = self.xpath(expr % full_path)
         if not result:
-            raise KeyError, 'path "%s" not found' % full_path
+            raise KeyError('path "%s" not found' % full_path)
         file_entry = result[0]
         root = self.get_root()
         root.delete(file_entry)

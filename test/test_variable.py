@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2013 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -47,6 +48,8 @@ from lpod.variable import odf_create_title_variable
 from lpod.variable import odf_create_keywords_variable
 from lpod.variable import odf_create_subject_variable
 from lpod.utils import convert_unicode
+from lpod.variable import odf_create_user_defined
+from lpod.const import ODF_META
 
 
 class TestVariables(TestCase):
@@ -143,6 +146,15 @@ class TestUserFields(TestCase):
         self.assertEqual(user_field_get.serialize(), expected)
 
 
+    def test_create_user_field_input(self):
+        user_field_input = odf_create_user_field_input(u'你好 Zoé', value=42)
+        expected = ('<text:user-field-input text:name="%s" '
+                      'office:value-type="float" office:value="42">'
+                      '42'
+                    '</text:user-field-input>') % convert_unicode(u'你好 Zoé')
+        self.assertEqual(user_field_input.serialize(), expected)
+
+
     def test_get_user_field_decl(self):
         clone = self.document.clone()
         body = clone.get_body()
@@ -159,6 +171,148 @@ class TestUserFields(TestCase):
         value = body.get_user_field_value(u"Champêtre")
         self.assertEqual(value, True)
 
+
+
+class TestUserDefined(TestCase):
+
+    def setUp(self):
+        self.document = odf_get_document('samples/meta.odt')
+        self.meta = self.document.get_part(ODF_META)
+
+
+    def test_create_user_defined_1(self):
+        element = odf_create_user_defined(u'unknown_in_meta',
+                                value=42,
+                                value_type=u'float',
+                                text=None,
+                                style=None,
+                                from_document=self.document)
+        expected = ('<text:user-defined text:name="unknown_in_meta" '
+                    'office:value-type="float" '
+                    'office:value="42">42</text:user-defined>')
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_create_user_defined_2(self):
+        element = odf_create_user_defined(u'unknown_in_meta2',
+                                value=datetime(2013, 12, 30),
+                                value_type=u'date',
+                                text=u'2013-12-30',
+                                style=None,
+                                from_document=self.document)
+        expected = ('<text:user-defined text:name="unknown_in_meta2" '
+                    'office:value-type="date" '
+                    'office:date-value="2013-12-30T00:00:00">2013-12-30'
+                    '</text:user-defined>')
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_create_user_defined_2_no_doc(self):
+        element = odf_create_user_defined(u'unknown_in_meta2',
+                                value=datetime(2013, 12, 30),
+                                value_type=u'date',
+                                text=u'2013-12-30',
+                                style=None,
+                                from_document=None)
+        expected = ('<text:user-defined text:name="unknown_in_meta2" '
+                    'office:value-type="date" '
+                    'office:date-value="2013-12-30T00:00:00">2013-12-30'
+                    '</text:user-defined>')
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_create_user_defined_3_existing(self):
+        element = odf_create_user_defined(u'Référence',
+                                from_document=self.document)
+        expected = (
+                    '<text:user-defined text:name="%s" '
+                    'office:value-type="boolean" '
+                    'office:boolean-value="true">'
+                    'true</text:user-defined>') % convert_unicode(u'Référence')
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_create_user_defined_4_existing(self):
+        element = odf_create_user_defined(u'Référence',
+                                value=False, # default value if not existing
+                                value_type=u'boolean',
+                                from_document=self.document)
+        expected = (
+                    '<text:user-defined text:name="%s" '
+                    'office:value-type="boolean" '
+                    'office:boolean-value="true">'
+                    'true</text:user-defined>') % convert_unicode(u'Référence')
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_create_user_defined_5_nodoc(self):
+        element = odf_create_user_defined(u'Référence',
+                                value=False, # default value if not existing
+                                value_type=u'boolean',
+                                from_document=None)
+        expected = (
+                    '<text:user-defined text:name="%s" '
+                    'office:value-type="boolean" '
+                    'office:boolean-value="false">'
+                    'false</text:user-defined>') % convert_unicode(u'Référence')
+        self.assertEqual(element.serialize(), expected)
+
+
+    def test_get_user_defined(self):
+        element = odf_create_user_defined(u'Référence',
+                                value=False, # default value if not existing
+                                value_type=u'boolean',
+                                from_document=self.document)
+        body = self.document.get_body()
+        para = body.get_paragraph()
+        para.append(element)
+        user_defined = body.get_user_defined(u'Référence')
+        expected = (
+                    '<text:user-defined text:name="%s" '
+                    'office:value-type="boolean" '
+                    'office:boolean-value="true">'
+                    'true</text:user-defined>') % convert_unicode(u'Référence')
+        self.assertEqual(user_defined.serialize(), expected)
+
+
+    def test_get_user_defined_list(self):
+        element = odf_create_user_defined(u'Référence',
+                                value=False, # default value if not existing
+                                value_type=u'boolean',
+                                from_document=self.document)
+        body = self.document.get_body()
+        para = body.get_paragraph()
+        para.append(element)
+        element2 = odf_create_user_defined(u'unknown_in_meta2',
+                                value=datetime(2013, 12, 30),
+                                value_type=u'date',
+                                text=u'2013-12-30',
+                                style=None,
+                                from_document=None)
+        para.append(element2)
+        user_defined_list = body.get_user_defined_list()
+        self.assertEqual(len(user_defined_list), 2)
+
+
+    def test_get_user_defined_value(self):
+        element = odf_create_user_defined(u'Référence',
+                                value=False, # default value if not existing
+                                value_type=u'boolean',
+                                from_document=self.document)
+        body = self.document.get_body()
+        para = body.get_paragraph()
+        para.append(element)
+        element2 = odf_create_user_defined(u'unknown_in_meta2',
+                                value=datetime(2013, 12, 30),
+                                value_type=u'date',
+                                text=u'2013-12-30',
+                                style=None,
+                                from_document=None)
+        para.append(element2)
+        value = body.get_user_defined_value(u'Référence')
+        self.assertEqual(value, True)
+        value = body.get_user_defined_value(u'unknown_in_meta2')
+        self.assertEqual(value, datetime(2013, 12, 30))
 
 
 # TODO On all the following variable tests, interact with the document

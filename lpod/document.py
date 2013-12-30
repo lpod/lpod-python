@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2013 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: David Versmisse <david.versmisse@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
 #          Romain Gauthier <romain@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -113,7 +114,7 @@ class odf_document(object):
     """
     def __init__(self, container):
         if not isinstance(container, odf_container):
-            raise TypeError, "container is not an ODF container"
+            raise TypeError("container is not an ODF container")
         self.container = container
 
         # Cache of XML parts
@@ -156,11 +157,6 @@ class odf_document(object):
             xmlparts[path] = part = cls(path, container)
         return part
 
-    #get_content = obsolete('get_content', get_part, ODF_CONTENT)
-    #get_meta = obsolete('get_meta', get_part, ODF_META)
-    #get_styles = obsolete('get_styles', get_part, ODF_STYLES)
-    #get_manifest = obsolete('get_manifest', get_part, ODF_MANIFEST)
-
 
     def set_part(self, path, data):
         """Set the bytes of the given part. The path is relative to the
@@ -183,7 +179,7 @@ class odf_document(object):
         path = _get_part_path(path)
         cls = _get_part_class(path)
         if path == ODF_MANIFEST or cls is not None:
-            raise ValueError, 'part "%s" is mandatory' % path
+            raise ValueError('part "%s" is mandatory' % path)
         return self.container.del_part(path)
 
 
@@ -223,7 +219,7 @@ class odf_document(object):
         type = self.get_type()
         if type not in ('text', 'text-template', 'presentation',
                 'presentation-template'):
-            raise NotImplementedError, ('Type of document "%s" not '
+            raise NotImplementedError('Type of document "%s" not '
                                         'supported yet' % type)
         # Initialize an empty context
         context = {'document': self,
@@ -458,7 +454,6 @@ class odf_document(object):
         return (content.get_styles(family=family)
                 + styles.get_styles(family=family, automatic=automatic))
 
-    #get_style_list = obsolete('get_style_list', get_styles)
 
     def get_style(self, family, name_or_element=None, display_name=None):
         """Return the style uniquely identified by the name/family pair. If
@@ -600,10 +595,10 @@ class odf_document(object):
 
             # Error
             else:
-              raise AttributeError, "invalid combination of arguments"
+              raise AttributeError("invalid combination of arguments")
         # Invalid style
         else:
-            raise ValueError, "invalid style"
+            raise ValueError ("invalid style: %s" % style)
 
         # Insert it!
         if existing is not None:
@@ -721,17 +716,17 @@ class odf_document(object):
             elif partname == "office:document-content":
                 part = content
             else:
-                raise NotImplementedError, partname
+                raise NotImplementedError(partname)
             # Implemented containers
             if container_name not in ('office:styles',
                                       'office:automatic-styles',
                                       'office:master-styles',
                                       'office:font-face-decls'):
-                raise NotImplementedError, container_name
+                raise NotImplementedError(container_name)
             dest = part.get_element('//%s' % container_name)
             # Implemented style types
             if tagname not in registered_styles:
-                raise NotImplementedError, tagname
+                raise NotImplementedError(tagname)
             duplicate = part.get_style(family, stylename)
             if duplicate is not None:
                 duplicate.delete()
@@ -799,8 +794,3 @@ def odf_new_document(path_or_file):
     """
     container = odf_new_container(path_or_file)
     return odf_document(container)
-
-#odf_new_document_from_template = obsolete('odf_new_document_from_template',
-#    odf_new_document)
-#odf_new_document_from_type = obsolete('odf_new_document_from_type',
-#    odf_new_document)

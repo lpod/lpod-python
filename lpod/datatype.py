@@ -48,7 +48,7 @@ class Boolean(object):
             return True
         elif data == 'false':
             return False
-        raise ValueError, 'boolean "%s" is invalid' % data
+        raise ValueError('boolean "%s" is invalid' % data)
 
 
     @staticmethod
@@ -57,7 +57,7 @@ class Boolean(object):
             return "true"
         elif value is False or str(value).lower() == "false":
             return "false"
-        raise TypeError, '"%s" is not a boolean' % value
+        raise TypeError('"%s" is not a boolean' % value)
 
 
 
@@ -105,7 +105,7 @@ class Duration(object):
         elif data.startswith('-P'):
             sign = -1
         else:
-            raise ValueError, "duration not valid"
+            raise ValueError("duration not valid")
 
         days = 0
         hours = 0
@@ -130,7 +130,7 @@ class Duration(object):
                 buffer = ''
                 break
         if buffer != '':
-            raise ValueError, "duration not valid"
+            raise ValueError("duration not valid")
 
         return timedelta(days=sign*days,
                          hours=sign*hours,
@@ -141,7 +141,7 @@ class Duration(object):
     @staticmethod
     def encode(value):
         if type(value) is not timedelta:
-            raise TypeError, "duration must be a timedelta"
+            raise TypeError("duration must be a timedelta")
 
         days = value.days
         if days < 0:
@@ -195,9 +195,9 @@ class Unit(object):
 
     def __cmp__(self, other):
         if type(other) is not type(self):
-            raise ValueError, "can only compare Unit"
+            raise ValueError ("can only compare Unit")
         if self.unit != other.unit:
-            raise NotImplementedError, "no conversion yet"
+            raise NotImplementedError("no conversion yet")
         return cmp(self.value, other.value)
 
 
@@ -207,5 +207,5 @@ class Unit(object):
                 return Unit(int(self.value * dpi), 'px')
             elif self.unit == 'cm':
                 return Unit(int(self.value / Decimal('2.54') * dpi), 'px')
-            raise NotImplementedError, self.unit
-        raise NotImplementedError, unit
+            raise NotImplementedError("%s" % self.unit)
+        raise NotImplementedError("%s" % unit)

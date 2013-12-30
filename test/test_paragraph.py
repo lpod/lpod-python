@@ -192,7 +192,7 @@ class TestParagraphItems(TestCase):
                     'some &#233; and <text:tab/> and <text:s text:c="4"/>'
                     '5 spaces.</text:p>')
         self.assertEqual(para.serialize(), expected)
-        
+
 
 class TestSetSpan(TestCase):
 
@@ -271,6 +271,97 @@ class TestSetSpan(TestCase):
                     '</text:p>')
         self.assertEqual(paragraph.serialize(), expected)
 
+
+
+class TestPraragraphReferences(TestCase):
+
+    def setUp(self):
+        document = odf_get_document('samples/base_text.odt').clone()
+        self.body = document.get_body()
+
+
+    def test_set_reference_mark_single(self):
+        body = self.body
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one', position=0)
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'<text:reference-mark text:name="one"/>'
+                    u'This is the first paragraph.</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_set_reference_mark_single_2(self):
+        body = self.body
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one', position=2)
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'Th'
+                    u'<text:reference-mark text:name="one"/>'
+                    u'is is the first paragraph.</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_set_reference_mark_content(self):
+        body = self.body
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one', content=para)
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'<text:reference-mark-start text:name="one"/>'
+                    u'This is the first paragraph.'
+                    u'<text:reference-mark-end text:name="one"/>'
+                    u'</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_set_reference_mark_content_pos(self):
+        body = self.body
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one', position=(2, 4))
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'Th'
+                    u'<text:reference-mark-start text:name="one"/>'
+                    u'is'
+                    u'<text:reference-mark-end text:name="one"/>'
+                    u' is the first paragraph.'
+                    u'</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_set_reference_mark_content_2(self):
+        body = self.body
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one', content=u'first paragraph.')
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'This is the '
+                    u'<text:reference-mark-start text:name="one"/>'
+                    u'first paragraph.'
+                    u'<text:reference-mark-end text:name="one"/>'
+                    u'</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_set_reference_mark_after(self):
+        body = self.body
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one', after=u'first')
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'This is the first'
+                    u'<text:reference-mark text:name="one"/>'
+                    u' paragraph.'
+                    u'</text:p>')
+        self.assertEqual(para.serialize(), expected)
+
+
+    def test_set_reference_mark_before(self):
+        body = self.body
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one', before=u'first')
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'This is the '
+                    u'<text:reference-mark text:name="one"/>'
+                    u'first paragraph.'
+                    u'</text:p>')
+        self.assertEqual(para.serialize(), expected)
 
 
 if __name__ == '__main__':

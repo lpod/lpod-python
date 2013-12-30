@@ -40,6 +40,8 @@ class reference_markTest(TestCase):
     def setUp(self):
         document = odf_get_document('samples/bookmark.odt').clone()
         self.body = document.get_body()
+        document2 = odf_get_document('samples/base_text.odt').clone()
+        self.body2 = document2.get_body()
 
 
     def test_create_reference_mark(self):
@@ -63,21 +65,23 @@ class reference_markTest(TestCase):
         self.assertEqual(reference_mark_end.serialize(), expected)
 
 
-    def test_get_reference_mark(self):
+    def test_get_reference_mark_single(self):
         body = self.body
+        para = body.get_paragraph()
         reference_mark = odf_create_reference_mark(u'你好 Zoé')
-        body.append(reference_mark)
-        get = body.get_reference_mark(name=u'你好 Zoé')
+        para.append(reference_mark)
+        get = body.get_reference_mark_single(name=u'你好 Zoé')
         expected = ('<text:reference-mark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
 
 
-    def test_get_reference_mark_list(self):
+    def test_get_reference_mark_single_list(self):
         body = self.body
+        para = body.get_paragraph()
         reference_mark = odf_create_reference_mark(u'你好 Zoé')
-        body.append(reference_mark)
-        get = body.get_reference_marks()[0]
+        para.append(reference_mark)
+        get = body.get_reference_marks_single()[0]
         expected = ('<text:reference-mark text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
         self.assertEqual(get.serialize(), expected)
@@ -85,8 +89,9 @@ class reference_markTest(TestCase):
 
     def test_get_reference_mark_start(self):
         body = self.body
+        para = body.get_paragraph()
         reference_mark_start = odf_create_reference_mark_start(u'你好 Zoé')
-        body.append(reference_mark_start)
+        para.append(reference_mark_start)
         get = body.get_reference_mark_start(name=u'你好 Zoé')
         expected = ('<text:reference-mark-start text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -105,8 +110,9 @@ class reference_markTest(TestCase):
 
     def test_get_reference_mark_end(self):
         body = self.body
+        para = body.get_paragraph()
         reference_mark_end = odf_create_reference_mark_end(u'你好 Zoé')
-        body.append(reference_mark_end)
+        para.append(reference_mark_end)
         get = body.get_reference_mark_end(name=u'你好 Zoé')
         expected = ('<text:reference-mark-end text:name="%s"/>' %
                     convert_unicode(u'你好 Zoé'))
@@ -122,6 +128,144 @@ class reference_markTest(TestCase):
                       'text:name="Nouvelle r&#233;f&#233;rence"/>')
         self.assertEqual(element.serialize(), expected)
 
+
+    def test_get_referenced_1_odf(self):
+        body = self.body2
+        para = body.get_paragraph(content=u'of the second title')
+        para.set_reference_mark(u'one',
+                                content=u'paragraph of the second title')
+        ref = body.get_reference_mark(name=u'one')
+        referenced = ref.get_referenced()
+        expected = (u'<office:text><text:p text:style-name="Text_20_body">'
+                    u'paragraph of the second title</text:p></office:text>')
+        self.assertEqual(referenced.serialize(), expected)
+
+
+    def test_get_referenced_1_xml(self):
+        body = self.body2
+        para = body.get_paragraph(content=u'of the second title')
+        para.set_reference_mark(u'one',
+                                content=u'paragraph of the second title')
+        ref = body.get_reference_mark(name=u'one')
+        referenced = ref.get_referenced(as_xml=True)
+        expected = (u'<office:text><text:p text:style-name="Text_20_body">'
+                    u'paragraph of the second title</text:p></office:text>')
+        self.assertEqual(referenced, expected)
+
+
+    def test_get_referenced_1_list(self):
+        body = self.body2
+        para = body.get_paragraph(content=u'of the second title')
+        para.set_reference_mark(u'one',
+                                content=u'paragraph of the second title')
+        ref = body.get_reference_mark(name=u'one')
+        referenced = ref.get_referenced(as_list=True)
+        self.assertEqual(isinstance(referenced, list), True)
+        self.assertEqual(len(referenced), 1)
+        expected = (u'<text:p text:style-name="Text_20_body">'
+                    u'paragraph of the second title</text:p>')
+        self.assertEqual(referenced[0].serialize(), expected)
+
+
+    def test_get_referenced_multi_odf(self):
+        body = self.body2
+        para = body.get_paragraph(content=u'of the second title')
+        para.set_reference_mark(u'one',
+                                content=para)
+        para.set_reference_mark(u'two',
+                                position=(0, 7))
+        ref = body.get_reference_mark(name=u'two')
+        referenced = ref.get_referenced()
+        expected = (u'<office:text>'
+                    u'<text:p text:style-name="Text_20_body">'
+                    u'This is'
+                    u'</text:p></office:text>')
+        self.assertEqual(referenced.serialize(), expected)
+
+
+    def test_get_referenced_multi_xml_dirty(self):
+        body = self.body2
+        para = body.get_paragraph(content=u'of the second title')
+        para.set_reference_mark(u'one',
+                                content=para)
+        para.set_reference_mark(u'two',
+                                position=(0, 7))
+        ref = body.get_reference_mark(name=u'one')
+        referenced = ref.get_referenced(as_xml=True, clean=False)
+        expected = (u'<office:text>'
+                    u'<text:p text:style-name="Text_20_body">'
+                    u'<text:reference-mark-start text:name="two"/>'
+                    u'This is<text:reference-mark-end text:name="two"/>'
+                    u' the first paragraph of the second title.'
+                    u'</text:p>'
+                    u'</office:text>')
+        self.assertEqual(referenced, expected)
+
+
+    def test_get_referenced_multi_xml_clean(self):
+        body = self.body2
+        para = body.get_paragraph(content=u'of the second title')
+        para.set_reference_mark(u'one',
+                                content=para)
+        para.set_reference_mark(u'two',
+                                position=(0, 7))
+        ref = body.get_reference_mark(name=u'one')
+        referenced = ref.get_referenced(as_xml=True, clean=True)
+        expected = (u'<office:text>'
+                    u'<text:p text:style-name="Text_20_body">'
+                    u'This is'
+                    u' the first paragraph of the second title.'
+                    u'</text:p>'
+                    u'</office:text>')
+        self.assertEqual(referenced, expected)
+
+
+    def test_get_referenced_mix_xml(self):
+        body = self.body2
+        para = body.get_paragraph()
+        para.set_reference_mark(u'one',
+                                content=u'first paragraph.')
+        para.set_reference_mark(u'two',
+                                position=(0, 17))
+        ref = body.get_reference_mark(name=u'two')
+        referenced = ref.get_referenced(as_xml=True)
+        expected = (u'<office:text>'
+                    u'<text:p text:style-name="Text_20_body">'
+                    u'This is the first'
+                    u'</text:p>'
+                    u'</office:text>')
+        self.assertEqual(referenced, expected)
+
+
+    def test_get_referenced_header(self):
+        body = self.body2
+        head = body.get_heading()
+        head.set_reference_mark(u'one',
+                                content=head)
+        ref = body.get_reference_mark(name=u'one')
+        referenced = ref.get_referenced(as_xml=True)
+        expected = (u'<office:text>'
+                    u'<text:h text:style-name="Heading_20_1" '
+                    u'text:outline-level="1">'
+                    u'LpOD Test Case Document'
+                    '</text:h>'
+                    u'</office:text>')
+        self.assertEqual(referenced, expected)
+
+
+    def test_get_referenced_no_header(self):
+        body = self.body2
+        head = body.get_heading()
+        head.set_reference_mark(u'one',
+                                content=head)
+        ref = body.get_reference_mark(name=u'one')
+        referenced = ref.get_referenced(as_xml=True, no_header=True)
+        expected = (u'<office:text>'
+                    u'<text:p>'
+                    u'LpOD Test Case Document'
+                    '</text:p>'
+                    u'</office:text>')
+        self.assertEqual(referenced, expected)
 
 
 if __name__ == '__main__':

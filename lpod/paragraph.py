@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2013 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: David Versmisse <david.versmisse@itaapy.com>
 #          Hervé Cauwelier <herve@itaapy.com>
 #          Romain Gauthier <romain@itaapy.com>
+#          Jerome Dumonteil <jerome.dumonteil@itaapy.com>
 #
 # This file is part of Lpod (see: http://lpod-project.net).
 # Lpod is free software; you can redistribute it and/or modify it under
@@ -27,203 +28,26 @@
 #
 
 # Import from the Standard Library
-from re import compile, escape, UNICODE
+import re
+from functools import wraps  # for keeping trace of docstring with decorators
 
 # Import from lpod
 from bookmark import odf_create_bookmark, odf_create_bookmark_start
 from bookmark import odf_create_bookmark_end
-from element import FIRST_CHILD, odf_text
+from element import FIRST_CHILD, NEXT_SIBLING
 from element import register_element_class, odf_element, odf_create_element
-from note import odf_create_note, odf_create_annotation
+from paragraph_base import paragraph_base
+from paragraph_base import odf_create_spaces
+from paragraph_base import odf_create_tabulation
+from paragraph_base import odf_create_line_break
+
+from note import odf_create_note
+from note import odf_create_annotation, odf_create_annotation_end
+from reference import odf_create_reference_mark, odf_create_reference_mark_start
+from reference import odf_create_reference_mark_end, odf_create_reference
 from style import odf_style
+from link import odf_create_link
 
-
-_rsplitter = compile(u'(\n|\t|  +)', UNICODE)
-_rspace = compile(u'^  +$', UNICODE)
-
-
-
-def _guess_decode(text):
-    """Try to decode text using common encoding
-    """
-    done = False
-    for encoding in ('utf-8', 'iso8859-1', 'ascii'):
-        try:
-            decoded = text.decode(encoding)
-            done = True
-            break
-        except UnicodeDecodeError:
-            continue
-    if done:
-        return decoded
-    else:
-        raise UnicodeDecodeError
-
-
-
-def _get_formatted_text(element, context, with_text=True):
-    document = context['document']
-    rst_mode = context['rst_mode']
-
-    result = []
-    if with_text:
-        objects = element.xpath('*|text()')
-    else:
-        objects = element.get_children()
-    for obj in objects:
-        if type(obj) is odf_text:
-            result.append(obj)
-        else:
-            tag = obj.get_tag()
-            # Good tags with text
-            if tag in ('text:a', 'text:p'):
-                result.append(_get_formatted_text(obj, context,
-                                                 with_text=True))
-            # Try to convert some styles in rst_mode
-            elif tag == 'text:span':
-                text = _get_formatted_text(obj, context, with_text=True)
-                if not rst_mode:
-                    result.append(text)
-                    continue
-                if not text.strip():
-                    result.append(text)
-                    continue
-                style = obj.get_style()
-                if style is None:
-                    result.append(text)
-                    continue
-                style = document.get_style("text", style)
-                properties = style.get_properties()
-                if properties is None:
-                    result.append(text)
-                    continue
-                # Compute before, text and after
-                before = ''
-                for c in text:
-                    if c.isspace():
-                        before += c
-                    else:
-                        break
-                after = ''
-                for c in reversed(text):
-                    if c.isspace():
-                        after = c + after
-                    else:
-                        break
-                text = text.strip()
-                # Bold ?
-                if properties.get('fo:font-weight') == 'bold':
-                    result.append(before)
-                    result.append('**')
-                    result.append(text)
-                    result.append('**')
-                    result.append(after)
-                    continue
-                # Italic ?
-                if properties.get('fo:font-style') == 'italic':
-                    result.append(before)
-                    result.append('*')
-                    result.append(text)
-                    result.append('*')
-                    result.append(after)
-                    continue
-                # Unknown style, ...
-                result.append(before)
-                result.append(text)
-                result.append(after)
-            # Footnote or endnote
-            elif tag == 'text:note':
-                note_class = obj.get_class()
-                container = {'footnote': context['footnotes'],
-                             'endnote': context['endnotes']}[note_class]
-                citation = obj.get_citation()
-                if not citation:
-                    # Would only happen with hand-made documents
-                    citation = len(container)
-                body = obj.get_body()
-                container.append((citation, body))
-                if rst_mode:
-                    marker = {'footnote': u" [#]_ ",
-                              'endnote': u" [*]_ "}[note_class]
-                else:
-                    marker = {'footnote': u"[{citation}]",
-                              'endnote': u"({citation})"}[note_class]
-                result.append(marker.format(citation=citation))
-            # Annotations
-            elif tag == 'office:annotation':
-                context['annotations'].append(obj.get_body())
-                if rst_mode:
-                    result.append(' [#]_ ')
-                else:
-                    result.append('[*]')
-            # Tabulation
-            elif tag == 'text:tab':
-                result.append(u'\t')
-            # Line break
-            elif tag == 'text:line-break':
-                if rst_mode:
-                    result.append(u"\n|")
-                else:
-                    result.append(u"\n")
-            else:
-                result.append(obj.get_formatted_text(context))
-    return u''.join(result)
-
-
-
-def odf_create_spaces(number=1):
-    """
-    This element shall be used to represent the second and all following “ “
-    (U+0020, SPACE) characters in a sequence of “ “ (U+0020, SPACE) characters.
-    Note: It is not an error if the character preceding the element is not a
-    white space character, but it is good practice to use this element only for
-    the second and all following SPACE characters in a sequence.
-
-    Arguments:
-
-        number -- int
-
-    Return odf_element
-    """
-    element = odf_create_element('text:s')
-    element.set_attribute('text:c', str(number))
-    return element
-
-
-
-def odf_create_tabulation(position=None):
-    """
-    This element represents the [UNICODE] tab character (HORIZONTAL TABULATION,
-    U+0009).
-
-    The position attribute contains the number of the tab-stop to which
-    a tab character refers. The position 0 marks the start margin of a
-    paragraph. Note: The position attribute is only a hint to help non-layout
-    oriented consumers to determine the tab/tab-stop association. Layout
-    oriented consumers should determine the tab positions based on the style
-    information
-
-    Arguments:
-
-        number -- int
-
-    Return odf_element
-    """
-    element = odf_create_element('text:tab')
-    if position is not None:
-        if position >=0:
-            element.set_attribute('text:tab-ref', str(position))
-    return element
-
-
-
-def odf_create_line_break():
-    """
-    This element represents a line break.
-
-    Return odf_element
-    """
-    return odf_create_element('text:line-break')
 
 
 
@@ -271,58 +95,100 @@ def odf_create_paragraph(text_or_element=None, style=None):
 
 
 
-class odf_paragraph(odf_element):
-    """Specialised element for paragraphs.
-    """
-    def get_style(self):
-        return self.get_attribute('text:style-name')
+def _by_regex_offset(method):
+    @wraps(method)
+    def wrapper(element, *args, **kwargs):
+        """Insert the result of method(element, ...) at the place matching the
+        regex OR the positional arguments offset and length.
 
+        Arguments:
 
-    def set_style(self, name):
-        return self.set_style_attribute('text:style-name', name)
+            method -- wrapped method
 
+            element -- self
 
-    def get_text_style(self):
-        return self.get_attribute('text:style-name')
+            regex -- unicode regular expression
 
+            offset -- int
 
-    def set_text_style(self, name):
-        return self.set_style_attribute('text:style-name', name)
-
-
-    def get_formatted_text(self, context):
-        result = [_get_formatted_text(self, context, with_text=True)]
-        result.append(u'\n\n')
-        return u''.join(result)
-
-
-    def append_plain_text(self, text=u'', encoding=None):
-        """Append unicode plain text to the paragraph, replacing <CR>, <TAB>
-           and multiple spaces by ODF corresponding tags.
+            length -- int
         """
-        if not isinstance(text, unicode):
-            if encoding:
-                text = text.decode(encoding)
-            else:
-                text = _guess_decode(text)
-        blocs = _rsplitter.split(text)
-        for b in blocs:
-            if not b:
-                continue
-            if b == u'\n':
-                self.append(odf_create_line_break())
-                continue
-            if b == u'\t':
-                self.append(odf_create_tabulation())
-                continue
-            if _rspace.match(b):
-                # follow ODF standard : n spaces => one space + spacer(n-1)
-                self.append(u' ')
-                self.append(odf_create_spaces(len(b) - 1))
-                continue
-            # standard piece of text:
-            self.append(b)
+        offset = kwargs.get('offset', None)
+        regex = kwargs.get('regex', None)
+        if offset:
+            length = kwargs.get('length', 0)
+            counted = 0
+            for text in element.xpath("//text()"):
+                if len(text) + counted <= offset:
+                    counted += len(text)
+                    continue
+                if length > 0:
+                    length = min(length, len(text))
+                else:
+                    length = len(text)
+                # Static information about the text node
+                container = text.get_parent()
+                upper = container.get_parent()
+                is_text = text.is_text()
+                start = offset - counted
+                end = start + length
+                # Do not use the text node as it changes at each loop
+                if is_text:
+                    text = container.get_text()
+                else:
+                    text = container.get_tail()
+                before = text[:start]
+                match = text[start:end]
+                tail = text[end:]
+                result = method(element, match, tail, *args, **kwargs)
+                if is_text:
+                    container.set_text(before)
+                    # Insert as first child
+                    container.insert(result, position=0)
+                else:
+                    container.set_tail(before)
+                    # Insert as next sibling
+                    index = upper.index(container)
+                    upper.insert(result, position=index + 1)
+                return
+        if regex:
+            pattern = re.compile(unicode(regex), re.UNICODE)
+            for text in element.xpath('descendant::text()'):
+                # Static information about the text node
+                container = text.get_parent()
+                upper = container.get_parent()
+                is_text = text.is_text()
+                # Group positions are calculated and static, so apply in
+                # reverse order to preserve positions
+                for group in reversed(list(pattern.finditer(text))):
+                    start, end = group.span()
+                    # Do not use the text node as it changes at each loop
+                    if is_text:
+                        text = container.get_text()
+                    else:
+                        text = container.get_tail()
+                    before = text[:start]
+                    match = text[start:end]
+                    tail = text[end:]
+                    result = method(element, match, tail, *args, **kwargs)
+                    if is_text:
+                        container.set_text(before)
+                        # Insert as first child
+                        container.insert(result, position=0)
+                    else:
+                        container.set_tail(before)
+                        # Insert as next sibling
+                        index = upper.index(container)
+                        upper.insert(result, position=index + 1)
+    return wrapper
 
+
+
+class odf_paragraph(paragraph_base):
+    """Specialised element for paragraphs <text:p>. The <text:p> element
+    represents a paragraph, which is the basic unit of text in an OpenDocument
+    file.
+    """
 
     def insert_note(self, note_element=None, after=None,
                     note_class='footnote', note_id=None, citation=None,
@@ -343,19 +209,54 @@ class odf_paragraph(odf_element):
                 note_element.set_body(body)
         note_element.check_validity()
         if type(after) is unicode:
-            self._insert(note_element, after=after)
+            self._insert(note_element, after=after, main_text=True)
         elif isinstance(after, odf_element):
             after.insert(note_element, FIRST_CHILD)
         else:
             self.insert(note_element, FIRST_CHILD)
 
 
-    def insert_annotation(self, annotation_element=None, after=None,
+    def insert_annotation(self, annotation_element=None, before=None,
+                          after=None, position=0, content=None,
                           body=None, creator=None, date=None):
+        """Insert an annotation, at the position defined by the regex (before,
+        after, content) or by positionnal argument (position). If content is
+        provided, the annotation covers the full content regex. Else, the
+        annotation is positionned either 'before' or 'after' provided regex.
+
+        If content is an odf element (ie: paragraph, span, ...), the full inner
+        content is covered by the annotation (of the position just after if
+        content is a single empty tag).
+
+        If content/before or after exists (regex) and return a group of matching
+        positions, the position value is the index of matching place to use.
+
+        annotation_element can contain a previously created annotation, else
+        the annotation is created from the body, creator and optional date
+        (current date by default).
+
+        Arguments:
+
+            annotation_element -- annotation element or name
+
+            before -- unicode regular expression or None
+
+            after -- unicode regular expression or None
+
+            content -- unicode regular expression or None, or odf_element
+
+            position -- int or tuple of int
+
+            body -- unicode or odf_element
+
+            creator -- unicode
+
+            date -- datetime
+        """
+
         if annotation_element is None:
-            annotation_element = odf_create_annotation(body,
-                                                       creator=creator,
-                                                       date=date)
+            annotation_element = odf_create_annotation(body, creator=creator,
+                                                       date=date, parent=self)
         else:
             # XXX clone or modify the argument?
             if body:
@@ -365,21 +266,231 @@ class odf_paragraph(odf_element):
             if date:
                 annotation_element.set_dc_date(date)
         annotation_element.check_validity()
-        if type(after) is unicode:
-            self._insert(annotation_element, after=after)
-        elif isinstance(after, odf_element):
+
+        # special case: content is an odf element (ie: a paragraph)
+        if isinstance(content, odf_element):
+            if content.is_empty():
+                content.insert(annotation_element, xmlposition=NEXT_SIBLING)
+                return annotation_element
+            content.insert(annotation_element, start=True)
+            annotation_end = odf_create_annotation_end(annotation_element)
+            content.append(annotation_end)
+            return annotation_element
+
+        # special case
+        if isinstance(after, odf_element):
             after.insert(annotation_element, FIRST_CHILD)
-        else:
-            self.insert(annotation_element, FIRST_CHILD)
+            return annotation_element
+
+        # With "content" => automatically insert a "start" and an "end"
+        # bookmark
+        if (before is None and after is None and content is not None
+                and type(position) is int):
+            # Start tag
+            self._insert(annotation_element, before=content, position=position,
+                         main_text=True)
+            # End tag
+            annotation_end = odf_create_annotation_end(annotation_element)
+            self._insert(annotation_end, after=content, position=position,
+                         main_text=True)
+            return annotation_element
+
+        # With "(int, int)" =>  automatically insert a "start" and an "end"
+        # bookmark
+        if (before is None and after is None and content is None
+                and type(position) is tuple):
+            # Start
+            self._insert(annotation_element, position=position[0],
+                         main_text=True)
+            # End
+            annotation_end = odf_create_annotation_end(annotation_element)
+            self._insert(annotation_end, position=position[1], main_text=True)
+            return annotation_element
+
+        # Without "content" nor "position"
+        if content is not None or type(position) is not int:
+            raise ValueError("bad arguments")
+
+        # Insert
+        self._insert(annotation_element, before=before, after=after,
+                     position=position, main_text=True)
+        return annotation_element
+
+
+    def insert_annotation_end(self, annotation_element, before=None,
+                          after=None, position=0):
+        """Insert an annotation end tag for an existing annotation. If some end
+        tag already exists, replace it. Annotation end tag is set at the
+        position defined by the regex (before or after).
+
+        If content/before or after (regex) returns a group of matching
+        positions, the position value is the index of matching place to use.
+
+        Arguments:
+
+            annotation_element -- annotation element (mandatory)
+
+            before -- unicode regular expression or None
+
+            after -- unicode regular expression or None
+
+            position -- int
+        """
+
+        if annotation_element is None:
+            raise ValueError
+        if annotation_element.get_tag() != u'office:annotation':
+            raise ValueError("Not a 'office:annotation' element")
+
+        # remove existing end tag
+        name = annotation_element.get_name()
+        existing_end_tag = self.get_annotation_end(name=name)
+        if existing_end_tag:
+            existing_end_tag.delete()
+
+        # create the end tag
+        end_tag = odf_create_annotation_end(annotation_element)
+
+        # Insert
+        self._insert(end_tag, before=before, after=after,
+                     position=position, main_text=True)
+        return end_tag
+
+
+    def set_reference_mark(self, name, before=None, after=None, position=0,
+                           content=None):
+        """Insert a reference mark, at the position defined by the regex
+        (before, after, content) or by positionnal argument (position). If
+        content is provided, the annotation covers the full range content regex
+        (instances of odf_reference_mark_start and odf_reference_mark_end are
+        created). Else, an instance of odf_reference_mark is positionned either
+        'before' or 'after' provided regex.
+
+        If content is an odf element (ie: paragraph, span, ...), the full inner
+        content is referenced (of the position just after if content is a single
+        empty tag).
+
+        If content/before or after exists (regex) and return a group of matching
+        positions, the position value is the index of matching place to use.
+
+        Name is mandatory and shall be unique in the document for the preference
+        mark range.
+
+        Arguments:
+
+            name -- unicode
+
+            before -- unicode regular expression or None
+
+            after -- unicode regular expression or None, or odf_element
+
+            content -- unicode regular expression or None, or odf_element
+
+            position -- int or tuple of int
+
+        Return: the created reference or reference start
+        """
+        # special case: content is an odf element (ie: a paragraph)
+        if isinstance(content, odf_element):
+            if content.is_empty():
+                reference = odf_create_reference_mark(name)
+                content.insert(reference, xmlposition=NEXT_SIBLING)
+                return reference
+            reference_start = odf_create_reference_mark_start(name)
+            content.insert(reference_start, start=True)
+            reference_end = odf_create_reference_mark_end(name)
+            content.append(reference_end)
+            return reference_start
+        # With "content" => automatically insert a "start" and an "end"
+        # reference
+        if (before is None and after is None and content is not None
+                and type(position) is int):
+            # Start tag
+            reference_start = odf_create_reference_mark_start(name)
+            self._insert(reference_start, before=content, position=position,
+                         main_text=True)
+            # End tag
+            reference_end = odf_create_reference_mark_end(name)
+            self._insert(reference_end, after=content, position=position,
+                         main_text=True)
+            return reference_start
+
+        # With "(int, int)" =>  automatically insert a "start" and an "end"
+        if (before is None and after is None and content is None
+                and type(position) is tuple):
+            # Start
+            reference_start = odf_create_reference_mark_start(name)
+            self._insert(reference_start, position=position[0],
+                         main_text=True)
+            # End
+            reference_end = odf_create_reference_mark_end(name)
+            self._insert(reference_end, position=position[1], main_text=True)
+            return reference_start
+
+        # Without "content" nor "position"
+        if content is not None or type(position) is not int:
+            raise ValueError("bad arguments")
+
+        # Insert a positional reference mark
+        reference = odf_create_reference_mark(name)
+        self._insert(reference, before=before, after=after,
+                     position=position, main_text=True)
+        return reference
+
+
+    def set_reference_mark_end(self, reference_mark, before=None,
+                          after=None, position=0):
+        """Insert/move a reference_mark_end for an existing reference mark. If
+        some end tag already exists, replace it. Reference tag is set at the
+        position defined by the regex (before or after).
+
+        If content/before or after (regex) returns a group of matching
+        positions, the position value is the index of matching place to use.
+
+        Arguments:
+
+            reference_mark -- reference element (mandatory)
+
+            before -- unicode regular expression or None
+
+            after -- unicode regular expression or None
+
+            position -- int
+        """
+        if reference_mark.get_tag() not in (u'text:reference-mark',
+                                            u'text:reference-mark-start'):
+            raise ValueError(
+            "Not a 'text:reference-mark or text:reference-mark-start' element")
+        name = reference_mark.get_name()
+        if reference_mark.get_tag() == u'text:reference-mark':
+            # change it to a range reference:
+            reference_mark._set_tag_raw('text:reference-mark-start')
+
+        existing_end_tag = self.get_reference_mark_end(name=name)
+        if existing_end_tag:
+            existing_end_tag.delete()
+
+        # create the end tag
+        end_tag = odf_create_reference_mark_end(name)
+
+        # Insert
+        self._insert(end_tag, before=before, after=after,
+                     position=position, main_text=True)
+        return end_tag
 
 
     def insert_variable(self, variable_element,  after):
-        self._insert(variable_element, after=after)
+        self._insert(variable_element, after=after, main_text=True)
 
 
-    def set_span(self, style, regex=None, offset=None, length=0):
-        """Apply the given style to text content matching the regex OR the
+    @_by_regex_offset
+    def set_span(self, match, tail, style, regex=None, offset=None, length=0):
+        """
+        set_span(style, regex=None, offset=None, length=0)
+        Apply the given style to text content matching the regex OR the
         positional arguments offset and length.
+
+        (match, tail: provided by decorator)
 
         Arguments:
 
@@ -393,79 +504,129 @@ class odf_paragraph(odf_element):
         """
         if isinstance(style, odf_style):
             style = style.get_name()
-        if offset:
-            counted = 0
-            for text in self.xpath("//text()"):
-                if len(text) + counted <= offset:
-                    counted += len(text)
-                    continue
-                if length > 0:
-                    length = min(length, len(text))
-                else:
-                    length = len(text)
-                # Static information about the text node
-                container = text.get_parent()
-                wrapper = container.get_parent()
-                is_text = text.is_text()
-                start = offset - counted
-                end = start + length
-                # Do not use the text node as it changes at each loop
-                if is_text:
-                    text = container.get_text()
-                else:
-                    text = container.get_tail()
-                before = text[:start]
-                match = text[start:end]
-                after = text[end:]
-                span = _odf_create_span(match, style=style)
-                span.set_tail(after)
-                if is_text:
-                    container.set_text(before)
-                    # Insert as first child
-                    container.insert(span, position=0)
-                else:
-                    container.set_tail(before)
-                    # Insert as next sibling
-                    index = wrapper.index(container)
-                    wrapper.insert(span, position=index + 1)
-                return
-        if regex:
-            pattern = compile(unicode(regex), UNICODE)
-            for text in self.xpath('descendant::text()'):
-                # Static information about the text node
-                container = text.get_parent()
-                wrapper = container.get_parent()
-                is_text = text.is_text()
-                # Group positions are calculated and static, so apply in
-                # reverse order to preserve positions
-                for group in reversed(list(pattern.finditer(text))):
-                    start, end = group.span()
-                    # Do not use the text node as it changes at each loop
-                    if is_text:
-                        text = container.get_text()
-                    else:
-                        text = container.get_tail()
-                    before = text[:start]
-                    match = text[start:end]
-                    after = text[end:]
-                    span = _odf_create_span(match, style=style)
-                    span.set_tail(after)
-                    if is_text:
-                        container.set_text(before)
-                        # Insert as first child
-                        container.insert(span, position=0)
-                    else:
-                        container.set_tail(before)
-                        # Insert as next sibling
-                        index = wrapper.index(container)
-                        wrapper.insert(span, position=index + 1)
+        span = _odf_create_span(match, style=style)
+        span.set_tail(tail)
+        return span
 
 
-    def set_link(self, url, regex=None, offset=None, length=0):
-        """Make a link from text content matching the regex OR the positional
-        arguments.
+    def remove_spans(self, keep_heading=True):
+        """Send back a copy of the element, without span styles.
+        If keep_heading is True (default), the first level heading style is left
+        unchanged.
         """
-        raise NotImplementedError
+        strip = ('text:span',)
+        if keep_heading:
+            protect = ('text:h',)
+        else:
+            protect = None
+        return self.strip_tags(strip=strip, protect=protect)
+
+
+    def remove_span(self, spans):
+        """Send back a copy of the element, the spans (not a clone) removed.
+
+        Arguments:
+
+            spans -- odf_element or list of odf_element
+        """
+        return self.strip_elements(spans)
+
+
+    @_by_regex_offset
+    def set_link(self, match, tail, url, regex=None, offset=None, length=0):
+        """
+        set_link(url, regex=None, offset=None, length=0)
+        Make a link to the provided url from text content matching the regex
+        OR the positional arguments offset and length.
+
+        (match, tail: provided by decorator)
+
+        Arguments:
+
+
+            url -- unicode
+
+            regex -- unicode regular expression
+
+            offset -- int
+
+            length -- int
+        """
+        link = odf_create_link(url, text=match)
+        link.set_tail(tail)
+        return link
+
+
+    def remove_links(self):
+        """Send back a copy of the element, without links tags.
+        """
+        strip = ('text:a',)
+        return self.strip_tags(strip=strip)
+
+
+    def remove_link(self, links):
+        """Send back a copy of the element, the sub_links (not a clone) removed.
+
+        Arguments:
+
+            links -- odf_link or list of odf_link
+        """
+        return self.strip_elements(links)
+
+
+    def insert_reference(self, name, ref_format='', before=None, after=None,
+                         position=0, display=None):
+        """Create and Insert a reference to a content marked by a reference
+        mark. The odf_reference element (<text:reference-ref>) represents a
+        field that references a <text:reference-mark-start> or
+        <text:reference-mark> element. Its text:reference-format attribute
+        specifies what is displayed from the referenced element. Default is
+        'page' Actual content is not automatically updated except for the 'text'
+        format.
+
+        Name is mandatory and should represent an existing reference mark of the
+        document.
+        The ref_format is the type of formt reference : default is 'page'. The
+        reference is inserted the position defined by the regex (before/after),
+        or by positionnal argument (position). If 'display' is provided, it will
+        be used as the text value for the reference.
+        If after is an odf element, the reference is inserted as first child of
+        this element.
+
+        Arguments:
+
+            name -- unicode
+
+            ref_format -- one of : 'chapter', 'direction', 'page', 'text',
+                                    'caption', 'category-and-value', 'value',
+                                    'number', 'number-all-superior',
+                                    'number-no-superior'
+
+            before -- unicode regular expression or None
+
+            after -- unicode regular expression or odf element or None
+
+            position -- int
+
+            display -- unicode or None
+        """
+        reference = odf_create_reference(name, ref_format)
+        if display is None and ref_format == 'text':
+            # get reference content
+            body = self.get_document_body()
+            if not body:
+                body = self.get_root()
+            mark = body.get_reference_mark(name=name)
+            if mark:
+                display = mark.get_referenced_text()
+        if not display:
+            display = u' '
+        reference.set_text(display)
+        if isinstance(after, odf_element):
+            after.insert(reference, FIRST_CHILD)
+        else:
+            self._insert(reference, before=before, after=after,
+                         position=position, main_text=True)
 
 
     def set_bookmark(self, name, before=None, after=None, position=0,
@@ -516,10 +677,12 @@ class odf_paragraph(odf_element):
                 and content is not None and type(position) is int):
             # Start
             start = odf_create_bookmark_start(name)
-            self._insert(start, before=content, position=position)
+            self._insert(start, before=content, position=position,
+                         main_text=True)
             # End
             end = odf_create_bookmark_end(name)
-            self._insert(end, after=content, position=position)
+            self._insert(end, after=content, position=position,
+                         main_text=True)
             return start, end
 
         # With "(int, int)" =>  automatically insert a "start" and an "end"
@@ -528,15 +691,15 @@ class odf_paragraph(odf_element):
                 and content is None and type(position) is tuple):
             # Start
             start = odf_create_bookmark_start(name)
-            self._insert(start, position=position[0])
+            self._insert(start, position=position[0], main_text=True)
             # End
             end = odf_create_bookmark_end(name)
-            self._insert(end, position=position[1])
+            self._insert(end, position=position[1], main_text=True)
             return start, end
 
         # Without "content" nor "position"
         if content is not None or type(position) is not int:
-            raise ValueError, "bad arguments"
+            raise ValueError("bad arguments")
 
         # Role
         if role is None:
@@ -546,10 +709,11 @@ class odf_paragraph(odf_element):
         elif role == "end":
             bookmark = odf_create_bookmark_end(name)
         else:
-            raise ValueError, "bad arguments"
+            raise ValueError("bad arguments")
 
         # Insert
-        self._insert(bookmark, before=before, after=after, position=position)
+        self._insert(bookmark, before=before, after=after, position=position,
+                     main_text=True)
 
         return bookmark
 

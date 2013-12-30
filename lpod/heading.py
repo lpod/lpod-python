@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2009-2010 Ars Aperta, Itaapy, Pierlis, Talend.
+# Copyright (c) 2009-2013 Ars Aperta, Itaapy, Pierlis, Talend.
 #
 # Authors: Hervé Cauwelier <herve@itaapy.com>
 #
@@ -75,7 +75,16 @@ class odf_heading(odf_paragraph):
     paragraphs.
     """
 
-    def get_formatted_text(self, context):
+    def get_formatted_text(self, context=None):
+        if not context:
+            context = { 'document': None,
+                        'footnotes': [],
+                        'endnotes': [],
+                        'annotations': [],
+                        'rst_mode': False,
+                        'img_counter': 0,
+                        'images': [],
+                        'no_img_level': 0}
         context['no_img_level'] += 1
         title = odf_paragraph.get_formatted_text(self, context)
         context['no_img_level'] -= 1
