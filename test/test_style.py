@@ -367,10 +367,10 @@ class StylePropertiesTestCase(TestCase):
 
     def test_set_style_properties_new_area(self):
         style = self.style_element.clone()
-        properties = style.get_properties(area='toto')
+        properties = style.get_properties(area='chart')
         self.assertEqual(properties, None)
-        style.set_properties({'fo:color': '#f00'}, area='toto')
-        properties = style.get_properties(area='toto')
+        style.set_properties({'fo:color': '#f00'}, area='chart')
+        properties = style.get_properties(area='chart')
         self.assertEqual(len(properties), 1)
         self.assertEqual(properties['fo:color'], "#f00")
 
