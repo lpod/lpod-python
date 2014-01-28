@@ -312,6 +312,7 @@ def odf_create_table_cell_style(border=None, border_top=None,
                                 background_color=None, shadow=None,
                                 color=None):
     """Returns a cell style.
+
     The borders arguments must be some style attribute strings or None, see the
     method 'make_table_cell_border_string' to generate them.
     If the 'border' argument as the value 'default', the default style
@@ -322,13 +323,21 @@ def odf_create_table_cell_style(border=None, border_top=None,
     (ODF value is fo:border="none").
 
     Arguments:
+
         border -- str, style string for 4 borders
+
         border_top -- str, style string for top if no 'border' argument
+
         border_bottom -- str, style string for bottom if no 'border' argument
+
         border_left -- str, style string for left if no 'border' argument
+
         border_right -- str, style string for right if no 'border' argument
+
         background_color -- str or rgb 3-tuple, str is 'black', 'grey', ... or '#012345'
+
         shadow -- str, e.g. "#808080 0.176cm 0.176cm"
+
         color -- str or rgb 3-tuple, str is 'black', 'grey', ... or '#012345'
 
     Returns : odf_style
