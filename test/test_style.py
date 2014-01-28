@@ -631,5 +631,20 @@ class Table_cell_style_test(TestCase):
             '<style:text-properties fo:color="#804020"/></style:style>'))
 
 
+    def test_odf_create_table_cell_style_default_border(self):
+        style = odf_create_table_cell_style(border='default')
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="0.06pt solid #000000"/>'
+            '</style:style>'))
+
+
+    def test_odf_create_table_cell_style_none_border(self):
+        style = odf_create_table_cell_style()
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="none"/>'
+            '</style:style>'))
+
 if __name__ == '__main__':
     main()
