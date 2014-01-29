@@ -574,7 +574,7 @@ color &#8211; str or rgb 3-tuple, str is &#8216;black&#8217;, &#8216;grey&#8217;
 
 <dl class="function">
 <dt id="lpod.style.odf_create_style">
-<tt class="descclassname">lpod.style.</tt><tt class="descname">odf_create_style</tt><big>(</big><em>family</em>, <em>name=None</em>, <em>display_name=None</em>, <em>parent=None</em>, <em>area=None</em>, <em>color=None</em>, <em>background_color=None</em>, <em>italic=False</em>, <em>bold=False</em>, <em>master_page=None</em>, <em>page_layout=None</em>, <em>next_style=None</em>, <em>data_style=None</em>, <em>border=None</em>, <em>border_top=None</em>, <em>border_right=None</em>, <em>border_bottom=None</em>, <em>border_left=None</em>, <em>shadow=None</em>, <em>height=None</em>, <em>use_optimal_height=None</em>, <em>width=None</em>, <em>break_before=None</em>, <em>break_after=None</em>, <em>min_height=None</em>, <em>font_name=None</em>, <em>font_family=None</em>, <em>font_family_generic=None</em>, <em>font_pitch=u'variable'</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#lpod.style.odf_create_style" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">lpod.style.</tt><tt class="descname">odf_create_style</tt><big>(</big><em>family</em>, <em>name=None</em>, <em>display_name=None</em>, <em>parent=None</em>, <em>area=None</em>, <em>color=None</em>, <em>background_color=None</em>, <em>italic=False</em>, <em>bold=False</em>, <em>master_page=None</em>, <em>page_layout=None</em>, <em>next_style=None</em>, <em>data_style=None</em>, <em>border=None</em>, <em>border_top=None</em>, <em>border_right=None</em>, <em>border_bottom=None</em>, <em>border_left=None</em>, <em>padding=None</em>, <em>padding_top=None</em>, <em>padding_bottom=None</em>, <em>padding_left=None</em>, <em>padding_right=None</em>, <em>shadow=None</em>, <em>height=None</em>, <em>use_optimal_height=None</em>, <em>width=None</em>, <em>break_before=None</em>, <em>break_after=None</em>, <em>min_height=None</em>, <em>font_name=None</em>, <em>font_family=None</em>, <em>font_family_generic=None</em>, <em>font_pitch=u'variable'</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#lpod.style.odf_create_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a style of the given family. The name is not mandatory at this
 point but will become required when inserting in a document as a common
 style.</p>
@@ -613,6 +613,8 @@ apply to is optional and defaults to the family.</p>
 <blockquote>
 <div><p>border, border_top, border_right, border_bottom, border_left &#8211; str,
 e.g. &#8220;0.002cm solid #000000&#8221; or &#8216;none&#8217;</p>
+<p>padding, padding_top, padding_right, padding_bottom, padding_left &#8211; str,
+e.g. &#8220;0.002cm&#8221; or &#8216;none&#8217;</p>
 <p>shadow &#8211; str, e.g. &#8220;#808080 0.176cm 0.176cm&#8221;</p>
 </div></blockquote>
 <p>&#8216;table-row&#8217; Properties:</p>
@@ -631,7 +633,7 @@ e.g. &#8220;0.002cm solid #000000&#8221; or &#8216;none&#8217;</p>
 
 <dl class="function">
 <dt id="lpod.style.odf_create_table_cell_style">
-<tt class="descclassname">lpod.style.</tt><tt class="descname">odf_create_table_cell_style</tt><big>(</big><em>border=None</em>, <em>border_top=None</em>, <em>border_bottom=None</em>, <em>border_left=None</em>, <em>border_right=None</em>, <em>background_color=None</em>, <em>shadow=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#lpod.style.odf_create_table_cell_style" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">lpod.style.</tt><tt class="descname">odf_create_table_cell_style</tt><big>(</big><em>border=None</em>, <em>border_top=None</em>, <em>border_bottom=None</em>, <em>border_left=None</em>, <em>border_right=None</em>, <em>padding=None</em>, <em>padding_top=None</em>, <em>padding_bottom=None</em>, <em>padding_left=None</em>, <em>padding_right=None</em>, <em>background_color=None</em>, <em>shadow=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#lpod.style.odf_create_table_cell_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a cell style.</p>
 <p>The borders arguments must be some style attribute strings or None, see the
 method &#8216;make_table_cell_border_string&#8217; to generate them.
@@ -641,13 +643,22 @@ If any value is used for border, it is used for the 4 borders, else any of
 the 4 borders can be specified by it&#8217;s own string. If all the border,
 border_top, border_bottom, ... arguments are None, an empty border is used
 (ODF value is fo:border=&#8221;none&#8221;).</p>
+<p>Padding arguments are string specifying a length (e.g. &#8220;0.5mm&#8221;)&#8221;. If
+&#8216;padding&#8217; is provided, it is used for the 4 sides, else any of
+the 4 sides padding can be specified by it&#8217;s own string. Default padding is
+no padding.</p>
 <p>Arguments:</p>
 <blockquote>
-<div><p>border &#8211; str, style string for 4 borders</p>
+<div><p>border &#8211; str, style string for borders on four sides</p>
 <p>border_top &#8211; str, style string for top if no &#8216;border&#8217; argument</p>
 <p>border_bottom &#8211; str, style string for bottom if no &#8216;border&#8217; argument</p>
 <p>border_left &#8211; str, style string for left if no &#8216;border&#8217; argument</p>
 <p>border_right &#8211; str, style string for right if no &#8216;border&#8217; argument</p>
+<p>padding &#8211; str, style string for padding on four sides</p>
+<p>padding_top &#8211; str, style string for top if no &#8216;padding&#8217; argument</p>
+<p>padding_bottom &#8211; str, style string for bottom if no &#8216;padding&#8217; argument</p>
+<p>padding_left &#8211; str, style string for left if no &#8216;padding&#8217; argument</p>
+<p>padding_right &#8211; str, style string for right if no &#8216;padding&#8217; argument</p>
 <p>background_color &#8211; str or rgb 3-tuple, str is &#8216;black&#8217;, &#8216;grey&#8217;, ... or &#8216;#012345&#8217;</p>
 <p>shadow &#8211; str, e.g. &#8220;#808080 0.176cm 0.176cm&#8221;</p>
 <p>color &#8211; str or rgb 3-tuple, str is &#8216;black&#8217;, &#8216;grey&#8217;, ... or &#8216;#012345&#8217;</p>
@@ -735,7 +746,7 @@ Arguments:</p>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2013, lpOD team.
-      Last updated on Last release: lpOD 1.1.7. Last modified: 2014-01-28 13:45..
+      Last updated on Last release: lpOD 1.1.7. Last modified: 2014-01-29 13:47..
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
     </div>
   </body>

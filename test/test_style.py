@@ -622,13 +622,17 @@ class Table_cell_style_test(TestCase):
                                 background_color='yellow',
                                 color=(128,64,32),
                                 border_left=border_left,
-                                border_right=border_right)
+                                border_right=border_right,
+                                padding_right='0.05pt')
         self.assertEqual(style.serialize(), ('<style:style '
             'style:family="table-cell"><style:table-cell-properties '
-            'fo:border-top="none" fo:border-left="0.06pt solid #0000FF" '
-            'fo:background-color="#FFFF00" '
-            'fo:border-right="0.60pt solid #000000" fo:border-bottom="none"/>'
-            '<style:text-properties fo:color="#804020"/></style:style>'))
+            'fo:border-top="none" fo:background-color="#FFFF00" '
+            'fo:border-left="0.06pt solid #0000FF" fo:padding-bottom="none" '
+            'fo:padding-right="0.05pt" fo:padding-left="none" '
+            'fo:padding-top="none" fo:border-bottom="none" '
+            'fo:border-right="0.60pt solid #000000"/>'
+            '<style:text-properties fo:color="#804020"/>'
+            '</style:style>'))
 
 
     def test_odf_create_table_cell_style_default_border(self):
@@ -645,6 +649,25 @@ class Table_cell_style_test(TestCase):
             'style:family="table-cell"><style:table-cell-properties '
             'fo:border="none"/>'
             '</style:style>'))
+
+
+    def test_odf_create_table_cell_style_padding(self):
+        style = odf_create_table_cell_style(padding='0.5mm')
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:border="none" fo:padding="0.5mm"/>'
+            '</style:style>'))
+
+
+    def test_odf_create_table_cell_style_padding_some(self):
+        style = odf_create_table_cell_style(padding_top='0.6mm',
+                                            padding_bottom='0.7mm')
+        self.assertEqual(style.serialize(), ('<style:style '
+            'style:family="table-cell"><style:table-cell-properties '
+            'fo:padding-top="0.6mm" fo:padding-left="none" fo:border="none" '
+            'fo:padding-right="none" fo:padding-bottom="0.7mm"/>'
+            '</style:style>'))
+
 
 if __name__ == '__main__':
     main()
